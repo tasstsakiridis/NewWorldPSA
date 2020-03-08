@@ -1,0 +1,20 @@
+<template>
+    <lightning-card title={labels.filters.label} icon-name="utility:calibration">
+        <div class="slds-m-horizontal_medium">
+            <section>
+                <lightning-input type="checkbox"
+                                 label={labels.myAgreements.label}
+                                 name="i_MyAgreements"
+                                 value={myAgreements}
+                                 onchange={handleMyAgreementsChange}></lightning-input>
+            </section>
+            <section>
+                <lightning-input type="date"
+                                 name="i_StartDate"
+                                 label={labels.startDate.label}
+                                 value={startDate}
+                                 onchange={handleStartDateChange}></lightning-input>
+            </section>
+        </div>
+    </lightning-card>
+</template>

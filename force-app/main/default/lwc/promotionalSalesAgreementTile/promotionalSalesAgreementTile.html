@@ -1,0 +1,27 @@
+<template>
+    <div>
+        <a onclick={handleClick}>
+            <div class="content">
+                <template if:true={isNewAgreement}>
+                    <div class="slds-align_absolute-center new-agreement-placeholder">{name}</div>
+                    <div class="footer">
+                        <lightning-icon icon-name="utility:new" alternative-text="New" title="New"></lightning-icon>
+                        {name}
+                    </div>
+                </template>
+                <template if:false={isNewAgreement}>
+                    <p class="title slds-align_absolute-center">{name}</p>
+                    <p class="slds-align_absolute-center">{accountName}</p>
+                    <p class="slds-align_absolute-center">{signingCustomer}</p>
+                    <p class="slds-align_absolute-center">
+                        <lightning-formatted-date-time value={startDate}
+                                                  year="numeric" month="short" day="2-digit" weekday="long"></lightning-formatted-date-time>
+                        &nbsp;-&nbsp;
+                        <lightning-formatted-date-time value={endDate}
+                                                  year="numeric" month="short" day="2-digit" weekday="long"></lightning-formatted-date-time>                                              
+                    </p>    
+                </template>
+            </div>
+        </a>
+    </div>
+</template>

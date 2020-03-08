@@ -1,0 +1,33 @@
+body {
+}
+.content {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    min-height: 7rem;
+}
+
+a {
+    color: inherit;
+}
+
+img.account {
+    height: 12px;
+    max-width: initial;
+    pointer-events: none;
+}
+
+.title {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.tile {
+    border: 1px solid #e6e6e6;
+    border-radius: 0.25rem;
+}
+.tileSelected {
+    border: 2px solid #406EC8;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 5px grey;
+}

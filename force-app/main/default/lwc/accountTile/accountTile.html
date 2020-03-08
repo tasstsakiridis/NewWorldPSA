@@ -1,0 +1,20 @@
+<template>
+    <div class={tileClass}>
+        <a onclick={handleClick}>
+            <div class="content">
+                <template if:true={pictureUrl}>
+                    <img src={pictureUrl} class="account slds-m-around_x-small" alt="Account picture" />
+                </template>
+                <p class="title slds-align_absolute-center slds-m-bottom_x-small">{accountName}</p>
+                <p class="slds-align_absolute-center">
+                    <lightning-formatted-address street={accountStreet}
+                                                 city={accountCity}
+                                                 country={accountCountry}
+                                                 postal-code={accountPostalCode}
+                                                 province={accountState}></lightning-formatted-address>
+                </p>
+            </div>
+        </a>
+    </div>
+    
+</template>

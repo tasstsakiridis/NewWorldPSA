@@ -1,0 +1,123 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-partners">
+                                <lightning-icon icon-name="standard:partners" alternative-text="Agreement" title="Promotional Sales Agreement" ></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>&nbsp;</span>
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}</span>                                        
+                                    </h1>
+                                </div>
+                            </div>
+                            <template if:true={psaItems}>
+                                <p class="slds-page-header__name-meta">{psaItemCount}</p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <template if:false={isPhone}>
+                    <div class="slds-page-header__col-actions">
+                        <div class="slds-page-header__controls">
+                            <div class="slds-page-header__control">
+                                <lightning-button-group>
+                                <!--
+                                    <lightning-input type="toggle"
+                                        message-toggle-active={labels.viewSelected.label}
+                                        message-toggle-inactive={labels.allProducts.label}
+                                        class="slds-m-horizontal_large"
+                                        onchange={handleShowSelectedChange}></lightning-input>
+                                -->
+                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </article>
+    <template if:true={isPhone}>
+        <lightning-layout multiple-rows="true">
+            <lightning-layout-item size="12">
+                <lightning-layout horizontal-align="spread">
+                    <lightning-layout-item>
+                        <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                    </lightning-layout-item>
+                    <lightning-layout-item>
+                        <lightning-button-icon icon-name="utility:filterList" title="Brand Filters" alternative-text="Brand Filters" class="slds-m-right_x-small" onclick={handleFilterButtonClick}></lightning-button-icon>
+                    </lightning-layout-item>
+                    <lightning-layout-item>
+                        <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                    </lightning-layout-item>        
+                </lightning-layout>
+            </lightning-layout-item>
+            <!--
+            <lightning-layout-item size="12">
+                <lightning-input type="toggle"
+                    message-toggle-active={labels.viewSelected.label}
+                    message-toggle-inactive={labels.allProducts.label}
+                    class="slds-m-horizontal_large slds-float_right"
+                    onchange={handleShowSelectedChange}></lightning-input>
+
+            </lightning-layout-item>
+        -->
+        </lightning-layout>        
+    </template>
+
+
+    <div class="card-body slds-m-top_small">
+        <section>
+            <template if:true={products}>
+                <lightning-layout>
+                    <template if:true={showBrandFilter}>
+                        <lightning-layout-item size="3" padding="around-small">
+                            <c-brand-filter ></c-brand-filter>
+                        </lightning-layout-item>
+                    </template>
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size={productLayoutSize} padding="around-small">
+                        <template if:true={products.records.length}>
+                            <div class="content">
+                                <template for:each={products.records} for:item="product">
+                                    <c-product-tile key={product.id} 
+                                                product={product.product}
+                                                psa-item={product.psaItem} 
+                                                onselected={handleProductSelected} ></c-product-tile>
+                                </template>    
+                            </div>
+                            <c-paginator page-number={pageNumber}
+                                            page-size={products.pageSize}
+                                            total-item-count={products.totalItemCount}
+                                            object-type={labels.product.labelPlural}
+                                            onprevious={handlePreviousPage}
+                                            onnext={handleNextPage}></c-paginator>  
+                        </template>      
+                    </lightning-layout-item>
+                    <template if:false={isPhone}>
+                        <template if:true={showPSADetailsForm}>
+                            <lightning-layout-item size="3" padding="around-small" class="slds-border_left">
+                                <c-promotional-sales-agreement-item-form 
+                                            psa-id={psaId} 
+                                            psa-item-id={selectedPSAItemId} 
+                                            product-id={selectedProductId} 
+                                            product-name={selectedProductName} 
+                                            promotion-id={promotionId}
+                                            onsave={handleSavePSADetails}
+                                            onclose={handleClosePSADetailForm}></c-promotional-sales-agreement-item-form>
+                            </lightning-layout-item>
+                        </template>    
+                    </template>
+                </lightning-layout>
+            </template>
+        </section>
+    </div>
+</template>

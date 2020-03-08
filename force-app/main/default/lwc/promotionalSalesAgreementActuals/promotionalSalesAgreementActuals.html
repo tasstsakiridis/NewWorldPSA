@@ -1,0 +1,71 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-partners">
+                                <lightning-icon icon-name="standard:partners" alternative-text="Agreement" title="Promotional Sales Agreement" ></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>&nbsp;</span>
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}</span>                                        
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <template if:false={isPhone}>
+                    <div class="slds-page-header__col-actions">
+                        <div class="slds-page-header__controls">
+                            <div class="slds-page-header__control">
+                                <lightning-button-group>
+                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_medium" onclick={handleHelpButtonClick}></lightning-button-icon>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </article>
+    <template if:true={isPhone}>
+        <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+        <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+    </template>
+
+
+    <div class="card-body slds-m-top_small">        
+        <lightning-layout>
+            <lightning-layout-item size="12" small-device-size="12" large-device-size="7" padding="around-small" class="right-border">
+                <!-- Tree -->
+                <template if:true={treeItems}>
+                    <div class="pageLeftMargin" >
+                        <lightning-tree items={treeItems} header={psaName} class="large-font" onselect={handleOnSelect}></lightning-tree>
+                    </div>
+                </template>
+            </lightning-layout-item>
+            <template if:false={isPhone}>
+                <lightning-layout-item size="12" small-device-size="12" large-device-size="5" padding="around-small">
+                    <!-- Actuals record-->
+                    <template if:true={showActualsForm}>
+                        <c-promotional-sales-agreement-actuals-form 
+                                    psa-id={psaId} 
+                                    account-id={selectedAccountId} 
+                                    pmia-id={selectedPMIAId} 
+                                    pmi-id={selectedPMIId}
+                                    onclose={handleCloseForm}
+                                    onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>
+                    </template>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+</template>

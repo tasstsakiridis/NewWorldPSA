@@ -1,0 +1,12 @@
+.content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+c-brand-tile {
+    margin: 0.5rem;
+}
+
+c-paginator {
+    display: block;
+}

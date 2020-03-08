@@ -1,0 +1,14 @@
+.card-body {
+    background-color: #fff;
+}
+
+.destructive {
+    color: red;
+}
+
+img.product {
+    height: 80px;
+    max-height: 80px;
+    max-width: initial;
+    pointer-events: none;
+}

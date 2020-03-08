@@ -1,0 +1,138 @@
+<template>
+    <lightning-card>
+        <h3 slot="title" class="slds-text-title_caps">
+            {labels.actuals.label}
+        </h3>
+        <template if:false={isPhone}>
+            <lightning-button-group slot="actions">
+                <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                <template if:true={canEdit}>
+                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
+                </template>
+                <template if:true={pmiRecords}>
+                    <lightning-formatted-text value={multipleRecordsMessage} ></lightning-formatted-text>
+                    <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" onclick={handleSkipButtonClick}></lightning-button>
+                    <template if:false={isFirstRecord}>
+                        <lightning-button label={labels.prev.label} icon-name="utility:left" title="Previous" class="" onclick={handlePreviousRecordButtonClick}></lightning-button>                        
+                    </template>                    
+                    <template if:false={isLastRecord}>
+                        <lightning-button label={labels.next.label} icon-name="utility:right" title="Next" class="" onclick={handleNextRecordButtonClick}></lightning-button>                        
+                    </template>                    
+                </template>
+                <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+            </lightning-button-group>
+        </template>
+        <div>
+            <template if:true={isPhone}>
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item size="12">
+                        <lightning-layout>
+                            <lightning-layout-item size="2">
+                                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="7" class="slds-text-align_center">
+                                <template if:true={canEdit}>
+                                    <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                                </template>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="3">
+                                <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                            </lightning-layout-item>        
+                        </lightning-layout>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>    
+        </div>
+
+        <div class="card-body slds-m-top_small">
+            <lightning-layout multiple-rows="true">
+                <lightning-layout-item size="12" padding="around-small">
+                    <p class="slds-text-title_caps">{accountLabel}</p>
+                    <span class="slds-text-heading_medium">{accountName}</span>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <p class="slds-text-title_caps">{productLabel}</p>
+                    <span class="slds-text-heading_medium">{productName}</span>
+                </lightning-layout-item>
+                <template if:false={canEdit}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.processed.label}</p>
+                        <span class="slds-text-heading_medium">{processedMessage}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.status.label}</p>
+                        <span class="slds-text-heading_medium">{approvalStatus}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <template if:true={isPhone}>
+                            <p class="slds-text-title_caps">{actualQtylabel}</p>
+                            <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                        </template>
+                        <template if:false={isPhone}>
+                            <p>
+                                <span class="slds-text-title_caps">{actualQtyFormattedLabel}</span>
+                            </p>                            
+                        </template>
+                        <lightning-formatted-number value={actualQty} maximum-fraction-digits="0" class="slds-text-heading_medium" ></lightning-formatted-number>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{paymentDateLabel}</p>
+                        <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
+                        <span class="slds-text-heading_medium">{wholesalerName}</span>
+                    </lightning-layout-item>
+                </template>
+                <template if:true={canEdit}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <template if:true={isFinanceUser}>
+                            <lightning-combobox name="i_ApprovalStatus"
+                                                label={labels.status.label}
+                                                value={approvalStatus}
+                                                options={approvalStatusOptions}
+                                                onchange={handleApprovalStatusChange}>
+                            </lightning-combobox>
+                        </template>
+                        <template if:false={isFinanceUser}>
+                            <p>{labels.status.label}</p>
+                            <span>{approvalStatus}</span>
+                        </template>    
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
+                        <template if:true={isPhone}>
+                            <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                        </template>
+                        <lightning-input type="number" 
+                                         label={actualQtyFormattedLabel} 
+                                         name="i_ActQty" value={actualQty} 
+                                         placeholder={actualQtyPlaceholder} 
+                                         onchange={handleActualQtyChange}></lightning-input>
+                        <template if:true={hasActualQtyError}>
+                            <span class="error">{actualQtyErrorMessage}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                        <lightning-input type="date" 
+                                         label={paymentDateLabel} 
+                                         name="i_PaymentDate" 
+                                         value={formattedPaymentDate} 
+                                         placeholder={paymentDatePlaceholder} 
+                                         onchange={handlePaymentDateChange}></lightning-input>
+                        <template if:true={hasPaymentDateError}>
+                            <span class="error">{paymentDateErrorMessage}</span>
+                        </template>
+                    </lightning-layout-item>    
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                        <lightning-combobox name="i_Wholesaler"
+                            label={labels.purchasedFrom.label}
+                            value={wholesaler}
+                            options={wholesalerOptions}
+                            onchange={handleWholesalerChange}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </template>
+            </lightning-layout>
+        </div>
+    </lightning-card>
+</template>

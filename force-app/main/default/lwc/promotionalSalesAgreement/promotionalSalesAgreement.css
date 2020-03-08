@@ -1,0 +1,38 @@
+.card-body {
+    background-color: #ffffff;
+    border: 1px #e6e6e6 solid;
+    border-radius: 5px;
+}
+
+.content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.input-error {
+    color: red;
+    font-size: x-small;
+}
+.error-large {
+    font-size: large;
+}
+
+.vl {
+    border-left: 1px solid #e6e6e6;
+    margin: 2rem 0px;
+}
+.border-left {
+    border-left: 1px #e6e6e6 solid;
+}
+.border-bottom {
+    border-bottom: 1px #e6e6e6 solid;
+}
+.border-right {
+    border-right: 1px #e6e6e6 solid;
+}
+
+@media screen and (max-width: 600px) {
+    .right-border {
+        border-right: none;
+    }
+}

@@ -1,0 +1,220 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-partners">
+                                <lightning-icon icon-name="standard:partners" alternative-text="Agreement" title="Promotional Sales Agreement" ></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>&nbsp;</span>
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                       
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <template if:false={isPhone}>
+                    <div class="slds-page-header__col-actions">
+                        <div class="slds-page-header__controls">
+                            <div class="slds-page-header__control">
+                                <lightning-button-group>
+                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
+                                    <template if:true={canSubmitForApproval}>
+                                        <lightning-button label={label.submitForApproval.label} icon-name="utility:approval" title="Submit for Approval" class="slds-m-horizontal_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canClone}>
+                                        <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canEditItems}>
+                                        <lightning-button label={labels.items.label} icon-name="utility:snippet" title="Items" class="slds-m-horizontal_x-small" onclick={handleItemsButtonClick} ></lightning-button>
+                                    </template>
+                                    <template if:true={canEditActuals}>
+                                        <lightning-button label={labels.actuals.label} icon-name="utility:task" title="Actuals" class="slds-m-horizontal_x-small" onclick={handleActualsButtonClick}></lightning-button>
+                                    </template>
+                                    <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </article>
+    <template if:true={isPhone}>
+        <lightning-layout>
+            <lightning-layout-item size="2">
+                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item size="8" class="slds-text-align_center">
+                <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                <template if:true={canSubmitForApproval}>
+                    <lightning-button-icon icon-name="utility:approval" title="Submit for Approval" alternative-text="Submit for Approval" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={canClone}>
+                    <lightning-button-icon icon-name="utility:copy" title="Clone" alternative-text={labels.clone.label} class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={canEditItems}>
+                    <lightning-button-icon icon-name="utility:snippet" title="Items" alternative-text="Items" class="slds-m-right_x-small" onclick={handleItemsButtonClick}></lightning-button-icon>            
+                </template>
+                <template if:true={canEditActuals}>
+                    <lightning-button-icon icon-name="utility:task" title="Actuals" class="slds-m-horizontal_x-small" onclick={handleActualsButtonClick}></lightning-button-icon>
+                </template>
+            </lightning-layout-item>
+            <lightning-layout-item size="2">
+                <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+        </lightning-layout>        
+    </template>
+
+    <template if:true={error}>
+        <c-inline-message message={error} errors={errors} type="error"></c-inline-message>
+    </template>
+
+    <div class="card-body slds-m-top_small">
+        <lightning-layout multiple-rows={isPhone}>
+            <lightning-layout-item size="12" small-device-size="12" large-device-size="4" class="border-right">
+                <h2 class="slds-text-title_caps slds-m-around_small">{labels.dateRange.label}</h2>
+                <lightning-layout multiple-rows="true" class="slds-m-vertical_small">
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-input type="date" name="i_StartDate" label={labels.startDate.label} value={formattedStartDate} class="slds-m-horizontal_small" onchange={handleStartDateChange}></lightning-input>
+                        <template if:true={hasStartDateError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.startDate.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.label} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                        <template if:true={hasLengthOfPSAError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">Agreement will end on</h2>
+                        <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
+                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.routeToMarket.label}</h3>                        
+                        <lightning-combobox name="i_WholesalerPreferred"
+                                            label={labels.preferredRTM.label}
+                                            placeholder={labels.preferredRTM.placeholder}
+                                            value={wholesalerPreferred}
+                                            options={wholesalers}
+                                            onchange={handlePreferredRTMChange}>
+                        </lightning-combobox>
+                        <template if:true={hasPreferredRTMError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.preferredRTM.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-combobox name="i_WholesalerAlternate"
+                                            label={labels.alternateRTM.label}
+                                            placeholder={labels.alternateRTM.placeholder}
+                                            value={wholesalerAlternate}
+                                            options={wholesalers}
+                                            onchange={handleAlternateRTMChange}>
+                        </lightning-combobox>
+                        <template if:true={hasAlternateRTMError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.alternateRTM.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" small-device-size="12" large-device-size="8" class="slds-m-horizontal_small">
+                <h2 class="slds-text-title_caps slds-m-around_small">{labels.customerDetails.label}</h2>
+                <lightning-layout multiple-rows="true" class="slds-m-around_small">
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size="6" padding="around-small">
+                        <lightning-input type="search" name="i_search_account" label={accountSearchInputLabel} is-loading={isSearching} onchange={handleSearchAccountChange}></lightning-input>
+                        <div class="slds-float_right slds-m-top_x-small">
+                            <lightning-button-group>
+                                <lightning-input type="toggle" class="account-type-toggle" name="accountTypeSearchOption" checked message-toggle-active={labels.parentAccount.label} message-toggle-inactive={labels.account.label} onchange={handleAccountTypeToggle}></lightning-input>        
+                                <lightning-button label={labels.search.label} icon-name="utility:search" title="Search for Account" alternative-text="Search for account" class="slds-m-left_small" disabled={isSearching} onclick={handleAccountSearchButtonClick}></lightning-button>
+                            </lightning-button-group>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size="6" padding="around-small">
+                        <template if:true={hasParentAccountError}>
+                            <div class="slds-m-horizontal_small">
+                                <span class="input-error error-large">{labels.parentAccount.error}</span>
+                            </div>
+                        </template>
+                        <template if:true={parentAccount}>
+                            <div class="">
+                                <h3 class="slds-m-around_small border-bottom">{labels.signingCustomerHeader.label}</h3>
+                                <template if:true={signingCustomer}>
+                                    <span class="slds-text-heading_medium slds-m-horizontal_medium">{signingCustomerName}</span>
+                                    <template if:true={hasMultipleSigningContacts}>
+                                        <template if:true={isPhone}>
+                                            <lightning-button-icon variant="bare" icon-name="utility:edit" alternative-text="change" title="Change" onclick={handleChangeSigningCustomerClick}></lightning-button-icon>
+                                        </template>
+                                        <template if:false={isPhone}>
+                                            <lightning-button variant="base" label={labels.change.labelLowercase} class="lowercase slds-m-left_x-small" icon-name="utility:edit" icon-position="right" title="Change" alternative-text="Change signing customer" onclick={handleChangeSigningCustomerClick}></lightning-button>
+                                        </template>
+                                    </template>
+                                </template>
+                                <template if:false={signingCustomer}>
+                                    <div class="slds-m-horizontal_medium">
+                                        <span class="slds-text-title_caps">{labels.noSigningCustomers.message}</span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div>
+                                <h3 class="slds-m-around_small border-bottom">{labels.companyDetails.label}</h3>
+                                <lightning-button variant="base" label={labels.clear.label} icon-name="utility:clear" class="slds-float_right" onclick={handleClearAccountDetailsClick}></lightning-button>
+                            </div>
+                            <h4 class="slds-text-heading_medium slds-m-horizontal_medium slds-truncate">{accountName}</h4>
+                            <div class="slds-m-top_x-small slds-m-horizontal_medium">
+                                <lightning-formatted-address street={accountStreet} city={accountCity} province={accountState} country={accountCountry} postal-code={accountPostalCode} class="slds-truncate"></lightning-formatted-address>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12">
+                        <hr class="slds-m-around_medium" />
+                        <span class="slds-m-around_small">{accountsHeader}</span>
+                        <template if:true={showAccountActions}>
+                            <lightning-button-group class="slds-float_right slds-m-right_small">
+                                <lightning-button label={labels.selectAll.label} icon-name="utility:locker_service_api_viewer" title="Select All accounts" onclick={handleSelectAllAccountsClick}></lightning-button>
+                                <lightning-button label={labels.deSelectAll.label} icon-name="utility:matrix" title="UnSelect All accounts" onclick={handleUnSelectAllAccountsClick}></lightning-button>
+                            </lightning-button-group>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12">
+                        <template if:true={hasChildAccountsError}>
+                            <span class="slds-m-horizontal_small input-error">Please select atleast one account</span>
+                        </template>
+                        
+                        <template if:true={accounts}>
+                            <template if:true={accounts.records.length}>
+                                <div class="content">
+                                    <template for:each={accounts.records} for:item="account">
+                                        <c-account-tile key={account.item.Id} 
+                                                        account={account}
+                                                        onselected={handleAccountSelected}
+                                                        ondeselected={handleAccountDeSelected}
+                                                        class="slds-m-around_x-small"></c-account-tile>
+                                    </template>    
+                                </div>
+                                <c-paginator page-number={pageNumber}
+                                            page-size={accounts.pageSize}
+                                            total-item-count={accounts.totalItemCount}
+                                            object-type={labels.account.labelPlural}
+                                            onprevious={handlePreviousPage}
+                                            onnext={handleNextPage}></c-paginator>
+                                    
+                            </template>
+                        </template>
+                    </lightning-layout-item>                    
+                </lightning-layout>
+            </lightning-layout-item>
+        </lightning-layout>
+    
+    </div>
+
+</template>

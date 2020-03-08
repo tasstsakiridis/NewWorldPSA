@@ -1,0 +1,159 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <img src={productImageUrl} class="product slds-m-around_x-small" alt="Product picture" />
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-m-bottom_small" style="word-wrap: normal;" title={productName}>{productName}</span>                                        
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <template if:true={isWorking}>
+        <div class="slds-m-around_medium slds-align_absolute-center">
+            <lightning-spinner alternative-text="Saving. Please wait..."></lightning-spinner>
+            <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
+    <template if:false={isWorking}>
+    <div class="card-body slds-m-top_small slds-p-top_small">
+        <lightning-layout horizontal-align="space" class="slds-m-around_small">
+            <lightning-layout-item>
+                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="" onclick={handleCancelButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item>
+                <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <template if:true={canDelete}>
+                <lightning-layout-item>
+                    <lightning-button-icon variant="brand" icon-name="utility:delete" label="" title="Delete" alternative-text="Delete" onclick={handleDeleteButtonClick}></lightning-button-icon>
+                </lightning-layout-item>
+            </template>
+            <lightning-layout-item>
+                <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right" onclick={handleHelpButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+        </lightning-layout>        
+
+        <lightning-layout multiple-rows="true" horizontal-align="center">
+            <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                <!-- Total Investment -->
+                <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
+                <lightning-formatted-number label="Total Investment" value={totalInvestment}
+                                            format-style="currency"
+                                            currency-display-as="symbol">
+                </lightning-formatted-number>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Brand Status -->
+                <lightning-combobox name="i_BrandStatus" 
+                                    label={brandStatusLabel}
+                                    value={brandStatus}
+                                    placeholder={brandStatusPlaceholder}
+                                    options={brandStatusOptions}
+                                    onchange={handleBrandStatusChange}>
+                </lightning-combobox>
+            </lightning-layout-item>                        
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Volume Forecast -->
+                <lightning-input type="number" name="i_VolumeForecast" 
+                                 label={labels.volumeForecast.label}
+                                 value={volumeForecast}
+                                 onchange={handleVolumeForecastChange}
+                                 required >
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Discounts per Case -->
+                <lightning-input type="number" name="i_DiscountPerCase" 
+                                 label={labels.discountPerCase.label}
+                                 value={discount}
+                                 onchange={handleDiscountChange}
+                                 required
+                                 formatter="currency">
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Listing Fee -->
+                <lightning-input type="number" name="i_ListingFee" 
+                                 label={listingFeeLabel}
+                                 value={listingFee}
+                                 onchange={handleListingFeeChange}
+                                 required
+                                 formatter="currency">
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Drink Strategy -->
+                <lightning-combobox name="i_DrinkStrategy" label={drinkStrategyLabel}
+                                    value={drinkStrategy}
+                                    placeholder={drinkStrategyPlaceholder}
+                                    options={drinkStrategyOptions}
+                                    onchange={handleDrinkStrategyChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Promotional Activity -->
+                <lightning-combobox name="i_PromotionalActivity" 
+                                    label={promotionalActivityLabel}
+                                    value={promotionalActivity}
+                                    placeholder={promotionalActivityPlaceholder}
+                                    options={promotionalActivityOptions}
+                                    onchange={handlePromotionalActivityChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Promotional Activity Amount -->
+                <lightning-input type="number" name="i_PromotionalActivityAmount" 
+                                 label={promotionalActivityLabel}
+                                 value={promotionalActivityAmount}
+                                 onchange={handlePromotionalActivityValueChange}
+                                 required
+                                 formatter="currency">
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Training & Advocacy -->
+                <lightning-combobox name="i_TrainingAdvocacy" 
+                                    label={trainingAdvocacyLabel}
+                                    value={trainingAdvocacy}
+                                    placeholder={trainingAdvocacyPlaceholder}
+                                    options={trainingAdvocacyOptions}
+                                    onchange={handleTrainingAdvocacyChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Training & Advocacy Amount -->
+                <lightning-input type="number" name="i_TrainingAdvocacyAmount" 
+                                 label={trainingAdvocacyLabel}
+                                 value={trainingAdvocacyAmount}
+                                 onchange={handleTrainingAdvocacyValueChange}
+                                 required
+                                 formatter="currency">
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Outlet to Provide -->
+                <lightning-combobox name="i_OutletToProvide" label={outletToProvideLabel}
+                                    value={outletToProvide}
+                                    placeholder={outletToProvidePlaceholder}
+                                    options={outletToProvideOptions}
+                                    onchange={handleOutletToProvideChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+    </template>    
+</template>

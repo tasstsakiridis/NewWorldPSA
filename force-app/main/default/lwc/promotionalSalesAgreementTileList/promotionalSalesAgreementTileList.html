@@ -1,0 +1,29 @@
+<template>
+    <lightning-card class="">
+        <lightning-button label={labels.new.label} title="New" onclick={handleNewButtonClick} slot="actions"></lightning-button>
+        <template if:true={agreements.data}>
+            <template if:true={agreements.data.records.length}>
+                <div class="content">
+                    <template for:each={agreements.data.records} for:item="agreement">
+                        <c-promotional-sales-agreement-tile key={agreement.Id}
+                                          agreement={agreement}
+                                          class="slds-m-around_x-small">
+                        </c-promotional-sales-agreement-tile>                        
+                    </template>
+                </div>
+                <c-paginator page-number={pageNumber}
+                             page-size={agreements.data.pageSize}
+                             total-item-count={agreements.data.totalItemCount}
+                             onprevious={handlePreviousPage}
+                             onnext={handleNextPage}>
+                </c-paginator>
+            </template>
+            <template if:false={agreements.data.records.length}>
+                <c-placeholder message={labels.noAgreements.message} ></c-placeholder>
+            </template>
+        </template>
+        <template if:true={agreements.error}>
+            <c-inline-message errors={agreements.error}></c-inline-message>
+        </template>
+    </lightning-card>
+</template>
