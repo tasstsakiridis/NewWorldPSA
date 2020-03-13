@@ -65,6 +65,9 @@ public with sharing class PSAWrapper {
     @AuraEnabled 
     public Integer lengthOfPSA { get; set; }
 
+    @AuraEnabled
+    public Boolean isLengthInYears { get; set; }
+
     @AuraEnabled 
     public Date beginDate { get; set; }
 
@@ -109,6 +112,7 @@ public with sharing class PSAWrapper {
         this.parentAccountId = '';
         this.signingCustomerId = '';
         this.lengthOfPSA = 0;
+        this.isLengthInYears = true;
         this.beginDate = null;
         this.endDate = null;
         this.wholesalerAlternateId = '';
@@ -132,6 +136,7 @@ public with sharing class PSAWrapper {
         this.parentAccountId = psa.Account__c;
         this.signingCustomerId = psa.Contact__c;
         this.lengthOfPSA = Integer.valueOf(psa.Length_of_Agreement__c);
+        this.isLengthInYears = psa.Is_Length_in_Years__c;
         this.beginDate = psa.Begin_Date__c;
         this.endDate = psa.End_Date__c;
         this.wholesalerAlternateId = psa.Wholesaler_Alternate__c;

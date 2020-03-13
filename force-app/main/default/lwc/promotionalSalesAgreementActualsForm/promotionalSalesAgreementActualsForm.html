@@ -28,7 +28,7 @@
                     <lightning-layout-item size="12">
                         <lightning-layout>
                             <lightning-layout-item size="2">
-                                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
                             </lightning-layout-item>
                             <lightning-layout-item size="7" class="slds-text-align_center">
                                 <template if:true={canEdit}>
@@ -47,11 +47,11 @@
         <div class="card-body slds-m-top_small">
             <lightning-layout multiple-rows="true">
                 <lightning-layout-item size="12" padding="around-small">
-                    <p class="slds-text-title_caps">{accountLabel}</p>
+                    <p class="slds-text-title_caps">{labels.account.label}</p>
                     <span class="slds-text-heading_medium">{accountName}</span>
                 </lightning-layout-item>
                 <lightning-layout-item size="12" padding="around-small">
-                    <p class="slds-text-title_caps">{productLabel}</p>
+                    <p class="slds-text-title_caps">{labels.product.label}</p>
                     <span class="slds-text-heading_medium">{productName}</span>
                 </lightning-layout-item>
                 <template if:false={canEdit}>
@@ -65,7 +65,7 @@
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
                         <template if:true={isPhone}>
-                            <p class="slds-text-title_caps">{actualQtylabel}</p>
+                            <p class="slds-text-title_caps">{labels.actualQty.label}</p>
                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                         </template>
                         <template if:false={isPhone}>
@@ -76,7 +76,7 @@
                         <lightning-formatted-number value={actualQty} maximum-fraction-digits="0" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{paymentDateLabel}</p>
+                        <p class="slds-text-title_caps">{label.paymentDate.label}</p>
                         <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
@@ -114,7 +114,7 @@
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                         <lightning-input type="date" 
-                                         label={paymentDateLabel} 
+                                         label={labels.paymentDate.label} 
                                          name="i_PaymentDate" 
                                          value={formattedPaymentDate} 
                                          placeholder={paymentDatePlaceholder} 

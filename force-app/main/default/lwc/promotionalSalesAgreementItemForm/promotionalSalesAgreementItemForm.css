@@ -12,3 +12,23 @@ img.product {
     max-width: initial;
     pointer-events: none;
 }
+
+.input-error {
+    color: red;
+    font-size: x-small;
+}
+
+.label {
+    font-size: 0.75rem;
+}
+
+select {
+    width: 100%;
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+select > option {
+    font-family: 'Salesforce Sans',Arial,sans-serif;
+    font-size: 0.8125rem;
+    color: #080707;
+}

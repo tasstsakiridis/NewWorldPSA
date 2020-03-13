@@ -28,28 +28,29 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled(Cacheable=true)
-    public static String getUserMarket() {
+    public static Market__c getUserMarket() {
         User u = [SELECT Id, Market__c FROM User WHERE Id =:UserInfo.getUserId()];
-        String market = 'Australia';
+        String marketName = 'Australia';
         if (u != null && u.Market__c != null) {
-            market = u.Market__c;
+            marketName = u.Market__c;
         }
+        Market__c market = [SELECT Id, Name, Maximum_Agreement_Length__c FROM Market__c WHERE Name =:marketName LIMIT 1];
         return market;
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Promotion_Activity__c getPSA(String psaId){
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
                                             Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
-                                            Contact__c, Contact__r.Name, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Channel__c,
+                                            Contact__c, Contact__r.Name, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, 
                                                     Account__r.ShippingCountry, Account__r.ShippingPostalCode FROM Promotions__r),
                                             (SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
-                                                    Drink_Strategy__c, Status__c, Listing_Fee__c, Outlet_to_Provide__c, Promotional_Activity__c,
+                                                    Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
                                                     Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
-                                                    Total_Investment__c FROM Promotion_Material_Items__r), 
+                                                    Total_Investment__c, Comments_Long__c FROM Promotion_Material_Items__r), 
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
                                                     Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name FROM PMI_Actuals__r ORDER BY Payment_Date__c)
@@ -111,7 +112,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         String soql = 'SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,';
         soql += '(SELECT Id, Name FROM Contacts WHERE Decision_Maker__c = true)';
         soql += ' FROM Account WHERE Name LIKE \'%' + accountName + '%\'';
-        soql += ' AND Market__r.Name = \'' + market + '\'';
+        soql += ' AND Market__c = \'' + market + '\'';
         if (isSearchingForParent) {
             soql += ' AND RecordType.Name = \'Parent\'';
         } else {
@@ -149,17 +150,17 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return result;
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Promotion_Material_Item__c getPSAItemDetails(String psaItemId) {
         return [SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Brand_Status__c, Approval_Status__c, Plan_Rebate__c, 
                        Plan_Volume__c, Drink_Strategy__c, Status__c, Listing_Fee__c, Outlet_to_Provide__c, Promotional_Activity__c,
                        Promotional_Activity_Value__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
-                       Total_Investment__c, Product_Custom__r.Image_Name__c
+                       Total_Investment__c, Product_Custom__r.Image_Name__c, Comments_Long__c
                   FROM Promotion_Material_Item__c 
                  WHERE Id =:psaItemId];
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Product__c getProductDetails(String productId) {
         return [SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c 
                   FROM Product__c 
@@ -222,11 +223,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return [SELECT Id, Name 
                   FROM Wholesaler__c 
                  WHERE Is_Active__c = true
-                   AND Market__r.Name =:market  
+                   AND Market__c =:market  
                   WITH SECURITY_ENFORCED];
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static PMI_Actual__c getPMIADetails(String pmiaId) {
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, Activity__c, Promotion__c, Account__c, Account_Name__c,
                        Promotion_Material_Item__c, Product__c, Product_Name__c, Act_Qty__c, Actual_Discount__c, 

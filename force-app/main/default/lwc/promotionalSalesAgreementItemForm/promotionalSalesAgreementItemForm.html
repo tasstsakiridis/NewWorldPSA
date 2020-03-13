@@ -58,22 +58,23 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Brand Status -->
-                <lightning-combobox name="i_BrandStatus" 
-                                    label={brandStatusLabel}
-                                    value={brandStatus}
-                                    placeholder={brandStatusPlaceholder}
-                                    options={brandStatusOptions}
-                                    onchange={handleBrandStatusChange}>
-                </lightning-combobox>
+                <p class="label">{brandStatusLabel}</p>
+                <select class="brandStatus" multiple onchange={handleBSChange}>
+                    <template for:each={brandStatusOptions} for:item="bs">
+                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
+                    </template>
+                </select>
             </lightning-layout-item>                        
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
                 <lightning-input type="number" name="i_VolumeForecast" 
                                  label={labels.volumeForecast.label}
                                  value={volumeForecast}
-                                 onchange={handleVolumeForecastChange}
-                                 required >
+                                 onchange={handleVolumeForecastChange}>
                 </lightning-input>
+                <template if:true={hasVolumeForecastError}>
+                    <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                </template>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Discounts per Case -->
@@ -81,9 +82,11 @@
                                  label={labels.discountPerCase.label}
                                  value={discount}
                                  onchange={handleDiscountChange}
-                                 required
                                  formatter="currency">
                 </lightning-input>
+                <template if:true={hasDiscountError}>
+                    <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                </template>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Listing Fee -->
@@ -97,22 +100,21 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Drink Strategy -->
-                <lightning-combobox name="i_DrinkStrategy" label={drinkStrategyLabel}
-                                    value={drinkStrategy}
-                                    placeholder={drinkStrategyPlaceholder}
-                                    options={drinkStrategyOptions}
-                                    onchange={handleDrinkStrategyChange}>
-                </lightning-combobox>
+                <p class="label">{drinkStrategyLabel}</p>
+                <select class="drinkStrategy" multiple>
+                    <template for:each={drinkStrategyOptions} for:item="bs">
+                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
+                    </template>
+                </select>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity -->
-                <lightning-combobox name="i_PromotionalActivity" 
-                                    label={promotionalActivityLabel}
-                                    value={promotionalActivity}
-                                    placeholder={promotionalActivityPlaceholder}
-                                    options={promotionalActivityOptions}
-                                    onchange={handlePromotionalActivityChange}>
-                </lightning-combobox>
+                <p class="label">{promotionalActivityLabel}</p>
+                <select class="promotionalActivity" multiple>
+                    <template for:each={promotionalActivityOptions} for:item="bs">
+                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
+                    </template>
+                </select>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity Amount -->
@@ -126,13 +128,12 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy -->
-                <lightning-combobox name="i_TrainingAdvocacy" 
-                                    label={trainingAdvocacyLabel}
-                                    value={trainingAdvocacy}
-                                    placeholder={trainingAdvocacyPlaceholder}
-                                    options={trainingAdvocacyOptions}
-                                    onchange={handleTrainingAdvocacyChange}>
-                </lightning-combobox>
+                <p class="label">{trainingAdvocacyLabel}</p>
+                <select class="trainingAdvocacy" multiple>
+                    <template for:each={trainingAdvocacyOptions} for:item="bs">
+                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
+                    </template>
+                </select>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy Amount -->
@@ -146,12 +147,21 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Outlet to Provide -->
-                <lightning-combobox name="i_OutletToProvide" label={outletToProvideLabel}
-                                    value={outletToProvide}
-                                    placeholder={outletToProvidePlaceholder}
-                                    options={outletToProvideOptions}
-                                    onchange={handleOutletToProvideChange}>
-                </lightning-combobox>
+                <p class="label">{outletToProvideLabel}</p>
+                <select class="outletToProvide" multiple>
+                    <template for:each={outletToProvideOptions} for:item="bs">
+                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
+                    </template>
+                </select>
+
+            </lightning-layout-item>
+            <lightning-layout-item size="12" padding="around-small">
+                <lightning-input name="i_Comments" type="text"
+                                 max="32768"
+                                 value={comments}
+                                 label={labels.comments.label}
+                                 placeholder={labels.comments.placeholder}>
+                </lightning-input>
             </lightning-layout-item>
         </lightning-layout>
     </div>

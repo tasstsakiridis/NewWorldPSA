@@ -56,6 +56,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     selectedProductId;
     selectedProductName;
     selectedPSAItemId;
+    loadProducts = true;
 
     get isThisTass() {
         return userId == '00530000005n92iAAA';
@@ -77,62 +78,78 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         return this.thePSA == null ? '' : this.thePSA.Name;
     }
 
-    @wire(CurrentPageReference) pageRef;
+    pageRef;
+    @wire(CurrentPageReference)
+    setCurrentPageReference(currentPageReference) {
+        this.pageRef = currentPageReference;
+        this.currentPageReference = currentPageReference;
+        console.log('[psaitems.setcurrentpagerefernce] pageref', currentPageReference);
+        this.psaId = currentPageReference.state.c__psaId;
+        if (currentPageReference.state.c__promotionId) {
+            this.promotionId = currentPageReference.state.c__promotionId;
+        }
+        if (currentPageReference.state.c__productId) {
+            this.productId = currentPageReference.state.c__productId;
+        }
+        if (currentPageReference.state.c__psaItemId) {
+            this.psaItemId = currentPageReference.state.c__psaItemId;
+        }
+        if (currentPageReference.state.c__showPSADetailForm) {
+            this.showPSADetailsForm = currentPageReference.state.c__showPSADetailForm;
+        }
+    }
 
-    //wiredAgreement;
-    //@wire(getPSA, {psaId: '$psaId'})
-    //wiredGetAgreement(value) {
-    //    this.wiredAgreement = value;
-    getAgreement(loadProducts) {
+    wiredAgreement;
+    @wire(getPSA, {psaId: '$psaId'})
+    wiredGetAgreement(value) {
+        this.wiredAgreement = value;
         console.log('[psaItems.getPSA] psaId', this.psaId);
-        getPSA({psaId: this.psaId})
-            .then(record => {
-                console.log('[psaItems.getPSA] getpsa', record);
-                this.error = undefined;
-                this.thePSA = record;
-                this.promotionId = this.thePSA.Promotions__r[0].Id;
-                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                    this.psaItems.clear();
-                    this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
-                        this.psaItems.set(pmi.Product_Custom__c, pmi);
-                    });
-                    console.log('psaItems', this.psaItems);
-                    console.log('products', this.products);
-        
-                }
-
-                if (loadProducts) {
-                    this.getProductList();
-                } else {
-                    console.log('[handlesave] products', this.products);
-                    const newList = this.products.records.map(p => {
-                        const newItem = {
-                            id: p.id,
-                            product: p.product,
-                            psaItem: {}
-                        };
-        
-                        if (this.psaItems.has(p.id)) {
-                            newItem.psaItem = this.psaItems.get(p.id);
-                        }
-                        return newItem;
-                    })
-                    this.products = {
-                        pageSize: this.products.pageSize,
-                        pageNumber: this.products.pageNumber,
-                        records: newList,
-                        totalItemCount: this.products.totalItemCount
+        console.log('[psaItems.getPSA] value', value);
+        if (value.error) {
+            this.error = value.error;
+            this.thePSA = undefined;
+        } else if (value.data) {
+            this.error = undefined;
+            this.thePSA = value.data;
+            this.promotionId = this.thePSA.Promotions__r[0].Id;
+            if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
+                this.psaItems.clear();
+                this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
+                    this.psaItems.set(pmi.Product_Custom__c, pmi);
+                });
+                console.log('psaItems', this.psaItems);
+                const newList = this.products.records.map(p => {
+                    const newItem = {
+                        id: p.id,
+                        product: p.product,
+                        psaItem: {}
                     };
-                    console.log('[psaItems.handlesavepsa] products', this.products);
-        
-                }
+    
+                    if (this.psaItems.has(p.id)) {
+                        newItem.psaItem = this.psaItems.get(p.id);
+                    }
+                    return newItem;
+                })
+                this.products = {
+                    pageSize: this.products.pageSize,
+                    pageNumber: this.products.pageNumber,
+                    records: newList,
+                    totalItemCount: this.products.totalItemCount
+                };
 
-        
-            })
-            .catch(error => {
-                this.error = error;
-                this.thePSA = undefined;    
-            });
+                console.log('products', this.products);
+    
+            }
+
+            if (this.loadProducts) {
+                //this.pageNumber = 1;
+            } else {
+                console.log('[handlesave] products', this.products);
+                console.log('[psaItems.handlesavepsa] products', this.products);
+    
+            }
+
+        }
     };
 
     brands;
@@ -140,85 +157,58 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         records: []
     };
     wiredProducts;
-    getProductList() {
-        console.log('[getProductList]');
-        try {
-            if (this.isThisTass && this.isPhone) {
-                alert('loading products');
-            }
-        getProducts({pageNumber: this.pageNumber}) 
-            .then(result => {
-                console.log('[getProducts] result', result);
-                const newList = result.records.map(p => {
-                    const obj = {
-                        id: p.Id,
-                        product: p,
-                        psaItem: {}
-                    };
-                    if (this.psaItems.has(p.Id)) {
-                        obj.psaItem = this.psaItems.get(p.Id);
-                    }
-                    return obj;
-                });
-                this.products = {
-                    pageSize: result.pageSize,
-                    pageNumber: result.pageNumber,
-                    records: newList,
-                    totalItemCount: result.totalItemCount
+    @wire(getProducts, {pageNumber: '$pageNumber'})
+    wiredGetProducts(value) {
+        this.wiredProducts = value;
+        if (value.error) {
+            this.error = value.error;
+            this.products = undefined;
+        } else if (value.data) {
+            this.error = undefined;
+            const newList = value.data.records.map(p => {
+                const obj = {
+                    id: p.Id,
+                    product: p,
+                    psaItem: {}
                 };
-                this.wiredProducts = this.products;
-                console.log('[getProducts] products', this.products);
-                if (this.isPhone && this.isThisTass) {
-                    alert('finished loading products');
+                if (this.psaItems.has(p.Id)) {
+                    obj.psaItem = this.psaItems.get(p.Id);
                 }
-            })
-            .catch(error => {
-                this.error = error;
-                this.products = undefined;
+                return obj;
             });
-            
-        }catch(ex) {
-            console.log('[getproducts] exception', ex);
+            console.log('[psaItems.getProducts] psaItems', this.psaItems);
+            console.log('[psaItems.getProducts] newList', newList);
+            this.products = {
+                pageSize: value.data.pageSize,
+                pageNumber: value.data.pageNumber,
+                records: newList,
+                totalItemCount: value.data.totalItemCount
+            };
+            console.log('[getProducts] products', this.products);
+            if (this.isPhone && this.isThisTass) {
+                alert('finished loading products');
+            }    
         }
     }
 
-    getPSAItem(psaItemId) {
-        getPSAItemDetails({psaItemId: psaItemId})
-            .then(result => {
-                try {
-                    console.log('[psaitems.getpsaitemdetails] psaitem', result);
-                    console.log('[psaItems.getpsaitemdetails] wiredproducts', this.wiredProducts);
-                    this.wiredProducts.records.forEach(p => {
-                        if (p.product.Id === result.Product_Custom__c) {
-                            p.psaItem = result; return true;
-                        }
-                    });
-                    this.products.records.forEach(p => {
-                        if (p.product.Id === result.Product_Custom__c) {
-                            console.log('[psaitems.getpsaitemdetails] product found updating psaitem');
-                            p.psaItem = result; return true;
-                        }
-                    });
-                    this.psaItems.set(result.Product_Custom__c, result);
-                    console.log('[psaItems.getpsaitemdetails] products', this.products);
-                    console.log('[psaItems.getpsaitemdetails] psaItems', this.psaItems);
-                }catch(ex) {
-                    console.log('[psaitems.getpsaitemdetails] exception', ex);
+    wiredPSAItem;
+    @wire(getPSAItemDetails, { psaItemId: '$psaItemId'})
+    wiredGetPSAItem(value) {
+        this.wiredPSAItem = value;
+        if (value.error) {
+            this.error = value.error;
+            this.psaItem = undefined;
+        } else if (value.data) {
+            this.error = undefined;
+            this.psaItem = value.data;
+            this.products.records.forEach(p => {
+                if (p.product.Id === value.data.Product_Custom__c) {
+                    console.log('[psaitems.getpsaitemdetails] product found updating psaitem');
+                    p.psaItem = value.data; return true;
                 }
-            })
-            .catch(error => {
-                this.error = error;
-                console.log('[psaitems.getpsaitemDetails] error', error);
-                /*
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error getting details of updated Promotional Sales Agreement Item',
-                        message: error.body.message,
-                        variant: 'error'
-                    }),
-                );
-                */
             });
+            this.psaItems.set(value.data.Product_Custom__c, value.data);
+        }
     }
     
     get psaItemCount() {
@@ -231,7 +221,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     connectedCallback() {
         registerListener('brandsSelected', this.handleBrandsSelected, this);
 
-        this.getAgreement(true);
+        //this.getAgreement(true);
     }
 
     disconnectedCallback() {
@@ -255,6 +245,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         }, true);
         }catch(ex) {
             console.log('[handelCancelButtonClick] exception', ex);
+            if (this.isPhone && this.isThisTass) {
+                alert('[psaItem.handlecancel] exception', ex);
+            }
         }
     }
 
@@ -272,8 +265,16 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         this.selectedPSAItemId = event.detail.psaItemId;
         this.selectedProductName = event.detail.productName;
 
+
         if (CLIENT_FORM_FACTOR === 'Large') {
-            this.showPSADetailsForm = true;
+            //this.showPSADetailsForm = true;
+            this[NavigationMixin.Navigate](this.getUpdatedPageReference({
+                c__psaId: this.psaId,
+                c__productId: event.detail.productId,
+                c__psaItemId: event.detail.psaItemId,
+                c__promotionId: this.promotionId,
+                c__showPSADetailForm: true
+            }), true);
         } else {
             if (this.isThisTass) {
                 alert('product selected: ' + event.detail.productId + ', psaitemid: ' + event.detail.psaItemId);
@@ -306,18 +307,41 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaItems.handlesavepsa] volume', event.detail.volume);
             console.log('[psaItems.handlesavepsa] discount', event.detail.discount);
             console.log('[psaItems.handlesavepsa] investment', event.detail.totalInvestment);
-            /*
-            this.wiredAgreement = refreshApex(this.wiredAgreement);
-            this.thePSA = this.wiredAgreement.data;
-            if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                this.psaItems.clear();
-                this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
-                    this.psaItems.set(pmi.Product_Custom__c, pmi);
+            if (event.detail.psaItemId == undefined) {
+                this.wiredAgreement = refreshApex(this.wiredAgreement);
+                this.thePSA = this.wiredAgreement.data;
+                console.log('[psaItems.handlesavepsa] wiredagreement', this.wiredAgreement);
+                console.log('[psaItems.handlesavepsa] psa', this.thePSA);
+                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
+                    this.psaItems.clear();
+                    this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
+                        this.psaItems.set(pmi.Product_Custom__c, pmi);
+                    });
+                    console.log('psaItems', this.psaItems);
+                }    
+            } else {  
+                const item = this.psaItems.get(event.detail.productId); 
+                const newItem = Object.assign({}, item);
+                newItem.Plan_Rebate__c = event.detail.discount;
+                newItem.Plan_Volume__c = event.detail.volume;
+                newItem.Total_Investment__c = event.detail.totalInvestment;
+                console.log('[psaitems.handlesave] newitem', newItem);
+                this.psaItems.set(event.detail.productId, newItem);
+                this.products.records.forEach(p => {
+                    if (p.product.Id === event.detail.productId) {
+                        p.psaItem = newItem;
+                        console.log('[psaitems.handlesave] product found updating psaitem');
+                        /*
+                        p.psaItem.Plan_Rebate__c = event.detail.discount; 
+                        p.psaItem.Volume_Forecast__c = event.detail.volume;
+                        p.psaItem.Total_Investment__c = event.detail.totalInvestment;
+                        */
+                        return true;
+                    }
                 });
-                console.log('psaItems', this.psaItems);
             }
-            */
-            this.getAgreement(false);
+            
+            //this.getAgreement(false);
 
 
         //const psaItemId = event.detail;
@@ -344,6 +368,13 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     /**
      * Helper functions
      */
+    getUpdatedPageReference(stateChanges) {
+        console.log('[psaitems.getupdatedpagereference] statechanges', stateChanges);
+        return Object.assign({}, this.currentPageReference, {
+            state: Object.assign({}, this.currentPageReference.state, stateChanges)
+        });
+    }
+
     handleBrandsSelected(brandsSelected) {
         console.log('[productItems.handleBrandsSelected] brands', brandsSelected);
         console.log('[productItems.handleBrandsSelected] wiredProducts', this.wiredProducts.data);

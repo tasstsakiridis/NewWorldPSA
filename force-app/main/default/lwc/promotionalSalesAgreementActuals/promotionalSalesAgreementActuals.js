@@ -21,8 +21,14 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         createNew    : { label: 'Create new...' },
         createNewForAllProducts : { label: 'Create new for all products...' }
     };    
-
-    @wire(CurrentPageReference) pageRef;
+    
+    @wire(CurrentPageReference)
+    setCurrentPageReference(currentPageReference) {
+        this.currentPageReference = currentPageReference;
+        console.log('[psaactuals.setcurrentpagerefernce] pageref', currentPageReference);
+        this.psaId = currentPageReference.state.c__psaId;
+        this.showActualsForm = currentPageReference.state.c__showActualsForm;
+    }
 
     isPhone = (CLIENT_FORM_FACTOR === "Small");
     get pageLeftMargin() {
@@ -35,25 +41,25 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     selectedPMIAId;
     selectedPMIId;
     selectedAccountId;
-    showActualsForm = false;
+    showActualsForm;
+    connected = false;
 
     treeItems;
     error;
     thePSA;
     wiredPSA;
-    //@wire(getPSA, {psaId: '$psaId'})
-    //getWiredPSA(value) {
-    //this.wiredPSA = value;
-    getAgreement() {
-        getPSA({psaId: this.psaId})
-            .then(record => {
-                this.error = undefined;
-                this.thePSA = record;
-                this.buildTree();    
-            }).catch(error => {
-                this.error = error;
-                this.thePSA = undefined;
-            });
+    @wire(getPSA, {psaId: '$psaId'})
+    getWiredPSA(value) {
+        this.wiredPSA = value;
+        console.log('[psaactuals.getWiredPSA] psa', value);
+        if (value.error) {
+            this.error = value.error;
+            this.thePSA = undefined;
+        } else if (value.data) {
+            this.error = undefined;
+            this.thePSA = value.data;
+            this.buildTree();
+        }
     }
 
     get psaName() {
@@ -64,7 +70,21 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
      * Handle lifecycle events
      */
     connectedCallback() {
-        this.getAgreement();
+        //this.getAgreement();
+        this.connected = true;
+        /*
+        console.log('[psaactuals.connectedCallback] psaId', this.psaId);
+        if (this.thePSA != undefined && this.psaId !== this.thePSA.Id) {
+            console.log('[psaactuals.connectedCallback] refreshing apex');
+            refreshApex(this.wiredPSA);
+            this.thePSA = this.wiredPSA.data;
+            console.log('[psaactuals.connectedCallback] refreshing apex. thePSA', this.thePSA);
+            this.buildTree();
+        }
+        */
+    }
+    renderredCallback() {
+        console.log('[psaactuals.renderredCallback] psaId', this.psaId);
     }
     /**
      * Handle Actuals Form evnts
@@ -80,10 +100,11 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     handleSaveForm(event) {
         try {
         console.log('[psaActuals.handleSaveForm] detail', event.detail);
-        //this.wiredPSA = refreshApex(this.wiredPSA);
-        //this.thePSA = this.wiredPSA.data;
-        //this.buildTree();
-            this.getAgreement();
+            console.log('[psaActuals.handleSaveForm] detail.id', event.detail.Id);
+            this.wiredPSA = refreshApex(this.wiredPSA);
+            this.thePSA = this.wiredPSA.data;
+            this.buildTree();
+            //this.getAgreement();
         } catch(ex) {
             console.log('[psaActuals.handleSaveForm] exception', ex);
         }
@@ -113,28 +134,75 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             console.log('handle on select. name', event.detail.name);
             const parts = event.detail.name.split('_');
             let prefix = event.detail.name.substring(0, 4);
-            let id = event.detail.name.substring(4);        
-            if (prefix === 'new_') { 
-                this.selectedAccountId = parts[2];           
-                this.selectedPMIId = parts[1];
-                this.selectedPMIAId = undefined;
-                this.showActualsForm = true;
-                if (this.showActualsForm) {
-                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').createNew();
-                }
+            let id = event.detail.name.substring(4); 
+            console.log('[psaactuals.handleonselect] prefix', prefix);       
+            console.log('[psaactuals.handleonselect] parts[0]', parts[0]);       
+            let newState;
+            if (parts[0] === 'new') {     
+                console.log('[psaactuals.handleonselect] setting up for new pmia');            
+                newState = {
+                    c__psaId: this.psaId,
+                    c__pmiaId: undefined,
+                    c__promotionId: parts[2],
+                    c__pmiId: parts[1],
+                    c__showActualsForm: true
+                };
             } else if (parts[0] === 'newaccount') {
+                newState = { 
+                        c__psaId: this.psaId,
+                        c__pmiaId: undefined,
+                        c__promotionId: parts[2],
+                        c__pmiId: undefined,
+                        c__showActualsForm: true
+                }
+                /*
                 this.selectedAccountId = parts[1];
                 this.selectedPMIId = undefined;
                 this.selectedPMIAId = undefined;
-                this.showActualsForm = true;
                 if (this.showActualsForm) {
-                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').createNew();
+                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').createNew(this.selectedAccountId, this.psaId);
+                } else {
+                    this.showActualsForm = true;
                 }
+                */
             } else if (parts[0] === 'pmia') {
-                this.selectedAccountId = undefined;
-                this.selectedPMIId = undefined;
-                this.selectedPMIAId = parts[1];
-                this.showActualsForm = true;
+                //this.selectedAccountId = undefined;
+                //this.selectedPMIId = undefined;
+                //this.selectedPMIAId = parts[1];
+                /*
+                this.currentPageReference = this.getUpdatedPageReference({
+                    c__psaId: this.psaId,
+                    c__pmiaId: parts[1],
+                    c__promotionId: undefined,
+                    c__pmiId: undefined,
+                    c__showActualsForm: true 
+                });*/
+                newState = {
+                    c__psaId: this.psaId,
+                    c__pmiaId: parts[1],
+                    c__promotionId: undefined,
+                    c__pmiId: undefined,
+                    c__showActualsForm: true
+                };
+                //this[NavigationMixin.Navigate](this.currentPageReference, true);
+                /*
+                if (this.showActualsForm) {
+                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').loadPMIA(this.selectedPMIAId, this.psaId);
+                } else {
+                    this.showActualsForm = true;
+                }
+                */
+            }
+            if (this.isPhone) {
+                this[NavigationMixin.Navigate]({
+                    type: 'standard__component',
+                    attributes: {
+                        componentName: 'c__PromotionalSalesAgreementActualsFormContainer'
+                    },
+                    state: newState
+                });
+            } else {
+                this[NavigationMixin.Navigate](this.getUpdatedPageReference(newState), true);
             }
         }catch(ex) {
             console.log('[handleOnSelect] exception', ex);
@@ -144,6 +212,12 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     /**
      * Helper functions
      */    
+    getUpdatedPageReference(stateChanges) {
+        console.log('[psaactuals.getupdatedpagereference] statechanges', stateChanges);
+        return Object.assign({}, this.currentPageReference, {
+            state: Object.assign({}, this.currentPageReference.state, stateChanges)
+        });
+    }
     buildTree() {
         console.log('[actuals.buildTree] thepsa', this.thePSA);
         try {

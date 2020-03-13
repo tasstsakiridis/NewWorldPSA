@@ -2,8 +2,6 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
-import PRODUCT_IMAGES from '@salesforce/resourceUrl/ProductImages';
-
 export default class ProductTile extends LightningElement {
 
     tileClass = 'tile';
@@ -12,6 +10,7 @@ export default class ProductTile extends LightningElement {
 
     connectedCallback() {
         registerListener('selectTile', this.handleSelectTile, this);
+        registerListener('psaupdated', this.handlePSAUpdate, this);
     }
 
     disconnectedCallback() {
@@ -81,7 +80,22 @@ export default class ProductTile extends LightningElement {
     handleSelectTile(isSelected) {
         console.log('[producttile] selectTile method called');
         this.isSelected = isSelected;
-        this.selectTile();
+        //this.selectTile();
+    }
+    handlePSAUpdate(detail) {
+        console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem.Id);
+        try {
+        if (detail.psaItemId === this.psaItem.Id) {   
+            const newItem = Object.assign({}, this.psaItem);                     
+            newItem.Plan_Rebate__c = detail.discount;
+            newItem.Plan_Volume__c = detail.volume;
+            newItem.Total_Investment__c = detail.totalInvestment;
+            this.psaItem = Object.assign({}, newItem);
+            console.log('[producttile.handlepsaupdated] psaitem', this.psaItem);
+        }
+        }catch(ex) {
+            console.log('[producttile.handlepsaupdated] exception', ex);
+        }
     }
 
     handleClick(event) {

@@ -18,6 +18,8 @@ import savePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.saveP
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
+import userId from '@salesforce/user/Id';
+
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
@@ -72,7 +74,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         customerDetails         : { label: 'Customer Details' },
         companyDetails          : { label: 'Company Details' },
         startDate               : { label: 'This agreement will start at', error: 'No Start Date selected' },
-        lengthOfPSA             : { label: 'Length of Agreement (in years)', error: 'Please select from one of the Length of Agreement options' },
+        lengthOfPSA             : { yearsLabel: 'Length of Agreement (in years)', monthsLabel: 'Length of Agreement (in months)', error: 'Please select from one of the Length of Agreement options' },
         parentAccount           : { label: 'Parent Account', error: 'No Parent or Retail Account selected and no Signing Customer selected' },
         account                 : { label: 'Account', labelPlural: 'Accounts' },        
         retailAccountsHeading   : { label: 'Names of individual outlets in estate and parts of business included in PSA' },
@@ -89,7 +91,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         noSigningCustomers      : { message: 'There are no contacts for this account setup as decision makers.'},
         error                   : { message: 'Errors found validating/saving the PSA.  Please review and try saving again.' },
         saveError               : { message: 'Error saving PSA' },
-        saveSuccess             : { message: 'All changes saved successfully'}
+        saveSuccess             : { message: 'All changes saved successfully'},
+        year                    : { label: 'year', labelPlural: 'years' },
+        month                   : { label: 'month', labelPlural: 'months' }
         
     };
 
@@ -128,106 +132,38 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     wiredAccount;
 
     wiredAgreement;
-    //@wire(getPSA, {psaId: '$recordId'})
-    //wiredGetAgreement(value) {
-    getAgreement() {
-        getPSA({psaId: this.recordId})
-            .then(record => {
-                this.error = undefined;
-
-                console.log('[getAgreement] data', record);
-                if (this.thePSA == undefined) { this.thePSA = {}; }
-                this.thePSA = Object.assign(this.thePSA, record);            
-                console.log('[getAgreement] psa', this.thePSA);
-                this.psaId = record.Id;
-                try {
-                    if (record.Account__c) {
-                        this.parentAccount = {
-                            Id: record.Account__c,
-                            Name: record.Account__r.Name,
-                            ShippingStreet: record.Account__r.ShippingStreet,
-                            ShippingCity: record.Account__r.ShippingCity,
-                            ShippingCountry: record.Account__r.ShippingCountry,
-                            ShippingState: record.Account__r.ShippingState,
-                            ShippingCountry: record.Account__r.ShippingCountry,
-                            Contacts: [record.Contact__r]
-                        };
-                        this.isSearchingForParent = false;
-                        this.isUsingParentAccount = record.Account__r.RecordType.Name === 'Parent';
-                        const el = this.template.querySelector("lightning-input.account-type-toggle");
-                        console.log('[getPSA] account-type-toggle', el);
-                        if (el) {
-                            el.checked = this.isUsingParentAccount;
-                        }
-                        //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
-                    }
-                    this.wholesalerPreferred = record.Wholesaler_Preferred__c;
-                    this.wholesalerAlternate = record.Wholesaler_Alternate__c;
-                    if (record.Begin_Date__c) {
-                        this.startDate = new Date(record.Begin_Date__c);
-                    }
-                    if (record.Length_of_Agreement__c) {
-                        this.lengthOfPSA = record.Length_of_Agreement__c.toString();
-                    }
-    
-                    this.selectedAccounts.clear();
-                    this.promotionsToDelete.clear();
-                            
-                    if (record.Promotions__r != undefined && record.Promotions__r.length > 0) {
-                        record.Promotions__r.forEach(p => {
-                            this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
-                        });
-                        getAccountsForParent({ parentAccountId: this.parentAccount.Id, pageNumber: 1 })
-                            .then(result => {
-                                try {
-                                console.log('[getAccountsForParent] result', result);
-                                const newList = result.records.map(account => {
-                                    var isSelected = this.selectedAccounts.has(account.Id);
-        
-                                    return { item: account, isSelected: isSelected };
-                                });
-                                console.log('[getAccountsForParent] children', newList);
-                                this.accounts = {
-                                    pageSize: result.pageSize,
-                                    pageNumber: result.pageNumber,
-                                    records: newList,
-                                    totalItemCount: result.totalItemCount
-                                };
-                                }catch(ex) {
-                                    console.log('[getAccountsForParent] exception', ex);
-                                }
-                            })
-                            .catch(error => {
-                                console.log('[getAccountsForParent] error', error);
-                                this.error = error;
-                                this.accounts = undefined;
-                            });
-        
-                    }
-                }catch(ex) {
-                    console.log('[getPSA] exception', ex);
-                }
-            })
-            .catch(error => {
-                this.error = error;
-                this.thePSA = undefined;    
-            });
-            console.log('[getAgreement] after psa', this.thePSA);
-
-        
+    @wire(getPSA, {psaId: '$recordId'})
+    wiredGetAgreement(value) {
+        this.wiredAgreement = value;
+        console.log('[psa.getagreement] value', value);
+        if (this.isPhone && this.isThisTass) {
+            alert('[psa.getagreement]');
+        }
+        if (value.error) {
+            this.error = value.error;
+            this.thePSA = undefined;
+        } else if (value.data) {
+            this.error = undefined;
+            this.loadPSADetails(value.data);
+        }
     }
 
     @wire(CurrentPageReference) pageRef;
 
     market = '';
+    marketId = '';
     @wire(getUserMarket)
-    wiredMarket({ error, data }) {
-        if (data) {
-            this.market = data;
+    wiredMarket(value) {
+        console.log('[psa.getmarket] value', value);
+        if (value.data) {
+            this.market = value.data;
             this.error = undefined;
-        } else if (error) {
-            this.error = error;
-            this.market = 'Australia';
+            this.marketId = this.market.Id;
+            this.maximumLengthOfPSA = this.market.Maximum_Agreement_Length__c == undefined ? 3 : this.market.Maximum_Agreement_Length__c;            
+        } else if (value.error) {
+            this.error = value.error;
+            this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
+            this.showToast('warning', labels.generalError.title, 'Could not load market details.  Check the Market setting on your user profile');
         }
     }
 
@@ -235,9 +171,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     wholesalers;
     wholesalerPreferred;
     wholesalerAlternate;
-    @wire(getWholesalers, { market: '$market'})
+    @wire(getWholesalers, { market: '$marketId'})
     wiredGetWholesalers({ error, data }) {
         if (data) {
+            if (this.isPhone && this.isThisTass) {
+                alert('[psa.getwholesalers]');
+            }
             console.log('[wiredGetWholesalers] wholesalers', data);
             this.error = undefined;
             this.wiredWholesalers = data;
@@ -251,12 +190,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
 
     isPhone = CLIENT_FORM_FACTOR === "Small";
+    get isThisTass() {
+        return userId == '00530000005n92iAAA';
+    }
 
 
     @track
     lengthOfPSA = '1';
     
     get canClone() {
+        return false;
         return this.thePSA != null;
     }
     get canEditItems() {
@@ -276,7 +219,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.thePSA == undefined ? LABEL_NEW : this.thePSA.Status__c;
     }
 
+    isLengthInYears = true;
+
+    maximumLengthOfPSA = 3;
     get lengthOfPSAOptions() {
+        console.log('[psa.lengthofpsaoptions] max length of psa', this.maximumLengthOfPSA);
+        const options = [];
+        for(var i = 0; i < this.maximumLengthOfPSA; i++) {
+            options.push({label: (i+1).toString(), value: (i+1).toString()});
+        }
+        return options;
         return [
             { label: '1', value: '1' },
             { label: '2', value: '2' },
@@ -294,11 +246,21 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get endDate() {
         var theDate = this.startDate == null ? new Date() : this.startDate;
-        var year = theDate.getFullYear() + parseInt(this.lengthOfPSA);
+        var year = theDate.getFullYear();
         var month = theDate.getMonth();
         var day = theDate.getDate();
-        console.log('[endDate] theDate', theDate, year, month, day);
-        return new Date(year, month, day);
+        let newDate = new Date(year, month, day);
+        console.log('[enddate] islengthinyears', this.isLengthInYears, this.lengthOfPSA, newDate);
+        if (this.isLengthInYears) {
+            newDate.setFullYear(newDate.getFullYear() + parseInt(this.lengthOfPSA));
+        } else {
+            newDate.setMonth(newDate.getMonth() + parseInt(this.lengthOfPSA));
+        }
+        if (newDate > theDate) {
+            newDate.setDate(newDate.getDate() - 1);
+        }
+        console.log('[endDate] theDate', theDate, year, month, day, newDate);
+        return newDate;
     }    
 
     parentAccount;
@@ -396,8 +358,19 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     connectedCallback() {
         // Register Event Listeners
         //registerListener('accountSelected', this.handleAccountSelected, this);
-        this.getAgreement();
+        //this.getAgreement();
+        console.log('[psa.connectedCallback] psaId', this.psaId);        
     }    
+    renderedCallback() {
+        console.log('[psa.renderredCallback] psaId', this.psaId);    
+        if (!this.isLengthInYears) {
+            this.template.querySelector("lightning-input.length-type-toggle").checked = this.isLengthInYears;            
+        }    
+        if (!this.isUsingParentAccount) {
+            this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;            
+        }
+        
+    }
 
     /*
         Handle Button Clicks
@@ -452,7 +425,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             state: {
                 c__psaId: this.recordId
             }
-        });        
+        });
     }
     handleSubmitForApprovalButtonClick(event) {
 
@@ -523,6 +496,22 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleAlternateRTMChange(event) {
         this.wholesalerAlternate = event.detail.value;
     }
+    handleLengthTypeToggle(event) {
+        try {            
+            this.isLengthInYears = event.detail.checked;   
+            let newLength = 1;         
+            if (this.isLengthInYears) {
+                newLength = Math.floor(this.lengthOfPSA / 12).toString();
+                if (newLength < 1) { newLength = 1; }
+                this.lengthOfPSA = newLength.toString();
+            } else {
+                this.lengthOfPSA = parseInt(this.lengthOfPSA) * 12;
+            }
+            console.log('[psa.handlelengthtypetoggle] islength in year, length', this.isLengthInYears, this.lengthOfPSA);
+        }catch(ex) {
+            console.log('[psa.handlelengthtypechange] length type', event.detail.checked);
+        }
+    }
 
     /*
         Handle Listener events
@@ -563,6 +552,102 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
 
+    /**
+     * Helper functions
+     */
+    loadPSADetails(data) {
+        //this.thePSA = Object.assign(this.thePSA, record);            
+        try {
+            this.thePSA = { ...data };
+            console.log('[getAgreement] psa', this.thePSA);
+            this.psaId = data.Id;
+            if (data.Account__c) {
+                this.parentAccount = {
+                    Id: data.Account__c,
+                    Name: data.Account__r.Name,
+                    ShippingStreet: data.Account__r.ShippingStreet,
+                    ShippingCity: data.Account__r.ShippingCity,
+                    ShippingCountry: data.Account__r.ShippingCountry,
+                    ShippingState: data.Account__r.ShippingState,
+                    ShippingCountry: data.Account__r.ShippingCountry,
+                    Contacts: [data.Contact__r]
+                };
+                this.isSearchingForParent = false;
+                this.isUsingParentAccount = data.Account__r.RecordType.Name === 'Parent';
+                const el = this.template.querySelector("lightning-input.account-type-toggle");
+                console.log('[getPSA] account-type-toggle', el);
+                if (el) {
+                    el.checked = this.isUsingParentAccount;
+                }
+                //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
+            }
+            this.wholesalerPreferred = data.Wholesaler_Preferred__c;
+            this.wholesalerAlternate = data.Wholesaler_Alternate__c;
+            if (data.Begin_Date__c) {
+                this.startDate = new Date(data.Begin_Date__c);
+            }
+            if (data.Is_Length_in_Years__c != undefined) {
+                this.isLengthInYears = data.Is_Length_in_Years__c;
+            }
+            if (data.Length_of_Agreement__c != undefined) {
+                if (this.isLengthInYears) {
+                    this.lengthOfPSA = data.Length_of_Agreement__c.toString();
+                } else {
+                    this.lengthOfPSA = data.Length_of_Agreement__c;
+                }
+            }
+            console.log('[getPSA] islengthInYears, length', this.isLengthInYears, this.lengthOfPSA);
+
+            this.selectedAccounts.clear();
+            this.promotionsToDelete.clear();
+                        
+            if (data.Promotions__r != undefined && data.Promotions__r.length > 0) {
+                if (this.isPhone && this.isThisTass) {
+                    alert('[psa.loadpsadetails] # of promotions', data.Promotions__r.length);
+                }
+                data.Promotions__r.forEach(p => {
+                    this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
+                });
+                getAccountsForParent({ parentAccountId: this.parentAccount.Id, pageNumber: 1 })
+                    .then(result => {
+                        try {
+                        console.log('[getAccountsForParent] result', result);
+                        if (this.isPhone && this.isThisTass) {
+                            alert('[psa.getaccountsforparent] # of child accounts', result.totalItemCount);
+                        }
+            
+                        const newList = result.records.map(account => {
+                            var isSelected = this.selectedAccounts.has(account.Id);
+
+                            return { item: account, isSelected: isSelected };
+                        });
+                        console.log('[getAccountsForParent] children', newList);
+                        this.accounts = {
+                            pageSize: result.pageSize,
+                            pageNumber: result.pageNumber,
+                            records: newList,
+                            totalItemCount: result.totalItemCount
+                        };
+                        }catch(ex) {
+                            console.log('[getAccountsForParent] exception', ex);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('[getAccountsForParent] error', error);
+                        this.error = error;
+                        this.accounts = undefined;
+                    });
+
+            } else {
+                if (this.isPhone && this.isThisTass) {
+                    alert('[psa.loadpsadetails] no promotions for this psa');
+                }    
+            }
+        }catch(ex) {
+            console.log('[getPSA] exception', ex);
+        }
+
+    }
     validatePSA() {
         let isValid = true;
 
@@ -576,6 +661,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.lengthOfPSA == undefined) {
             this.hasLengthOfPSAError = true;
             isValid = false; 
+        } else if (this.isLengthInYears == false) {
+            if (this.lengthOfPSA / 12 > this.maximumLengthOfPSA) {
+                this.hasLengthOfPSAError = true;
+            }
         }
         if (this.wholesalerPreferred == undefined) {
             this.hasPreferredRTMError = true;
@@ -648,7 +737,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[handleaccountsearchbuttonclick] querystring', this.accountQueryString);
         console.log('[handleaccountsearchbuttonclick] usingparent', this.isUsingParentAccount);
         console.log('[handleaccountsearchbuttonclick] market', this.market);
-        getAccountsByName({accountName: this.accountQueryString, isSearchingForParent: this.isUsingParentAccount, market: this.market, pageNumber: this.pageNumber})
+        getAccountsByName({accountName: this.accountQueryString, isSearchingForParent: this.isUsingParentAccount, market: this.marketId, pageNumber: this.pageNumber})
             .then(result => {
                 console.log('[getAccountsByName] result', result);
                 const newList = result.records.map(item => {
@@ -701,13 +790,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         };
 
         if (this.thePSA.Market__c == undefined) {
-            param.marketName = this.market;
-            param.marketId = '';
+            param.marketId = this.marketId;
         }
         
         param.beginDate = this.startDate;
         param.endDate = this.endDate;
         param.lengthOfPSA = this.lengthOfPSA;
+        param.isLengthInYears = this.isLengthInYears;
         param.parentAccountId = this.parentAccount.Id;
         param.signingCustomerId = this.signingCustomer.Id;
         param.wholesalerPreferredId = this.wholesalerPreferred;

@@ -91,9 +91,42 @@
                         </template>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.label} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
-                        <template if:true={hasLengthOfPSAError}>
-                            <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                        <template if:true={isPhone}>
+                            <lightning-layout>
+                                <lightning-layout-item size="12">
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" checked message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12">
+                                    <template if:true={isLengthInYears}>
+                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                    </template>                            
+                                    <template if:false={isLengthInYears}>
+                                        <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-input>
+                                    </template>
+                                    <template if:true={hasLengthOfPSAError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                                    </template>            
+                                </lightning-layout-item>
+                            </lightning-layout>    
+
+                        </template>
+                        <template if:false={isPhone}>
+                            <lightning-layout>
+                                <lightning-layout-item size="9">
+                                    <template if:true={isLengthInYears}>
+                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                    </template>                            
+                                    <template if:false={isLengthInYears}>
+                                        <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-input>
+                                    </template>
+                                    <template if:true={hasLengthOfPSAError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                                    </template>            
+                                </lightning-layout-item>
+                                <lightning-layout-item size="3">
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" checked message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </lightning-layout>    
                         </template>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
