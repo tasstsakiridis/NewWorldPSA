@@ -101,10 +101,15 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         try {
         console.log('[psaActuals.handleSaveForm] detail', event.detail);
             console.log('[psaActuals.handleSaveForm] detail.id', event.detail.Id);
-            this.wiredPSA = refreshApex(this.wiredPSA);
-            this.thePSA = this.wiredPSA.data;
-            this.buildTree();
-            //this.getAgreement();
+            refreshApex(this.wiredPSA)
+                .then(() => {
+                    this.thePSA = this.wiredPSA.data;
+                    console.log('[psaActuals.handleSaveForm] after refreshapex has returned. thePSa', this.thePSA);
+                    this.buildTree();
+                })
+                .catch(error => {
+                    console.log('[psaActuals.handleSaveForm] error', error);
+                });
         } catch(ex) {
             console.log('[psaActuals.handleSaveForm] exception', ex);
         }

@@ -31,6 +31,7 @@ import FIELD_COMMENTS from '@salesforce/schema/Promotion_Material_Item__c.Commen
 
 import getProductDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProductDetails';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
+import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updatePMITotals';
 
 import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
@@ -667,6 +668,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
+                this.updateTotals();
+
                 if (!this.isPhone) {
                     const saveEvent = new CustomEvent('save', {
                         detail: psaItem
@@ -702,6 +705,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                         variant: 'success'
                     }),
                 );
+
+                this.updateTotals();
 
                 try {
                 if (!this.isPhone) {
@@ -753,6 +758,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
+                this.updateTotals();
                 if (!this.isPhone) {
                     const saveEvent = new CustomEvent('save', {
                         detail: this.psaItem
@@ -769,5 +775,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
             });
+    }
+
+    updateTotals() {
+        updatePMITotals({psaId: this.psaId})
+            .then((status) => {
+                console.log('[updateTotals] status', status);
+            })
+            .catch((error) => {
+                console.log('[updateTotals] error', error);
+            });
+
     }
 }

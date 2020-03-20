@@ -34,6 +34,9 @@
                                     <template if:true={canClone}>
                                         <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
                                     </template>
+                                    <template if:true={canViewSummary}>
+                                        <lightning-button label={labels.summary.label} icon-name="utility:matrix" title="Summary" class="slds-m-horizontal_x-small" onclick={handleSummaryButtonClick}></lightning-button>
+                                    </template>
                                     <template if:true={canEditItems}>
                                         <lightning-button label={labels.items.label} icon-name="utility:snippet" title="Items" class="slds-m-horizontal_x-small" onclick={handleItemsButtonClick} ></lightning-button>
                                     </template>

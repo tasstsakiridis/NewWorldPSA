@@ -11,6 +11,7 @@ import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getPMIADetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPMIADetails';
+import updateActualTotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updateActualTotals';
 
 import OBJECT_PMIA from '@salesforce/schema/PMI_Actual__c';
 
@@ -24,6 +25,9 @@ import FIELD_EXTERNAL_KEY from '@salesforce/schema/PMI_Actual__c.External_Key__c
 import FIELD_ACTUAL_QTY from '@salesforce/schema/PMI_Actual__c.Act_Qty__c';
 import FIELD_PAYMENT_DATE from '@salesforce/schema/PMI_Actual__c.Payment_Date__c';
 import FIELD_ACTUAL_WHOLESALER from '@salesforce/schema/PMI_Actual__c.Actual_Wholesaler__c';
+import FIELD_LISTING_FEE from '@salesforce/schema/PMI_Actual__c.Listing_Fee__c';
+import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/PMI_Actual__c.Promotional_Activity__c';
+import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/PMI_Actual__c.Training_and_Advocacy__c';
 
 import CANCEL_LABEL from '@salesforce/label/c.Cancel';
 import SAVE_LABEL from '@salesforce/label/c.Save';
@@ -52,8 +56,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         validation    : { error: 'There are some issues with the data you entered.  Please review the error messages and try again.'},
         skip          : { label: 'skip' },
         prev          : { label: 'prev' },
-        next          : { label: 'next' }
-
+        next          : { label: 'next' },
+        listingFeePaid : { label: 'Listing Fee Paid', placeholder: 'Enter listing fee paid', error: 'Listing fee error' },
+        promotionalActivityPaid: { label: 'Promotional Activity Paid', placeholder: 'Enter Promotional Activity paid', error: 'Promotional Activity paid error'},
+        trainingAndAdvocacyPaid: { label: 'Training & Advocacy Paid', placeholder: 'Enter Training & Advocacy Paid', error: 'Training and Advocacy Paid error'},
+        remaining     : { label: 'remaining' }
     };    
 
     @wire(CurrentPageReference)
@@ -140,6 +147,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         refreshApex(this.wiredPMIActual);
         this.thePMIA = this.wiredPMIActual.data;
         this.loadPMIADetails();
+        this.setRemainingTotals();
     }
 
     error;
@@ -164,7 +172,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true },
                 { label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c }
             ];
-    
+                
+            this.setRemainingTotals();
+
             if (this.pmiaId == undefined) {                    
                 this.createNewActual();
             }
@@ -185,6 +195,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.error = undefined;
             this.thePMIA = value.data;
             this.loadPMIADetails();
+            this.setRemainingTotals();
         }
     }
     /*
@@ -244,16 +255,34 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }
     }
 
+    listingFeePaid;
+    listingFeeRemaining;
+    get listingFeePaidLabel() {
+        return `${this.labels.listingFeePaid.label} [${this.labels.remaining.label}: ${this.listingFeeRemaining}]`;
+    }
+    promotionalActivityPaid;
+    promotionalActivityRemaining;
+    get promotionalActivityPaidLabel() {
+        return `${this.labels.promotionalActivityPaid.label} [${this.labels.remaining.label}: ${this.promotionalActivityRemaining}]`;
+    }
+
+    trainingAndAdvocacyPaid;
+    trainingAndAdvocacyRemaining;
+    get trainingAndAdvocacyPaidLabel() {
+        return `${this.labels.trainingAndAdvocacyPaid.label} [${this.labels.remaining.label}: ${this.trainingAndAdvocacyRemaining}]`;
+    }
+
     paymentDate;
     paymentDateLabel;
     paymentDatePlaceholder;
     paymentDateErrorMessage = this.labels.paymentDate.error;
     hasPaymentDateError;
     get formattedPaymentDate() {
-        var theDate = this.paymentDate == null ? new Date() : this.paymentDate;
+        console.log('[actuals.formattedPaymentDate] paymentDate', this.paymentDate);
+        var theDate = this.paymentDate == null ? new Date() : new Date(this.paymentDate);
         return theDate.toISOString();
     }
-
+    
     processed;
     processedLabel;
     get processedMessage() {
@@ -338,6 +367,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     handleActualQtyChange(event) {
         this.actualQty = event.detail.value;
     }
+    handleListingFeeChange(event) {
+        this.listingFeePaid = event.detail.value;
+    }
+    handlePromotionalActivityChange(event) {
+        this.promotionalActivityPaid = event.detail.value;
+    }
+    handleTrainingAndAdvocacyChange(event) {
+        this.trainingAndAdvocacyPaid = event.detail.value;
+    }
     handlePaymentDateChange(event) {
         this.paymentDate = new Date(event.detail.value);
     }
@@ -416,6 +454,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.productName = this.thePMIA.Product_Name__c;
         this.accountName = this.thePMIA.Account_Name__c;
         this.actualQty = this.thePMIA.Act_Qty__c;
+        this.listingFeePaid = this.thePMIA.Listing_Fee__c;
+        this.promotionalActivityPaid = this.thePMIA.Promotional_Activity__c;
+        this.trainingAndAdvocacyPaid = this.thePMIA.Training_and_Advocacy__c;
         this.paymentDate = this.thePMIA.Payment_Date__c;
         this.approvalStatus = this.thePMIA.Approval_Status__c;
         this.processed = this.thePMIA.Boomi_Processed__c;
@@ -424,7 +465,29 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.plannedDiscount = this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c;
         this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
         this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
+
     }
+
+    setRemainingTotals() {
+        console.log('[actuals.setremainingtotals] psa, pmia', this.thePSA, this.thePMIA);
+        if (this.thePSA != undefined) {
+            if (this.thePMIA == undefined) {
+                const pmi = this.thePSA.Promotion_Material_Items__r.find(pmi => pmi.Id === this.pmiId);
+                this.listingFeeRemaining = pmi.Listing_Fee__c - (pmi.Total_Listing_Fee_Paid__c == undefined ? 0 : pmi.Total_Listing_Fee_Paid__c);
+                this.promotionalActivityRemaining = pmi.Promotional_Activity_Value__c - (pmi.Total_Promotional_Activity_Paid__c == undefined ? 0 : pmi.Total_Promotional_Activity_Paid__c);
+                this.trainingAndAdvocacyRemaining = pmi.Training_and_Advocacy_Value__c - (pmi.Total_Training_and_Advocacy_Paid__c == undefined ? 0 : pmi.Total_Training_and_Advocacy_Paid__c);
+            } else {
+                const pmi = this.thePSA.Promotion_Material_Item__r.find(pmi => pmi.Id === this.thePMIA.Promotion_Material_Item__c);
+                console.log('[actuals.setremainingtotals] p', p);
+                if (pmi) {
+                    this.listingFeeRemaining = this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c - (pmi.Total_Listing_Fee_Paid__c == undefined ? 0 : pmi.Total_Listing_Fee_Paid__c);
+                    this.promotionalActivityRemaining = this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c - (pmi.Total_Promotional_Activity_Paid__c == undefined ? 0 : pmi.Total_Promotional_Activity_Paid__c);
+                    this.trainingAndAdvocacyRemaining = this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c - (pmi.Total_Training_and_Advocacy_Paid__c == undefined ? 0 : pmi.Total_Training_and_Advocacy_Paid__c);
+                }    
+            }
+        }
+    }
+
     createNewActual() {
         console.log('createNewActual.thePSa', this.thePSA);
         this.wholesaler = this.thePSA.Wholesaler_Preferred__c;
@@ -453,6 +516,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.approvalStatus = 'New';
         this.paymentDate = new Date();
         this.actualQty = 0;
+        this.listingFeePaid = 0;
+        this.promotionalActivityPaid = 0;
+        this.trainingAndAdvocacyPaid = 0;
     }
 
     goBack() {
@@ -504,15 +570,19 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             }
             if (!this.isFinanceUser) {
                 fields[FIELD_ACTUAL_QTY.fieldApiName] = this.actualQty;
-            }
-            fields[FIELD_PAYMENT_DATE.fieldApiName] = this.paymentDate;
+            }            
+            fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFeePaid;
+            fields[FIELD_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityPaid;
+            fields[FIELD_TRAINING_ADVOCACY.fieldApiName] = this.trainingAndAdvocacyPaid;
             fields[FIELD_APPROVAL_STATUS.fieldApiName] = this.approvalStatus;
             fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
+            fields[FIELD_PAYMENT_DATE.fieldApiName] = this.paymentDate;
 
-            console.log('[psaactualform.save] paymentDate', this.paymentDate);  
-            const paymentDateYear = this.paymentDate.getFullYear().toString();
-            const paymentDateMonth = ('00' + this.paymentDate.getMonth()).substr(1);
-            const paymentDateDay = ('00' + this.paymentDate.getDate()).substr(1);
+            const pd = new Date(this.paymentDate);
+            console.log('[psaactualform.save] paymentDate, pd', this.paymentDate, pd);  
+            const paymentDateYear = pd.getFullYear().toString();
+            const paymentDateMonth = ('00' + pd.getMonth()).substr(1);
+            const paymentDateDay = ('00' + pd.getDate()).substr(1);
             console.log('[psaactualform.save] date parts', paymentDateYear, paymentDateMonth, paymentDateDay);          
             const dateString = paymentDateYear + paymentDateMonth + paymentDateDay;
             console.log('[psaactualform.save] dateString', dateString);
@@ -542,6 +612,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 console.log('[pmiaForm.createRecord] pmiaItem', pmiaItem);
                 this.isWorking = false;
                 this.pmiaId = pmiaItem.id;
+
+                this.updateTotals();
 
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -596,7 +668,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[pmiaForm.update] record', record);
         updateRecord(record)
             .then(() => {
+                
                 this.isWorking = false;
+
+                this.updateTotals();
+
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
@@ -607,8 +683,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
                 try {
                 if (!this.isPhone) {
-                    const updatedRecord = refreshApex(this.wiredPMIActual);
-                    console.log('updated record', updatedRecord);
+                    refreshApex(this.wiredPMIActual);
                     const saveEvent = new CustomEvent('save', {
                         detail: updatedRecord
                     });
@@ -631,5 +706,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 );
             });
 
+    }
+
+    updateTotals() {
+        updateActualTotals({psaId: this.psaId})
+            .then((status) => {
+                console.log('[updateTotals] status', status);
+            })
+            .catch((error) => {
+                console.log('[updateTotals] error', error);
+            });
     }
 }

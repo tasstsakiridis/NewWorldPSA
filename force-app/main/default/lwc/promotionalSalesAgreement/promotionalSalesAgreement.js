@@ -37,6 +37,7 @@ import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
 import LABEL_ROUTETOMARKET from '@salesforce/label/c.RouteToMarket';
 import LABEL_NEW from '@salesforce/label/c.New';
+import LABEL_SUMMARY from '@salesforce/label/c.Summary';
 
 import OBJECT_ACTIVITY from '@salesforce/schema/Promotion_Activity__c';
 import OBJECT_PROMOTION from '@salesforce/schema/Promotion__c';
@@ -93,8 +94,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         saveError               : { message: 'Error saving PSA' },
         saveSuccess             : { message: 'All changes saved successfully'},
         year                    : { label: 'year', labelPlural: 'years' },
-        month                   : { label: 'month', labelPlural: 'months' }
-        
+        month                   : { label: 'month', labelPlural: 'months' },
+        summary                 : { label: LABEL_SUMMARY }
     };
 
     @track promotionObjectInfo;
@@ -208,6 +209,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get canEditActuals() {
         return true;
         return this.thePSA != null && this.thePSA.Status__c == 'Approved';
+    }
+    get canViewSummary() {
+        return this.thePSA != null;
     }
 
     error;
@@ -432,6 +436,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleCloneButtonClick(event) {
 
+    }
+    handleSummaryButtonClick(event) {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__component',
+            attributes: {
+                componentName: 'c__PromotionalSalesAgreementSummaryContainer'
+            },
+            state: {
+                c__psaId: this.recordId
+            }
+        });
     }
     handleHelpButtonClick(event) {
 

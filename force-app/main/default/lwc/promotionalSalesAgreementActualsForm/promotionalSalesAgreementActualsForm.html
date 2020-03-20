@@ -80,6 +80,19 @@
                         <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{label.listFeePaid.label}</p>
+                        <lightning-formatted-number value={listingFeePaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{label.promotionalActivityPaid.label}</p>
+                        <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{label.trainingAdvocacyPaid.label}</p>
+                        <lightning-formatted-number value={trainingAndAdvocacyPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" padding="around-small">
                         <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
                         <span class="slds-text-heading_medium">{wholesalerName}</span>
                     </lightning-layout-item>
@@ -123,6 +136,36 @@
                             <span class="error">{paymentDateErrorMessage}</span>
                         </template>
                     </lightning-layout-item>    
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
+                        <lightning-input type="currency" 
+                                         label={listingFeePaidLabel} 
+                                         name="i_ListingFeePaid" value={listingFeePaid} 
+                                         placeholder={labels.listingFeePaid.placeholder} 
+                                         onchange={handleListingFeeChange}></lightning-input>
+                        <template if:true={hasListingFeeError}>
+                            <span class="error">{labels.listingFeePaid.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
+                        <lightning-input type="currency" 
+                                         label={promotionalActivityPaidLabel} 
+                                         name="i_PromotionalActivity" value={promotionalActivityPaid} 
+                                         placeholder={labels.promotionalActivityPaid.placeholder} 
+                                         onchange={handlePromotionalActivityChange}></lightning-input>
+                        <template if:true={hasPromotionalActivityError}>
+                            <span class="error">{labels.promotionalActivityPaid.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
+                        <lightning-input type="currency" 
+                                         label={trainingAndAdvocacyPaidLabel} 
+                                         name="i_TrainingAndAdvocacy" value={trainingAndAdvocacyPaid} 
+                                         placeholder={labels.trainingAndAdvocacyPaid.placeholder} 
+                                         onchange={handleTrainingAndAdvocacyChange}></lightning-input>
+                        <template if:true={hasTrainingAdvocacyError}>
+                            <span class="error">{labels.trainingAndAdvocacyPaid.error}</span>
+                        </template>
+                    </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                         <lightning-combobox name="i_Wholesaler"
                             label={labels.purchasedFrom.label}

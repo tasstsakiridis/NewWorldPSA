@@ -1,0 +1,20 @@
+.datatable {
+    overflow-x: scroll;
+}
+
+.section {
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    padding: 0.25rem;
+}
+
+.section > span {
+    width: 100px;
+}
+
+.col1 {
+    width: 100px;
+}
+.col2 {
+    width: 200px;
+}

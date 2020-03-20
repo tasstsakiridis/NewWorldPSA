@@ -1,0 +1,125 @@
+<template>
+    <lightning-card>
+        <lightning-button slot="actions" name="b_Back" label={labels.cancel.label} icon-name="utility:back" onclick={handleCancelButtonClick}></lightning-button>
+        <h3 slot="title">
+            <lightning-icon icon-name="standard:partners" size="small"></lightning-icon>
+            {psaName} {labels.summary.label}
+        </h3>
+
+        <div class="slds-m-top_small">
+            <lightning-layout multiple-rows="true">
+                <lightning-layout-item size="12">
+                    <lightning-layout horiztonal-align="spread">
+                        <lightning-layout-item padding="around-small">
+                            <div class="section">                                
+                                <h4 class="slds-text-title_caps">{labels.details.label}</h4>
+                                <table class="slds-m-left_x-small slds-m-top_small">
+                                    <tr>
+                                        <td class="col1"><h4>{labels.start.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-date-time value={startDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.end.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-date-time value={endDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.numberOfQuarters.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={numberOfQuarters} maximum-fraction-digits="0"></lightning-formatted-number></td>
+                                    </tr>
+                                </table>
+                            </div>                          
+                        </lightning-layout-item>
+
+                        <lightning-layout-item padding="around-small">
+                            <div class="section">
+                                <h4 class="slds-text-title_caps">{labels.volume.label}</h4>
+                                <table class="slds-m-left_x-small slds-m-top_small">
+                                    <tr>
+                                        <td class="col1"><h4>{labels.planned.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={totalVolume} type="number" maximum-fraction-digits="0" ></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.actual.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={totalActualVolume} type="number" maximum-fraction-digits="0"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={volumeBalance} type="number" maximum-fraction-digits="0"></lightning-formatted-number></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <div class="section">
+                                <h4 class="slds-text-title_caps">{labels.listingFee.label}</h4>
+                                <table class="slds-m-left_x-small slds-m-top_small">
+                                    <tr>
+                                        <td class="col1"><h4>{labels.total.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={listingFee} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.paid.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={listingFeePaid} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={listingFeeBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <div class="section">
+                                <h4 class="slds-text-title_caps">{labels.promotionalActivity.label}</h4>
+                                <table class="slds-m-left_x-small slds-m-top_small">
+                                    <tr>
+                                        <td class="col1"><h4>{labels.total.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={promotionalActivity} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.paid.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={promotionalActivityPaid} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={promotionalActivityBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="around-small">
+                            <div class="section">
+                                <h4 class="slds-text-title_caps">{labels.trainingAdvocacy.label}</h4>
+                                <table class="slds-m-left_x-small slds-m-top_small">
+                                    <tr>
+                                        <td class="col1"><h4>{labels.total.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={trainingAdvocacy} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.paid.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={trainingAdvocacyPaid} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                        <td class="col2"><lightning-formatted-number value={trainingAdvocacyBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-datatable key-field="id"
+                                         columns={columns}
+                                         data={psaData}
+                                         hide-checkbox-column
+                                         default-sort-direction={defaultSortDirection}
+                                         sorted-direction={sortDirection}
+                                         sorted-by={sortedBy}
+                                         class="slds-table_bordered slds-table_col-bordered slds-table_striped datatable"
+                                         onsort={handleOnSort}></lightning-datatable>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>        
+    </lightning-card>    
+</template>

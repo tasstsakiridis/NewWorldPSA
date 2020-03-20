@@ -44,16 +44,21 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
                                             Contact__c, Contact__r.Name, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
-                                            Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c,
+                                            Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
+                                            Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, 
+                                            Total_Training_and_Advocacy_Paid__c, Total_Volume__c, Total_Actual_Volume__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, 
-                                                    Account__r.ShippingCountry, Account__r.ShippingPostalCode FROM Promotions__r),
+                                                    Account__r.ShippingCountry, Account__r.ShippingPostalCode, Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, 
+                                                    Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
                                             (SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
                                                     Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
                                                     Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
-                                                    Total_Investment__c, Comments_Long__c FROM Promotion_Material_Items__r), 
+                                                    Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
+                                                    Total_Training_and_Advocacy_Paid__c FROM Promotion_Material_Items__r), 
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
-                                                    Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name FROM PMI_Actuals__r ORDER BY Payment_Date__c)
+                                                    Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name, Listing_Fee__c,
+                                                    Promotional_Activity__c, Training_and_Advocacy__c FROM PMI_Actuals__r ORDER BY Payment_Date__c)
                                       FROM Promotion_Activity__c 
                                      WHERE Id =:psaId];
     }
@@ -155,7 +160,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return [SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Brand_Status__c, Approval_Status__c, Plan_Rebate__c, 
                        Plan_Volume__c, Drink_Strategy__c, Status__c, Listing_Fee__c, Outlet_to_Provide__c, Promotional_Activity__c,
                        Promotional_Activity_Value__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
-                       Total_Investment__c, Product_Custom__r.Image_Name__c, Comments_Long__c
+                       Total_Investment__c, Product_Custom__r.Image_Name__c, Comments_Long__c, Total_Listing_Fee_Paid__c, 
+                       Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c
                   FROM Promotion_Material_Item__c 
                  WHERE Id =:psaItemId];
     }
@@ -230,9 +236,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled(cacheable=true)
     public static PMI_Actual__c getPMIADetails(String pmiaId) {
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, Activity__c, Promotion__c, Account__c, Account_Name__c,
-                       Promotion_Material_Item__c, Product__c, Product_Name__c, Act_Qty__c, Actual_Discount__c, 
+                       Promotion_Material_Item__c, Product__c, Product_Name__c, Payment_Date__c, Act_Qty__c, Actual_Discount__c, 
                        Plan_Payment__c, Promotion_Material_Item__r.Plan_Volume__c, Promotion_Material_Item__r.Plan_Rebate__c,
-                       Boomi_Processed__c, LastModifiedDate, Approval_Status__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name
+                       Boomi_Processed__c, LastModifiedDate, Approval_Status__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name,
+                       Listing_Fee__c, Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Listing_Fee__c,
+                       Promotion_Material_Item__r.Promotional_Activity_Value__c, Promotion_Material_Item__r.Training_and_Advocacy_Value__c
                   FROM PMI_Actual__c 
                  WHERE Id =:pmiaId];
     }
@@ -399,6 +407,135 @@ public with sharing class PromotionalSalesAgreement_Controller {
             msg = ex.getMessage();
         }
         
+        return msg;
+    }
+
+    @AuraEnabled 
+    public static String updateActualTotals(String psaId) {
+        String msg = 'OK';
+
+        try {
+            Promotion_Activity__c psa = [SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c,
+                                                (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
+                                                        Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
+                                                (SELECT Id, Promotion__c, Product_Custom__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
+                                                        Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c FROM Promotion_Material_Items__r), 
+                                                (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Act_Qty__c, Listing_Fee__c, 
+                                                        Promotional_Activity__c, Training_and_Advocacy__c FROM PMI_Actuals__r)
+                                        FROM Promotion_Activity__c 
+                                        WHERE Id =:psaId];
+            
+            psa.Total_Actual_Volume__c = 0;
+            psa.Total_Listing_Fee_Paid__c = 0;
+            psa.Total_Promotional_Activity_Paid__c = 0;
+            psa.Total_Training_and_Advocacy_Paid__c = 0;
+
+            Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
+            for(Promotion__c p : psa.Promotions__r) {
+                m_Promotions.put(p.Id, p);
+            }
+            Map<Id, Promotion_Material_Item__c> m_PMIs = new Map<Id, Promotion_Material_Item__c>();
+            for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
+                m_PMIs.put(pmi.Id, pmi);
+            }
+
+            Decimal actualQty = 0;
+            Decimal listingFee = 0;
+            Decimal promotionalActivity = 0;
+            Decimal trainingAndAdvocacy = 0;
+
+            Promotion__c p;
+            Promotion_Material_Item__c pmi;
+            for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
+                actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
+                listingFee = pmia.Listing_Fee__c == null ? 0 : pmia.Listing_Fee__c;
+                promotionalActivity = pmia.Promotional_Activity__c == null ? 0 : pmia.Promotional_Activity__c;
+                trainingAndAdvocacy = pmia.Training_and_Advocacy__c == null ? 0 : pmia.Training_and_Advocacy__c;
+
+                psa.Total_Actual_Volume__c += actualQty;
+                psa.Total_Listing_Fee_Paid__c += listingFee;
+                psa.Total_Promotional_Activity_Paid__c += promotionalActivity;
+                psa.Total_Training_and_Advocacy_Paid__c += trainingAndAdvocacy;
+
+                p = m_Promotions.get(pmia.Promotion__c);
+                if (p.Total_Listing_Fee_Paid__c == null) { p.Total_Listing_Fee_Paid__c = 0; }
+                if (p.Total_Promotional_Activity_Paid__c == null) { p.Total_Promotional_Activity_Paid__c = 0; }
+                if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
+
+                p.Total_Listing_Fee_Paid__c += listingFee;
+                p.Total_Promotional_Activity_Paid__c += promotionalActivity;
+                p.Total_Training_and_Advocacy_Paid__c += trainingAndAdvocacy;
+                m_Promotions.put(p.Id, p);
+
+                pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
+                if (pmi.Total_Actual_Volume__c == null) { pmi.Total_Actual_Volume__c = 0; }
+                if (pmi.Total_Listing_Fee_Paid__c == null) { pmi.Total_Listing_Fee_Paid__c = 0; }
+                if (pmi.Total_Promotional_Activity_Paid__c == null) { pmi.Total_Promotional_Activity_Paid__c = 0; }
+                if (pmi.Total_Training_and_Advocacy_Paid__c == null) { pmi.Total_Training_and_Advocacy_Paid__c = 0; }
+
+                pmi.Total_Listing_Fee_Paid__c += listingFee;
+                pmi.Total_Promotional_Activity_Paid__c += promotionalActivity;
+                pmi.Total_Training_and_Advocacy_Paid__c += trainingAndAdvocacy;
+                pmi.Total_Actual_Volume__c += actualQty;
+            }
+
+            if (m_Promotions.size() > 0) {
+                update m_Promotions.values();
+            }
+            if (m_PMIs.size() > 0) {
+                update m_PMIs.values();
+            }
+            update psa;
+        }catch(Exception ex) {
+            msg = ex.getMessage();   
+            System.debug('update totals exception ' + ex.getMessage());         
+        }
+        return msg;
+    }
+    
+    @AuraEnabled 
+    public static String updatePMITotals(String psaId) {
+        String msg = 'OK';
+
+        try {
+            Promotion_Activity__c psa = [SELECT Id, Total_Volume__c, Total_Listing_Fee__c, Total_Promotional_Activity__c, Total_Training_and_Advocacy__c,
+                                                (SELECT Id, Total_Listing_Fee__c, Total_Promotional_Activity__c, 
+                                                        Total_Training_and_Advocacy__c FROM Promotions__r),
+                                                (SELECT Id, Promotion__c, Product_Custom__c, Plan_Volume__c, Listing_Fee__c, Promotional_Activity_Value__c, 
+                                                        Training_and_Advocacy_Value__c FROM Promotion_Material_Items__r)
+                                        FROM Promotion_Activity__c 
+                                        WHERE Id =:psaId];
+            
+            psa.Total_Volume__c = 0;
+            psa.Total_Listing_Fee__c = 0;
+            psa.Total_Promotional_Activity__c = 0;
+            psa.Total_Training_and_Advocacy__c = 0;
+
+            Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();            
+            for(Promotion__c p : psa.Promotions__r) {
+                p.Total_Listing_Fee__c = 0;
+                p.Total_Promotional_Activity__c = 0;
+                p.Total_Training_and_Advocacy__c = 0; 
+            }
+            for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
+                psa.Total_Volume__c += pmi.Plan_Volume__c;
+                psa.Total_Listing_Fee__c += pmi.Listing_Fee__c;
+                psa.Total_Promotional_Activity__c += pmi.Promotional_Activity_Value__c;
+                psa.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
+
+                for(Promotion__c p : psa.Promotions__r) {
+                    p.Total_Listing_Fee__c += pmi.Listing_Fee__c;
+                    p.Total_Promotional_Activity__c += pmi.Promotional_Activity_Value__c;
+                    p.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
+                }
+            }
+
+            update psa.Promotions__r;
+            update psa;
+        }catch(Exception ex) {
+            msg = ex.getMessage();   
+            System.debug('update pmi totals exception ' + ex.getMessage());         
+        }
         return msg;
     }
 }
