@@ -15,6 +15,7 @@ import getAccountsForParent from '@salesforce/apex/PromotionalSalesAgreement_Con
 import getWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controller.getWholesalers';
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import savePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.savePSA';
+import detachDocument from '@salesforce/apex/PromotionalSalesAgreement_Controller.detachDocument';
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
@@ -54,48 +55,53 @@ import FIELD_PROMOTION_ACCOUNT from '@salesforce/schema/Promotion__c';
 
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
-        cancel                  : { label: LABEL_CANCEL },
-        clear                   : { label: LABEL_CLEAR },
-        change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
-        saveAndClose            : { label: LABEL_SAVE_AND_CLOSE },
-        save                    : { label: LABEL_SAVE },
-        skip                    : { label: LABEL_SKIP },
-        recordType              : { label: LABEL_RECORD_TYPE },
-        duration                : { label: LABEL_DURATION  },
-        yes                     : { label: LABEL_YES },
-        no                      : { label: LABEL_NO },
-        items                   : { label: LABEL_ITEMS },
+        account                 : { label: 'Account', labelPlural: 'Accounts' },        
+        accountSearchResults    : { label: 'Accounts matching "%0"' },
         actuals                 : { label: 'Actuals' },
+        alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: 'No Alternate Wholesaler selected'},
+        cancel                  : { label: LABEL_CANCEL },
+        change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
+        clear                   : { label: LABEL_CLEAR },
         clone                   : { label: LABEL_CLONE },
-        help                    : { label: LABEL_HELP },
-        success                 : { label: 'Success' },
-        selectAll               : { label: 'Select All' },
+        companyDetails          : { label: 'Company Details' },
+        confirmDetachFile       : { message: 'Are you sure you want to detach {0} from this PSA?' },
+        customerDetails         : { label: 'Customer Details' },
         deSelectAll             : { label: 'DeSelect All' },
         dateRange               : { label: 'Date Range' },
-        customerDetails         : { label: 'Customer Details' },
-        companyDetails          : { label: 'Company Details' },
-        startDate               : { label: 'This agreement will start at', error: 'No Start Date selected' },
-        lengthOfPSA             : { yearsLabel: 'Length of Agreement (in years)', monthsLabel: 'Length of Agreement (in months)', error: 'Please select from one of the Length of Agreement options' },
-        parentAccount           : { label: 'Parent Account', error: 'No Parent or Retail Account selected and no Signing Customer selected' },
-        account                 : { label: 'Account', labelPlural: 'Accounts' },        
-        retailAccountsHeading   : { label: 'Names of individual outlets in estate and parts of business included in PSA' },
-        search                  : { label: 'Search' },
-        searchBy                : { label: 'Search by %0' },
-        signingCustomerHeader   : { label: 'Full name of signing customer'},
-        selectParentAccount     : { help: 'Enter the name, or part of the name, of an account to search for' },
-        parentAccountSearchResults : { label: 'Accounts matching "%0".  Tap on an account below to select it and find any of it\'s retail accounts'},
-        accountSearchResults    : { label: 'Accounts matching "%0"' },
-        noAccountsFound         : { label: 'No retail accounts found for %0' },
-        preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: 'No Preferred Wholesaler selected' },
-        alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: 'No Alternate Wholesaler selected'},
-        routeToMarket           : { label: LABEL_ROUTETOMARKET },
-        noSigningCustomers      : { message: 'There are no contacts for this account setup as decision makers.'},
+        detachFile              : { label: 'Detach File', successMessage: 'File {0} has been successfully detached from this PSA.'},
+        duration                : { label: LABEL_DURATION  },
         error                   : { message: 'Errors found validating/saving the PSA.  Please review and try saving again.' },
+        help                    : { label: LABEL_HELP },
+        items                   : { label: LABEL_ITEMS },
+        info                    : { label: 'Info' },
+        lengthOfPSA             : { yearsLabel: 'Length of Agreement (in years)', monthsLabel: 'Length of Agreement (in months)', error: 'Please select from one of the Length of Agreement options' },
+        month                   : { label: 'month', labelPlural: 'months' },
+        no                      : { label: LABEL_NO },
+        noAccountsFound         : { label: 'No retail accounts found for %0' },
+        noSigningCustomers      : { message: 'There are no contacts for this account setup as decision makers.'},
+        parentAccount           : { label: 'Parent Account', error: 'No Parent or Retail Account selected and no Signing Customer selected' },
+        parentAccountSearchResults : { label: 'Accounts matching "%0".  Tap on an account below to select it and find any of it\'s retail accounts'},
+        preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: 'No Preferred Wholesaler selected' },
+        recordType              : { label: LABEL_RECORD_TYPE },
+        retailAccountsHeading   : { label: 'Names of individual outlets in estate and parts of business included in PSA' },
+        routeToMarket           : { label: LABEL_ROUTETOMARKET },
+        saveAndClose            : { label: LABEL_SAVE_AND_CLOSE },
+        save                    : { label: LABEL_SAVE },
         saveError               : { message: 'Error saving PSA' },
         saveSuccess             : { message: 'All changes saved successfully'},
-        year                    : { label: 'year', labelPlural: 'years' },
-        month                   : { label: 'month', labelPlural: 'months' },
-        summary                 : { label: LABEL_SUMMARY }
+        search                  : { label: 'Search' },
+        searchBy                : { label: 'Search by %0' },
+        selectAll               : { label: 'Select All' },
+        selectParentAccount     : { help: 'Enter the name, or part of the name, of an account to search for' },
+        signingCustomerHeader   : { label: 'Full name of signing customer'},
+        skip                    : { label: LABEL_SKIP },
+        startDate               : { label: 'This agreement will start at', error: 'No Start Date selected' },
+        success                 : { label: 'Success' },
+        summary                 : { label: LABEL_SUMMARY },
+        uploadFile              : { label: 'Upload & Attach Files', message: 'Select files to upload and attach to PSA', successMessage: 'Files uploaded successfully!' },
+        warning                 : { label: 'Warning' },        
+        yes                     : { label: LABEL_YES },
+        year                    : { label: 'year', labelPlural: 'years' }
     };
 
     @track promotionObjectInfo;
@@ -132,6 +138,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     promotionsToDelete = new Map();
     wiredAccount;
 
+    @track
+    attachedFiles;
+
     wiredAgreement;
     @wire(getPSA, {psaId: '$recordId'})
     wiredGetAgreement(value) {
@@ -146,6 +155,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         } else if (value.data) {
             this.error = undefined;
             this.loadPSADetails(value.data);
+            this.loadAttachedFiles();
         }
     }
 
@@ -266,6 +276,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[endDate] theDate', theDate, year, month, day, newDate);
         return newDate;
     }    
+
+    get acceptedFileUploadFormats() {
+        return ['.pdf', '.png'];
+    }
 
     parentAccount;
     get parentAccountSelected() {
@@ -527,6 +541,50 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[psa.handlelengthtypechange] length type', event.detail.checked);
         }
     }
+    handleFileUploadFinished(event) {
+        try {
+            const files = event.detail.files;  
+            const tempList = [...this.attachedFiles];
+            files.forEach(f => {
+                console.log('[handleFileUploadFinished] file', f);
+                let nameParts = f.name.split('.');
+                const filename = nameParts[0];
+                const fileExtension = nameParts.length == 2 ? nameParts[1].toLowerCase() : '';
+                let iconName = 'attachment';
+                if (fileExtension === 'png' || fileExtension === 'jpg' || fileExtension === 'jpeg') {
+                    iconName = 'image';
+                } else if (fileExtension === 'txt') {
+                    iconName = 'txt';
+                } else if (fileExtension === 'pdf') {
+                    iconName = 'pdf';
+                }
+                const attachedFile = {
+                    type: 'icon',
+                    name: f.documentId,
+                    label: filename,
+                    href: "/lightning/r/ContentDocument/" + f.documentId + "/view",
+                    src: "/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=" + f.documentId,
+                    iconName: 'doctype:'+iconName,
+                    fallbackIconName: 'doctype:'+iconName,
+                    variant: 'link',
+                    alternativeText: 'Attched document', 
+                    isLink: true 
+                }
+                console.log('[handleFileUploadFinished] attachedFile', attachedFile);
+                tempList.push(attachedFile);
+            });
+            this.attachedFiles = [...tempList];
+            this.showToast("success", this.labels.info.label, this.labels.uploadFile.successMessage);
+        }catch(ex) {
+            console.log('[promotionalSalesAgreement.handleFileUploadFinished] exception', ex);
+        }
+    }
+    handleRemoveAttachedFile(event) {
+        const response = confirm(this.labels.confirmDetachFile.message.replace('{0}', event.detail.item.label));
+        if (response == true) {            
+            this.detachFile(event.detail.item.name, event.detail.item.label, event.detail.index);
+        } 
+    }
 
     /*
         Handle Listener events
@@ -663,6 +721,62 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
 
     }
+
+    loadAttachedFiles() {
+        if (this.thePSA && this.thePSA.ContentDocumentLinks) {
+            this.attachedFiles = this.thePSA.ContentDocumentLinks.map(cdl => {
+                //return this.addToAttachedFilesList(cdl.ContentDocumentId, cdl.ContentDocument.LatestPublishedVersionId, cdl.ContentDocument.FileExtension, cdl.ContentDocument.Title);
+                let iconName = 'attachment';
+                if (cdl.ContentDocument.FileExtension === 'png' || cdl.ContentDocument.FileExtension === 'jpg' || cdl.ContentDocument.FileExtension === 'jpeg') {
+                    iconName = 'image';
+                } else if (cdl.ContentDocument.FileExtension === 'txt') {
+                    iconName = 'txt';
+                } else if (cdl.ContentDocument.FileExtension === 'pdf') {
+                    iconName = 'pdf';
+                } else {
+                    iconName = 'attachment';
+                }
+                return { type: 'icon',
+                         name: cdl.ContentDocumentId,
+                         label: cdl.ContentDocument.Title,
+                         href: "/lightning/r/ContentDocument/" + cdl.ContentDocumentId + "/view",
+                         src: "/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=" + cdl.ContentDocument.LatestPublishedVersionId,
+                         iconName: 'doctype:'+iconName,
+                         fallbackIconName: 'doctype:'+iconName,
+                         variant: 'link',
+                         alternativeText: 'Attched document', 
+                         isLink: true 
+                }
+            });
+
+            console.log('[loadAttachedFiles] attachedFiles', this.attachedFiles);
+        }
+    }
+    /*
+    addToAttachedFilesList(documentId, versionId, fileExtension, label) {
+        let iconName = 'attachment';
+        if (fileExtension === 'png' || fileExtension === 'jpg' || fileExtension === 'jpeg') {
+            iconName = 'image';
+        } else if (fileExtension === 'txt') {
+            iconName = 'txt';
+        } else if (fileExtension === 'pdf') {
+            iconName = 'pdf';
+        } else {
+            iconName = 'attachment';
+        }
+        return { type: 'icon',
+                 name: documentId,
+                 label: label,
+                 href: "/lightning/r/ContentDocument/" + documentId + "/view",
+                 src: "/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=" + versionId,
+                 iconName: 'doctype:'+iconName,
+                 fallbackIconName: 'doctype:'+iconName,
+                 variant: 'link',
+                 alternativeText: 'Attched document', 
+                 isLink: true 
+        };
+    }
+    */
     validatePSA() {
         let isValid = true;
 
@@ -724,6 +838,53 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     /*
         Server calls
     */
+    getAttachedDocuments() {
+        try {
+            getAttchedDocuments({ psaId: this.recordId })
+                .then(result => {
+                    this.attachedFiles = result.map(f => {
+                        return { type: 'avatar',
+                                 label: f.ContentDocument.Title,
+                                 href: 'https://www.salesforce./com',
+                                 fallbackIconName: 'doctype:attachment',
+                                 variant: 'circle',
+                                 alternativeText: 'Attched document', 
+                                 isLink: true,
+                                 contentDocumentId: f.ContentDocumentId }
+                    });
+
+                })
+                .catch(error => {
+                    this.error = error;
+                    this.attachedFiles = undefined;
+                });
+        } catch(ex) {
+            console.log('[promotionalSalesAgreement.getAttachedDocuments] exception', ex);
+        }
+    }
+    detachFile(documentId, name, index) {
+        console.log('[promotionalsalesagreement.detachFile] id, name, index', documentId, name, index);
+        console.log('[promotionalsalesagreement.detachFile] attachedFiles', this.attachedFiles);
+        detachDocument({psaId: this.recordId, documentId: documentId})
+            .then(result => {
+                console.log('[promotionalsalesagreement.detachFile] result', result);
+                if (result == 'OK') {
+                    this.showToast("success", this.labels.info.label, this.labels.detachFile.successMessage.replace('{0}', ));
+                } else {
+                    this.showToast("error", this.labels.error.label, result);
+                }
+
+                console.log('promotionalSalesAgreement.detachFile] index', index);
+                this.attachedFiles.splice(index, 1);
+                this.attachedFiles = [...this.attachedFiles];
+                console.log('promotionalSalesAgreement.detachFile] index', index);
+            })
+            .catch(error => {
+                console.log('[promotionalsalesagreement.detailFile] error', error);
+                this.error = error;   
+                this.showToast("error", this.labels.warning.label, error);             
+            });
+    }
     getAccount(accountId) {
         console.log('[promotionalSalesAgreement.getAccount] accountId', accountId);
 

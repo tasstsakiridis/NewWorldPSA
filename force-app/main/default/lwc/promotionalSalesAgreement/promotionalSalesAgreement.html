@@ -137,6 +137,22 @@
                         <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
+                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.uploadFile.label}</h3>
+                        <lightning-file-upload label={labels.uploadFile.message}
+                                               name="i_FileUpload"
+                                               accept={acceptedFileUploadFormats}
+                                               record-id={recordId}
+                                               class="fill-width"
+                                               onuploadfinished={handleFileUploadFinished}
+                                               multiple>
+                        </lightning-file-upload>
+                        <template if:true={attachedFiles}>
+                            <template if:true={attachedFiles.length}>
+                                <lightning-pill-container items={attachedFiles} onitemremove={handleRemoveAttachedFile}></lightning-pill-container>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
                         <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.routeToMarket.label}</h3>                        
                         <lightning-combobox name="i_WholesalerPreferred"
                                             label={labels.preferredRTM.label}

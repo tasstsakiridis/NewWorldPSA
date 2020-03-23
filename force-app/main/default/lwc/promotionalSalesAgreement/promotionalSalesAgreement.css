@@ -31,6 +31,10 @@
     border-right: 1px #e6e6e6 solid;
 }
 
+.fill-width {
+    width: 100%;
+}
+
 @media screen and (max-width: 600px) {
     .right-border {
         border-right: none;

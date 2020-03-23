@@ -58,7 +58,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
                                                     Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name, Listing_Fee__c,
-                                                    Promotional_Activity__c, Training_and_Advocacy__c FROM PMI_Actuals__r ORDER BY Payment_Date__c)
+                                                    Promotional_Activity__c, Training_and_Advocacy__c FROM PMI_Actuals__r ORDER BY Payment_Date__c),
+                                            (SELECT Id, ContentDocumentId, ContentDocument.Title, ContentDocument.FileType, ContentDocument.FileExtension,
+                                                    ContentDocument.LatestPublishedVersionId FROM ContentDocumentLinks) 
                                       FROM Promotion_Activity__c 
                                      WHERE Id =:psaId];
     }
@@ -103,6 +105,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
         result.totalItemCount = result.records == null ? 0 : result.records.size();
 
         return result;
+    }
+
+    @AuraEnabled 
+    public static List<ContentDocumentLink> getAttachedFiles(String psaId) {
+        return [SELECT Id, ContentDocumentId, ContentDocument.Title, ContentDocument.FileType, ContentDocument.FileExtension
+                  FROM ContentDocumentLink 
+                 WHERE LinkedEntityId =:psaId];
     }
 
     @AuraEnabled
@@ -537,5 +546,24 @@ public with sharing class PromotionalSalesAgreement_Controller {
             System.debug('update pmi totals exception ' + ex.getMessage());         
         }
         return msg;
+    }
+
+    @AuraEnabled 
+    public static String detachDocument(String psaId, String documentId) {
+        String result = 'OK';
+        try {
+            List<ContentDocumentLink> documentLinks = [SELECT Id FROM ContentDocumentLink 
+            WHERE ContentDocumentId =:documentId 
+              AND LinkedEntityId =:psaId];
+
+            if (documentLinks != null && documentLinks.size() > 0) {
+                delete documentLinks;
+            }    
+
+        }catch(Exception ex) {
+            result = ex.getMessage();
+        }
+
+        return result;
     }
 }
