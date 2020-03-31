@@ -61,6 +61,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api productId;
     @api productName;
     @api promotionId;
+    @api isLocked;
 
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
@@ -71,6 +72,13 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.productId = currentPageReference.state.c__productId;
         this.promotionId = currentPageReference.state.c__promotionId;
         console.log('[psaitemform.setcurrentpagereference] productid', this.productId);
+        
+        if (this.wiredProduct != undefined) {
+            refreshApex(this.wiredProduct);
+        }
+        if (this.wiredPSAItem != undefined) {
+            refreshApex(this.wiredPSAItem);
+        }
     }
 
     get isPhone() {
@@ -259,9 +267,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
     totalInvestmentLabel = 'Total Investment';
     get totalInvestment() {
-        console.log('total investment calc', this.volumeForecast, this.discount, this.listingFee, this.promotionalActivityAmount, this.trainingAdvocacyAmount);
+        //console.log('total investment calc', this.volumeForecast, this.discount, this.listingFee, this.promotionalActivityAmount, this.trainingAdvocacyAmount);
         const ti = (parseFloat(this.volumeForecast) * parseFloat(this.discount)) + parseFloat(this.listingFee) + parseFloat(this.promotionalActivityAmount) + parseFloat(this.trainingAdvocacyAmount);
-        console.log('totalInvestment', ti);
+        //console.log('totalInvestment', ti);
         return ti;
     }
 
@@ -282,20 +290,20 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
      */
     getRecordTypeId() {
         if (this.objectInfo.recordTypeInfos) {
-            console.log('[get recordtypeid] objectinfo', this.objectInfo);
+            //console.log('[psaitemform.getrecordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
-            console.log('[get recordtypeid] rtis', rtis);
+            //console.log('[psaitemform.getrecordtypeid] rtis', rtis);
             this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
-            console.log('[get recordtypeid] rtis', Object.keys(rtis));
-            console.log('[get recordtypeid] recordtypeid', this.recordTypeId);
+            //console.log('[psaitemform.getrecordtypeid] rtis', Object.keys(rtis));
+            //console.log('[psaitemform.getrecordtypeid] recordtypeid', this.recordTypeId);
         }    
     }
 
     setFieldLabels() {
-        console.log('[setFieldLabels] objectInfo', this.objectInfo);
+        console.log('[psaitemform.setFieldLabels] objectInfo', this.objectInfo);
         if (this.objectInfo.fields["Brand_Status__c"]) {
-            console.log('[setFieldLabels] brand status label', this.objectInfo.fields["Brand_Status__c"].label);
-            console.log('[setFieldLabels] brand status placeholder', this.objectInfo.fields["Brand_Status__c"].inlineHelpText);
+            console.log('[psaitemform.setFieldLabels] brand status label', this.objectInfo.fields["Brand_Status__c"].label);
+            console.log('[psaitemform.setFieldLabels] brand status placeholder', this.objectInfo.fields["Brand_Status__c"].inlineHelpText);
             this.brandStatusLabel = this.objectInfo.fields["Brand_Status__c"].label;
             this.brandStatusPlaceholder = this.objectInfo.fields["Brand_Status__c"].inlineHelpText;
         }
@@ -334,7 +342,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         if (this.isPhone && this.isThisTass) {
             alert('setting field options');
         }
-        console.log('[setFieldOptions] picklistValues', picklistValues);
+        console.log('[psaitemform.setFieldOptions] picklistValues', picklistValues);
         Object.keys(picklistValues).forEach(picklist => {            
             if (picklist === 'Brand_Status__c') {
                 this.brandStatusOptions = this.setFieldOptionsForField(picklistValues, picklist);
@@ -370,12 +378,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
         this.finishedLoadingObjectInfo = true;
         if (this.finishedLoadingDetails && this.finishedLoadingProduct) { this.isWorking = false; }
-        console.log('[psaItemForm.setfieldoptions] finishedloadingdetails, objectinof, product', this.finishedLoadingDetails, this.finishedLoadingObjectInfo, this.finishedLoadingProduct);
         
     }
     
     setFieldOptionsForField(picklistValues, picklist) {        
-        console.log('[setFieldOptionsForField] picklist field', picklist);
+        //console.log('[psaitemform.setFieldOptionsForField] picklist field', picklist);
         return picklistValues[picklist].values.map(item => ({
             label: item.label,
             value: item.value,
@@ -386,16 +393,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     selectPicklistValues(options, values) {
         if (options && options.length > 0 && values != undefined && values.length > 0) {            
             options.forEach(o => {
-                console.log('[psaitemsform.selectpicklistvalues] value is in options', values.includes(o.value), o.value);
                 if (values.includes(o.value)) {
                     o.selected = true;
                 }
             });
         }
-        console.log('[psaitemsform.selectpicklistvalues] options, values', options, values);
+        //console.log('[psaitemform.selectpicklistvalues] options, values', options, values);
     }
     
     initialiseItemForm() {
+        console.log('[psaitemform.initialiseitemform]');
         this.productId = undefined;
         this.psaItemId = undefined;
         this.promotionId = undefined;
@@ -422,13 +429,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
      * Handle local component events
      */
     handleCancelButtonClick(event) {
+        //this.addClickedClassToElement('cancel');
         this.goBack();
     }
     handleSaveButtonClick() {
+        this.addClickedClassToElement('save');
         this.workingMessage = this.labels.saving.message;
         this.isWorking = true;
         const isValid = this.validateForm();
-        console.log('[psaitems.handlesave] isValid', isValid);
+        console.log('[psaitemform..handlesavebuttonclick] isValid', isValid);
         //if (isValid) {
             this.save();
         //} else {
@@ -436,25 +445,22 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         //}
     }
     handleDeleteButtonClick() {
+        this.addClickedClassToElement('delete');
         this.delete();
     }
 
     handleBSChange(event) {
         const bs = this.template.querySelector("select.brandStatus");
-        console.log('[psaitem.bschange] checked values', bs.selectedOptions);
-        console.log('[psaitem.bschange] # of selected items', bs.selectedOptions.length);
         for(var i = 0; i < bs.selectedOptions.length; i++) {
-            console.log('[psaitem.bschange] checked value', bs.selectedOptions[i].label, bs.selectedOptions[i].value);
+            console.log('[psaitemform.hanelbschange] checked value', bs.selectedOptions[i].label, bs.selectedOptions[i].value);
         }
 
     }
     handleBrandStatusChange(event) {
         this.brandStatusValues = event.detail.value;
-        console.log('[psaitems.handlebrandstatuschange] brand status values, selected', this.brandStatusValues, event.detail.value);
     }
     handleVolumeForecastChange(event) {
         try {
-        console.log('volumeforecast change. value', event.detail.value);
         this.volumeForecast = event.detail.value;
         }catch(ex) {
             console.log('exception', ex);
@@ -462,7 +468,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleDiscountChange(event) {
         this.discount = event.detail.value;
-        console.log('[handleDiscountChange] discount', this.discount);
     }
     handleListingFeeChange(event) {
         this.listingFee = event.detail.value;
@@ -492,6 +497,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     /**
      * Helper functions
      */
+    addClickedClassToElement(elementName) {
+        const el = this.template.querySelector('[data-id="'+elementName+'"]');
+        if (el != undefined) {
+            console.log('el.classlist', el.classList);
+            if (el.classList.indexOf("clicked") < 0) {
+                el.className = el.className + " clicked";
+            }
+        }
+    }
     goBack() {
         try {
         if (this.isPhone) {
@@ -550,17 +564,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return isValid;
     }
     save() {
-        console.log('[psaitemForm.save]');
+        console.log('[psaitemform.save]');
         this.isWorking = true;
         try {
             this.brandStatusValues = [];
             const bs = this.template.querySelector("select.brandStatus");
             for(var i = 0; i < bs.selectedOptions.length; i++) {
-                console.log('[psaitem.save] checked value', bs.selectedOptions[i].label);
                 this.brandStatusValues.push(bs.selectedOptions[i].value);
             }
             this.brandStatusOptions = this.brandStatusOptions.map(bso => {                
-                console.log('[psaitem.save] bso', bso);
                 if (this.brandStatusValues.includes(bso.value)) {
                     bso.selected = true;
                 } else {
@@ -568,7 +580,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 }
                 return bso;
             });
-            console.log('[psaitem.save] brandstatusoptions', this.brandStatusOptions);
             const drinkStrategy = this.template.querySelector("select.drinkStrategy");
             this.drinkStrategyValues = [];
             for(var i = 0; i < drinkStrategy.selectedOptions.length; i++) {
@@ -623,7 +634,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_OUTLET_TO_PROVIDE.fieldApiName] = this.outletToProvideValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
 
-            console.log('[psaItemForm.save] fields', fields);
+            console.log('[psaitemform.save] fields', fields);
+            console.log('[psaitemform.save] psaitemId', this.psaItemId);
             if (this.psaItemId == undefined) {
                 fields['RecordTypeId'] = this.recordTypeId;
                 fields[FIELD_ACTIVITY_ID.fieldApiName] = this.psaId;
@@ -639,7 +651,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 this.updatePSAItem(record);
             }
         }catch(ex) {
-            console.log('[psaItemForm.save] exception', ex);
+            console.log('[psaitemform.save] exception', ex);
         }
     }
 
@@ -648,15 +660,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
      */
 
     createNewPSAItem(record) {
-        console.log('[psaItemForm.createNewPSAItem] record', record);
+        console.log('[psaitemform.createNewPSAItem] record', record);
         if (this.isPhone && this.isThisTass) {
             alert('creating new pmi record');
         }
         createRecord(record)
             .then(psaItem => {
+                console.log('[psaitemForm.createrecord] psaItem', psaItem);
                 this.isWorking = false;
                 this.psaItem = psaItem;
-                this.psaItemId = psaItem.Id;
+                this.psaItemId = psaItem.id;
                 if (this.isPhone && this.isThisTass) {
                     alert('created pmi successfully');
                 }

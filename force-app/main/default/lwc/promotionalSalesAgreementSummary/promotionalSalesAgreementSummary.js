@@ -1,4 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
@@ -22,7 +23,7 @@ import LABEL_SUMMARY from '@salesforce/label/c.Summary';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
 import LABEL_ACTUAL from '@salesforce/label/c.Actual';
 
-export default class PromotionalSalesAgreementSummary extends LightningElement { 
+export default class PromotionalSalesAgreementSummary extends NavigationMixin(LightningElement) { 
     labels = {
         cancel: { label: LABEL_CANCEL },
         start: { label: LABEL_START_DATE },
@@ -70,6 +71,14 @@ export default class PromotionalSalesAgreementSummary extends LightningElement {
         { label: this.totalInvestmentActual9lLabel, fieldName: 'totalInvestmentActual9L', type: 'currency', cellAttributes: { alignment: 'right' }},
     ];
     
+    @wire(CurrentPageReference)
+    setCurrentPageReference(currentPageReference) {
+        this.pageRef = currentPageReference;
+        this.currentPageReference = currentPageReference;
+        console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
+        this.psaId = currentPageReference.state.c__psaId;
+    }
+
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortBy;

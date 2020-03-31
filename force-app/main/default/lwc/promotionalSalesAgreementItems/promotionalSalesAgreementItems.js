@@ -77,14 +77,24 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get psaName() {
         return this.thePSA == null ? '' : this.thePSA.Name;
     }
+    get isLocked() {
+        if (this.thePSA == null) {
+            return false;
+        } else {
+            return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted';
+        }
+    }
 
     pageRef;
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
         this.pageRef = currentPageReference;
         this.currentPageReference = currentPageReference;
-        console.log('[psaitems.setcurrentpagerefernce] pageref', currentPageReference);
+        console.log('[psaitems.setcurrentpagerefernce] pageref', currentPageReference);        
         this.psaId = currentPageReference.state.c__psaId;
+        if (this.thePSA != null && this.psaId != this.thePSA.Id) {
+            refreshApex(this.wiredAgreement);
+        }
         if (currentPageReference.state.c__promotionId) {
             this.promotionId = currentPageReference.state.c__promotionId;
         }
@@ -235,14 +245,15 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     handleCancelButtonClick(event) {
         console.log('[handleCancelButtonClick]');
         try {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__recordPage',
-            attributes: {
-                recordId: this.psaId,
-                objectApiName: 'Promotion_Activity__c',
-                actionName: 'view'
-            }
-        }, true);
+            this.showPSADetailsForm = false;
+            this[NavigationMixin.Navigate]({
+                type: 'standard__recordPage',
+                attributes: {
+                    recordId: this.psaId,
+                    objectApiName: 'Promotion_Activity__c',
+                    actionName: 'view'
+                }
+            }, true);
         }catch(ex) {
             console.log('[handelCancelButtonClick] exception', ex);
             if (this.isPhone && this.isThisTass) {
@@ -380,12 +391,26 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         console.log('[productItems.handleBrandsSelected] wiredProducts', this.wiredProducts.data);
         try {
             this.brandsSelected = brandsSelected;
-            let newList;
+            let filteredProducts;
+
             if (brandsSelected.length > 0) {
-                newList = this.wiredProducts.data.records.filter(product => brandsSelected.indexOf(product.Brand__c) > -1);
+                filteredProducts = this.wiredProducts.data.records.filter(product => brandsSelected.indexOf(product.Brand__c) > -1);
             } else {
-                newList = this.wiredProducts.data.records;
+                filteredProducts = this.wiredProducts.data.records;
             }
+            
+            const newList = filteredProducts.map(p => {
+                const obj = {
+                    id: p.Id,
+                    product: p,
+                    psaItem: {}
+                };
+                if (this.psaItems.has(p.Id)) {
+                    obj.psaItem = this.psaItems.get(p.Id);
+                }
+
+                return obj;
+            });
             this.products = {
                 pageSize: this.wiredProducts.data.pageSize,
                 pageNumber: 1,

@@ -4,7 +4,8 @@
 }
 
 c-brand-tile {
-    margin: 0.5rem;
+    margin: 0.25rem;
+    max-width: fit-content;
 }
 
 c-paginator {

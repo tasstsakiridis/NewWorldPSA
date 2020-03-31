@@ -223,6 +223,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get canViewSummary() {
         return this.thePSA != null;
     }
+    get isLocked() {
+        if (this.thePSA == undefined) {
+            return false;
+        } else {
+            return this.thePSA.Status__c == 'Approved' || this.thePSA.Status__c == 'Submitted';
+        }
+    }
 
     error;
     get psaName() {

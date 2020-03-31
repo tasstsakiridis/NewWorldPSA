@@ -305,6 +305,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     Market__c m = [SELECT Id FROM Market__c WHERE Name =:marketName LIMIT 1];
                     psa.Market__c = m.Id;
                 }
+            } else {
+                psa.Market__c = psaData.marketId;
             }
 
             update psa;
@@ -428,9 +430,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                 (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                                         Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
                                                 (SELECT Id, Promotion__c, Product_Custom__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
-                                                        Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c FROM Promotion_Material_Items__r), 
+                                                        Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c, Total_Actual_Investment__c
+                                                        FROM Promotion_Material_Items__r), 
                                                 (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Act_Qty__c, Listing_Fee__c, 
-                                                        Promotional_Activity__c, Training_and_Advocacy__c FROM PMI_Actuals__r)
+                                                        Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Plan_Rebate__c,
+                                                        Promotion_Material_Item__r.Listing_Fee__c, Promotion_Material_Item__r.Promotional_Activity_Value__c,
+                                                        Promotion_Material_Item__r.Training_and_Advocacy_Value__c FROM PMI_Actuals__r)
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaId];
             
@@ -438,6 +443,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Total_Listing_Fee_Paid__c = 0;
             psa.Total_Promotional_Activity_Paid__c = 0;
             psa.Total_Training_and_Advocacy_Paid__c = 0;
+            psa.Total_Actual_Investment__c = 0;
 
             Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
             for(Promotion__c p : psa.Promotions__r) {
@@ -452,6 +458,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             Decimal listingFee = 0;
             Decimal promotionalActivity = 0;
             Decimal trainingAndAdvocacy = 0;
+            Decimal actualInvestment = 0;
 
             Promotion__c p;
             Promotion_Material_Item__c pmi;
@@ -460,11 +467,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 listingFee = pmia.Listing_Fee__c == null ? 0 : pmia.Listing_Fee__c;
                 promotionalActivity = pmia.Promotional_Activity__c == null ? 0 : pmia.Promotional_Activity__c;
                 trainingAndAdvocacy = pmia.Training_and_Advocacy__c == null ? 0 : pmia.Training_and_Advocacy__c;
+                actualInvestment = (actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c) + pmia.Promotion_Material_Item__r.Listing_Fee__c + pmia.Promotion_Material_Item__r.Promotional_Activity_Value__c + pmia.Promotion_Material_Item__r.Training_and_Advocacy_Value__c;
 
                 psa.Total_Actual_Volume__c += actualQty;
                 psa.Total_Listing_Fee_Paid__c += listingFee;
                 psa.Total_Promotional_Activity_Paid__c += promotionalActivity;
                 psa.Total_Training_and_Advocacy_Paid__c += trainingAndAdvocacy;
+                psa.Total_Actual_Investment__c += actualInvestment;
 
                 p = m_Promotions.get(pmia.Promotion__c);
                 if (p.Total_Listing_Fee_Paid__c == null) { p.Total_Listing_Fee_Paid__c = 0; }
@@ -511,7 +520,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                 (SELECT Id, Total_Listing_Fee__c, Total_Promotional_Activity__c, 
                                                         Total_Training_and_Advocacy__c FROM Promotions__r),
                                                 (SELECT Id, Promotion__c, Product_Custom__c, Plan_Volume__c, Listing_Fee__c, Promotional_Activity_Value__c, 
-                                                        Training_and_Advocacy_Value__c FROM Promotion_Material_Items__r)
+                                                        Training_and_Advocacy_Value__c, Total_Investment__c FROM Promotion_Material_Items__r)
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaId];
             
@@ -519,6 +528,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Total_Listing_Fee__c = 0;
             psa.Total_Promotional_Activity__c = 0;
             psa.Total_Training_and_Advocacy__c = 0;
+            psa.Total_Investment__c = 0;
 
             Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();            
             for(Promotion__c p : psa.Promotions__r) {
@@ -531,6 +541,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 psa.Total_Listing_Fee__c += pmi.Listing_Fee__c;
                 psa.Total_Promotional_Activity__c += pmi.Promotional_Activity_Value__c;
                 psa.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
+                psa.Total_Investment__c += pmi.Total_Investment__c;
 
                 for(Promotion__c p : psa.Promotions__r) {
                     p.Total_Listing_Fee__c += pmi.Listing_Fee__c;

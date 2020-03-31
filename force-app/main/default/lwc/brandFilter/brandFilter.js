@@ -9,7 +9,8 @@ import getBrands from '@salesforce/apex/PromotionalSalesAgreement_Controller.get
 export default class BrandFilter extends LightningElement {
     labels = {
         search: { label: 'Search' },
-        brand: { label: 'Brand', labelPlural: 'Brands'}
+        brand: { label: 'Brand', labelPlural: 'Brands'},
+        clear: { label: 'Clear' }
     };
 
     isPhone = CLIENT_FORM_FACTOR === "Small";
@@ -41,6 +42,13 @@ export default class BrandFilter extends LightningElement {
         this.pageNumber = this.pageNumber + 1;
     }
 
+    handleClearButtonClick() {
+        fireEvent(this.pageRef, 'clearSelection', true);
+        
+        this.brandsSelected = [];
+        fireEvent(this.pageRef, 'brandsSelected', this.brandsSelected);
+
+    }
     handleSelected(event) {
         console.log('[brandFilter] handleSelected', event.detail);
         console.log('[brandFilter] handleSelected', this.brandsSelected);

@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
-
-import BRAND_LOGOS from '@salesforce/resourceUrl/BrandLogos';
+import { registerListener, unregisterAllListeners } from 'c/pubsub';
+import { CurrentPageReference } from 'lightning/navigation';
 
 export default class BrandTile extends LightningElement {
     /* Private Properties */
@@ -12,10 +12,14 @@ export default class BrandTile extends LightningElement {
 
     tileClass = 'tile';
 
+    @wire(CurrentPageReference) pageRef;
+
     connectedCallback() {
+        registerListener('clearSelection', this.handleClearSelection, this);
     }
 
     disconnectedCallback() {
+        unregisterAllListeners(this);
     }
 
     /* Public Properties */
@@ -25,7 +29,6 @@ export default class BrandTile extends LightningElement {
     }
     
     set brand(value) {
-        console.log('[brandtile.setbrand] value', value);
         this._brand = value;
         this.brandName = value.Name;
         this.isSelected = value.isSelected;
@@ -33,13 +36,16 @@ export default class BrandTile extends LightningElement {
             //this.pictureUrl = BRAND_LOGOS + '/BrandLogos/'+value.Primary_Logo__c;
             this.pictureUrl = 'https://salesforce-static.b-fonline.com/images/brand_logos/' + value.Primary_Logo__c;
         }
-        console.log('[brandtile] brand is selected:', value.isSelected);
         this.selectTile();
     }
 
     handleSelectTile(isSelected) {
         console.log('[brandtile] selectTile method called');
         this.isSelected = isSelected;
+        this.selectTile();
+    }
+    handleClearSelection() {
+        this.isSelected = false;
         this.selectTile();
     }
 

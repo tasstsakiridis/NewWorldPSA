@@ -3,7 +3,9 @@
         <a onclick={handleClick}>
             <div class="content">
                 <template if:true={pictureUrl}>
-                    <img src={pictureUrl} class="brand slds-align_absolute-center slds-m-around_x-small" alt="Brand picture" />
+                    <div class="slds-align_absolute-center">
+                        <img src={pictureUrl} class="brand slds-align_absolute-center slds-m-around_x-small" alt="Brand picture" />
+                    </div>
                 </template>
                 <p class="title slds-align_absolute-center slds-m-bottom_x-small">{brandName}</p>
             </div>

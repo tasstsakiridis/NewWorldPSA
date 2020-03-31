@@ -3,6 +3,7 @@
         <template if:true={isPhone}>
             <lightning-icon slot="actions" icon-name="utility:close" size="small" alternative-text="Close" onclick={handleCloseButtonClick}></lightning-icon>
         </template>
+        <lightning-button slot="actions" label={labels.clear.label} icon-name="utility:clear" title="Clear" class="slds-m-horizontal_x-small" onclick={handleClearButtonClick} ></lightning-button>
 
         <template if:true={showSearchBar}>
             <div class="slds-m-horizontal_medium">
