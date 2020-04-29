@@ -71,9 +71,10 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
                                             Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, 
                                             Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, Total_Volume__c, Total_Actual_Volume__c, Purchase_Order__c,
-                                            (SELECT Id, Account__c, AccountName__c, Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, 
-                                                    Account__r.ShippingCountry, Account__r.ShippingPostalCode, Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, 
-                                                    Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
+                                            (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
+                                                    Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
+                                                    Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
+                                                    FROM Promotions__r),
                                             (SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
                                                     Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
                                                     Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
@@ -532,10 +533,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Total_Training_and_Advocacy_Paid__c = 0;
             psa.Total_Actual_Investment__c = 0;
 
+            /*
             Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
             for(Promotion__c p : psa.Promotions__r) {
                 m_Promotions.put(p.Id, p);
             }
+            */
             Map<Id, Promotion_Material_Item__c> m_PMIs = new Map<Id, Promotion_Material_Item__c>();
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
                 m_PMIs.put(pmi.Id, pmi);
@@ -554,12 +557,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
             for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
                 rebateAmount = pmia.Rebate_Amount__c == null ? 0 : pmia.Rebate_Amount__c;
                 
+                /*
                 p = m_Promotions.get(pmia.Promotion__c);
                 if (p.Total_Actual_Discount__c == null) { p.Total_Actual_Discount__c = 0; }
                 if (p.Total_Listing_Fee_Paid__c == null) { p.Total_Listing_Fee_Paid__c = 0; }
                 if (p.Total_Promotional_Activity_Paid__c == null) { p.Total_Promotional_Activity_Paid__c = 0; }
                 if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
-
+                */
                 pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
                 if (pmi.Total_Actual_Volume__c == null) { pmi.Total_Actual_Volume__c = 0; }
                 if (pmi.Total_Listing_Fee_Paid__c == null) { pmi.Total_Listing_Fee_Paid__c = 0; }
@@ -570,15 +574,15 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 System.debug('[rebateAmount: ' + pmia.Rebate_Amount__c);
                 if (pmia.Rebate_Type__c == 'Listing Fee') {
                     psa.Total_Listing_Fee_Paid__c += rebateAmount;
-                    p.Total_Listing_Fee_Paid__c += rebateAmount;
+                    //p.Total_Listing_Fee_Paid__c += rebateAmount;
                     pmi.Total_Listing_Fee_Paid__c += rebateAmount;
                 } else if (pmia.Rebate_Type__c == 'Promotional Activity') {
                     psa.Total_Promotional_Activity_Paid__c += rebateAmount;
-                    p.Total_Promotional_Activity_Paid__c += rebateAmount;
+                    //p.Total_Promotional_Activity_Paid__c += rebateAmount;
                     pmi.Total_Promotional_Activity_Paid__c += rebateAmount;
                 } else if (pmia.Rebate_Type__c == 'Training & Advocacy') {
                     psa.Total_Training_and_Advocacy_Paid__c += rebateAmount;
-                    p.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                    //p.Total_Training_and_Advocacy_Paid__c += rebateAmount;
                     pmi.Total_Training_and_Advocacy_Paid__c += rebateAmount;
                 } else if (pmia.Rebate_Type__c == 'Volume') {
                     actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
@@ -586,20 +590,22 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
                     psa.Total_Actual_Volume__c += actualQty;                    
                     psa.Total_Actual_Discount__c += totalDiscount;
-                    p.Total_Actual_Discount__c += totalDiscount;
+                    //p.Total_Actual_Discount__c += totalDiscount;
                     pmi.Total_Actual_Volume__c += actualQty;
                 }
 
-                m_Promotions.put(p.Id, p);
+                //m_Promotions.put(p.Id, p);
                 m_PMIs.put(pmi.Id, pmi);
 
             }
 
             psa.Total_Actual_Investment__c = psa.Total_Actual_Discount__c + psa.Total_Listing_Fee_Paid__c + psa.Total_Promotional_Activity_Paid__c + psa.Total_Training_and_Advocacy_Paid__c;
 
+            /*
             if (m_Promotions.size() > 0) {
                 update m_Promotions.values();
             }
+            */
             if (m_PMIs.size() > 0) {
                 update m_PMIs.values();
             }
@@ -631,6 +637,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Total_Training_and_Advocacy__c = 0;
             psa.Total_Investment__c = 0;
 
+            /*
             Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();            
             for(Promotion__c p : psa.Promotions__r) {
                 p.Total_Planned_Discount__c = 0;
@@ -638,6 +645,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 p.Total_Promotional_Activity__c = 0;
                 p.Total_Training_and_Advocacy__c = 0; 
             }
+            */
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
                 psa.Total_Volume__c += pmi.Plan_Volume__c;
                 psa.Total_Listing_Fee__c += pmi.Listing_Fee__c;
@@ -645,15 +653,17 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 psa.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
                 psa.Total_Investment__c += pmi.Total_Investment__c;
 
+                /*
                 for(Promotion__c p : psa.Promotions__r) {
                     p.Total_Planned_Discount__c = pmi.Plan_Volume__c * pmi.Plan_Rebate__c;
                     p.Total_Listing_Fee__c += pmi.Listing_Fee__c;
                     p.Total_Promotional_Activity__c += pmi.Promotional_Activity_Value__c;
                     p.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
                 }
+                */
             }
 
-            update psa.Promotions__r;
+            //update psa.Promotions__r;
             update psa;
         }catch(Exception ex) {
             msg = ex.getMessage();   

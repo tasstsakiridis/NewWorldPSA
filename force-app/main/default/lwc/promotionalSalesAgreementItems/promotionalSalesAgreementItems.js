@@ -126,7 +126,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         } else if (value.data) {
             this.error = undefined;
             this.thePSA = value.data;
-            this.promotionId = this.thePSA.Promotions__r[0].Id;
+            if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
+                this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__r.RecordType.Name == 'Parent').Id;
+            } else {
+                this.promotionId = this.thePSA.Promotions__r[0].Id;
+            }
             if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
                 this.psaItems.clear();
                 this.thePSA.Promotion_Material_Items__r.forEach(pmi => {

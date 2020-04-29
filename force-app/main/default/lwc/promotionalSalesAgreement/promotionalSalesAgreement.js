@@ -1180,6 +1180,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     console.log('value', value, key);
                     param.accounts.push({id:value.id, itemId:value.itemId});
                 });
+                if (!this.selectedAccounts.has(param.parentAccountId)) {
+                    param.accounts.push({id: null, itemId: param.parentAccountId});
+                }
             }
             if (this.promotionsToDelete.size > 0) {
                 this.promotionsToDelete.forEach((value, key, map) => {
