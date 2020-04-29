@@ -12,6 +12,7 @@ import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA
 import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProducts';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
 
+import LABEL_BACK from '@salesforce/label/c.Back';
 import CANCEL_LABEL from '@salesforce/label/c.Cancel';
 import CHANGE_LABEL from '@salesforce/label/c.Change';
 import SAVE_AND_CLOSE_LABEL from '@salesforce/label/c.Save_and_Close';
@@ -27,6 +28,7 @@ import HELP_LABEL from '@salesforce/label/c.help';
 
 export default class PromotionsalSalesAgreementItems extends NavigationMixin(LightningElement) {
     labels = {
+        back         : { label: LABEL_BACK },
         cancel       : { label: CANCEL_LABEL },
         change       : { label: CHANGE_LABEL, labelLowercase: CHANGE_LABEL.toLowerCase() },
         save         : { label: SAVE_LABEL },
@@ -77,11 +79,14 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get psaName() {
         return this.thePSA == null ? '' : this.thePSA.Name;
     }
+    get psaStatus() {
+        return this.thePSA == null ? 'New' : this.thePSA.Status__c;
+    }
     get isLocked() {
         if (this.thePSA == null) {
             return false;
         } else {
-            return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted';
+            return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted' || this.thePSA.Status__c == 'Pending Approval' || this.thePSA.Is_Approved__c;
         }
     }
 

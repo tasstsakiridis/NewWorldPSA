@@ -14,7 +14,7 @@
                                 <div class="slds-page-header__name-title">
                                     <h1>
                                         <span>&nbsp;</span>
-                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}</span>                                        
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                        
                                     </h1>
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
                                         class="slds-m-horizontal_large"
                                         onchange={handleShowSelectedChange}></lightning-input>
                                 -->
-                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
                                     <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
                                 </lightning-button-group>
                             </div>
@@ -51,7 +51,7 @@
             <lightning-layout-item size="12">
                 <lightning-layout horizontal-align="spread">
                     <lightning-layout-item>
-                        <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
                     </lightning-layout-item>
                     <lightning-layout-item>
                         <lightning-button-icon icon-name="utility:filterList" title="Brand Filters" alternative-text="Brand Filters" class="slds-m-right_x-small" onclick={handleFilterButtonClick}></lightning-button-icon>

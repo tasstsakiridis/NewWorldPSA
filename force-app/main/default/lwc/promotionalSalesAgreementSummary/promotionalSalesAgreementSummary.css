@@ -18,3 +18,9 @@
 .col2 {
     width: 200px;
 }
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}

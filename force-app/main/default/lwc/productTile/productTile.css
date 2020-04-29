@@ -32,7 +32,11 @@ img.product {
     border-radius: 0.25rem;
     transform: scale(1.15);
 }
-
+.selected {
+    border: 2px solid #406EC8;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 5px grey;
+}
 .tileSelected {
     /*border: 2px solid #406EC8;
     border-radius: 0.25rem;

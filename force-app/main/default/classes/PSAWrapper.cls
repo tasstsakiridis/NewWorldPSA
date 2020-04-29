@@ -93,6 +93,9 @@ public with sharing class PSAWrapper {
     public String message { get; set; }
 
     @AuraEnabled 
+    public String purchaseOrder { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -121,6 +124,7 @@ public with sharing class PSAWrapper {
         this.wholesalerAlternateName = '';
         this.status = 'OK';
         this.message = '';
+        this.purchaseOrder = '';
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -144,6 +148,7 @@ public with sharing class PSAWrapper {
         this.wholesalerPreferredId = psa.Wholesaler_Preferred__c;
         this.wholesalerPreferredName = psa.Wholesaler_Preferred_Name__c;
         this.status = psa.Status__c;
+        this.purchaseOrder = psa.Purchase_Order__c;
 
         
     }

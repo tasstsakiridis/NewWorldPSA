@@ -5,7 +5,7 @@
         </h3>
         <template if:false={isPhone}>
             <lightning-button-group slot="actions">
-                <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
                 <template if:true={canEdit}>
                     <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
                 </template>
@@ -28,7 +28,7 @@
                     <lightning-layout-item size="12">
                         <lightning-layout>
                             <lightning-layout-item size="2">
-                                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
                             </lightning-layout-item>
                             <lightning-layout-item size="7" class="slds-text-align_center">
                                 <template if:true={canEdit}>
@@ -76,19 +76,19 @@
                         <lightning-formatted-number value={actualQty} maximum-fraction-digits="0" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{label.paymentDate.label}</p>
+                        <p class="slds-text-title_caps">{labels.paymentDate.label}</p>
                         <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{label.listFeePaid.label}</p>
+                        <p class="slds-text-title_caps">{labels.listFeePaid.label}</p>
                         <lightning-formatted-number value={listingFeePaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{label.promotionalActivityPaid.label}</p>
+                        <p class="slds-text-title_caps">{labels.promotionalActivityPaid.label}</p>
                         <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{label.trainingAdvocacyPaid.label}</p>
+                        <p class="slds-text-title_caps">{labels.trainingAdvocacyPaid.label}</p>
                         <lightning-formatted-number value={trainingAndAdvocacyPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
 
@@ -98,83 +98,140 @@
                     </lightning-layout-item>
                 </template>
                 <template if:true={canEdit}>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <template if:true={isFinanceUser}>
-                            <lightning-combobox name="i_ApprovalStatus"
-                                                label={labels.status.label}
-                                                value={approvalStatus}
-                                                options={approvalStatusOptions}
-                                                onchange={handleApprovalStatusChange}>
-                            </lightning-combobox>
-                        </template>
-                        <template if:false={isFinanceUser}>
+                    <template if:true={isNew}>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <p>{labels.status.label}</p>
                             <span>{approvalStatus}</span>
-                        </template>    
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
-                        <template if:true={isPhone}>
-                            <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-input type="date" 
+                                            label={labels.paymentDate.label} 
+                                            name="i_PaymentDate" 
+                                            value={formattedPaymentDate} 
+                                            placeholder={paymentDatePlaceholder} 
+                                            onchange={handlePaymentDateChange}></lightning-input>
+                            <template if:true={hasPaymentDateError}>
+                                <span class="error">{paymentDateErrorMessage}</span>
+                            </template>
+                        </lightning-layout-item>    
+
+                        <template if:true={rebates}>
+                            <template for:each={rebates} for:item="rebate">                        
+                                <lightning-layout-item key={rebate.rebateType} size="12" padding="around-small" class="slds-m-top_small">                                                                                                
+                                    <template if:true={rebate.isVolumeRebate}>
+                                        <div class="slds-m-bottom_x-small">
+                                            <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number></p>
+                                        </div>
+                                        
+                                        <template if:true={isPhone}>
+                                            <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                                        </template>
+                                        <lightning-input type="number" 
+                                                        label={actualQtyFormattedLabel} 
+                                                        name="i_ActQty" value={rebate.rebateAmount} 
+                                                        placeholder={actualQtyPlaceholder} 
+                                                        data-rebate-type={rebate.rebateType}
+                                                        onchange={handleRebateAmountChange}></lightning-input>
+                                        <template if:true={hasActualQtyError}>
+                                            <span class="error">{actualQtyErrorMessage}</span>
+                                        </template>
+                                    </template>
+                                    <template if:false={rebate.isVolumeRebate}>
+                                        <lightning-input type="currency" 
+                                            label={rebate.rebateType} 
+                                            name="i_rebateAmount" value={rebate.rebateAmount} 
+                                            placeholder={labels.rebateAmount.placeholder} 
+                                            data-rebate-type={rebate.rebateType}
+                                            onchange={handleRebateAmountChange}></lightning-input>
+                                        <template if:true={hasRebateAmountError}>
+                                            <span class="error">{labels.rebateAmount.error}</span>
+                                        </template>
+
+                                    </template>
+                                </lightning-layout-item>                            
+                            </template>
                         </template>
-                        <lightning-input type="number" 
-                                         label={actualQtyFormattedLabel} 
-                                         name="i_ActQty" value={actualQty} 
-                                         placeholder={actualQtyPlaceholder} 
-                                         onchange={handleActualQtyChange}></lightning-input>
-                        <template if:true={hasActualQtyError}>
-                            <span class="error">{actualQtyErrorMessage}</span>
-                        </template>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                        <lightning-input type="date" 
-                                         label={labels.paymentDate.label} 
-                                         name="i_PaymentDate" 
-                                         value={formattedPaymentDate} 
-                                         placeholder={paymentDatePlaceholder} 
-                                         onchange={handlePaymentDateChange}></lightning-input>
-                        <template if:true={hasPaymentDateError}>
-                            <span class="error">{paymentDateErrorMessage}</span>
-                        </template>
-                    </lightning-layout-item>    
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
-                        <lightning-input type="currency" 
-                                         label={listingFeePaidLabel} 
-                                         name="i_ListingFeePaid" value={listingFeePaid} 
-                                         placeholder={labels.listingFeePaid.placeholder} 
-                                         onchange={handleListingFeeChange}></lightning-input>
-                        <template if:true={hasListingFeeError}>
-                            <span class="error">{labels.listingFeePaid.error}</span>
-                        </template>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
-                        <lightning-input type="currency" 
-                                         label={promotionalActivityPaidLabel} 
-                                         name="i_PromotionalActivity" value={promotionalActivityPaid} 
-                                         placeholder={labels.promotionalActivityPaid.placeholder} 
-                                         onchange={handlePromotionalActivityChange}></lightning-input>
-                        <template if:true={hasPromotionalActivityError}>
-                            <span class="error">{labels.promotionalActivityPaid.error}</span>
-                        </template>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
-                        <lightning-input type="currency" 
-                                         label={trainingAndAdvocacyPaidLabel} 
-                                         name="i_TrainingAndAdvocacy" value={trainingAndAdvocacyPaid} 
-                                         placeholder={labels.trainingAndAdvocacyPaid.placeholder} 
-                                         onchange={handleTrainingAndAdvocacyChange}></lightning-input>
-                        <template if:true={hasTrainingAdvocacyError}>
-                            <span class="error">{labels.trainingAndAdvocacyPaid.error}</span>
-                        </template>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                        <lightning-combobox name="i_Wholesaler"
-                            label={labels.purchasedFrom.label}
-                            value={wholesaler}
-                            options={wholesalerOptions}
-                            onchange={handleWholesalerChange}>
-                        </lightning-combobox>
-                    </lightning-layout-item>
-                </template>
+
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-combobox name="i_Wholesaler"
+                                label={labels.purchasedFrom.label}
+                                value={wholesaler}
+                                options={wholesalerOptions}
+                                onchange={handleWholesalerChange}>
+                            </lightning-combobox>
+                        </lightning-layout-item>
+
+                    </template>
+                    <template if:false={isNew}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <template if:true={isSOMUser}>
+                                <lightning-combobox name="i_ApprovalStatus"
+                                                    label={labels.status.label}
+                                                    value={approvalStatus}
+                                                    options={approvalStatusOptions}
+                                                    onchange={handleApprovalStatusChange}>
+                                </lightning-combobox>
+                            </template>
+                            <template if:false={isSOMUser}>
+                                <p>{labels.status.label}</p>
+                                <span>{approvalStatus}</span>
+                            </template>    
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-input type="date" 
+                                            label={labels.paymentDate.label} 
+                                            name="i_PaymentDate" 
+                                            value={formattedPaymentDate} 
+                                            placeholder={paymentDatePlaceholder} 
+                                            onchange={handlePaymentDateChange}></lightning-input>
+                            <template if:true={hasPaymentDateError}>
+                                <span class="error">{paymentDateErrorMessage}</span>
+                            </template>
+                        </lightning-layout-item>    
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
+                            <template if:true={isVolumeRebate}>
+                                <div class="slds-m-bottom_x-small">
+                                    <p class="slds-text-title_caps">{labels.totalDiscount.label}</p>
+                                    <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number>
+                                </div>
+
+                                <template if:true={isPhone}>
+                                    <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                                </template>
+                                <lightning-input type="number" 
+                                                label={actualQtyFormattedLabel} 
+                                                name="i_ActQty" value={rebateAmount} 
+                                                placeholder={actualQtyPlaceholder} 
+                                                onchange={handleActualQtyChange}></lightning-input>
+                                <template if:true={hasActualQtyError}>
+                                    <span class="error">{actualQtyErrorMessage}</span>
+                                </template>    
+                            </template>
+                            <template if:false={isVolumeRebate}>
+                                <lightning-input type="currency" 
+                                    label={rebateType} 
+                                    name="i_rebateAmount" value={rebateAmount} 
+                                    placeholder={labels.rebateAmount.placeholder} 
+                                    data-rebate-type={rebateType}
+                                    onchange={handleRebateAmountChange}></lightning-input>
+                                <template if:true={hasRebateAmountError}>
+                                    <span class="error">{labels.rebateAmount.error}</span>
+                                </template>
+
+                            </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <template if:true={isVolumeRebate}>
+                                <lightning-combobox name="i_Wholesaler"
+                                    label={labels.purchasedFrom.label}
+                                    value={wholesaler}
+                                    options={wholesalerOptions}
+                                    onchange={handleWholesalerChange}>
+                                </lightning-combobox>
+                            </template>
+                        </lightning-layout-item>
+                    </template>
+                </template>                
             </lightning-layout>
         </div>
     </lightning-card>

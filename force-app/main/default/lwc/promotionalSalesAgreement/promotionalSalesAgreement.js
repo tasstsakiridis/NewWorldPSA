@@ -1,5 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
@@ -16,11 +16,16 @@ import getWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controlle
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import savePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.savePSA';
 import detachDocument from '@salesforce/apex/PromotionalSalesAgreement_Controller.detachDocument';
+import getIsSOMUser from '@salesforce/apex/PromotionalSalesAgreement_Controller.getIsSOMUser';
+import submitForApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.submitForApproval';
+import recallApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.recallApproval';
+import clonePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.clonePSA';
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
 import userId from '@salesforce/user/Id';
 
+import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
@@ -53,21 +58,25 @@ import FIELD_WHOLESALER_ALTERNATE from '@salesforce/schema/Promotion_Activity__c
 
 import FIELD_PROMOTION_ACCOUNT from '@salesforce/schema/Promotion__c';
 
+const invalidStatusSelections = ['New','Submitted','Pending Approval'];
+
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
         account                 : { label: 'Account', labelPlural: 'Accounts' },        
         accountSearchResults    : { label: 'Accounts matching "%0"' },
         actuals                 : { label: 'Actuals' },
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: 'No Alternate Wholesaler selected'},
+        back                    : { label: LABEL_BACK },
         cancel                  : { label: LABEL_CANCEL },
         change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
         clear                   : { label: LABEL_CLEAR },
-        clone                   : { label: LABEL_CLONE },
+        clone                   : { label: LABEL_CLONE, clonedMessage: 'PSA successfully cloned.' },
         companyDetails          : { label: 'Company Details' },
         confirmDetachFile       : { message: 'Are you sure you want to detach {0} from this PSA?' },
         customerDetails         : { label: 'Customer Details' },
         deSelectAll             : { label: 'DeSelect All' },
         dateRange               : { label: 'Date Range' },
+        details                 : { label: 'Details' },
         detachFile              : { label: 'Detach File', successMessage: 'File {0} has been successfully detached from this PSA.'},
         duration                : { label: LABEL_DURATION  },
         error                   : { message: 'Errors found validating/saving the PSA.  Please review and try saving again.' },
@@ -75,6 +84,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         items                   : { label: LABEL_ITEMS },
         info                    : { label: 'Info' },
         lengthOfPSA             : { yearsLabel: 'Length of Agreement (in years)', monthsLabel: 'Length of Agreement (in months)', error: 'Please select from one of the Length of Agreement options' },
+        loading                 : { message: 'Loading PSA details. Please wait...' },
         month                   : { label: 'month', labelPlural: 'months' },
         no                      : { label: LABEL_NO },
         noAccountsFound         : { label: 'No retail accounts found for %0' },
@@ -96,12 +106,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         signingCustomerHeader   : { label: 'Full name of signing customer'},
         skip                    : { label: LABEL_SKIP },
         startDate               : { label: 'This agreement will start at', error: 'No Start Date selected' },
+        status                  : { label: 'Status' },
         success                 : { label: 'Success' },
         summary                 : { label: LABEL_SUMMARY },
         uploadFile              : { label: 'Upload & Attach Files', message: 'Select files to upload and attach to PSA', successMessage: 'Files uploaded successfully!' },
         warning                 : { label: 'Warning' },        
         yes                     : { label: LABEL_YES },
-        year                    : { label: 'year', labelPlural: 'years' }
+        year                    : { label: 'year', labelPlural: 'years' },
+        purchaseOrder           : { label: 'Purchase Order' },
+        submitForApproval       : { label: 'Submit for Approval', submittedMessage: 'PSA has successfully been submitted for approval' },
+        recall                  : { label: 'Recall', recalledMessage: 'PSA recalled successfully' },
+        working                 : { label: 'Working. Please wait...' }
     };
 
     @track promotionObjectInfo;
@@ -137,6 +152,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     selectedAccounts = new Map();
     promotionsToDelete = new Map();
     wiredAccount;
+    purchaseOrder;
+
+    isWorking = true;
+    workingMessage = this.labels.working.message;    
 
     @track
     attachedFiles;
@@ -150,16 +169,51 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             alert('[psa.getagreement]');
         }
         if (value.error) {
+            this.isWorking = false;
             this.error = value.error;
             this.thePSA = undefined;
         } else if (value.data) {
             this.error = undefined;
             this.loadPSADetails(value.data);
             this.loadAttachedFiles();
+            this.isWorking = false;
         }
     }
 
     @wire(CurrentPageReference) pageRef;
+    /*
+    @wire(CurrentPageReference)
+    setCurrentPageReference(currentPageReference) {
+        this.currentPageReference = currentPageReference;
+        this.pageRef = currentPageReference;
+        console.log('[psa.setcurrentpagereference] pageref', currentPageReference);
+        if (currentPageReference.attributes.recordId == undefined) {
+            this.recordId = currentPageReference.state.c__psaId;
+        } else {
+            this.recordId = currentPageReference.attributes.recordId;
+        }
+    }
+    */
+
+    @wire(getIsSOMUser)
+    isSOMUser;
+
+    statusOptions;
+    recordTypeId;
+    picklistValuesMap;
+    @wire(getPicklistValuesByRecordType, { objectApiName: OBJECT_ACTIVITY, recordTypeId: '$recordTypeId' })
+    wiredPicklistValues({ error, data }) {
+        console.log('[getPicklistValues] data', data);
+        console.log('[getPicklistValues] error', error);
+        if (data) {
+            this.error = undefined;
+            this.picklistValuesMap = data.picklistFieldValues;
+            this.setFieldOptions(data.picklistFieldValues);    
+        } else if (error) {
+            this.error = error;
+            this.picklistValuesMap = undefined;
+        }
+    }
 
     market = '';
     marketId = '';
@@ -209,16 +263,21 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     @track
     lengthOfPSA = '1';
     
+    get canSubmitForApproval() {
+        return !this.isSubmitted && this.thePSA != null && !this.thePSA.Is_Approved__c && (this.thePSA.Promotions__r != null && this.thePSA.Promotions__r.length > 0) && (this.thePSA.Promotion_Material_Items__r != null && this.thePSA.Promotion_Material_Items__r.length > 0);
+    }
+
+    get isSubmitted() {
+        return this.status == 'Submitted' || this.status == 'Pending Approval';
+    }
     get canClone() {
-        return false;
-        return this.thePSA != null;
+        return this.thePSA != null && (this.thePSA.Promotions__r != null && this.thePSA.Promotions__r.length > 0) && (this.thePSA.Promotion_Material_Items__r != null && this.thePSA.Promotion_Material_Items__r.length > 0);
     }
     get canEditItems() {
-        return this.thePSA != null && this.thePSA.Status__c !== 'Approved';
+        return this.thePSA != null && this.thePSA.Is_Approved__c == false;
     }
     get canEditActuals() {
-        return true;
-        return this.thePSA != null && this.thePSA.Status__c == 'Approved';
+        return this.thePSA != null && this.thePSA.Is_Approved__c == true;
     }
     get canViewSummary() {
         return this.thePSA != null;
@@ -227,8 +286,15 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.thePSA == undefined) {
             return false;
         } else {
-            return this.thePSA.Status__c == 'Approved' || this.thePSA.Status__c == 'Submitted';
+            return this.status == 'Approved' || this.status == 'Submitted' || this.status == 'Pending Approval' || this.thePSA.Is_Approved__c == true;
         }
+    }
+    get isApproved() {
+        return this.thePSA != null && (this.thePSA.Status__c == 'Approved' || this.thePSA.Is_Approved__c);
+    }
+    get canChangeStatus() {
+        console.log('[canChangestatus] status, isSOMUser', this.status, this.isSOMUser);
+        return this.status != 'New' && this.status != 'Submitted' && this.isSOMUser;
     }
 
     error;
@@ -236,8 +302,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.thePSA == undefined ? '' : this.thePSA.Name;
     }
 
+    status = 'New';
     get psaStatus() {
-        return this.thePSA == undefined ? LABEL_NEW : this.thePSA.Status__c;
+        return this.status;
     }
 
     isLengthInYears = true;
@@ -388,13 +455,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }    
     renderedCallback() {
         console.log('[psa.renderredCallback] psaId', this.psaId);    
+        /*
         if (!this.isLengthInYears) {
             this.template.querySelector("lightning-input.length-type-toggle").checked = this.isLengthInYears;            
         }    
         if (!this.isUsingParentAccount) {
             this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;            
         }
-        
+        */
     }
 
     /*
@@ -403,6 +471,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleCancelButtonClick(event) {
         console.log('[handleCancelButtonClick]');
         try {
+            this.isWorking = true;
             this[NavigationMixin.Navigate]({
                 type: 'standard__objectPage',
                 attributes: {
@@ -419,11 +488,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleSaveButtonClick(event) {
         try {
+            this.isWorking = true;
             const isValid = this.validatePSA();
             console.log('[handleSaveButtonClick] isValid', isValid);
             if (isValid) {
                 this.save();
             } else {
+                this.isWorking = false;
                 this.showToast('error', this.labels.saveError.message, this.labels.error.message);            
             }
         }catch(ex) {
@@ -431,6 +502,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
     handleItemsButtonClick(event) {
+        this.isWorking = true;
         this[NavigationMixin.Navigate]({
             type: 'standard__component',
             attributes: {
@@ -442,6 +514,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
     }
     handleActualsButtonClick(event) {
+        this.isWorking = true;
         this[NavigationMixin.Navigate]({
             type: 'standard__component',
             attributes: {
@@ -453,12 +526,66 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
     }
     handleSubmitForApprovalButtonClick(event) {
+        this.isWorking = true;
+        submitForApproval({ psaId: this.recordId })
+            .then(result => {
+                this.isWorking = false;
+                if (result == 'OK') {
+                    this.status = 'Pending Approval';
+                    this.showToast('success','Success', this.labels.submitForApproval.submittedMessage);
+                } else {
+                    this.showToast('error', 'Warning', result);
+                }
+            })
+            .catch(error => {
+                this.isWorking = false;
+                this.error = error;
+                this.showToast('error', 'Warning', error);
+            });
 
     }
+    handleRecallButtonClick() {
+        this.isWorking = true;
+        recallApproval({psaId: this.recordId })
+            .then(result => {
+                this.isWorking = false;
+                if (result == 'OK') {
+                    this.status = 'New';
+                    this.showToast('success', 'Success', this.labels.recall.recalledMessage);
+                } else {
+                    this.showToast('error', 'Warning', msg);
+                }
+            })
+            .catch(error => {
+                this.isWorking = false;
+                this.error = error;
+                this.showToast('error', 'Warning', error);
+            });
+    }
     handleCloneButtonClick(event) {
+        this.isWorking = true;
+        clonePSA({ psaId: this.recordId })
+            .then(result => {
+                this.isWorking = false;
+                console.log('[clone] result', result);
+                // navigate to new PSA
+                if (result.selected) {
+                    this.showToast('success', 'Success', this.labels.clone.clonedMessage);    
+                    this.recordId = result.id;
+                } else {
+                    this.showToast('error', 'Warning', result.description);
+                }
+            })
+            .catch(error => {
+                console.log('[clone] error', error);
+                this.isWorking = false;
+                this.error = error;
+                this.showToast('error', 'Warning', error);
+            });
 
     }
     handleSummaryButtonClick(event) {
+        this.isWorking = true;
         this[NavigationMixin.Navigate]({
             type: 'standard__component',
             attributes: {
@@ -468,9 +595,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 c__psaId: this.recordId
             }
         });
+        
     }
     handleHelpButtonClick(event) {
-
+        this.showToast('info', 'Help', 'Sorry.  Help has not been completed yet.');
     }
     handleSearchAccountChange(event) {
         console.log('[handleSearchAccountChange] event.detail', event.detail);
@@ -592,6 +720,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.detachFile(event.detail.item.name, event.detail.item.label, event.detail.index);
         } 
     }
+    handlePurchaseOrderChange(event) {
+        this.purchaseOrder = event.detail.value;
+    }
+    handleStatusChange(event) {
+        this.status = event.detail.value;
+        console.log('this.status', this.status);
+        if (invalidStatusSelections.indexOf(this.status) >= 0) {
+            this.status = this.thePSA.Status__c;
+            this.showToast('error', 'Invalid selection', 'You cannot select this status');
+        }
+    }
 
     /*
         Handle Listener events
@@ -635,12 +774,49 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     /**
      * Helper functions
      */
+    getUpdatedPageReference(stateChanges) {
+        console.log('[psa.getupdatedpagereference] statechanges', stateChanges);
+        return Object.assign({}, this.currentPageReference, {
+            state: Object.assign({}, this.currentPageReference.state, stateChanges)
+        });
+    }
+
+    setFieldOptions(picklistValues) {
+        console.log('[setFieldOptions] picklistValues', picklistValues);
+        Object.keys(picklistValues).forEach(picklist => {            
+            if (picklist === 'Status__c') {
+                //this.statusOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                this.statusOptions = [];
+                picklistValues[picklist].values.forEach(pv => {
+                    if (invalidStatusSelections.indexOf(pv.value) < 0) {
+                        this.statusOptions.push({ label: pv.label, value: pv.value });
+                    }
+                });
+                console.log('[psaactualsform.setfieldoptions] approvalstatusoptions', this.statusOptions);
+            }
+        });
+
+        this.finishedLoadingObjectInfo = true;
+        if (this.finishedLoadingDetails && this.finishedLoadingProduct) { this.isWorking = false; }
+        
+    }
+    
+    setFieldOptionsForField(picklistValues, picklist) {        
+        console.log('[setFieldOptionsForField] picklist field', picklist);
+        
+        return picklistValues[picklist].values.map(item => ({
+            label: item.label,
+            value: item.value
+        }));
+    }
+
     loadPSADetails(data) {
         //this.thePSA = Object.assign(this.thePSA, record);            
         try {
             this.thePSA = { ...data };
             console.log('[getAgreement] psa', this.thePSA);
             this.psaId = data.Id;
+            this.recordTypeId = data.RecordTypeId;
             if (data.Account__c) {
                 this.parentAccount = {
                     Id: data.Account__c,
@@ -661,6 +837,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 }
                 //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
             }
+            this.status = data.Status__c;
+            this.purchaseOrder = data.Purchase_Order__c;
             this.wholesalerPreferred = data.Wholesaler_Preferred__c;
             this.wholesalerAlternate = data.Wholesaler_Alternate__c;
             if (data.Begin_Date__c) {
@@ -790,7 +968,6 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.hasLengthOfPSAError = false;
         this.hasStartDateError = false;
         this.hasPreferredRTMError = false;
-        this.hasAlternateRTMError = false;
         this.hasParentAccountError = false;
         this.hasChildAccountError = false;
 
@@ -804,10 +981,6 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         if (this.wholesalerPreferred == undefined) {
             this.hasPreferredRTMError = true;
-            isValid = false; 
-        }
-        if (this.wholesalerAlternate == undefined) {
-            this.hasAlternateRTMError = true;
             isValid = false; 
         }
         if (this.parentAccount == undefined) {
@@ -917,6 +1090,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
     getAccounts() {
+        this.isWorking = true;
         console.log('[handleaccountsearchbuttonclick] querystring', this.accountQueryString);
         console.log('[handleaccountsearchbuttonclick] usingparent', this.isUsingParentAccount);
         console.log('[handleaccountsearchbuttonclick] market', this.market);
@@ -934,9 +1108,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     totalItemCount: result.totalItemCount
                 };
                 this.error = undefined;
+                this.isWorking = false;
             })
             .catch(error => {
                 console.log('[getAccountsByName] error', error);
+                this.isWorking = false;
                 this.error = error;
                 this.accounts = undefined;
             });
@@ -991,6 +1167,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('wholesalerAlternate', this.wholesalerAlternate);
         const wa = this.wholesalers.find(w => w.value === this.wholesalerAlternate);
         param.wholesalerAlternateName = wa.label;
+        param.purchaseOrder = this.purchaseOrder;
+        param.status = this.status;
         console.log('wa', wa);
 
         param.accounts = [];
@@ -1015,6 +1193,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[save] param', param);
         savePSA({ psaData: param })
             .then(result => {
+                this.isWorking = false;
                 console.log('[savePSA] success. result', result);
                 this.psaId = result.Id;
                 this.dispatchEvent(
@@ -1029,6 +1208,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             })
             .catch(error => {
                 console.log('[savePSA] error', error);
+                this.isWorking = false;
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: this.labels.saveError.message,

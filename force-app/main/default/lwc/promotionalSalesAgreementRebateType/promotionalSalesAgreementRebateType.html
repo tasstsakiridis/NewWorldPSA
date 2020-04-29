@@ -1,0 +1,59 @@
+<template>
+    <lightning-layout multiple-rows="true">
+        <lightning-layout-item padding="around-small">
+            <p>{labels.approvalStatus.label}</p>
+            <template if:false={isFinanceUser}>
+                <span>{rebate.Approval_Status__c}</span>
+            </template>
+        </lightning-layout-item>
+        <lightning-layout-item padding="around-small" class="slds-m-top_small">
+            <lightning-input type="date" 
+                label={labels.paymentDate.label} 
+                name="i_PaymentDate" 
+                value={formattedPaymentDate} 
+                placeholder={paymentDatePlaceholder} 
+                onchange={handlePaymentDateChange}></lightning-input>
+            <template if:true={hasPaymentDateError}>
+                <span class="error">{paymentDateErrorMessage}</span>
+            </template>
+        </lightning-layout-item>
+        <lightning-layout-item padding="around-small" class="slds-m-top_small">
+            <p class="slds-text-title_caps">{labels.rebateType.label}</p>
+            <lightning-combobox name="i_RebateType"
+                                label={labels.rebateType.label}
+                                value={rebate.Rebate_Type__c}
+                                placeholder={labels.rebateType.placeholder}
+                                options={rebateTypes}
+                                onchange={handleRebateTypeChange}>
+            </lightning-combobox>
+        </lightning-layout-item>
+        <lightning-layout-item padding="around-small" class="slds-m-top_small">
+            <template if:true={isVolumeRebate}>
+                <p class="slds-text-title_caps">{labels.actualQty.label}</p>
+                <template if:true={isPhone}>
+                    <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                </template>
+                <lightning-input type="number" 
+                                 label={actualQtyFormattedLabel} 
+                                 name="i_ActQty" value={rebate.Act_Qty__c} 
+                                 placeholder={actualQtyPlaceholder} 
+                                 onchange={handleActualQtyChange}></lightning-input>
+                <template if:true={hasActualQtyError}>
+                    <span class="error">{actualQtyErrorMessage}</span>
+                </template>
+            </template>
+            <template if:false={isVolumeRebate}>
+                <p class="slds-text-title_caps">{labels.rebateAmount.label}</p>
+                <lightning-input type="currency" 
+                    label={labels.amount.label} 
+                    name="i_rebateAmount" value={rebate.Rebate_Amount__c} 
+                    placeholder={labels.rebateAmount.placeholder} 
+                    onchange={handleRebateAmountChange}></lightning-input>
+                <template if:true={hasRebateAmountError}>
+                    <span class="error">{labels.rebateAmount.error}</span>
+                </template>
+            </template>
+        </lightning-layout-item>
+        
+    </lightning-layout>
+</template>

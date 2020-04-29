@@ -26,12 +26,15 @@
                         <div class="slds-page-header__controls">
                             <div class="slds-page-header__control">
                                 <lightning-button-group>
-                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
                                     <template if:false={isLocked}>
                                         <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
                                     </template>
                                     <template if:true={canSubmitForApproval}>
-                                        <lightning-button label={label.submitForApproval.label} icon-name="utility:approval" title="Submit for Approval" class="slds-m-horizontal_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button>
+                                        <lightning-button label={labels.submitForApproval.label} icon-name="utility:approval" title="Submit for Approval" class="slds-m-horizontal_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={isSubmitted}>
+                                        <lightning-button label={labels.recall.label} icon-name="utility:reassign" title="Recall" class="slds-m-horizontal_x-small" onclick={handleRecallButtonClick}></lightning-button>
                                     </template>
                                     <template if:true={canClone}>
                                         <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
@@ -55,7 +58,7 @@
     <template if:true={isPhone}>
         <lightning-layout>
             <lightning-layout-item size="2">
-                <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <lightning-layout-item size="8" class="slds-text-align_center">
                 <template if:false={isLocked}>
@@ -63,6 +66,9 @@
                 </template>
                 <template if:true={canSubmitForApproval}>
                     <lightning-button-icon icon-name="utility:approval" title="Submit for Approval" alternative-text="Submit for Approval" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={isSubmitted}>
+                    <lightning-button-icon icon-name="utility:reassign" title="Recall" alternative-text="Submit for Approval" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
                 </template>
                 <template if:true={canClone}>
                     <lightning-button-icon icon-name="utility:copy" title="Clone" alternative-text={labels.clone.label} class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button-icon>
@@ -82,6 +88,12 @@
         <c-inline-message message={error} errors={errors} type="error"></c-inline-message>
     </template>
 
+    <template if:true={isWorking}>
+        <div class="slds-m-around_medium slds-align_absolute-center">
+            <lightning-spinner alternative-text="Saving. Please wait..."></lightning-spinner>
+            <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
     <div class="card-body slds-m-top_small">
         <lightning-layout multiple-rows={isPhone}>
             <lightning-layout-item size="12" small-device-size="12" large-device-size="4" class="border-right">
@@ -95,9 +107,9 @@
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
                         <template if:true={isPhone}>
-                            <lightning-layout>
+                            <lightning-layout multiple-rows="true">
                                 <lightning-layout-item size="12">
-                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" readonly={isLocked} checked message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" readonly={isLocked} checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                                 <lightning-layout-item size="12">
                                     <template if:true={isLengthInYears}>
@@ -136,6 +148,21 @@
                         <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">Agreement will end on</h2>
                         <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
                     </lightning-layout-item>
+                    <template if:true={isApproved}>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
+                            <h3 class="slds-text-title_caps" slot="title">{labels.details.label}</h3>
+                            <lightning-layout multiple-rows="true">
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <template if:true={canChangeStatus}>
+                                        <lightning-combobox name="i_Status" label={labels.status.label} value={status} options={statusOptions} class="slds-m-horizontal_small" onchange={handleStatusChange}></lightning-combobox>
+                                    </template>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="text" name="i_PurchaseOrder" label={labels.purchaseOrder.label} value={purchaseOrder} class="slds-m-horizontal_small" onchange={handlePurchaseOrderChange}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </lightning-layout-item>
+                    </template>
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
                         <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.uploadFile.label}</h3>
                         <lightning-file-upload label={labels.uploadFile.message}
@@ -189,7 +216,7 @@
                             <lightning-input type="search" name="i_search_account" label={accountSearchInputLabel} is-loading={isSearching} readonly={isLocked} onchange={handleSearchAccountChange}></lightning-input>
                             <div class="slds-float_right slds-m-top_x-small">
                                 <lightning-button-group>
-                                    <lightning-input type="toggle" class="account-type-toggle" name="accountTypeSearchOption" checked message-toggle-active={labels.parentAccount.label} message-toggle-inactive={labels.account.label} onchange={handleAccountTypeToggle}></lightning-input>        
+                                    <lightning-input type="toggle" class="account-type-toggle" name="accountTypeSearchOption" checked={isUsingParentAccount} message-toggle-active={labels.parentAccount.label} message-toggle-inactive={labels.account.label} onchange={handleAccountTypeToggle}></lightning-input>        
                                     <lightning-button label={labels.search.label} icon-name="utility:search" title="Search for Account" alternative-text="Search for account" class="slds-m-left_small" disabled={isSearching} onclick={handleAccountSearchButtonClick}></lightning-button>
                                 </lightning-button-group>
                             </div>

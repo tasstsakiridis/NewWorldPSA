@@ -17,6 +17,9 @@ export default class ProductTile extends LightningElement {
         unregisterAllListeners(this);
     }
 
+    @api 
+    keepSelection = false;
+
     @api
     product;
 
@@ -116,7 +119,11 @@ export default class ProductTile extends LightningElement {
     }
 
     selectTile() {
-        this.tileClass = this.isSelected ? 'tileSelected' : 'tile';
+        if (this.keepSelection && this.isSelected) {
+            this.tileClass = 'selected';
+        } else {
+            this.tileClass = this.isSelected ? 'tileSelected' : 'tile';
+        }
     }
 
 }

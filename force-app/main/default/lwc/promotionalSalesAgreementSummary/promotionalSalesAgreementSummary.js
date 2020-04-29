@@ -3,6 +3,7 @@ import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
+import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
 import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
 import LABEL_END_DATE from '@salesforce/label/c.End_Date';
@@ -25,6 +26,7 @@ import LABEL_ACTUAL from '@salesforce/label/c.Actual';
 
 export default class PromotionalSalesAgreementSummary extends NavigationMixin(LightningElement) { 
     labels = {
+        back: { label: LABEL_BACK },
         cancel: { label: LABEL_CANCEL },
         start: { label: LABEL_START_DATE },
         end: { label: LABEL_END_DATE },
@@ -190,6 +192,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 alert('[psaItem.handlecancel] exception', ex);
             }
         }
+    }
+    handlePrintButtonClick() {
+        window.print();
     }
 
     handleOnSort(event) {

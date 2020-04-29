@@ -1,0 +1,32 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <style>
+            @media print {    
+                .no-print {
+                    display: none !important;
+                }
+            }                            
+        </style>        
+    </head>
+    <apex:includeLightning />
+    <apex:outputLink onclick="javascript:print(); return false;" styleClass="no-print" style="padding: 5px; float:right; border: 1px solid #999; border-radius: 5px; text-decoration: none;" value="#" >Print</apex:outputLink>
+
+    <div id="lightning" style="margin-top: 30px; width: 100%; height: 100%;" />
+    <script>
+    var id = '{!$CurrentPage.Parameters.id}';
+    
+    $Lightning.use("c:PromotionalSalesAgreementSummaryApp", function() {
+        $Lightning.createComponent(
+            "c:PromotionalSalesAgreementSummary",
+            { "psaId":id },            
+            "lightning",
+            function(cmp) {
+        });
+    });
+    </script>
+</apex:page>

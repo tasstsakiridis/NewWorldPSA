@@ -1,6 +1,7 @@
 <template>
     <lightning-card>
-        <lightning-button slot="actions" name="b_Back" label={labels.cancel.label} icon-name="utility:back" onclick={handleCancelButtonClick}></lightning-button>
+        <lightning-button slot="actions" name="b_Back" label={labels.back.label} icon-name="utility:back" class="no-print" onclick={handleCancelButtonClick}></lightning-button>
+        <lightning-button slot="actions" name="b_Print" label="Print" class="no-print" onclick={handlePrintButtonClick}></lightning-button>
         <h3 slot="title">
             <lightning-icon icon-name="standard:partners" size="small"></lightning-icon>
             {psaName} {labels.summary.label}

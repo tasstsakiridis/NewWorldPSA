@@ -32,7 +32,7 @@
     <div class="card-body slds-m-top_small slds-p-top_small">
         <lightning-layout horizontal-align="space" class="slds-m-around_small">
             <lightning-layout-item>
-                <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
+                <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Back" alternative-text="Back" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <lightning-layout-item>
                 <template if:false={isLocked}>
@@ -99,7 +99,6 @@
                                  value={listingFee}
                                  onchange={handleListingFeeChange}
                                  disabled={isLocked}
-                                 required
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
@@ -128,7 +127,6 @@
                                  value={promotionalActivityAmount}
                                  onchange={handlePromotionalActivityValueChange}
                                  disabled={isLocked}
-                                 required
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
@@ -148,7 +146,6 @@
                                  value={trainingAdvocacyAmount}
                                  disabled={isLocked}
                                  onchange={handleTrainingAdvocacyValueChange}
-                                 required
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>

@@ -26,7 +26,7 @@
                         <div class="slds-page-header__controls">
                             <div class="slds-page-header__control">
                                 <lightning-button-group>
-                                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Cancel" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
                                     <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_medium" onclick={handleHelpButtonClick}></lightning-button-icon>
                                 </lightning-button-group>
                             </div>
@@ -37,7 +37,7 @@
         </div>
     </article>
     <template if:true={isPhone}>
-        <lightning-button-icon icon-name="utility:back" title="Cancel" alternative-text="Cancel" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
+        <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleSaveButtonClick}></lightning-button-icon>
         <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
     </template>
 
@@ -58,7 +58,7 @@
                     <template if:true={showActualsForm}>
                         <c-promotional-sales-agreement-actuals-form 
                                     psa-id={psaId} 
-                                    account-id={selectedAccountId} 
+                                    promotion-id={selectedAccountId} 
                                     pmia-id={selectedPMIAId} 
                                     pmi-id={selectedPMIId}
                                     onclose={handleCloseForm}

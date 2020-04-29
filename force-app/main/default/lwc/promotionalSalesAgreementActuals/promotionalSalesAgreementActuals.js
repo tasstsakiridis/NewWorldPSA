@@ -9,12 +9,14 @@ import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA
 
 import userLocale from '@salesforce/i18n/locale';
 
+import LABEL_BACK from '@salesforce/label/c.Back';
 import CANCEL_LABEL from '@salesforce/label/c.Cancel';
 import SAVE_LABEL from '@salesforce/label/c.Save';
 import HELP_LABEL from '@salesforce/label/c.help';
 
 export default class PromotionalSalesAgreementActuals extends NavigationMixin(LightningElement) {
     labels = {
+        back         : { label: LABEL_BACK },
         cancel       : { label: CANCEL_LABEL },
         save         : { label: SAVE_LABEL },
         help         : { label: HELP_LABEL },
@@ -99,13 +101,14 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     }
     handleSaveForm(event) {
         try {
-        console.log('[psaActuals.handleSaveForm] detail', event.detail);
+            console.log('[psaActuals.handleSaveForm] detail', event.detail);
             console.log('[psaActuals.handleSaveForm] detail.id', event.detail.Id);
             refreshApex(this.wiredPSA)
                 .then(() => {
                     this.thePSA = this.wiredPSA.data;
                     console.log('[psaActuals.handleSaveForm] after refreshapex has returned. thePSa', this.thePSA);
                     this.buildTree();
+                    this.handleCloseForm();
                 })
                 .catch(error => {
                     console.log('[psaActuals.handleSaveForm] error', error);
@@ -230,6 +233,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
             const items = this.thePSA.Promotions__r.map(account => {
                 //const isExpanded = account.Id == this.selectedAccountId;
+                console.log('[buildtree] account', account);
                 const accountTree = {
                     label: account.AccountName__c,
                     name: account.Id,
@@ -237,12 +241,14 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     expanded: true,
                     items: []
                 };
+                console.log('[buildTree] accountTree', accountTree);
                 
                 if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
                     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
                     const pmiItems = this.thePSA.Promotion_Material_Items__r.map(pmi => {                                            
                         //const pmiIsExpanded = pmi.Id == this.selectedPMIId;
+                        console.log('[buildtree] pmi', pmi);
                         const key = pmi.Id + '_' + account.Id;
                         const pmiTree = {
                             label: pmi.Product_Name__c,
@@ -252,13 +258,71 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                             items: []
                         };
 
+                        
                         if (this.thePSA.PMI_Actuals__r && this.thePSA.PMI_Actuals__r.length > 0) {
                             const actualsForPMI = this.thePSA.PMI_Actuals__r.filter(pmia => (pmia.Promotion_Material_Item__c === pmi.Id && pmia.Promotion__c === account.Id));
+                            console.log('[buildtree] actualforpmi', actualsForPMI);
                             if (actualsForPMI) {
+                                
+                                actualsForPMI.forEach(actual => {
+                                    console.log('[buildtree] actual', actual);
+                                    const pd = new Date(actual.Payment_Date__c);
+                                    let metatext = '';
+                                    if (actual.Rebate_Type__c == 'Volume') {
+                                        metatext += 'Actual Qty: ' + actual.Act_Qty__c;
+                                    } else {
+                                        metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
+                                    }
+                                    let found = false;
+                                    pmiTree.items.forEach(item => {
+                                        if (item.paymentDate == actual.Payment_Date__c) {
+                                            found = true;
+                                            item.items.push({
+                                                label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                                metatext: metatext,
+                                                name: 'pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
+                                                disabled: false,
+                                                expanded: false,
+                                                items: []    
+                                            });
+                                            return true;
+                                        }
+                                    });
+                                    console.log('[buildtree] found', found);
+                                    console.log('[buildtree] pmiTree', pmiTree);
+                                    if (!found) {
+                                        pmiTree.items.push({
+                                            paymentDate: actual.Payment_Date__c,
+                                            label: pd.toLocaleDateString(userLocale, dateOptions),
+                                            metatext: actual.Actual_Wholesaler__r.Name,
+                                            name: 'pmia_'+actual.Id,
+                                            disabled: false,
+                                            expanded: true,
+                                            items: [
+                                                { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                                  metatext: metatext,
+                                                  name: 'pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                                  disabled: false,
+                                                  expanded: false,
+                                                  items: []
+                                            }]
+                                        });
+                                    }
+                                });
+                                /*
                                 pmiTree.items = actualsForPMI.map(actuals => {
+
                                     const pd = new Date(actuals.Payment_Date__c);
                                     let metattext = actuals.Approval_Status__c + ' : ' + actuals.Actual_Wholesaler__r.Name;
-                                    metattext += ', Actual Qty: ' + actuals.Act_Qty__c;
+                                    if (actuals.Rebate_Type__c == 'Volume') {
+                                        metattext += ', Actual Qty: ' + actuals.Act_Qty__c;
+                                    } else if (actuals.Rebate_Type__c == 'ListingFee') {
+                                        metattext += ', Listing Fee: ' + actuals.Rebate_Amount__c;
+                                    } else if (actuals.Rebate_Type__c == 'PromotionalActivity') {
+                                        metattext += ', Promotional Activity: ' + actuals.Rebate_Amount__c;
+                                    } else if (actuals.Rebate_Type__c == 'TrainingAdvocacy') {
+                                        metattext += ', Training & Advocacy: ' + actuals.Rebate_Amount__c;
+                                    }
                                     return {
                                         label: pd.toLocaleDateString(userLocale, dateOptions),
                                         metatext: metattext,
@@ -268,18 +332,19 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                         items: []
                                     };
                                 })
+                                */
                             } else {
                                 pmiTree.items = [];
                             }
                             //pmiTree.items = actualsForPMI;
                         }
-
+                        console.log('[buildtree] pmiTree', pmiTree);
                         const createNew = { label:this.labels.createNew.label, name:'new_'+key, disabled:false, expanded:false, items:[] };
                         pmiTree.items.splice(0, 0, createNew);
                         return pmiTree;
                     });
-                    const createNewForAccount = { label:this.labels.createNewForAllProducts.label, name:'newaccount_'+account.Account__c, disabled:false, expanded:false, items:[] };
-                    pmiItems.splice(0, 0, createNewForAccount);
+                    //const createNewForAccount = { label:this.labels.createNewForAllProducts.label, name:'newaccount_'+account.Account__c, disabled:false, expanded:false, items:[] };
+                    //pmiItems.splice(0, 0, createNewForAccount);
                     accountTree.items = pmiItems;
                 }
                 

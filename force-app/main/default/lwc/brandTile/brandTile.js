@@ -10,8 +10,6 @@ export default class BrandTile extends LightningElement {
     pictureUrl;
     isSelected = false;
 
-    tileClass = 'tile';
-
     @wire(CurrentPageReference) pageRef;
 
     connectedCallback() {
@@ -27,7 +25,20 @@ export default class BrandTile extends LightningElement {
     get brand() {
         return this._brand;
     }
+
+    @api 
+    size = "normal";
     
+    get tileClass() {
+        let tc = 'tile';
+        if (this.size == 'small') {
+            tc = 'tile-small';
+        } else if (this.size == 'large') {
+            tc = 'tile-large';
+        }
+
+        return tc;
+    }
     set brand(value) {
         this._brand = value;
         this.brandName = value.Name;
