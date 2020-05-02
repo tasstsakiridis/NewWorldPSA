@@ -3,47 +3,53 @@ import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
-import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_CANCEL from '@salesforce/label/c.Cancel';
-import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
-import LABEL_END_DATE from '@salesforce/label/c.End_Date';
-import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
-import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
-import LABEL_PRODUCT from '@salesforce/label/c.Product';
-import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
-import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
-import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
-import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
-import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
-import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
-import LABEL_TRAINING_ADVOCACY from '@salesforce/label/c.Training_and_Advocacy';
-import LABEL_BALANCE from '@salesforce/label/c.Balance';
-import LABEL_PAID from '@salesforce/label/c.Paid';
-import LABEL_SUMMARY from '@salesforce/label/c.Summary';
-import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
 import LABEL_ACTUAL from '@salesforce/label/c.Actual';
+import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
+import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_BALANCE from '@salesforce/label/c.Balance';
+import LABEL_DETAILS from '@salesforce/label/c.Details2';
+import LABEL_END_DATE from '@salesforce/label/c.End_Date';
+import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
+import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
+import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
+import LABEL_PAID from '@salesforce/label/c.Paid';
+import LABEL_PLANNED from '@salesforce/label/c.Planned';
+import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
+import LABEL_PRINT from '@salesforce/label/c.Factsheet_Print';
+import LABEL_PRODUCT from '@salesforce/label/c.Product';
+import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
+import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
+import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
+import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
+import LABEL_SUMMARY from '@salesforce/label/c.Summary';
+import LABEL_TOTAL from '@salesforce/label/c.Total';
+import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+import LABEL_TRAINING_ADVOCACY from '@salesforce/label/c.Training_and_Advocacy';
+import LABEL_VOLUME from '@salesforce/label/c.Volume_Title';
+import LABEL_WORKING from '@salesforce/label/c.Working_PleaseWait';
 
 export default class PromotionalSalesAgreementSummary extends NavigationMixin(LightningElement) { 
     labels = {
-        back: { label: LABEL_BACK },
-        cancel: { label: LABEL_CANCEL },
-        start: { label: LABEL_START_DATE },
-        end: { label: LABEL_END_DATE },
-        account: { label: LABEL_ACCOUNT },
-        psaSummary: { label: LABEL_PSASUMMARY },
-        numberOfQuarters: { label: LABEL_NUMBEROFQUARTERS },
-        summary: { label: LABEL_SUMMARY },
-        volume: { label: 'Volume' },
-        planned: { label: 'Planned' },
-        actual: { label: LABEL_ACTUAL },
-        listingFee: { label: LABEL_LISTING_FEE },
-        promotionalActivity: { label: LABEL_PROMOTIONAL_ACTIVITY },
-        trainingAdvocacy: { label: LABEL_TRAINING_ADVOCACY },
-        balance: { label: LABEL_BALANCE },
-        total: { label: 'Total' },
-        paid: { label: LABEL_PAID },
-        details: { label: 'Details' }        
+        account:                { label: LABEL_ACCOUNT },
+        actual:                 { label: LABEL_ACTUAL },
+        back:                   { label: LABEL_BACK },
+        balance:                { label: LABEL_BALANCE },
+        details:                { label: LABEL_DETAILS },
+        end:                    { label: LABEL_END_DATE },
+        listingFee:             { label: LABEL_LISTING_FEE },
+        numberOfQuarters:       { label: LABEL_NUMBEROFQUARTERS },
+        paid:                   { label: LABEL_PAID },
+        planned:                { label: LABEL_PLANNED },
+        print:                  { label: LABEL_PRINT },
+        promotionalActivity:    { label: LABEL_PROMOTIONAL_ACTIVITY },
+        psaSummary:             { label: LABEL_PSASUMMARY },
+        start:                  { label: LABEL_START_DATE },
+        summary:                { label: LABEL_SUMMARY },
+        trainingAdvocacy:       { label: LABEL_TRAINING_ADVOCACY },
+        total:                  { label: LABEL_TOTAL },
+        volume:                 { label: LABEL_VOLUME },
+        working:                { message: LABEL_WORKING }
     };
     
     @api 
@@ -81,6 +87,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.psaId = currentPageReference.state.c__psaId;
     }
 
+    isWorking = false;
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortBy;
@@ -178,6 +185,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     handleCancelButtonClick(event) {
         console.log('[handleCancelButtonClick]');
         try {
+            this.isWorking = true;
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
@@ -193,7 +201,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             }
         }
     }
-    handlePrintButtonClick() {
+    handlePrintButtonClick() {        
         window.print();
     }
 
@@ -240,62 +248,63 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     }
     */
     buildTableData() {
-        const accountsMap = new Map();
+        //const accountsMap = new Map();
 
-        if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
-            this.thePSA.Promotions__r.forEach(p => {                            
-                console.log('[summary.buildtabledata] promotion', p);
-                const account = { id: p.Id, 
-                                  name: p.AccountName__c, 
-                                  actualVolume: parseFloat(p.Total_Actual_Qty__c),
-                                  plannedVolume: 0,
-                                  listingFee: 0,
-                                  listingFeePaid: parseFloat(p.Total_Listing_Fee_Paid__c),
-                                  promotionalActivity: 0,
-                                  promotionalActivityPaid: parseFloat(p.Total_Promotional_Activity_Paid__c),
-                                  trainingAdvocacy: 0,
-                                  trainingAdvocacyPaid: parseFloat(p.Total_Training_and_Advocacy_Paid__c),
-                                  pmi: new Map() };                
+       // if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
+       //     this.thePSA.Promotions__r.forEach(p => {                            
+        //console.log('[summary.buildtabledata] promotion', p);
+        this.isWorking = true;
+        const account = { id: this.thePSA.Account__c, 
+                            name: this.thePSA.Account__r.Name, 
+                            actualVolume: parseFloat(this.thePSA.Total_Actual_Volume__c),
+                            plannedVolume: 0,
+                            listingFee: 0,
+                            listingFeePaid: parseFloat(this.thePSA.Total_Listing_Fee_Paid__c),
+                            promotionalActivity: 0,
+                            promotionalActivityPaid: parseFloat(this.thePSA.Total_Promotional_Activity_Paid__c),
+                            trainingAdvocacy: 0,
+                            trainingAdvocacyPaid: parseFloat(this.thePSA.Total_Training_and_Advocacy_Paid__c),
+                            pmi: new Map() };                
                 
-                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                    this.thePSA.Promotion_Material_Items__r.forEach((pmi, index) => {
-                        console.log('[summary.buildtabledata] pmi, index', pmi, index);
+        if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
+            this.thePSA.Promotion_Material_Items__r.forEach((pmi, index) => {
+                console.log('[summary.buildtabledata] pmi, index', pmi, index);
 
-                        if (pmi.Plan_Volume__c != undefined) {
-                            account.plannedVolume += pmi.Plan_Volume__c;
-                        }
-                        if (pmi.Listing_Fee__c != undefined) {
-                            account.listingFee += pmi.Listing_Fee__c;
-                        }
-                        if (pmi.Promotional_Activity__c != undefined) {
-                            account.promotionalActivity += pmi.Promotional_Activity__c;                            
-                        }
-                        if (pmi.Training_and_Advocacy__c != undefined) {
-                            account.trainingAdvocacy += pmi.Training_and_Advocacy__c;
-                        }
-
-                        account.pmi.set(pmi.Id, {
-                            id: pmi.Id, 
-                            product: pmi.Product_Name__c, 
-                            plannedVolume: parseFloat(pmi.Plan_Volume__c),
-                            discount: parseFloat(pmi.Plan_Rebate__c),
-                            listingFee: parseFloat(pmi.Listing_Fee__c),
-                            promotionalActivity: parseFloat(pmi.Promotional_Activity_Value__c),
-                            trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
-                            totalInvestment: parseFloat(pmi.Total_Investment__c)
-                        });
-                    });
+                if (pmi.Plan_Volume__c != undefined) {
+                    account.plannedVolume += pmi.Plan_Volume__c;
+                }
+                if (pmi.Listing_Fee__c != undefined) {
+                    account.listingFee += pmi.Listing_Fee__c;
+                }
+                if (pmi.Promotional_Activity__c != undefined) {
+                    account.promotionalActivity += pmi.Promotional_Activity__c;                            
+                }
+                if (pmi.Training_and_Advocacy__c != undefined) {
+                    account.trainingAdvocacy += pmi.Training_and_Advocacy__c;
                 }
 
-                accountsMap.set(p.Id, account);
+                account.pmi.set(pmi.Id, {
+                    id: pmi.Id, 
+                    product: pmi.Product_Name__c, 
+                    plannedVolume: parseFloat(pmi.Plan_Volume__c),
+                    discount: parseFloat(pmi.Plan_Rebate__c),
+                    listingFee: parseFloat(pmi.Listing_Fee__c),
+                    promotionalActivity: parseFloat(pmi.Promotional_Activity_Value__c),
+                    trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
+                    totalInvestment: parseFloat(pmi.Total_Investment__c)
+                });
             });
         }
 
-        console.log('[summary.buildtabledata] accountsMap', accountsMap);
+        //accountsMap.set(p.Id, account);
+            //});
+        //}
+
+        //console.log('[summary.buildtabledata] accountsMap', accountsMap);
         if (this.thePSA.PMI_Actuals__r && this.thePSA.PMI_Actuals__r.length > 0) {
             this.thePSA.PMI_Actuals__r.forEach(pmia => {
                 console.log('[summary.buildtabledata] pmia', pmia);
-                let account = accountsMap.get(pmia.Promotion__c);
+                //let account = accountsMap.get(pmia.Promotion__c);
                 let pmi = account.pmi.get(pmia.Promotion_Material_Item__c);
                 /*
                 const newPMI = {...pmi};
@@ -323,7 +332,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
 
         const data = [];
         let index = 0;
-        accountsMap.forEach((account, key, map) => {
+        //accountsMap.forEach((account, key, map) => {
             console.log('[summary.buildtabledata] account', account);
             index = 0;
             account.pmi.forEach(pmi => {
@@ -373,10 +382,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                                  trainingAdvocacyPaid: account.trainingAdvocacyPaid };
             data.push(accountRow);
             */
-        });
+        //});
         
         this.psaData = data;
         console.log('[summary.buildtabledata] data', data);
+        this.isWorking = false;
     }
 
 }

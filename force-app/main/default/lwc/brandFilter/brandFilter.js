@@ -6,11 +6,16 @@ import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
 import getBrands from '@salesforce/apex/PromotionalSalesAgreement_Controller.getBrands';
 
+import LABEL_BRAND from '@salesforce/label/c.Brand';
+import LABEL_BRANDS from '@salesforce/label/c.Brands';
+import LABEL_CLEAR from '@salesforce/label/c.Clear';
+import LABEL_SEARCH from '@salesforce/label/c.Search';
+
 export default class BrandFilter extends LightningElement {
     labels = {
-        search: { label: 'Search' },
-        brand: { label: 'Brand', labelPlural: 'Brands'},
-        clear: { label: 'Clear' }
+        brand: { label: LABEL_BRAND, labelPlural: LABEL_BRANDS},
+        clear: { label: LABEL_CLEAR },
+        search: { label: LABEL_SEARCH },
     };
 
     isPhone = CLIENT_FORM_FACTOR === "Small";

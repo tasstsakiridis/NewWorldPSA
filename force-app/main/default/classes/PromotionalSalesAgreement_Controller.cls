@@ -62,6 +62,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return isSOMUser;
     }
 
+    @AuraEnabled(cacheable=true) 
+    public static User getUserDetails() {
+        return [SELECT Id, Name, FirstName, LastName, Email
+                  FROM User 
+                 WHERE Id =:UserInfo.getUserId()];
+    }
+
     @AuraEnabled(cacheable=true)
     public static Promotion_Activity__c getPSA(String psaId){
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
@@ -314,6 +321,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Id = psaData.id;
             psa.Begin_Date__c = psaData.beginDate;
             psa.End_Date__c = psaData.endDate;
+            psa.Is_Length_in_Years__c = psaData.isLengthInYears;
             psa.Length_of_Agreement__c = Integer.valueOf(psaData.lengthOfPSA);
             psa.Account__c = psaData.parentAccountId;
             psa.Contact__c = psaData.signingCustomerId;
@@ -321,6 +329,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Wholesaler_Preferred_Name__c = psaData.wholesalerPreferredName;
             psa.Wholesaler_Alternate__c = psaData.wholesalerAlternateId;
             psa.Wholesaler_Alternate_Name__c = psaData.wholesalerAlternateName;
+            psa.Status__c = psaData.status;
             psa.Purchase_Order__c = psaData.purchaseOrder;
 
             if (psaData.marketId == null || psaData.marketId == '') {
@@ -736,7 +745,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled 
-    public static SimpleListItem clonePSA(String psaId) {
+    public static SimpleListItem clonePSA(String psaId, String newName) {
         SimpleListItem sli = new SimpleListItem('', 'OK', true, '');
 
         try {
@@ -760,7 +769,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
             Promotion_Activity__c newPSA = psa.clone(false, true, false, false);
             Date today = Date.today();
-            newPSA.Name = 'PSA_' + today.year() + today.month() + today.day();
+            if (newName == null || newName == '') {
+                newPSA.Name = 'PSA_' + today.year() + today.month() + today.day();
+            } else {
+                newPSA.Name = newName;
+            }
             newPSA.Status__c = 'New';
             newPSA.Is_Approved__c = false;
             newPSA.Date_Approved__c = null;
@@ -812,4 +825,35 @@ public with sharing class PromotionalSalesAgreement_Controller {
         }
         return sli;
     }
+
+    @AuraEnabled 
+    public static String sendDocuSignEnvelope(String psaId) {
+        String msg = 'OK';
+
+        dfsle.Envelope theEnvelope = dfsle.EnvelopeService.getEmptyEnvelope(new dfsle.Entity(psaId));
+        dfsle.Recipient theRecipient = dfsle.Recipient.fromSource(
+            UserInfo.getUserName(), 
+            UserInfo.getUserEmail(), 
+            null,                                       // Optional Phone Number
+            'Signer 1',                                 // Role Name.  Specify the exact role name from template
+            new dfsle.Entity(UserInfo.getUserId())      // Source object for the recipient
+        );
+
+        theEnvelope = theEnvelope.withRecipients(new List<dfsle.Recipient> { theRecipient });
+
+        dfsle.UUID theTemplateId = dfsle.UUID.parse('d65a6a14-3770-ea11-b80c-48df378a7098');
+        dfsle.Document theDocument = dfsle.Document.fromTemplate(theTemplateId, 'UK PSA');
+
+        theEnvelope = theEnvelope.withDocuments(new List<dfsle.Document> { theDocument });
+        theEnvelope = dfsle.EnvelopeService.sendEnvelope(theEnvelope, true);
+
+        List<dfsle.Envelope.Status> envelopeStatus = dfsle.StatusService.getStatus(new Set<Id> { psaId }, 1);
+        System.debug('# of statuses: ' + envelopeStatus.size());
+        for(dfsle.Envelope.Status s : envelopeStatus) {
+            System.debug('status: ' + s);
+            msg += s + ',';
+        }
+        msg = msg.removeEnd(',');
+        return msg;
+    }    
 }

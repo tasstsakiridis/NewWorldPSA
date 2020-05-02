@@ -40,6 +40,7 @@
                                         <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
                                     </template>
                                     <template if:true={canViewSummary}>
+                                        <lightning-button label={labels.docusign.label} icon-name="utility:edit_form" title="Docusign" class="slds-m-horizontal_x-small" onclick={handleDocusignButtonClick}></lightning-button>
                                         <lightning-button label={labels.summary.label} icon-name="utility:matrix" title="Summary" class="slds-m-horizontal_x-small" onclick={handleSummaryButtonClick}></lightning-button>
                                     </template>
                                     <lightning-button label={labels.items.label} icon-name="utility:snippet" title="Items" class="slds-m-horizontal_x-small" onclick={handleItemsButtonClick} ></lightning-button>
@@ -90,8 +91,25 @@
 
     <template if:true={isWorking}>
         <div class="slds-m-around_medium slds-align_absolute-center">
-            <lightning-spinner alternative-text="Saving. Please wait..."></lightning-spinner>
+            <lightning-spinner alternative-text={labels.save.message}></lightning-spinner>
             <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
+    <template if:true={isCloning}>
+        <div class="slds-m-top_small">
+            <lightning-card title={labels.clone.label}>
+                <template if:true={isPhone}>
+                    <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneCancelButtonClick}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:check" title="OK" alternative-text="OK" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneOKButtonClick}></lightning-button-icon>
+                </template>
+                <template if:false={isPhone}>
+                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Back" slot="actions" class="" onclick={handleCloneCancelButtonClick} ></lightning-button>
+                    <lightning-button label={labels.ok.label} icon-name="utility:check" title="OK" slot="actions" class="" onclick={handleCloneOKButtonClick} ></lightning-button>
+                </template>
+                <div class="slds-m-around_medium">            
+                    <lightning-input name="i_ClonedName" label={labels.clone.instruction} max-length="80" value={cloneName} onchange={handleCloneNameChange}></lightning-input>
+                </div>    
+            </lightning-card>
         </div>
     </template>
     <div class="card-body slds-m-top_small">
@@ -139,18 +157,18 @@
                                     </template>            
                                 </lightning-layout-item>
                                 <lightning-layout-item size="3">
-                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" disabled={isLocked} checked message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" disabled={isLocked} checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                             </lightning-layout>    
                         </template>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small">
-                        <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">Agreement will end on</h2>
+                        <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.agreementEndDate.label}</h2>
                         <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
                     </lightning-layout-item>
                     <template if:true={isApproved}>
                         <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
-                            <h3 class="slds-text-title_caps" slot="title">{labels.details.label}</h3>
+                            <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
                             <lightning-layout multiple-rows="true">
                                 <lightning-layout-item size="12" padding="around-small">
                                     <template if:true={canChangeStatus}>
@@ -202,9 +220,6 @@
                                             readonly={isLocked}
                                             onchange={handleAlternateRTMChange}>
                         </lightning-combobox>
-                        <template if:true={hasAlternateRTMError}>
-                            <span class="slds-m-horizontal_small input-error">{labels.alternateRTM.error}</span>
-                        </template>
                     </lightning-layout-item>
                 </lightning-layout>
             </lightning-layout-item>

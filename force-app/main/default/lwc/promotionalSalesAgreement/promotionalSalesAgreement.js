@@ -3,6 +3,7 @@ import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObject
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
+import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 
 import { refreshApex } from '@salesforce/apex';
 
@@ -14,36 +15,89 @@ import getAccountsByName from '@salesforce/apex/PromotionalSalesAgreement_Contro
 import getAccountsForParent from '@salesforce/apex/PromotionalSalesAgreement_Controller.getAccountsForParent';
 import getWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controller.getWholesalers';
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
+import getUserDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getUserDetails';
 import savePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.savePSA';
 import detachDocument from '@salesforce/apex/PromotionalSalesAgreement_Controller.detachDocument';
 import getIsSOMUser from '@salesforce/apex/PromotionalSalesAgreement_Controller.getIsSOMUser';
 import submitForApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.submitForApproval';
 import recallApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.recallApproval';
 import clonePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.clonePSA';
+import sendDocuSignEnvelope from '@salesforce/apex/PromotionalSalesAgreement_Controller.sendDocuSignEnvelope';
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
 import userId from '@salesforce/user/Id';
 
+import LABEL_ACCOUNT from '@salesforce/label/c.Account';
+import LABEL_ACCOUNT_SEARCH_RESULTS from '@salesforce/label/c.Account_Search_Results';
+import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
+import LABEL_AGREEMENT_END_DATE from '@salesforce/label/c.Agreement_End_Date';
+import LABEL_AGREEMENT_START_DATE from '@salesforce/label/c.Agreement_Start_Date';
+import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
+import LABEL_ALTERNATE_RTM_ERROR from '@salesforce/label/c.Alternate_RTM_Error';
+import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
-import LABEL_SAVE_AND_CLOSE from '@salesforce/label/c.Save_and_Close';
-import LABEL_SAVE from '@salesforce/label/c.Save';
-import LABEL_SKIP from '@salesforce/label/c.Skip';
-import LABEL_RECORD_TYPE from '@salesforce/label/c.RecordType';
-import LABEL_DURATION from '@salesforce/label/c.Duration';
-import LABEL_YES from '@salesforce/label/c.Yes';
-import LABEL_NO from '@salesforce/label/c.No';
-import LABEL_ITEMS from '@salesforce/label/c.Items';
 import LABEL_CLONE from '@salesforce/label/c.Clone';
+import LABEL_CLONE_SUCCESS_MESSAGE from '@salesforce/label/c.Clone_Success_Message';
+import LABEL_CLONE_PSA_INSTRUCTION from '@salesforce/label/c.Clone_PSA_Instruction';
+import LABEL_COMPANY_DETAILS from '@salesforce/label/c.Company_Details';
+import LABEL_CUSTOMER_DETAILS from '@salesforce/label/c.Customer_Details';
+import LABEL_DATE_RANGE from '@salesforce/label/c.Date_Range';
+import LABEL_DESELECT_ALL from '@salesforce/label/c.DeSelect_All';
+import LABEL_DETACH_FILE from '@salesforce/label/c.Detach_File';
+import LABEL_DETACH_FILE_CONFIRMATION from '@salesforce/label/c.Detach_File_Confirmation';
+import LABEL_DETACH_FILE_SUCCESS from '@salesforce/label/c.Detach_File_Success';
+import LABEL_DETAILS from '@salesforce/label/c.Details2';
+import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
+import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
 import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_INFO from '@salesforce/label/c.Info';
+import LABEL_ITEMS from '@salesforce/label/c.Items';
+import LABEL_LENGTH_OF_AGREEMENT_ERROR from '@salesforce/label/c.Length_of_Agreement_Error';
+import LABEL_LENGTH_OF_AGREEMENT_YEARS from '@salesforce/label/c.Length_of_Agreement_Years';
+import LABEL_LENGTH_OF_AGREEMENT_MONTHS from '@salesforce/label/c.Length_of_Agreement_Months';
+import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
+import LABEL_MONTH from '@salesforce/label/c.Month';
+import LABEL_MONTHS from '@salesforce/label/c.Months';
+import LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT from '@salesforce/label/c.No_Accounts_Found_for_Parent';
+import LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT from '@salesforce/label/c.No_Decision_Makers_found_for_Account';
+import LABEL_NONE from '@salesforce/label/c.None';
+import LABEL_NONE_PICKLIST_VALUE from '@salesforce/label/c.None_Picklist_Value';
+import LABEL_OK from '@salesforce/label/c.OK';
+import LABEL_PARENT_ACCOUNT from '@salesforce/label/c.Parent_Account';
+import LABEL_PARENT_ACCOUNT_ERROR from '@salesforce/label/c.Parent_Account_Error';
+import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Parent_Account_Search_Results_Message';
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
-import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
+import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
+import LABEL_PSA_RETAIL_ACCOUNTS_HEADING from '@salesforce/label/c.PSA_Retail_Accounts_Heading';
+import LABEL_PURCHASE_ORDER from '@salesforce/label/c.Purchase_Order';
+import LABEL_RECALL from '@salesforce/label/c.Recall';
+import LABEL_RECALL_SUCCESS from '@salesforce/label/c.Recall_Success';
 import LABEL_ROUTETOMARKET from '@salesforce/label/c.RouteToMarket';
-import LABEL_NEW from '@salesforce/label/c.New';
+import LABEL_SAVE from '@salesforce/label/c.Save';
+import LABEL_SAVE_ERROR_MESSAGE from '@salesforce/label/c.Save_Error_Message';
+import LABEL_SAVE_SUCCESS_MESSAGE from '@salesforce/label/c.Save_Success_Message';
+import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
+import LABEL_SEARCH from '@salesforce/label/c.Search';
+import LABEL_SEARCH_BY from '@salesforce/label/c.SearchBy';
+import LABEL_SEARCH_HELP_TEXT from '@salesforce/label/c.Search_Help_Text';
+import LABEL_SELECT_ALL from '@salesforce/label/c.Select_All';
+import LABEL_SIGNING_CUSTOMER from '@salesforce/label/c.Signing_Customer';
+import LABEL_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
+import LABEL_STATUS from '@salesforce/label/c.Status';
+import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_for_Approval';
+import LABEL_SUCCESS from '@salesforce/label/c.Success';
 import LABEL_SUMMARY from '@salesforce/label/c.Summary';
+import LABEL_UPLOAD_AND_ATTACH from '@salesforce/label/c.Upload_and_Attach';
+import LABEL_UPLOAD_AND_ATTACH_HELPTEXT from '@salesforce/label/c.Upload_and_Attach_HelpText';
+import LABEL_UPLOAD_AND_ATTACH_SUCCESS from '@salesforce/label/c.Upload_and_Attach_Success';
+import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
+import LABEL_WORKING_PLEASEWAIT from '@salesforce/label/c.Working_PleaseWait';
+import LABEL_YEAR from '@salesforce/label/c.Year';
+import LABEL_YEARS from '@salesforce/label/c.Years';
 
 import OBJECT_ACTIVITY from '@salesforce/schema/Promotion_Activity__c';
 import OBJECT_PROMOTION from '@salesforce/schema/Promotion__c';
@@ -62,61 +116,59 @@ const invalidStatusSelections = ['New','Submitted','Pending Approval'];
 
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
-        account                 : { label: 'Account', labelPlural: 'Accounts' },        
-        accountSearchResults    : { label: 'Accounts matching "%0"' },
-        actuals                 : { label: 'Actuals' },
-        alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: 'No Alternate Wholesaler selected'},
+        account                 : { label: LABEL_ACCOUNT },        
+        accountSearchResults    : { label: LABEL_ACCOUNT_SEARCH_RESULTS },
+        actuals                 : { label: LABEL_ACTUALS },
+        agreementEndDate        : { label: LABEL_AGREEMENT_END_DATE },
+        alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
         back                    : { label: LABEL_BACK },
         cancel                  : { label: LABEL_CANCEL },
         change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
         clear                   : { label: LABEL_CLEAR },
-        clone                   : { label: LABEL_CLONE, clonedMessage: 'PSA successfully cloned.' },
-        companyDetails          : { label: 'Company Details' },
-        confirmDetachFile       : { message: 'Are you sure you want to detach {0} from this PSA?' },
-        customerDetails         : { label: 'Customer Details' },
-        deSelectAll             : { label: 'DeSelect All' },
-        dateRange               : { label: 'Date Range' },
-        details                 : { label: 'Details' },
-        detachFile              : { label: 'Detach File', successMessage: 'File {0} has been successfully detached from this PSA.'},
-        duration                : { label: LABEL_DURATION  },
-        error                   : { message: 'Errors found validating/saving the PSA.  Please review and try saving again.' },
+        clone                   : { label: LABEL_CLONE, clonedMessage: LABEL_CLONE_SUCCESS_MESSAGE, instruction: LABEL_CLONE_PSA_INSTRUCTION },
+        companyDetails          : { label: LABEL_COMPANY_DETAILS },
+        customerDetails         : { label: LABEL_CUSTOMER_DETAILS },
+        deSelectAll             : { label: LABEL_DESELECT_ALL },
+        dateRange               : { label: LABEL_DATE_RANGE },
+        details                 : { label: LABEL_DETAILS },
+        detachFile              : { label: LABEL_DETACH_FILE, successMessage: LABEL_DETACH_FILE_SUCCESS, confirmation: LABEL_DETACH_FILE_CONFIRMATION},
+        docusign                : { label: LABEL_DOCUSIGN },
+        error                   : { message: LABEL_FORM_ERROR },
         help                    : { label: LABEL_HELP },
         items                   : { label: LABEL_ITEMS },
-        info                    : { label: 'Info' },
-        lengthOfPSA             : { yearsLabel: 'Length of Agreement (in years)', monthsLabel: 'Length of Agreement (in months)', error: 'Please select from one of the Length of Agreement options' },
-        loading                 : { message: 'Loading PSA details. Please wait...' },
-        month                   : { label: 'month', labelPlural: 'months' },
-        no                      : { label: LABEL_NO },
-        noAccountsFound         : { label: 'No retail accounts found for %0' },
-        noSigningCustomers      : { message: 'There are no contacts for this account setup as decision makers.'},
-        parentAccount           : { label: 'Parent Account', error: 'No Parent or Retail Account selected and no Signing Customer selected' },
-        parentAccountSearchResults : { label: 'Accounts matching "%0".  Tap on an account below to select it and find any of it\'s retail accounts'},
-        preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: 'No Preferred Wholesaler selected' },
-        recordType              : { label: LABEL_RECORD_TYPE },
-        retailAccountsHeading   : { label: 'Names of individual outlets in estate and parts of business included in PSA' },
+        info                    : { label: LABEL_INFO },
+        lengthOfPSA             : { yearsLabel: LABEL_LENGTH_OF_AGREEMENT_YEARS, monthsLabel: LABEL_LENGTH_OF_AGREEMENT_MONTHS, error: LABEL_LENGTH_OF_AGREEMENT_ERROR },
+        loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
+        month                   : { label: LABEL_MONTH.toLowerCase(), labelPlural: LABEL_MONTHS.toLowerCase() },
+        noAccountsFound         : { label: LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT },
+        noSigningCustomers      : { message: LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT },
+        ok                      : { label: LABEL_OK },
+        parentAccount           : { label: LABEL_PARENT_ACCOUNT, error: LABEL_PARENT_ACCOUNT_ERROR },
+        parentAccountSearchResults : { label: LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR },
+        preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
+        retailAccountsHeading   : { label: LABEL_PSA_RETAIL_ACCOUNTS_HEADING },
         routeToMarket           : { label: LABEL_ROUTETOMARKET },
-        saveAndClose            : { label: LABEL_SAVE_AND_CLOSE },
-        save                    : { label: LABEL_SAVE },
-        saveError               : { message: 'Error saving PSA' },
-        saveSuccess             : { message: 'All changes saved successfully'},
-        search                  : { label: 'Search' },
-        searchBy                : { label: 'Search by %0' },
-        selectAll               : { label: 'Select All' },
-        selectParentAccount     : { help: 'Enter the name, or part of the name, of an account to search for' },
-        signingCustomerHeader   : { label: 'Full name of signing customer'},
-        skip                    : { label: LABEL_SKIP },
-        startDate               : { label: 'This agreement will start at', error: 'No Start Date selected' },
-        status                  : { label: 'Status' },
-        success                 : { label: 'Success' },
+        save                    : { label: LABEL_SAVE, message: LABEL_SAVING_PLEASE_WAIT },
+        saveError               : { message: LABEL_SAVE_ERROR_MESSAGE.replace('%0', 'PSA') },
+        saveSuccess             : { message: LABEL_SAVE_SUCCESS_MESSAGE },
+        search                  : { label: LABEL_SEARCH },
+        searchBy                : { label: LABEL_SEARCH_BY },
+        searchHelpText          : { label: LABEL_SEARCH_HELP_TEXT },
+        selectAll               : { label: LABEL_SELECT_ALL },
+        signingCustomerHeader   : { label: LABEL_SIGNING_CUSTOMER },
+        startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_START_DATE_ERROR },
+        status                  : { label: LABEL_STATUS },
+        success                 : { label: LABEL_SUCCESS },
         summary                 : { label: LABEL_SUMMARY },
-        uploadFile              : { label: 'Upload & Attach Files', message: 'Select files to upload and attach to PSA', successMessage: 'Files uploaded successfully!' },
-        warning                 : { label: 'Warning' },        
-        yes                     : { label: LABEL_YES },
-        year                    : { label: 'year', labelPlural: 'years' },
-        purchaseOrder           : { label: 'Purchase Order' },
-        submitForApproval       : { label: 'Submit for Approval', submittedMessage: 'PSA has successfully been submitted for approval' },
-        recall                  : { label: 'Recall', recalledMessage: 'PSA recalled successfully' },
-        working                 : { label: 'Working. Please wait...' }
+        uploadFile              : { label: LABEL_UPLOAD_AND_ATTACH, message: LABEL_UPLOAD_AND_ATTACH_HELPTEXT.replace('%0', 'PSA'), successMessage: LABEL_UPLOAD_AND_ATTACH_SUCCESS },
+        userDetails             : { error: 'There was a problem getting your details from Salesforce.'},
+        warning                 : { label: LABEL_WARNING },        
+        year                    : { label: LABEL_YEAR, labelPlural: LABEL_YEARS },
+        purchaseOrder           : { label: LABEL_PURCHASE_ORDER },
+        submitForApproval       : { label: LABEL_SUBMIT_FOR_APPROVAL, submittedMessage: LABEL_APPROVAL_SUBMITTED.replace('%0', 'PSA') },
+        recall                  : { label: LABEL_RECALL, recalledMessage: LABEL_RECALL_SUCCESS.replace('%0', 'PSA') },
+        working                 : { label: LABEL_WORKING_PLEASEWAIT },
+        none                    : { label: LABEL_NONE, picklistLabel: LABEL_NONE_PICKLIST_VALUE }
     };
 
     @track promotionObjectInfo;
@@ -232,6 +284,20 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
 
+    user;
+    @wire(getUserDetails)
+    wiredGetUserDetails(value) {
+        console.log('[psa.getuserdetails] value', value);
+        if (value.data) {
+            this.user = value.data;
+            this.error = undefined;
+        } else if (value.error) {
+            this.error = value.erroor;
+            this.user = undefined;
+            console.log('[psa.getuserdetails] error', value.error);
+        }
+    }
+
     wiredWholesalers;
     wholesalers;
     wholesalerPreferred;
@@ -248,6 +314,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.wholesalers = data.map(wholesaler => { 
                return { label: wholesaler.Name, value: wholesaler.Id }; 
             });
+            this.wholesalers.splice(0, 0, { label: this.labels.none.picklistLabel, value: '-none-' });
         } else if (error) { 
             this.error = error;
             this.wholesalers = undefined;
@@ -307,6 +374,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.status;
     }
 
+    cloneName = '';
+    isCloning = false;
     isLengthInYears = true;
 
     maximumLengthOfPSA = 3;
@@ -363,9 +432,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get accountSearchInputLabel() {
         var lbl = this.labels.searchBy.label;
         if (this.isUsingParentAccount) {
-            lbl = lbl.replace('%0', this.labels.parentAccount.label);
+            lbl = lbl + ' ' + this.labels.parentAccount.label;
         } else {
-            lbl = lbl.replace('%0', this.labels.account.label);
+            lbl = lbl + ' ' + this.labels.account.label;
         }
 
         return lbl;
@@ -425,7 +494,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     return this.labels.accountSearchResults.label.replace('%0', this.accountQueryString);
                 }
             } else {
-                return this.labels.selectParentAccount.help;
+                return this.labels.searchHelpText.label.replace('%0', this.labels.account.label);
             }
         } else {
             //if (this.accounts && this.accounts.length > 0) {
@@ -563,26 +632,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             });
     }
     handleCloneButtonClick(event) {
-        this.isWorking = true;
-        clonePSA({ psaId: this.recordId })
-            .then(result => {
-                this.isWorking = false;
-                console.log('[clone] result', result);
-                // navigate to new PSA
-                if (result.selected) {
-                    this.showToast('success', 'Success', this.labels.clone.clonedMessage);    
-                    this.recordId = result.id;
-                } else {
-                    this.showToast('error', 'Warning', result.description);
-                }
-            })
-            .catch(error => {
-                console.log('[clone] error', error);
-                this.isWorking = false;
-                this.error = error;
-                this.showToast('error', 'Warning', error);
-            });
-
+        const today = new Date();
+        this.cloneName = this.parentAccount.Name + '-PSA-' + today.getFullYear() + today.getMonth() + today.getDate();
+        this.isCloning = true;
     }
     handleSummaryButtonClick(event) {
         this.isWorking = true;
@@ -597,8 +649,68 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
         
     }
+    handleDocusignButtonClick(event) {
+        sendDocuSignEnvelope({psaId: this.psaId})
+        .then(result => {
+            console.log('[senddocusignenv] success', result);
+        })
+        .catch(error => {
+            console.log('[senddocusignenv] error', error);
+        });
+        /*
+        if (this.user == undefined) {
+            this.showToast('error', 'Error', this.labels.userDetails.error);
+            return;
+        }
+
+        try {
+        this.isWorking = true;
+        const defaultValues = encodeDefaultFieldValues({
+            SourceID: this.psaId,
+            DSEID: '0',
+            DST: '59a80dfb-aeb9-48e3-ac8c-f277b7405082',
+            CRL: 'Email~' + this.user.Email + ';FirstName~' + this.user.FirstName + ';LastName~' + this.user.LastName + ';SignInPersonName~Customer;SignNow~1;RoutingOrder~1;Role~Signer 1, Email~' + this.user.Email + ';FirstName~' + this.user.FirstName + ';LastName~' + this.user.LastName + ';Role~Signer 2;RoutingOrder~2;',
+            OCO: 'Send',
+            CCTM: 'Signer 1~Host in person - sign now',
+            LF: '0',
+            CCRM: 'Signer 1~Customer;Signer 2~Sales Representative',
+            CEM: 'UK Envelope Test'
+        });        
+
+        const pageReference = {
+            type: 'standard__webPage',
+            attributes: {
+                url: '/apex/dsfs__DocuSign_CreateEnvelope'
+            },
+            state: {
+                defaultFieldValues: defaultValues
+            }
+        };
+        this[NavigationMixin.GenerateUrl](pageReference)
+            .then(url => {
+                console.log('[generateurl] url', url);
+                window.open(url);
+            });
+
+        } catch(ex) {
+            console.log('[docusign.exception] ex', ex);
+        }
+        */
+    }
     handleHelpButtonClick(event) {
         this.showToast('info', 'Help', 'Sorry.  Help has not been completed yet.');
+    }
+
+    handleCloneCancelButtonClick() {
+        this.isCloning = false;
+        this.cloneName = "";
+    }
+    handleCloneOKButtonClick() {
+        this.isCloning = false;
+        this.clonePSA();
+    }
+    handleCloneNameChange(event) {
+        this.cloneName = event.detail.value;
     }
     handleSearchAccountChange(event) {
         console.log('[handleSearchAccountChange] event.detail', event.detail);
@@ -715,7 +827,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
     handleRemoveAttachedFile(event) {
-        const response = confirm(this.labels.confirmDetachFile.message.replace('{0}', event.detail.item.label));
+        const response = confirm(this.labels.detachFile.confirmation.replace('{0}', event.detail.item.label));
         if (response == true) {            
             this.detachFile(event.detail.item.name, event.detail.item.label, event.detail.index);
         } 
@@ -769,7 +881,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 }
             }
         }
-    }
+    }    
 
     /**
      * Helper functions
@@ -962,6 +1074,27 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         };
     }
     */
+    clonePSA() {
+        this.isWorking = true;
+        clonePSA({ psaId: this.recordId, newName: this.cloneName })
+            .then(result => {
+                this.isWorking = false;
+                console.log('[clone] result', result);
+                // navigate to new PSA
+                if (result.selected) {
+                    this.showToast('success', 'Success', this.labels.clone.clonedMessage.replace('%0', 'PSA'));    
+                    this.recordId = result.id;
+                } else {
+                    this.showToast('error', 'Warning', result.description);
+                }
+            })
+            .catch(error => {
+                console.log('[clone] error', error);
+                this.isWorking = false;
+                this.error = error;
+                this.showToast('error', 'Warning', error);
+            });
+    }
     validatePSA() {
         let isValid = true;
 
@@ -979,7 +1112,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.hasLengthOfPSAError = true;
             }
         }
-        if (this.wholesalerPreferred == undefined) {
+        console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
+        if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             this.hasPreferredRTMError = true;
             isValid = false; 
         }
@@ -1163,13 +1297,18 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         const wp = this.wholesalers.find(w => w.value === this.wholesalerPreferred);
         param.wholesalerPreferredName = wp.label;
         console.log('wp', wp);
-        param.wholesalerAlternateId = this.wholesalerAlternate;
-        console.log('wholesalerAlternate', this.wholesalerAlternate);
-        const wa = this.wholesalers.find(w => w.value === this.wholesalerAlternate);
-        param.wholesalerAlternateName = wa.label;
+        if (this.wholesalerAlternate == undefined || this.wholesalerAlternate == '-none-') {
+            param.wholesalerAlternateId = null;
+            param.wholesalerAlternateName = '';
+        } else {
+            param.wholesalerAlternateId = this.wholesalerAlternate;
+            console.log('wholesalerAlternate', this.wholesalerAlternate);
+            const wa = this.wholesalers.find(w => w.value === this.wholesalerAlternate);
+            console.log('wa', wa);
+            param.wholesalerAlternateName = wa.label;    
+        }
         param.purchaseOrder = this.purchaseOrder;
         param.status = this.status;
-        console.log('wa', wa);
 
         param.accounts = [];
         param.promotionsToDelete = [];

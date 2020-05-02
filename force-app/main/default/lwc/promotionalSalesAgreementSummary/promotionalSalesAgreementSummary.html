@@ -1,9 +1,16 @@
 <template>
+    <template if:true={isWorking}>
+        <div class="slds-m-around_medium slds-align_absolute-center">
+            <lightning-spinner alternative-text={labels.working.message}></lightning-spinner>
+            <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
+
     <lightning-card>
         <lightning-button slot="actions" name="b_Back" label={labels.back.label} icon-name="utility:back" class="no-print" onclick={handleCancelButtonClick}></lightning-button>
-        <lightning-button slot="actions" name="b_Print" label="Print" class="no-print" onclick={handlePrintButtonClick}></lightning-button>
+        <lightning-button slot="actions" name="b_Print" label={labels.print.label} class="slds-m-left_x-small no-print" onclick={handlePrintButtonClick}></lightning-button>
         <h3 slot="title">
-            <lightning-icon icon-name="standard:partners" size="small"></lightning-icon>
+            <lightning-icon icon-name="standard:partners" size="small" class="slds-m-right_small"></lightning-icon>
             {psaName} {labels.summary.label}
         </h3>
 
@@ -40,7 +47,7 @@
                                         <td class="col2"><lightning-formatted-number value={totalVolume} type="number" maximum-fraction-digits="0" ></lightning-formatted-number></td>
                                     </tr>
                                     <tr>
-                                        <td class="col1"><h4>{labels.actual.label}</h4></td>
+                                        <td class="col1"><h4 style="text-transform:capitalize;">{labels.actual.label}</h4></td>
                                         <td class="col2"><lightning-formatted-number value={totalActualVolume} type="number" maximum-fraction-digits="0"></lightning-formatted-number></td>
                                     </tr>
                                     <tr>

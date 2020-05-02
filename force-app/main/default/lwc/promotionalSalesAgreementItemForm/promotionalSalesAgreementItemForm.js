@@ -35,27 +35,29 @@ import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controll
 
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
+import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
+import LABEL_SAVING_PLEASE_WAIT from '@salesfoce/label/c.Saving_Please_Wait';
+import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
+import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
 
 export default class PromotionalSalesAgreementItemForm extends NavigationMixin(LightningElement) {
     labels = {
         back                    : { label: LABEL_BACK },
-        brandStatus             : { help: 'bs help' },
-        volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: 'Volume entered is invalid' },
-        discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: 'Discount entered is invalid' },
+        volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
+        discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
         drinkStrategy           : { help: 'Drink Strategy help'},
         promotionalActivity     : { help: 'Promotional Activity help' },
         trainingAdvocacy        : { help: 'Training & Advocacy help' },
         outletToProvide         : { help: 'Outlet to Provide help' },
-        saving                  : { message: 'Saving. Please wait...' },
-        loading                 : { message: 'Loading PSA Item details. Please wait...' },
+        saving                  : { message: LABEL_SAVING_PLEASE_WAIT },
+        loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
         available               : { label: 'Available' },
-        selected                : { label: 'Selected' },
         error                   : { message: 'Errors found validating/saving item details.  Please review and try saving again.' },
         saveError               : { message: 'Error saving item' },
         saveSuccess             : { message: 'All changes saved successfully'},
-        comments                : { label: LABEL_COMMENTS, placeholder: 'Type some text...' }
+        comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER }
     };
 
     @api psaId;
@@ -315,12 +317,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.brandStatusLabel = this.objectInfo.fields["Brand_Status__c"].label;
             this.brandStatusPlaceholder = this.objectInfo.fields["Brand_Status__c"].inlineHelpText;
         }
-        if (this.objectInfo.fields["Discount__c"]) {
-            this.discountLabel = this.objectInfo.fields["Discount__c"].label;
-        }
-        if (this.objectInfo.fields["Volume_Forecast__c"]) {
-            this.volumeForecastLabel = this.objectInfo.fields["Volume_Forecast__c"].label;
-        }
+        //if (this.objectInfo.fields["Discount__c"]) {
+        //    this.discountLabel = this.objectInfo.fields["Discount__c"].label;
+        //}
+        //if (this.objectInfo.fields["Volume_Forecast__c"]) {
+        //    this.volumeForecastLabel = this.objectInfo.fields["Volume_Forecast__c"].label;
+        //}
         if (this.objectInfo.fields["Listing_Fee__c"]) {
             this.listingFeeLabel = this.objectInfo.fields["Listing_Fee__c"].label;
         }

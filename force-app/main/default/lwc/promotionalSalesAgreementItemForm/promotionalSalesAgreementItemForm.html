@@ -24,7 +24,7 @@
 
     <template if:true={isWorking}>
         <div class="slds-m-around_medium slds-align_absolute-center">
-            <lightning-spinner alternative-text="Saving. Please wait..."></lightning-spinner>
+            <lightning-spinner alternative-text={labels.saving.message}></lightning-spinner>
             <p class="slds-text-title_caps">{workingMessage}</p>
         </div>
     </template>
@@ -84,6 +84,7 @@
                 <lightning-input type="number" name="i_DiscountPerCase" 
                                  label={labels.discountPerCase.label}                                 
                                  value={discount}
+                                 step="0.01"
                                  disabled={isLocked}
                                  onchange={handleDiscountChange}
                                  formatter="currency">

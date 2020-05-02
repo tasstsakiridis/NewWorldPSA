@@ -32,44 +32,61 @@ import FIELD_LISTING_FEE from '@salesforce/schema/PMI_Actual__c.Listing_Fee__c';
 import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/PMI_Actual__c.Promotional_Activity__c';
 import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/PMI_Actual__c.Training_and_Advocacy__c';
 
+import LABEL_ACCOUNT from '@salesforce/label/c.Account'
+import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
+import LABEL_ACTUAL_QTY from '@salesforce/label/c.Actual_Qty';
+import LABEL_ACTUAL_QTY_ERROR from '@salesforce/label/c.Actual_Qty_Error';
+import LABEL_ACTUAL_QTY_PLACEHOLDER from '@salesforce/label/c.Actual_Qty_Placeholder';
 import LABEL_BACK from '@salesforce/label/c.Back';
-import CANCEL_LABEL from '@salesforce/label/c.Cancel';
-import SAVE_LABEL from '@salesforce/label/c.Save';
-import YES_LABEL from '@salesforce/label/c.Yes';
-import NO_LABEL from '@salesforce/label/c.No';
-import HELP_LABEL from '@salesforce/label/c.help';
-import WARNING_LABEL from '@salesforce/label/c.Warning_Title';
-
+import LABEL_ERROR from '@salesforce/label/c.Error';
+import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
+import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
+import LABEL_NEXT from '@salesforce/label/c.Next';
+import LABEL_PAYMENT_DATE from '@salesforce/label/c.Payment_Date';
+import LABEL_PAYMENT_DATE_ERROR from '@salesforce/label/c.Payment_Date_Error';
+import LABEL_PAYMENT_DATE_PLACEHOLDER from '@salesforce/label/c.Payment_Date_Placeholder';
+import LABEL_PLANNED from '@salesforce/label/c.Planned';
+import LABEL_PREV from '@salesforce/label/c.PREV';
+import LABEL_PROCESSED from '@salesforce/label/c.Processed';
+import LABEL_PRODUCT from '@salesforce/label/c.Product';
+import LABEL_PROMOTIONAL_ACTIVITY_PAID from '@salesforce/label/c.Promotional_Activity_Paid';
+import LABEL_PURCHASED_FROM from '@salesforce/label/c.Purchased_From';
+import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_Placeholder';
+import LABEL_SAVE from '@salesforce/label/c.Save';
+import LABEL_SKIP from '@salesforce/label/c.Skip'
+import LABEL_STATUS from '@salesforce/label/c.Status';
+import LABEL_TOTAL_DISCOUNT from '@salesforce/label/c.Total_Discount';
+import LABEL_TRAINING_ADVOCACY_PAID from '@salesforce/label/c.Training_and_Advocacy_Paid';
+import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
+ 
 export default class PromotionalSalesAgreementActualsForm extends NavigationMixin(LightningElement) {
     labels = {
         back         : { label: LABEL_BACK },
-        cancel       : { label: CANCEL_LABEL },
-        save         : { label: SAVE_LABEL },
-        yes          : { label: YES_LABEL },
-        no           : { label: NO_LABEL },
-        help         : { label: HELP_LABEL },
-        actuals      : { label: 'Actuals' },
-        error        : { label: 'Error' },
-        status       : { label: 'Status' },
-        account      : { label: 'Account' },
-        product      : { label: 'Product' },
-        actualQty    : { label: 'Actual Qty', placeholder: 'Enter the actual qty sold', error: 'No actual qty entered' },
-        paymentDate  : { label: 'Payment Date', placeholder: 'Enter the date payment of the rebate was made', error: 'No payment date selected' },
-        processed    : { label: 'Processed' },
-        planned      : { label: 'Planned' },
-        purchasedFrom : { label: 'Purchased from' },
-        warning       : { label: WARNING_LABEL },
-        validation    : { error: 'There are some issues with the data you entered.  Please review the error messages and try again.'},
-        skip          : { label: 'skip' },
-        prev          : { label: 'prev' },
-        next          : { label: 'next' },
-        listingFeePaid : { label: 'Listing Fee Paid', placeholder: 'Enter listing fee paid', error: 'Listing fee error' },
-        promotionalActivityPaid: { label: 'Promotional Activity Paid', placeholder: 'Enter Promotional Activity paid', error: 'Promotional Activity paid error'},
-        trainingAndAdvocacyPaid: { label: 'Training & Advocacy Paid', placeholder: 'Enter Training & Advocacy Paid', error: 'Training and Advocacy Paid error'},
+        save         : { label: LABEL_SAVE },
+        help         : { label: LABEL_HELP },
+        actuals      : { label: LABEL_ACTUALS },
+        error        : { label: LABEL_ERROR },
+        status       : { label: LABEL_STATUS },
+        account      : { label: LABEL_ACCOUNT },
+        product      : { label: LABEL_PRODUCT },
+        actualQty    : { label: LABEL_ACTUAL_QTY, placeholder: LABEL_ACTUAL_QTY_PLACEHOLDER, error: LABEL_ACTUAL_QTY_ERROR },
+        paymentDate  : { label: LABEL_PAYMENT_DATE, placeholder: LABEL_PAYMENT_DATE_PLACEHOLDER, error: LABEL_PAYMENT_DATE_ERROR },
+        processed    : { label: LABEL_PROCESSED },
+        planned      : { label: LABEL_PLANNED },
+        purchasedFrom : { label: LABEL_PURCHASED_FROM },
+        warning       : { label: LABEL_WARNING },
+        validation    : { error: LABEL_FORM_VALIDATION_ERROR },
+        skip          : { label: LABEL_SKIP.toLowerCase() },
+        prev          : { label: LABEL_PREV.toLowerCase() },
+        next          : { label: LABEL_NEXT.toLowerCase() },
+        listingFeePaid : { label: LABEL_LISTING_FEE_PAID },
+        promotionalActivityPaid: { label: LABEL_PROMOTIONAL_ACTIVITY_PAID },
+        trainingAndAdvocacyPaid: { label: LABEL_TRAINING_ADVOCACY_PAID },
+        rebateAmount  : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
         remaining     : { label: 'remaining' },
         amount        : { label: 'Amount' },
-        rebateAmount  : { label: 'Rebate amount', placeholder: 'rebate amount', error: 'Some error for rebate amount' },
-        totalDiscount : { label: 'Total Discount' }
+        totalDiscount : { label: LABEL_TOTAL_DISCOUNT }
     };    
 
     @wire(CurrentPageReference)
@@ -259,7 +276,6 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     actualQty;
     actualQtyLabel;
     actualQtyPlaceholder;
-    actualQtyErrorMessage = this.labels.actualQty.error;
     hasActualQtyError;
     get actualQtyFormattedLabel() {
         console.log('[actualQtyFormattedLabel] actualqtylabel', this.labels.actualQty.label);

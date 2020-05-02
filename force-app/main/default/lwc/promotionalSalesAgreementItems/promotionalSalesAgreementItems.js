@@ -13,34 +13,16 @@ import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.g
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import CANCEL_LABEL from '@salesforce/label/c.Cancel';
-import CHANGE_LABEL from '@salesforce/label/c.Change';
-import SAVE_AND_CLOSE_LABEL from '@salesforce/label/c.Save_and_Close';
-import SAVE_LABEL from '@salesforce/label/c.Save';
-import SKIP_LABEL from '@salesforce/label/c.Skip';
-import RECORD_TYPE_LABEL from '@salesforce/label/c.RecordType';
-import DURATION_LABEL from '@salesforce/label/c.Duration';
-import YES_LABEL from '@salesforce/label/c.Yes';
-import NO_LABEL from '@salesforce/label/c.No';
-import ITEMS_LABEL from '@salesforce/label/c.Items';
-import CLONE_LABEL from '@salesforce/label/c.Clone';
-import HELP_LABEL from '@salesforce/label/c.help';
+import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_PRODUCT from '@salesforce/label/c.Product';
+import LABEL_PRODUCTS from '@salesforce/label/c.Products';
+
 
 export default class PromotionsalSalesAgreementItems extends NavigationMixin(LightningElement) {
     labels = {
         back         : { label: LABEL_BACK },
-        cancel       : { label: CANCEL_LABEL },
-        change       : { label: CHANGE_LABEL, labelLowercase: CHANGE_LABEL.toLowerCase() },
-        save         : { label: SAVE_LABEL },
-        recordType   : { label: RECORD_TYPE_LABEL },
-        yes          : { label: YES_LABEL },
-        no           : { label: NO_LABEL },
-        help         : { label: HELP_LABEL },
-        selectAll    : { label: 'Select All' },
-        deSelectAll  : { label: 'DeSelect All' },
-        search       : { label: 'Search' },
-        searchBy     : { label: 'Search by %0' },
-        product      : { label: 'Product', labelPlural: 'Products' },
+        help         : { label: LABEL_HELP },
+        product      : { label: LABEL_PRODUCT, labelPlural: LABEL_PRODUCTS },
         viewSelected : { label: 'view selected' },
         allProducts  : { label: 'all products' }        
     };    

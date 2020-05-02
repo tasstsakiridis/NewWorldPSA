@@ -2,6 +2,8 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
+import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+
 export default class ProductTile extends LightningElement {
 
     tileClass = 'tile';
@@ -76,7 +78,7 @@ export default class ProductTile extends LightningElement {
     }
     get totalInvestmentSummary() {
         if (this.psaItem && this.psaItem.Total_Investment__c) {
-            return '$' + parseFloat(this.psaItem.Total_Investment__c) + ' total investment';
+            return '$' + parseFloat(this.psaItem.Total_Investment__c) + ' ' + LABEL_TOTAL_INVESTMENT.toLowerCase();
         }
     }
 

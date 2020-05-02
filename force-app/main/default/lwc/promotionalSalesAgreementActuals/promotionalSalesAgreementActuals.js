@@ -10,17 +10,14 @@ import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA
 import userLocale from '@salesforce/i18n/locale';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import CANCEL_LABEL from '@salesforce/label/c.Cancel';
-import SAVE_LABEL from '@salesforce/label/c.Save';
-import HELP_LABEL from '@salesforce/label/c.help';
+import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_CREATE_NEW from '@salesforce/label/c.CreateNew';
 
 export default class PromotionalSalesAgreementActuals extends NavigationMixin(LightningElement) {
     labels = {
         back         : { label: LABEL_BACK },
-        cancel       : { label: CANCEL_LABEL },
-        save         : { label: SAVE_LABEL },
-        help         : { label: HELP_LABEL },
-        createNew    : { label: 'Create new...' },
+        help         : { label: LABEL_HELP },
+        createNew    : { label: LABEL_CREATE_NEW },
         createNewForAllProducts : { label: 'Create new for all products...' }
     };    
     
