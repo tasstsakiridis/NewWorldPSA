@@ -287,10 +287,14 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     id: pmi.Id, 
                     product: pmi.Product_Name__c, 
                     plannedVolume: parseFloat(pmi.Plan_Volume__c),
+                    actualVolume: parseFloat(pmi.Total_Actual_Volume__c),
                     discount: parseFloat(pmi.Plan_Rebate__c),
                     listingFee: parseFloat(pmi.Listing_Fee__c),
+                    listingFeePaid: parseFloat(pmi.Total_Listing_Fee_Paid__c),
                     promotionalActivity: parseFloat(pmi.Promotional_Activity_Value__c),
+                    promotionalActivityPaid: parseFloat(pmi.Total_Promotional_Activity_Paid__c),
                     trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
+                    trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
                     totalInvestment: parseFloat(pmi.Total_Investment__c)
                 });
             });
@@ -301,18 +305,12 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         //}
 
         //console.log('[summary.buildtabledata] accountsMap', accountsMap);
+        /*
         if (this.thePSA.PMI_Actuals__r && this.thePSA.PMI_Actuals__r.length > 0) {
             this.thePSA.PMI_Actuals__r.forEach(pmia => {
                 console.log('[summary.buildtabledata] pmia', pmia);
                 //let account = accountsMap.get(pmia.Promotion__c);
                 let pmi = account.pmi.get(pmia.Promotion_Material_Item__c);
-                /*
-                const newPMI = {...pmi};
-                newPMI.actualVolume += pmia.Act_Qty__c;
-                newPMI.listingFeePaid += pmia.Listing_Fee__c;
-                newPMI.promotionalActivityPaid += pmia.Promotional_Activity__c;
-                newPMI.trainingAndAdvocacyPaid += pmia.Training_and_Advocacy__c;
-                */
                 if (pmia.Act_Qty__c != undefined) {
                     pmi.actualVolume = (pmi.actualVolume == undefined ? 0 : pmi.actualVolume) + parseFloat(pmia.Act_Qty__c);
                 }
@@ -329,7 +327,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 console.log('[summary.buildtabledata] newPMI', pmi);
             });            
         }
-
+        */
         const data = [];
         let index = 0;
         //accountsMap.forEach((account, key, map) => {

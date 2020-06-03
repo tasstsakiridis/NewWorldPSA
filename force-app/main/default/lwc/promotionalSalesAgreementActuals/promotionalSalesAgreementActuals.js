@@ -6,19 +6,22 @@ import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 import { refreshApex } from '@salesforce/apex';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
+import getGLMappings from '@salesforce/apex/PromotionalSalesAgreement_Controller.getGLMappings';
 
 import userLocale from '@salesforce/i18n/locale';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_HELP from '@salesforce/label/c.help';
 import LABEL_CREATE_NEW from '@salesforce/label/c.CreateNew';
+import LABEL_PSA_UPDATED_ACTUALS_MESSAGE from '@salesforce/label/c.PSA_Updated_Actuals_Message';
 
 export default class PromotionalSalesAgreementActuals extends NavigationMixin(LightningElement) {
     labels = {
         back         : { label: LABEL_BACK },
         help         : { label: LABEL_HELP },
         createNew    : { label: LABEL_CREATE_NEW },
-        createNewForAllProducts : { label: 'Create new for all products...' }
+        createNewForAllProducts : { label: 'Create new for all products...' },
+        psaUpdated   : { message: LABEL_PSA_UPDATED_ACTUALS_MESSAGE }
     };    
     
     @wire(CurrentPageReference)
@@ -45,6 +48,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
 
     treeItems;
     error;
+    marketId;
     thePSA;
     wiredPSA;
     @wire(getPSA, {psaId: '$psaId'})
@@ -57,12 +61,36 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         } else if (value.data) {
             this.error = undefined;
             this.thePSA = value.data;
+            this.marketId = this.thePSA.Market__c;
             this.buildTree();
         }
     }
 
     get psaName() {
         return this.thePSA == undefined ? '' : this.thePSA.Name;
+    }
+    get psaStatus() {
+        return this.thePSA == null ? 'New' : this.thePSA.Status__c;
+    }
+    get isApproved() {
+        return this.thePSA == null ? false : this.thePSA.Is_Approved__c;
+    }
+    get canEdit() {
+        console.log('[canEdit] status, isapproved', this.psaStatus, this.isApproved);
+        return this.psaStatus != 'Updated' && this.psaStatus != 'Submit' && this.psaStatus != 'Pending Approval' && this.isApproved;
+    }
+
+    glMappings;
+    @wire(getGLMappings, { marketId: '$marketId' })
+    getGLMappings(value) {
+        console.log('[getGLMappings] value', value);
+        if (value.error) {
+            this.error = value.error;
+            this.glMappings = undefined;
+        } else if (value.data) { 
+            this.error = undefined;
+            this.glMappings = value.data;
+        }
     }
 
     /**

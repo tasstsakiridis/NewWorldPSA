@@ -1,0 +1,1 @@
+It's time to capture actuals for PSA [{!Promotion_Activity__c.Name}] for this quarter. You can view this PSA by following this link:  {!Promotion_Activity__c.Link}

@@ -12,19 +12,33 @@ import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 import userId from '@salesforce/user/Id';
 
 import OBJECT_PMI from '@salesforce/schema/Promotion_Material_Item__c';
+import OBJECT_ACTIVITY from '@salesforce/schema/Promotion_Activity__c';
+
+import FIELD_PROMOTION_ACTIVITY_ID from '@salesforce/schema/Promotion_Activity__c.Id';
+import FIELD_PROMOTION_ACTIVITY_STATUS from '@salesforce/schema/Promotion_Activity__c.Status__c';
 
 import FIELD_ID from '@salesforce/schema/Promotion_Material_Item__c.Id';
 import FIELD_ACTIVITY_ID from '@salesforce/schema/Promotion_Material_Item__c.Activity__c';
 import FIELD_PROMOTION from '@salesforce/schema/Promotion_Material_Item__c.Promotion__c';
 import FIELD_PRODUCT from '@salesforce/schema/Promotion_Material_Item__c.Product_Custom__c';
 import FIELD_VOLUME_FORECAST from '@salesforce/schema/Promotion_Material_Item__c.Plan_Volume__c';
+import FIELD_ORIGINAL_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Volume__c';
+import FIELD_PREVIOUS_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Volume__c';
 import FIELD_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate__c';
+import FIELD_ORIGINAL_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Rebate__c';
+import FIELD_PREVIOUS_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Rebate__c';
 import FIELD_BRAND_STATUS from '@salesforce/schema/Promotion_Material_Item__c.Brand_Status__c';
 import FIELD_LISTING_FEE from '@salesforce/schema/Promotion_Material_Item__c.Listing_Fee__c';
+import FIELD_ORIGINAL_LISTING_FEE from '@salesforce/schema/Promotion_Material_Item__c.Original_Listing_Fee__c';
+import FIELD_PREVIOUS_LISTING_FEE from '@salesforce/schema/Promotion_Material_Item__c.Previous_Listing_Fee__c';
 import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Promotional_Activity__c';
 import FIELD_PROMOTIONAL_ACTIVITY_VALUE from '@salesforce/schema/Promotion_Material_Item__c.Promotional_Activity_Value__c';
+import FIELD_ORIGINAL_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Original_Promotional_Activity__c';
+import FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Previous_Promotional_Activity__c';
 import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Training_And_Advocacy__c';
 import FIELD_TRAINING_ADVOCACY_VALUE from '@salesforce/schema/Promotion_Material_Item__c.Training_And_Advocacy_Value__c';
+import FIELD_ORIGINAL_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Original_Training_Advocacy__c';
+import FIELD_PREVIOUS_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Previous_Training_Advocacy__c';
 import FIELD_DRINK_STRATEGY from '@salesforce/schema/Promotion_Material_Item__c.Drink_Strategy__c';
 import FIELD_OUTLET_TO_PROVIDE from '@salesforce/schema/Promotion_Material_Item__c.Outlet_To_Provide__c';
 import FIELD_COMMENTS from '@salesforce/schema/Promotion_Material_Item__c.Comments_Long__c';
@@ -34,11 +48,12 @@ import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Contro
 import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updatePMITotals';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_PERCENTAGE_CHANGE_ERROR from '@salesforce/label/c.Percentage_Change_Error';
 import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
-import LABEL_SAVING_PLEASE_WAIT from '@salesfoce/label/c.Saving_Please_Wait';
+import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
 
@@ -47,7 +62,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         back                    : { label: LABEL_BACK },
         volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
         discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
-        drinkStrategy           : { help: 'Drink Strategy help'},
+        drinkStrategy           : { help: 'Drink Strategy help' },
         promotionalActivity     : { help: 'Promotional Activity help' },
         trainingAdvocacy        : { help: 'Training & Advocacy help' },
         outletToProvide         : { help: 'Outlet to Provide help' },
@@ -57,7 +72,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         error                   : { message: 'Errors found validating/saving item details.  Please review and try saving again.' },
         saveError               : { message: 'Error saving item' },
         saveSuccess             : { message: 'All changes saved successfully'},
-        comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER }
+        comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
+        thresholdError          : { message: LABEL_PERCENTAGE_CHANGE_ERROR }
     };
 
     @api psaId;
@@ -66,6 +82,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api productName;
     @api promotionId;
     @api isLocked;
+    @api isApproved;
 
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
@@ -454,11 +471,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.isWorking = true;
         const isValid = this.validateForm();
         console.log('[psaitemform..handlesavebuttonclick] isValid', isValid);
-        //if (isValid) {
+        if (isValid) {
             this.save();
-        //} else {
-        //    this.showToast('error', this.labels.saveError.message, this.labels.error.message);            
-        //}
+        }
     }
     handleDeleteButtonClick() {
         //this.addClickedClassToElement('delete');
@@ -572,15 +587,69 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     validateForm() {
+        let msg = 'There are some issues that need your attention\n';
         let isValid = true;
-        if (this.volumeForecast == undefined || this.volumeForecast == 0) {
-            isValid = false; this.hasVolumeForecastError = true;
-        }
-        if (this.discount == undefined || this.discount == 0) {
-            isValid = false; this.hasDiscountError = true;
+        const threshold = 0.2;
+        const thresholdString = (threshold * 100) + '%';
+
+        //if (this.volumeForecast == undefined || this.volumeForecast == 0) {
+        //    isValid = false; this.hasVolumeForecastError = true;
+        //}
+        try {
+        //if (this.discount == undefined || this.discount == 0) {
+        //    isValid = false; this.hasDiscountError = true; msg += this.labels.thresholdError.replace('{0}', thresholdString).replace('{1}', 'Discount') + '\n'; 
+        //}
+
+        /*
+        if (isValid && this.thePSA.Is_Approved__c == false) {
+            const originalPlanVolume = this.psaItem.Original_Plan_Volume__c;
+            const originalPlanRebate = this.psaItem.Original_Plan_Rebate__c;
+            const originalListingFee = this.psaItem.Original_Listing_Fee__c;
+            const originalPromotionalActivity = this.psaItem.Original_Promotional_Activity__c;
+            const originalTrainingAdvocacy = this.psaItem.Original_Training_Advocacy__c;
+            let diff = 0;
+
+            if (originalPlanVolume > 0) {
+                diff = Math.abs(this.volumeForecast - originalPlanVolume) / originalPlanVolume;
+                if (diff > threshold) {
+                    isValid = false;  msg += this.volumeForecast.thresholdError.replace('{0}', thresholdString).replace('{1}', this.labels.volumeForecast.label) + '\n';
+                }    
+            }
+
+            if (originalPlanRebate > 0) {
+                diff = Math.abs(this.discount - originalPlanRebate) / originalPlanRebate;
+                if (diff > threshold) {
+                    isValid = false;  msg += this.discount.thresholdError.replace('{0}', thresholdString).replace('{1}', this.label.discountPerCase.label) + '\n';
+                }    
+            }
+
+            if (originalListingFee > 0) {
+                diff = Math.abs(this.listingFee - originalListingFee) / originalListingFee;
+                if (diff > threshold) {
+                    isValid = false;  msg += this.listingFee.thresholdError.replace('{0}', thresholdString).replace('{1}', this.listingFeeLabel) + '\n';
+                }    
+            }
+            if (originalPromotionalActivity > 0) {
+                diff = Math.abs(this.listingFee - originalPromotionalActivity) / originalPromotionalActivity;
+                if (diff > threshold) {
+                    isValid = false;  msg += this.promotionalActivity.thresholdError.replace('{0}', thresholdString).replace('{1}', this.promotionalActivityLabel) + '\n';
+                }    
+            }
+            if (originalTrainingAdvocacy > 0) {
+                diff = Math.abs(this.listingFee - originalTrainingAdvocacy) / originalTrainingAdvocacy;
+                if (diff > threshold) {
+                    isValid = false;  msg += this.trainingAdvocacy.thresholdError.replace('{0}', thresholdString).replace('{1}', this.trainingAdvocacyLabel) + '\n';
+                }    
+            }
+        } 
+        */
+        }catch(ex) {
+            console.log('[psaitemform.validateform] exception', ex);
         }
         console.log('[psaitems.validate] isvalie, volume, discount', isValid, this.hasVolumeForecastError, this.hasDiscountError);
-
+        if (!isValid) {
+            this.showToast('error', this.labels.validation.message, msg);            
+        }
         return isValid;
     }
     save() {
@@ -653,6 +722,27 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;
             fields[FIELD_OUTLET_TO_PROVIDE.fieldApiName] = this.outletToProvideValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
+
+            if (this.psaItem != null) {
+                fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.psaItem.Plan_Volume__c;
+                fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.psaItem.Plan_Rebate__c;
+                fields[FIELD_PREVIOUS_LISTING_FEE.fieldApiName] = this.psaItem.Listing_Fee__c;
+                fields[FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY.fieldApiName] = this.psaItem.Promotional_Activity_Value__c;
+                fields[FIELD_PREVIOUS_TRAINING_ADVOCACY.fieldApiName] = this.psaItem.Training_and_Advocacy_Value__c;
+            } else {
+                fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.volumeForecast;
+                fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.discount;
+                fields[FIELD_PREVIOUS_LISTING_FEE.fieldApiName] = this.listingFee;
+                fields[FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
+                fields[FIELD_PREVIOUS_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
+            }
+            if (this.isApproved == false) {
+                fields[FIELD_ORIGINAL_PLAN_VOLUME.fieldApiName] = this.volumeForecast;
+                fields[FIELD_ORIGINAL_PLAN_REBATE.fieldApiName] = this.discount;
+                fields[FIELD_ORIGINAL_LISTING_FEE.fieldApiName] = this.listingFee;
+                fields[FIELD_ORIGINAL_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
+                fields[FIELD_ORIGINAL_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
+            }
 
             console.log('[psaitemform.save] fields', fields);
             console.log('[psaitemform.save] psaitemId', this.psaItemId);
@@ -729,7 +819,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     updatePSAItem(record) {
         console.log('[psaItemForm.update] record', record);
         updateRecord(record)
-            .then((updatedRecord) => {
+            .then((updatedRecord) => {                
                 this.isWorking = false;
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -739,6 +829,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
+                this.updatePSAStatus("Updated");
                 this.updateTotals();
 
                 try {
@@ -753,6 +844,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                                   totalInvestment: this.totalInvestment }
                     });
                     //this.dispatchEvent(saveEvent);
+
                     const detail = {
                         psaItemId: this.psaItemId,
                         productId: this.productId,
@@ -819,5 +911,23 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 console.log('[updateTotals] error', error);
             });
 
+    }
+
+    updatePSAStatus(status) {
+        const fields = {};
+        fields[FIELD_PROMOTION_ACTIVITY_ID.fieldApiName] = this.psaId;
+        fields[FIELD_PROMOTION_ACTIVITY_STATUS.fieldApiName] = status;
+
+        const record = { fields };
+        updateRecord(record)
+            .then(() => {                
+                this.isWorking = false;
+                this.dispatchEvent(new CustomEvent('updated'));                
+            })
+            .catch(error => {
+                this.isWorking = false;
+                console.log('[updatePSAStatsu] error', error);
+            });
+        
     }
 }

@@ -71,6 +71,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted' || this.thePSA.Status__c == 'Pending Approval' || this.thePSA.Is_Approved__c;
         }
     }
+    get isApproved() {
+        return this.thePSA != null && this.thePSA.Is_Approved__c;
+    }
 
     pageRef;
     @wire(CurrentPageReference)
@@ -140,6 +143,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
 
                 console.log('products', this.products);
     
+            } else {
+                this.psaItems.clear();
+                if (this.products != undefined && this.products.records != undefined) {
+                    this.products.records.forEach(p => p.psaItem = {});
+                }
             }
 
             if (this.loadProducts) {
@@ -161,6 +169,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     @wire(getProducts, {pageNumber: '$pageNumber'})
     wiredGetProducts(value) {
         this.wiredProducts = value;
+        console.log('[wiredgetproducts] value', value);
         if (value.error) {
             this.error = value.error;
             this.products = undefined;
@@ -303,6 +312,10 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         }catch(ex) {
             console.log('[psaitems.handleClosePSAForm] exception', ex);
         }
+    }
+    handlePSAUpdated() {
+        this.wiredAgreement = refreshApex(this.wiredAgreement);
+        this.thePSA = this.wiredAgreement.data;
     }
     handleSavePSADetails(event) {
         try {

@@ -39,6 +39,15 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
         @AuraEnabled 
         public Decimal plannedRebate { get; set; }
+
+        @AuraEnabled 
+        public String glAccount { get; set; }
+
+        @AuraEnabled 
+        public Boolean hasTotals { get; set; }
+
+        @AuraEnabled 
+        public String externalKey { get; set; }
     }
 
     @AuraEnabled(Cacheable=true)
@@ -76,8 +85,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Contact__c, Contact__r.Name, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
-                                            Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, 
+                                            Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, Evaluation_Comments__c,
                                             Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, Total_Volume__c, Total_Actual_Volume__c, Purchase_Order__c,
+                                            MPO_Prestige__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -86,7 +96,10 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                     Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
                                                     Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
                                                     Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
-                                                    Total_Training_and_Advocacy_Paid__c FROM Promotion_Material_Items__r), 
+                                                    Total_Training_and_Advocacy_Paid__c, Original_Plan_Volume__c, Original_Plan_Rebate__c, Original_Listing_Fee__c,
+                                                    Original_Promotional_Activity__c, Original_Training_Advocacy__c, Total_Actual_Volume__c, Previous_Plan_Volume__c, 
+                                                    Previous_Plan_Rebate__c, Previous_Listing_Fee__c, Previous_Promotional_Activity__c, Previous_Training_Advocacy__c
+                                                    FROM Promotion_Material_Items__r), 
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
                                                     Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name, Listing_Fee__c,
@@ -203,7 +216,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                        Plan_Volume__c, Drink_Strategy__c, Status__c, Listing_Fee__c, Outlet_to_Provide__c, Promotional_Activity__c,
                        Promotional_Activity_Value__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
                        Total_Investment__c, Product_Custom__r.Image_Name__c, Comments_Long__c, Total_Listing_Fee_Paid__c, 
-                       Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c
+                       Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c, Original_Plan_Volume__c, Original_Plan_Rebate__c,
+                       Original_Listing_Fee__c, Original_Promotional_Activity__c, Original_Training_Advocacy__c
                   FROM Promotion_Material_Item__c 
                  WHERE Id =:psaItemId];
     }
@@ -226,7 +240,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Market__c market = [SELECT Id FROM Market__c WHERE Name =:marketName LIMIT 1];
         String marketId = market.Id;
 
-        String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c FROM Product__c WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId';
+        String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c FROM Product__c WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\'';
         soql += ' WITH SECURITY_ENFORCED ORDER BY Name LIMIT :pageSize OFFSET :offset';
         PagedResult result = new PagedResult();
         result.pageSize = pageSize;
@@ -288,13 +302,36 @@ public with sharing class PromotionalSalesAgreement_Controller {
                  WHERE Id =:pmiaId];
     }
 
+    @AuraEnabled(cacheable=true) 
+    public static List<SAP_Interfaced_Data_Configuration__c> getGLMappings(String marketId) {
+        if (marketId == null) {
+            User u = [SELECT Id, Market__c FROM User WHERE Id =:UserInfo.getUserId()];
+            String marketName = 'Australia';
+            if (u.Market__c != null) {
+                marketName = u.Market__c;
+            }
+
+            Market__c m = [SELECT Id FROM Market__c WHERE Name =:marketName LIMIT 1];
+            marketId = m.Id;
+        }
+        Map<String, Schema.RecordTypeInfo> rtList = SAP_Interfaced_Data_Configuration__c.SObjectType.getDescribe().getRecordTypeInfosByName();
+        String rtId = rtList.get('UK - PSA').getRecordTypeId();
+
+        return [SELECT Id, Classification__c, SoldTo_Code__c
+                  FROM SAP_Interfaced_Data_Configuration__c
+                 WHERE RecordTypeId =: rtId
+                   AND Market__c =:marketId
+                   AND Is_Active__c = true];
+    }
+
+    /*
     @AuraEnabled
     public static Promotion_Material_Item__c getPMIDetails(String pmiId) {
         return [SELECT Id, Name, Activity__c, Product_Custom__c, Product_Name__c, Plan_Volume__c, Plan_Rebate__c
                   FROM Promotion_Material_Item__c 
                  WHERE Id =:pmiId];
     }
-
+    */
 
     /**
      * Update Data methods
@@ -331,6 +368,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Wholesaler_Alternate_Name__c = psaData.wholesalerAlternateName;
             psa.Status__c = psaData.status;
             psa.Purchase_Order__c = psaData.purchaseOrder;
+            psa.Evaluation_Comments__c = psaData.comments;
+            psa.MPO_Prestige__c = psaData.mpoPrestige;
 
             if (psaData.marketId == null || psaData.marketId == '') {
                 String marketName = psaData.marketName;
@@ -450,6 +489,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 if (l_PMI.size() > 0) {
                     upsert(l_PMI);
                 }
+
+                Promotion_Activity__c theActivity = [SELECT Id, Status__c, Is_Approved__c FROM Promotion_Activity__c WHERE Id =:psaData.id];
+                if (theActivity.Is_Approved__c) {
+                    theActivity.Status__c = 'Updated';
+                    update theActivity;
+                }
             }
         } catch(Exception ex) {
             msg = ex.getMessage();
@@ -482,6 +527,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     pmia.Approval_Status__c = 'Submit';
                     pmia.Payment_Date__c = paymentDate;
                     pmia.Rebate_Type__c = rebate.rebateType;
+                    pmia.SAP_GL_Account__c = rebate.glAccount;
+                    pmia.Has_Totals__c = rebate.hasTotals;
                     if (rebate.rebateType == 'Volume') {
                         pmia.Act_Qty__c = rebate.rebateAmount;
 
@@ -491,7 +538,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
                         pmia.Rebate_Amount__c = rebate.rebateAmount;
                     }  
                     pmia.Period__c = 0;
-                    pmia.External_Key__c = externalKey + '_' + rebate.rebateType.replaceAll(' ','_');           
+                    //pmia.External_Key__c = externalKey + '_' + rebate.rebateType.replaceAll(' ','_'); 
+                    if (rebate.externalKey == null || rebate.externalKey == '') {
+                        pmia.External_Key__c = pmiId + '_' + rebate.rebateType;
+                    } else {
+                        pmia.External_Key__c = rebate.externalKey;
+                    }
     
                     actualsToCreate.add(pmia);    
                 }
@@ -531,7 +583,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                         Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Plan_Rebate__c,
                                                         Promotion_Material_Item__r.Listing_Fee__c, Promotion_Material_Item__r.Promotional_Activity_Value__c,
                                                         Promotion_Material_Item__r.Training_and_Advocacy_Value__c, Proposed_Discount__c, Rebate_Type__c, Rebate_Amount__c
-                                                        FROM PMI_Actuals__r)
+                                                        FROM PMI_Actuals__r WHERE Approval_Status__c = 'Paid')
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaId];
             
@@ -550,6 +602,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
             */
             Map<Id, Promotion_Material_Item__c> m_PMIs = new Map<Id, Promotion_Material_Item__c>();
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
+                pmi.Total_Actual_Volume__c = 0;
+                pmi.Total_Listing_Fee_Paid__c = 0;
+                pmi.Total_Promotional_Activity_Paid__c = 0;
+                pmi.Total_Training_and_Advocacy_Paid__c = 0;
+                
                 m_PMIs.put(pmi.Id, pmi);
             }
 
@@ -574,10 +631,6 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
                 */
                 pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
-                if (pmi.Total_Actual_Volume__c == null) { pmi.Total_Actual_Volume__c = 0; }
-                if (pmi.Total_Listing_Fee_Paid__c == null) { pmi.Total_Listing_Fee_Paid__c = 0; }
-                if (pmi.Total_Promotional_Activity_Paid__c == null) { pmi.Total_Promotional_Activity_Paid__c = 0; }
-                if (pmi.Total_Training_and_Advocacy_Paid__c == null) { pmi.Total_Training_and_Advocacy_Paid__c = 0; }
 
                 System.debug('[rebateType: ' + pmia.Rebate_Type__c);
                 System.debug('[rebateAmount: ' + pmia.Rebate_Amount__c);
@@ -641,6 +694,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                         WHERE Id =:psaId];
             
             psa.Total_Volume__c = 0;
+            psa.Total_Discount__c = 0;
             psa.Total_Listing_Fee__c = 0;
             psa.Total_Promotional_Activity__c = 0;
             psa.Total_Training_and_Advocacy__c = 0;
@@ -657,6 +711,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             */
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
                 psa.Total_Volume__c += pmi.Plan_Volume__c;
+                psa.Total_Discount__c += pmi.Plan_Volume__c * pmi.Plan_Rebate__c;
                 psa.Total_Listing_Fee__c += pmi.Listing_Fee__c;
                 psa.Total_Promotional_Activity__c += pmi.Promotional_Activity_Value__c;
                 psa.Total_Training_and_Advocacy__c += pmi.Training_and_Advocacy_Value__c;
@@ -827,24 +882,74 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled 
-    public static String sendDocuSignEnvelope(String psaId) {
+    public static String sendDocuSignEnvelope(String psaId, String contactId) {
         String msg = 'OK';
 
+/*
+        try {
+            Promotion_Activity__c theActivity = [SELECT Id, Send_by_DocuSign__c FROM Promotion_Activity__c WHERE Id =:psaId];
+            theActivity.Send_by_DocuSign__c = true;
+            update theActivity;
+        } catch(Exception ex) {
+            msg = ex.getMessage();
+        }
+*/
+        /*
+        String recipientId = UserInfo.getUserId();
+        String recipientName = UserInfo.getUserName();
+        String recipientEmail = UserInfo.getUserEmail();
+        System.debug('[sendwithdocusign] contactid: ' + contactId);
+        Contact decisionMaker = [SELECT Id, Name, Email FROM Contact WHERE Id =:contactId];
+        if (decisionMaker != null) {
+            recipientId = contactId;
+            recipientName = decisionMaker.Name;
+            recipientEmail = decisionMaker.Email;
+        }
         dfsle.Envelope theEnvelope = dfsle.EnvelopeService.getEmptyEnvelope(new dfsle.Entity(psaId));
         dfsle.Recipient theRecipient = dfsle.Recipient.fromSource(
+            recipientName, 
+            recipientEmail, 
+            null,                                       // Optional Phone Number
+            'Signer 1',                                 // Role Name.  Specify the exact role name from template
+            new dfsle.Entity(recipientId)      // Source object for the recipient
+        );
+        dfsle.Recipient theRecipient2 = dfsle.Recipient.fromSource(
             UserInfo.getUserName(), 
             UserInfo.getUserEmail(), 
             null,                                       // Optional Phone Number
-            'Signer 1',                                 // Role Name.  Specify the exact role name from template
+            'Signer 2',                                 // Role Name.  Specify the exact role name from template
             new dfsle.Entity(UserInfo.getUserId())      // Source object for the recipient
         );
 
-        theEnvelope = theEnvelope.withRecipients(new List<dfsle.Recipient> { theRecipient });
 
-        dfsle.UUID theTemplateId = dfsle.UUID.parse('d65a6a14-3770-ea11-b80c-48df378a7098');
-        dfsle.Document theDocument = dfsle.Document.fromTemplate(theTemplateId, 'UK PSA');
+        theEnvelope = theEnvelope.withRecipients(new List<dfsle.Recipient> { theRecipient, theRecipient2 });
 
-        theEnvelope = theEnvelope.withDocuments(new List<dfsle.Document> { theDocument });
+        
+        dfsle.UUID theTemplateId = dfsle.UUID.parse('59a80dfb-aeb9-48e3-ac8c-f277b7405082');
+        //dfsle.UUID theTemplateId = dfsle.UUID.parse('d65a6a14-3770-ea11-b80c-48df378a7098');
+        dfsle.Document theDocument = dfsle.Document.fromTemplate(theTemplateId, 'UK PSA - Gen');
+        System.debug('theDocument: ' + theDocument);
+        List<ContentDocumentLink> cdlList = [SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId =:psaId];
+        if (cdlList != null && cdlList.size() > 0) {
+            Set<Id> cdIds = new Set<Id>();
+            for(ContentDocumentLink cdl : cdlList) {
+                cdIds.add(cdl.ContentDocumentId);
+            }
+            List<ContentVersion> cvList = [SELECT Id FROM ContentVersion WHERE ContentDocumentId =:cdIds];
+            if (cvList != null && cvList.size() > 0) {
+                Set<Id> cvIds = new Set<Id>();
+                for(ContentVersion cv : cvList) {
+                    cdIds.add(cv.Id);
+                }
+                List<dfsle.Document> theDocuments = dfsle.DocumentService.getDocuments(ContentVersion.sObjectType, cvIds);
+                theEnvelope = theEnvelope.withDocuments(theDocuments);
+            } else {
+                theEnvelope = theEnvelope.withDocuments(new List<dfsle.Document> { theDocument });
+            }
+        } else {
+            theEnvelope = theEnvelope.withDocuments(new List<dfsle.Document> { theDocument });
+        }
+
         theEnvelope = dfsle.EnvelopeService.sendEnvelope(theEnvelope, true);
 
         List<dfsle.Envelope.Status> envelopeStatus = dfsle.StatusService.getStatus(new Set<Id> { psaId }, 1);
@@ -854,6 +959,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             msg += s + ',';
         }
         msg = msg.removeEnd(',');
+        */
         return msg;
     }    
 }

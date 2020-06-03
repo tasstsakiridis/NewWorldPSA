@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldUpdates>
+        <fullName>Approval_Status_Paid</fullName>
+        <description>Set the Approval Status to Paid after the Payment Date has been set</description>
+        <field>Approval_Status__c</field>
+        <literalValue>Paid</literalValue>
+        <name>Approval Status - Paid</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Approval_Status_Submit</fullName>
+        <field>Approval_Status__c</field>
+        <literalValue>Submit</literalValue>
+        <name>Approval Status - Submit</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <rules>
+        <fullName>Approval Status - Paid</fullName>
+        <actions>
+            <name>Approval_Status_Paid</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>PMI_Actual__c.Payment_Date__c</field>
+            <operation>notEqual</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>PMI_Actual__c.Approval_Status__c</field>
+            <operation>notEqual</operation>
+            <value>Paid</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>PMI_Actual__c.RecordTypeId</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <description>Set Approval Status to Paid after Payment Date has been set</description>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>Approval Status - Submit</fullName>
+        <actions>
+            <name>Approval_Status_Submit</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>PMI_Actual__c.Act_Qty__c</field>
+            <operation>notEqual</operation>
+            <value>0</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>PMI_Actual__c.Approval_Status__c</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>PMI_Actual__c.RecordTypeId</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <description>Set the Approval Status to Submit after setting the Act Qty</description>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+</Workflow>

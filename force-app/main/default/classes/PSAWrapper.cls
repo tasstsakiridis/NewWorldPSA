@@ -90,10 +90,16 @@ public with sharing class PSAWrapper {
     public String status { get; set; }
 
     @AuraEnabled 
+    public String comments { get; set; }
+
+    @AuraEnabled 
     public String message { get; set; }
 
     @AuraEnabled 
     public String purchaseOrder { get; set; }
+
+    @AuraEnabled 
+    public Boolean mpoPrestige { get; set; }
 
     @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
@@ -125,6 +131,8 @@ public with sharing class PSAWrapper {
         this.status = 'OK';
         this.message = '';
         this.purchaseOrder = '';
+        this.comments = '';
+        this.mpoPrestige = false;
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -141,6 +149,7 @@ public with sharing class PSAWrapper {
         this.signingCustomerId = psa.Contact__c;
         this.lengthOfPSA = Integer.valueOf(psa.Length_of_Agreement__c);
         this.isLengthInYears = psa.Is_Length_in_Years__c;
+        this.mpoPrestige = psa.MPO_Prestige__c;
         this.beginDate = psa.Begin_Date__c;
         this.endDate = psa.End_Date__c;
         this.wholesalerAlternateId = psa.Wholesaler_Alternate__c;
@@ -149,7 +158,6 @@ public with sharing class PSAWrapper {
         this.wholesalerPreferredName = psa.Wholesaler_Preferred_Name__c;
         this.status = psa.Status__c;
         this.purchaseOrder = psa.Purchase_Order__c;
-
-        
+        this.comments = psa.Evaluation_Comments__c;
     }
 }

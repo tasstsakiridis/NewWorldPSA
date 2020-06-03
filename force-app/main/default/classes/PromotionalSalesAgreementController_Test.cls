@@ -23,7 +23,11 @@ private class PromotionalSalesAgreementController_Test {
         String rtPSAPMI = pmiRecordTypes.get('UK - PSA').getRecordTypeId();
         String rtPSAPMIA = pmiaRecordTypes.get('UK - PSA').getRecordTypeId();
 
+        User manager = helper.createUser('System Administrator', 'Test', 'Manager', 'United Kingdom');
+        insert manager;
+
         User user1 = helper.createUser('System Administrator','Test','User', 'United Kingdom');
+        user1.ManagerId = manager.Id;
         insert user1;
 
         System.runAs(user1) {
@@ -96,6 +100,8 @@ private class PromotionalSalesAgreementController_Test {
             cdl.ShareType = 'V';
             insert cdl;
 
+            Test.startTest();
+            
             Market__c m = PromotionalSalesAgreement_Controller.getUserMarket();
             System.assertEquals('United Kingdom', m.Name, 'Market retrieved doesnt match');
 
@@ -137,6 +143,8 @@ private class PromotionalSalesAgreementController_Test {
 
             SelectableItem si1 = new SelectableItem();
             si1.itemId = childAccount.Id;
+            si1.item = null;
+            si1.isSelected = false;
             wrapper1.accounts.add(si1);
 
             String msg = PromotionalSalesAgreement_Controller.savePSA(wrapper1);
@@ -179,28 +187,58 @@ private class PromotionalSalesAgreementController_Test {
 
             psa1 = PromotionalSalesAgreement_Controller.getPSA(psa1.Id);
             
-			PMI_Actual__c pmia = new PMI_Actual__c();
-			pmia.Activity__c = psa1.Id;
-            pmia.Promotion_Material_Item__c = psa1.Promotion_Material_Items__r[0].Id;
-            pmia.Promotion__c = psa1.Promotions__r[0].Id;
-            pmia.Act_Qty__c = 5;
-            pmia.Listing_Fee__c = 1000;
-            pmia.Promotional_Activity__c = 1000;
-            pmia.Training_and_Advocacy__c = 2000;
-            pmia.Actual_Wholesaler__c = psa1.Wholesaler_Preferred__c;
-            pmia.Payment_Date__c = Date.today();
-            pmia.Period__c = 0;
-            pmia.External_Key__c = pmia.Promotion__c + '_' + pmia.Promotion_Material_Item__c + '_' + pmia.Period__c;
-            insert pmia;
-			    
+            String pmiId = psa1.Promotion_Material_Items__r[0].Id;            
+            //Promotion_Material_Item__c pmi = PromotionalSalesAgreement_Controller.getPMIDetails(pmiId);
+            //System.assertNotEquals(null, pmi);
+
+            Promotion_Material_Item__c pmi = PromotionalSalesAgreement_Controller.getPSAItemDetails(pmiId);
+            System.assertNotEquals(null, pmi);
+
+            Boolean isSOMUser = PromotionalSalesAgreement_Controller.getIsSOMUser();
+            System.assertEquals(false, isSOMUser);
+
+            User u = PromotionalSalesAgreement_Controller.getUserDetails();
+            System.assertNotEquals(null, u);
+
+            String promotionId = psa1.Promotions__r[0].Id;
+            String wholesalerId = psa1.Wholesaler_Preferred__c;
+            String externalKey = promotionId + '_' + pmiId + '_0';
+            PromotionalSalesAgreement_Controller.PSARebate rebate1 = new PromotionalSalesAgreement_Controller.PSARebate();
+            rebate1.rebateType = 'Listing Fee';
+            rebate1.rebateAmount = 1000.00;
+            rebate1.isVolumeRebate = false;
+
+            PromotionalSalesAgreement_Controller.PSARebate rebate2 = new PromotionalSalesAgreement_Controller.PSARebate();
+            rebate2.rebateType = 'Volume';
+            rebate2.rebateAmount = 10;
+            rebate2.isVolumeRebate = true;
+
+            List<PromotionalSalesAgreement_Controller.PSARebate> rebates = new List<PromotionalSalesAgreement_Controller.PSARebate>();
+            rebates.add(rebate1);
+            rebates.add(rebate2);
+
+            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, rebates);
+            System.assertNotEquals(0, pmiaIds.size());
+
             msg = PromotionalSalesAgreement_Controller.updateActualTotals(psa1.Id);
             System.assertEquals('OK', msg);
             
-            PMI_Actual__c pmia2 = PromotionalSalesAgreement_Controller.getPMIADetails(pmia.Id);
+            PMI_Actual__c pmia2 = PromotionalSalesAgreement_Controller.getPMIADetails(pmiaIds[0]);
             System.assertNotEquals(null, pmia2);
+
+            SimpleListItem sli = PromotionalSalesAgreement_Controller.clonePSA(psa1.Id, 'Cloned PSA');
+            System.assertEquals('OK', sli.name);
+
+            msg = PromotionalSalesAgreement_Controller.submitForApproval(sli.id);
+            System.assertEquals('OK', msg);
+
+            msg = PromotionalSalesAgreement_Controller.recallApproval(sli.id);
+            System.assertEquals('OK', msg);
             
-            Promotion_Material_Item__c pmi = PromotionalSalesAgreement_Controller.getPMIDetails(pmia.Promotion_Material_Item__c);
-            System.assertNotEquals(null, pmi);
+            PSAWrapper wrapper2 = new PSAWrapper(psa1);
+            System.assertNotEquals(null, wrapper2);
+            
+            Test.stopTest();
         }
     }
 }

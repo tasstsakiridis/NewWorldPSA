@@ -1,0 +1,3 @@
+The Promotional Sales Agreement ({!Promotion_Activity__c.Name}) has been {!Promotion_Activity__c.Status__c}.  
+
+Click the following link to go to the proposal  {!Promotion_Activity__c.Link}

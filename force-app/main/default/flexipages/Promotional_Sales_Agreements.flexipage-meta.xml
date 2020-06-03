@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageRegions>
+        <name>header</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <componentInstances>
+            <componentName>promotionalSalesAgreement</componentName>
+        </componentInstances>
+        <componentInstances>
+            <componentInstanceProperties>
+                <name>parentFieldApiName</name>
+                <value>Promotion_Activity__c.Id</value>
+            </componentInstanceProperties>
+            <componentInstanceProperties>
+                <name>relatedListApiName</name>
+                <value>ProcessSteps</value>
+            </componentInstanceProperties>
+            <componentInstanceProperties>
+                <name>relatedListComponentOverride</name>
+                <value>GRID</value>
+            </componentInstanceProperties>
+            <componentName>force:relatedListSingleContainer</componentName>
+            <visibilityRule>
+                <booleanFilter>1 OR 2</booleanFilter>
+                <criteria>
+                    <leftValue>{!Record.Status__c}</leftValue>
+                    <operator>EQUAL</operator>
+                    <rightValue>Submitted</rightValue>
+                </criteria>
+                <criteria>
+                    <leftValue>{!Record.Status__c}</leftValue>
+                    <operator>EQUAL</operator>
+                    <rightValue>Pending Approval</rightValue>
+                </criteria>
+            </visibilityRule>
+        </componentInstances>
+        <name>main</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>Promotional Sales Agreements</masterLabel>
+    <sobjectType>Promotion_Activity__c</sobjectType>
+    <template>
+        <name>flexipage:recordHomeSimpleViewTemplate</name>
+    </template>
+    <type>RecordPage</type>
+</FlexiPage>

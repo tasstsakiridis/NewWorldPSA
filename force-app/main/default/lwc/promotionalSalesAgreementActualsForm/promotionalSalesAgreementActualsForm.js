@@ -43,6 +43,7 @@ import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Err
 import LABEL_HELP from '@salesforce/label/c.help';
 import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
 import LABEL_NEXT from '@salesforce/label/c.Next';
+import LABEL_NINELITREVOLUME from '@salesforce/label/c.NineLitreVolume';
 import LABEL_PAYMENT_DATE from '@salesforce/label/c.Payment_Date';
 import LABEL_PAYMENT_DATE_ERROR from '@salesforce/label/c.Payment_Date_Error';
 import LABEL_PAYMENT_DATE_PLACEHOLDER from '@salesforce/label/c.Payment_Date_Placeholder';
@@ -62,6 +63,7 @@ import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
  
 export default class PromotionalSalesAgreementActualsForm extends NavigationMixin(LightningElement) {
     labels = {
+        nineLitreVolume : { label: LABEL_NINELITREVOLUME },
         back         : { label: LABEL_BACK },
         save         : { label: LABEL_SAVE },
         help         : { label: LABEL_HELP },
@@ -106,12 +108,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 } else {
                     this.createNewActual();
                 }
-            }    
+            } else {
+                this.loadPMIADetails();
+            }  
         }
     }
 
     isPhone = CLIENT_FORM_FACTOR === 'Small';    
-
 
     @track objectInfo;
     recordTypeId;
@@ -160,6 +163,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     promotionId;
 
+    @api
+    glMappings;
+
+
+    /*
     @api 
     createNew(promotionId, pmiId, psaId) {
         this.promotionId = promotionId;
@@ -178,13 +186,14 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.loadPMIADetails();
         this.setRemainingTotals();
     }
-
+    */
     error;
     thePMIA;
     thePMI;
     theAccount;
     isWorking = false;    
 
+    /*
     wiredPSA;
     @wire(getPSA, { psaId: '$psaId' })
     wiredGetPSA(value) {
@@ -227,6 +236,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.setRemainingTotals();
         }
     }
+    */
     /*
     getPMIA() {
         console.log('[getPMIA] pmiaId', this.pmiaId);
@@ -271,6 +281,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     totalDiscount;
 
     rebateType;
+    rebateLabel;
     rebateAmount;
 
     actualQty;
@@ -282,9 +293,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[actualQtyFormattedLabel] isPhone', this.isPhone);
         console.log('[actualQtyFormattedLabel] plannedVolume', this.plannedVolume);
         if (this.isPhone) {
-            return this.labels.actualQty.label;
+            return this.labels.nineLitreVolume.label;
         } else {
-            return this.labels.actualQty.label + ' [' + this.labels.planned.label.toUpperCase() + ' : ' + this.plannedVolume + ']';
+            return this.labels.nineLitreVolume.label + ' [' + this.labels.planned.label.toUpperCase() + ' : ' + this.plannedVolume + ']';
         }
     }
 
@@ -503,14 +514,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             if (picklist === 'Rebate_Type__c') {
                 this.rebates = picklistValues[picklist].values.map(item => ({
                     rebateType: item.value, 
+                    label: item.value + ' [' + this.labels.remaining.label + ' : %0]',
                     isVolumeRebate: item.value == 'Volume', 
                     rebateAmount: 0                    
                 }));
             }
         });
 
-        this.finishedLoadingObjectInfo = true;
-        if (this.finishedLoadingDetails && this.finishedLoadingProduct) { this.isWorking = false; }
+        console.log('[setFieldOptions] finished loading field options.  will load the psa');
+        this.loadPSA();
         
     }
     
@@ -522,26 +534,72 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }));
     }
 
+    loadPSA() {
+        console.log('[loadPSA]');
+        getPSA({psaId: this.psaId})
+        .then(result => {
+            this.error = undefined;
+            this.thePSA = result;
+
+            this.wholesalerOptions = [
+                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true },
+                { label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c }
+            ];
+                
+            //this.setRemainingTotals();
+            console.log('[loadPSA] pmiaId', this.pmiaId);
+            if (this.pmiaId == undefined) {                    
+                this.createNewActual();
+            } else {
+                this.loadPMIADetails();
+            }
+
+        })
+        .catch(error => {
+            this.error = error;
+            this.thePSA = undefined;
+        });
+    }
+    
     loadPMIADetails() {
-        this.productName = this.thePMIA.Product_Name__c;
-        this.accountName = this.thePMIA.Account_Name__c;
-        this.promotionId = this.thePMIA.Promotion__c;
-        this.pmiId = this.thePMIA.Promotion_Material_Item__c;
-        //this.actualQty = this.thePMIA.Act_Qty__c;
-        //this.listingFeePaid = this.thePMIA.Listing_Fee__c;
-        //this.promotionalActivityPaid = this.thePMIA.Promotional_Activity__c;
-        //this.trainingAndAdvocacyPaid = this.thePMIA.Training_and_Advocacy__c;
-        this.paymentDate = this.thePMIA.Payment_Date__c;
-        this.approvalStatus = this.thePMIA.Approval_Status__c;
-        this.processed = this.thePMIA.Boomi_Processed__c;
-        this.processedDate = this.thePMIA.Processed_Date__c;
-        this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c;
-        this.plannedDiscount = this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c;
-        this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
-        this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
-        this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
-        this.rebateAmount = this.isVolumeRebate ? this.thePMIA.Act_Qty__c : this.thePMIA.Rebate_Amount__c;
-        this.rebateType = this.thePMIA.Rebate_Type__c;    
+        getPMIADetails({pmiaId: this.pmiaId})
+        .then(result => {
+            this.thePMIA = result;
+            this.productName = this.thePMIA.Product_Name__c;
+            this.accountName = this.thePMIA.Account_Name__c;
+            this.promotionId = this.thePMIA.Promotion__c;
+            this.pmiId = this.thePMIA.Promotion_Material_Item__c;
+            //this.actualQty = this.thePMIA.Act_Qty__c;
+            //this.listingFeePaid = this.thePMIA.Listing_Fee__c;
+            //this.promotionalActivityPaid = this.thePMIA.Promotional_Activity__c;
+            //this.trainingAndAdvocacyPaid = this.thePMIA.Training_and_Advocacy__c;
+            this.paymentDate = this.thePMIA.Payment_Date__c;
+            this.approvalStatus = this.thePMIA.Approval_Status__c;
+            this.processed = this.thePMIA.Boomi_Processed__c;
+            this.processedDate = this.thePMIA.Processed_Date__c;
+            this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c;
+            this.plannedDiscount = this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c;
+            this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
+            this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
+            this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
+            this.rebateAmount = this.isVolumeRebate ? this.thePMIA.Act_Qty__c : this.thePMIA.Rebate_Amount__c;
+            this.rebateType = this.thePMIA.Rebate_Type__c;    
+            
+            try {
+                let key = this.rebateType.replace('&','and');
+                key = key.replace(/ /g,"_");
+                const total = this.thePSA['Total_'+key+'__c'] || 0;
+                const paid = this.thePSA['Total_'+key+'_Paid__c'] || 0;
+                const remaining = total - paid;
+                this.rebateLabel = this.rebateType + ' [' + this.labels.remaining.label + ' : ' + remaining + ']';    
+            }catch(ex) {
+                console.log('[loadPMIADetails] exception', ex);
+            }
+        })  
+        .catch(error => {
+            this.error = error;
+            this.thePMIA = undefined;
+        });    
     }
 
     setRemainingTotals() {
@@ -597,10 +655,32 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.listingFeePaid = 0;
         this.promotionalActivityPaid = 0;
         this.trainingAndAdvocacyPaid = 0;
+        console.log('[ccreatenewactuals] rebates', this.rebates);
         if (this.rebates) {
-            this.rebates.forEach(rebate => {
-                rebate.rebateAmount = 0;
-            });    
+            try {
+                this.rebates.forEach(rebate => {
+                    rebate.rebateAmount = 0;
+                    let key = rebate.rebateType.replace("&", "and");
+                    key = key.replace(/ /g, "_");
+                    console.log('[createnewactuals] key', key);
+                    let total = this.thePSA["Total_"+key+"__c"] || 0;
+                    let paid = this.thePSA["Total_"+key+"_Paid__c"] || 0;
+                    let remaining = total - paid;
+                    console.log('[createnewactuals] total, paid', total, paid);
+                    rebate.label = rebate.label.replace("%0", remaining);
+                    console.log('rebatelabel', rebate.label);
+                    /*
+                    if (rebate.rebateType == 'Listing Fee') {
+                        remaining = this.thePSA.Total_Listing_Fee__c - this.thePSA.Total_Listing_Fee_Paid__c;
+                        rebate.label = rebate.label.replace('%0', remaining);
+                    } else if (rebate.rebateType == 'Promotional Activity')
+                    */
+                });    
+                console.log('rebates', this.rebates);
+    
+            }catch(ex) {
+                console.log('[createnewactuals] exception', ex);
+            }
         }
     }
 
@@ -644,11 +724,17 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     save() {   
         console.log('[save]');   
         try {
+            const pd = new Date(this.paymentDate);
+            const paymentDateYear = pd.getFullYear().toString();
+            const paymentDateMonth = ('00' + (pd.getMonth()+1)).slice(-2);
+            const paymentDateDay = ('00' + pd.getDate()).slice(-2);
+            console.log('[psaactualform.save] date parts', paymentDateYear, paymentDateMonth, paymentDateDay);          
+
             const fields = {};
             
             fields[FIELD_APPROVAL_STATUS.fieldApiName] = this.approvalStatus;
             fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
-            fields[FIELD_PAYMENT_DATE.fieldApiName] = this.paymentDate;
+            fields[FIELD_PAYMENT_DATE.fieldApiName] = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
 
 
             if (this.pmiaId === undefined) {
@@ -660,12 +746,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName] = this.pmiId;
                 }
 
-                const pd = new Date(this.paymentDate);
                 console.log('[psaactualform.save] paymentDate, pd', this.paymentDate, pd);  
-                const paymentDateYear = pd.getFullYear().toString();
-                const paymentDateMonth = ('00' + pd.getMonth()).substr(1);
-                const paymentDateDay = ('00' + pd.getDate()).substr(1);
-                console.log('[psaactualform.save] date parts', paymentDateYear, paymentDateMonth, paymentDateDay);          
                 const dateString = paymentDateYear + paymentDateMonth + paymentDateDay;
                 console.log('[psaactualform.save] dateString', dateString);
                 const externalKey = this.promotionId + '_' + fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName] + '_' + dateString;
@@ -693,9 +774,32 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
     createNewPMIA(record) {        
         console.log('[pmiaForm.createNewPMIA] record', record);
+        console.log('[pmiaForm.createNewPMIA] glMappings', this.glMappings);
+        const pmiId = record.fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName];
         this.rebates.forEach(r => {
-            r.plannedDiscount = this.plannedDiscount;
+            r.plannedRebate = this.plannedDiscount;            
+            if (this.glMappings != undefined) {
+                const glMapping = this.glMappings.find(gl => gl.Classification__c == r.rebateType);
+                console.log('[pmiaform.createNewPMIA] glmapping', glMapping);
+                r.glAccount = glMapping == null ? '' : glMapping.SoldTo_Code__c;    
+            }
+            if (this.thePSA.PMI_Actuals__r == undefined || this.thePSA.PMI_Actuals__r.length == 0) {
+                r.hasTotals = true;
+            } else {                
+                const pmia = this.thePSA.PMI_Actuals__r.filter(pmia => pmia.Promotion_Material_Item__c == pmiId && pmia.Rebate_Type__c == r.rebateType);
+                console.log('[pmiaForm.createNewPMIA] rebateType, pmiId, pmia', r.rebateType, pmiId, pmia);
+                //r.hasTotals = pmia == null;
+                if (pmia == null || pmia.length == 0) {
+                    r.hasTotals = true;
+                    r.externalKey = pmiId + '-' + r.rebateType;
+                } else {
+                    r.hasTotals = false;
+                    r.externalKey = pmiId + '-' + r.rebateType + '-' + pmia.length;
+                }
+            }
         });
+        console.log('[pmiaForm.createNewPMIA] rebates', this.rebates);
+        console.log(']pmiaForm.createNewPMIA] record', record);
         createActuals({psaId: this.psaId, 
                             recordTypeId: this.recordTypeId, 
                             promotionId: record.fields[FIELD_PROMOTION_ID.fieldApiName],

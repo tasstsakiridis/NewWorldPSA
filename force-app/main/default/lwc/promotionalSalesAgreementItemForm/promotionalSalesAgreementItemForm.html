@@ -35,9 +35,7 @@
                 <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Back" alternative-text="Back" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <lightning-layout-item>
-                <template if:false={isLocked}>
-                    <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
-                </template>
+                <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <template if:true={canDelete}>
                 <lightning-layout-item>
@@ -61,7 +59,7 @@
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Brand Status -->
                 <p class="label">{brandStatusLabel}</p>
-                <select class="brandStatus" disabled={isLocked} multiple onchange={handleBSChange}>
+                <select class="brandStatus" multiple onchange={handleBSChange}>
                     <template for:each={brandStatusOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
@@ -72,7 +70,6 @@
                 <lightning-input type="number" name="i_VolumeForecast" 
                                  label={labels.volumeForecast.label}
                                  value={volumeForecast}
-                                 disabled={isLocked}
                                  onchange={handleVolumeForecastChange}>
                 </lightning-input>
                 <template if:true={hasVolumeForecastError}>
@@ -85,7 +82,6 @@
                                  label={labels.discountPerCase.label}                                 
                                  value={discount}
                                  step="0.01"
-                                 disabled={isLocked}
                                  onchange={handleDiscountChange}
                                  formatter="currency">
                 </lightning-input>
@@ -99,14 +95,13 @@
                                  label={listingFeeLabel}
                                  value={listingFee}
                                  onchange={handleListingFeeChange}
-                                 disabled={isLocked}
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Drink Strategy -->
                 <p class="label">{drinkStrategyLabel}</p>
-                <select class="drinkStrategy" multiple disabled={isLocked}>
+                <select class="drinkStrategy" multiple >
                     <template for:each={drinkStrategyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
@@ -115,7 +110,7 @@
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity -->
                 <p class="label">{promotionalActivityLabel}</p>
-                <select class="promotionalActivity" multiple disabled={isLocked}>
+                <select class="promotionalActivity" multiple >
                     <template for:each={promotionalActivityOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
@@ -127,14 +122,13 @@
                                  label={promotionalActivityLabel}
                                  value={promotionalActivityAmount}
                                  onchange={handlePromotionalActivityValueChange}
-                                 disabled={isLocked}
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy -->
                 <p class="label">{trainingAdvocacyLabel}</p>
-                <select class="trainingAdvocacy" disabled={isLocked} multiple>
+                <select class="trainingAdvocacy" multiple>
                     <template for:each={trainingAdvocacyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
@@ -145,7 +139,6 @@
                 <lightning-input type="number" name="i_TrainingAdvocacyAmount" 
                                  label={trainingAdvocacyLabel}
                                  value={trainingAdvocacyAmount}
-                                 disabled={isLocked}
                                  onchange={handleTrainingAdvocacyValueChange}
                                  formatter="currency">
                 </lightning-input>
@@ -153,7 +146,7 @@
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Outlet to Provide -->
                 <p class="label">{outletToProvideLabel}</p>
-                <select class="outletToProvide" disabled={isLocked} multiple>
+                <select class="outletToProvide" multiple>
                     <template for:each={outletToProvideOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
@@ -166,7 +159,6 @@
                                  value={comments}
                                  label={labels.comments.label}
                                  placeholder={labels.comments.placeholder}
-                                 disabled={isLocked}
                                  onchange={handleCommentsChange}>
                 </lightning-input>
             </lightning-layout-item>

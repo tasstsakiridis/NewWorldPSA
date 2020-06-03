@@ -138,7 +138,7 @@
                                     </template>
                                     <template if:false={rebate.isVolumeRebate}>
                                         <lightning-input type="currency" 
-                                            label={rebate.rebateType} 
+                                            label={rebate.label} 
                                             name="i_rebateAmount" value={rebate.rebateAmount} 
                                             placeholder={labels.rebateAmount.placeholder} 
                                             data-rebate-type={rebate.rebateType}
@@ -209,7 +209,7 @@
                             </template>
                             <template if:false={isVolumeRebate}>
                                 <lightning-input type="currency" 
-                                    label={rebateType} 
+                                    label={rebateLabel} 
                                     name="i_rebateAmount" value={rebateAmount} 
                                     placeholder={labels.rebateAmount.placeholder} 
                                     data-rebate-type={rebateType}

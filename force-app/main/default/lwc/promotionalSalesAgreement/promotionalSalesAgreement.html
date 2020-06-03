@@ -27,9 +27,7 @@
                             <div class="slds-page-header__control">
                                 <lightning-button-group>
                                     <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
-                                    <template if:false={isLocked}>
-                                        <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
-                                    </template>
+                                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
                                     <template if:true={canSubmitForApproval}>
                                         <lightning-button label={labels.submitForApproval.label} icon-name="utility:approval" title="Submit for Approval" class="slds-m-horizontal_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button>
                                     </template>
@@ -62,9 +60,7 @@
                 <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <lightning-layout-item size="8" class="slds-text-align_center">
-                <template if:false={isLocked}>
-                    <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
-                </template>
+                <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
                 <template if:true={canSubmitForApproval}>
                     <lightning-button-icon icon-name="utility:approval" title="Submit for Approval" alternative-text="Submit for Approval" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
                 </template>
@@ -131,7 +127,7 @@
                                 </lightning-layout-item>
                                 <lightning-layout-item size="12">
                                     <template if:true={isLengthInYears}>
-                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" readonly={isLocked} class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
                                     </template>                            
                                     <template if:false={isLengthInYears}>
                                         <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" readonly={isLocked} onchange={handleLengthOfPSAChange}></lightning-input>
@@ -147,10 +143,10 @@
                             <lightning-layout>
                                 <lightning-layout-item size="9">
                                     <template if:true={isLengthInYears}>
-                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" disabled={isLocked} class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                        <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
                                     </template>                            
                                     <template if:false={isLengthInYears}>
-                                        <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" readonly={isLocked} class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-input>
+                                        <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-input>
                                     </template>
                                     <template if:true={hasLengthOfPSAError}>
                                         <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
@@ -166,21 +162,32 @@
                         <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.agreementEndDate.label}</h2>
                         <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
                     </lightning-layout-item>
-                    <template if:true={isApproved}>
-                        <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
-                            <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
-                            <lightning-layout multiple-rows="true">
-                                <lightning-layout-item size="12" padding="around-small">
-                                    <template if:true={canChangeStatus}>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
+                        <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
+                        <lightning-layout multiple-rows="true">
+                            <template if:true={isApproved}>
+                                <template if:true={canChangeStatus}>
+                                    <lightning-layout-item size="12" padding="around-small">
                                         <lightning-combobox name="i_Status" label={labels.status.label} value={status} options={statusOptions} class="slds-m-horizontal_small" onchange={handleStatusChange}></lightning-combobox>
-                                    </template>
-                                </lightning-layout-item>
+                                    </lightning-layout-item>
+                                </template>                                
+                                <!--
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="text" name="i_PurchaseOrder" label={labels.purchaseOrder.label} value={purchaseOrder} class="slds-m-horizontal_small" onchange={handlePurchaseOrderChange}></lightning-input>                                        
                                 </lightning-layout-item>
-                            </lightning-layout>
-                        </lightning-layout-item>
-                    </template>
+                                -->
+                            </template>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.mpoPrestige.label}</h2>
+                                <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" disabled={isLocked} checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
+                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.comments.label}</h3>
+                        <lightning-textarea label={labels.comments.label} value={comments} onchange={handleCommentsChange}></lightning-textarea>
+                    </lightning-layout-item>
+                    <!--
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
                         <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.uploadFile.label}</h3>
                         <lightning-file-upload label={labels.uploadFile.message}
@@ -197,6 +204,7 @@
                             </template>
                         </template>
                     </lightning-layout-item>
+                -->
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
                         <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.routeToMarket.label}</h3>                        
                         <lightning-combobox name="i_WholesalerPreferred"

@@ -111,8 +111,10 @@
                                             product-id={selectedProductId} 
                                             product-name={selectedProductName} 
                                             promotion-id={promotionId}
-                                            is-locked={isLocked}
+                                            is-locked="false"
+                                            is-approved={isApproved}
                                             onsave={handleSavePSADetails}
+                                            onupdated={handlePSAUpdated}
                                             onclose={handleClosePSADetailForm}></c-promotional-sales-agreement-item-form>
                             </lightning-layout-item>
                         </template>    
