@@ -63,6 +63,12 @@ public with sharing class PSAWrapper {
     public String signingCustomerId { get; set; }
 
     @AuraEnabled 
+    public String signingCustomerName { get; set; }
+
+    @AuraEnabled
+    public String signingCustomerEmail { get; set; }
+
+    @AuraEnabled 
     public Integer lengthOfPSA { get; set; }
 
     @AuraEnabled
@@ -120,6 +126,8 @@ public with sharing class PSAWrapper {
         this.marketName = '';
         this.parentAccountId = '';
         this.signingCustomerId = '';
+        this.signingCustomerName = '';
+        this.signingCustomerEmail = '';
         this.lengthOfPSA = 0;
         this.isLengthInYears = true;
         this.beginDate = null;
@@ -147,6 +155,10 @@ public with sharing class PSAWrapper {
         this.marketName = psa.Market__r.Name;
         this.parentAccountId = psa.Account__c;
         this.signingCustomerId = psa.Contact__c;
+        if (psa.Contact__r != null) {
+            this.signingCustomerName = psa.Contact__r.Name;
+            this.signingCustomerEmail = psa.Contact__r.Email;    
+        }
         this.lengthOfPSA = Integer.valueOf(psa.Length_of_Agreement__c);
         this.isLengthInYears = psa.Is_Length_in_Years__c;
         this.mpoPrestige = psa.MPO_Prestige__c;

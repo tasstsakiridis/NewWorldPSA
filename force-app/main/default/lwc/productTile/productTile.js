@@ -42,7 +42,6 @@ export default class ProductTile extends LightningElement {
     }
     get pictureUrl() {
         var pictureUrl;
-        console.log('[productTile] product', this.product);
         if (this.product && this.product.Image_Name__c) {
             //pictureUrl = PRODUCT_IMAGES + '/ProductImages/' + this.product.Image_Name__c;
             pictureUrl = 'https://salesforce-static.b-fonline.com/images/'+this.product.Image_Name__c;
@@ -83,7 +82,6 @@ export default class ProductTile extends LightningElement {
     }
 
     handleSelectTile(isSelected) {
-        console.log('[producttile] selectTile method called');
         this.isSelected = isSelected;
         //this.selectTile();
     }

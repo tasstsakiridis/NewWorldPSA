@@ -131,6 +131,7 @@
                                                         name="i_ActQty" value={rebate.rebateAmount} 
                                                         placeholder={labels.actualQty.placeholder} 
                                                         data-rebate-type={rebate.rebateType}
+                                                        step="0.01"
                                                         onchange={handleRebateAmountChange}></lightning-input>
                                         <template if:true={hasActualQtyError}>
                                             <span class="error">{labels.actualQty.error}</span>
@@ -202,7 +203,8 @@
                                                 label={actualQtyFormattedLabel} 
                                                 name="i_ActQty" value={rebateAmount} 
                                                 placeholder={labels.actualQty.placeholder} 
-                                                onchange={handleActualQtyChange}></lightning-input>
+                                                step="0.01"
+                                                onchange={handleRebateAmountChange}></lightning-input>
                                 <template if:true={hasActualQtyError}>
                                     <span class="error">{labels.actualQty.error}</span>
                                 </template>    

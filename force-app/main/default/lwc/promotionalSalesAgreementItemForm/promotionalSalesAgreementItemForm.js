@@ -8,6 +8,7 @@ import { fireEvent } from 'c/pubsub';
 
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
+import CURRENCY_CODE from '@salesforce/i18n/currency';
 
 import userId from '@salesforce/user/Id';
 
@@ -56,6 +57,9 @@ import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
+import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
+import LABEL_EMPTYFORM_SAVE_ERROR from '@salesforce/label/c.EmptyForm_Save_Error';
+import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
 
 export default class PromotionalSalesAgreementItemForm extends NavigationMixin(LightningElement) {
     labels = {
@@ -73,9 +77,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         saveError               : { message: 'Error saving item' },
         saveSuccess             : { message: 'All changes saved successfully'},
         comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
-        thresholdError          : { message: LABEL_PERCENTAGE_CHANGE_ERROR }
+        thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR },
+        warning                 : { label: LABEL_WARNING },
+        emptyFormError          : { message: LABEL_EMPTYFORM_SAVE_ERROR }
     };
 
+    @api psa;
     @api psaId;
     @api psaItemId;
     @api productId;
@@ -86,20 +93,27 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
-        this.currentPageReference = currentPageReference;
-        console.log('[psaitemform.setcurrentpagereference] pageref', currentPageReference);
-        console.log('[psaitemform.setcurrentpagereference] psaItemId, productId', this.psaItemId, this.productId);
-        this.psaId = currentPageReference.state.c__psaId;
-        this.psaItemId = currentPageReference.state.c__psaItemId;        
-        this.productId = currentPageReference.state.c__productId;
-        this.promotionId = currentPageReference.state.c__promotionId;
-        console.log('[psaitemform.setcurrentpagereference] productid', this.productId);
-        
-        if (this.wiredProduct != undefined) {
-            refreshApex(this.wiredProduct);
-        }
-        if (this.wiredPSAItem != undefined) {
-            refreshApex(this.wiredPSAItem);
+        try {
+            this.currentPageReference = currentPageReference;
+            console.log('[psaitemform.setcurrentpagereference] pageref', currentPageReference);
+            console.log('[psaitemform.setcurrentpagereference.before] psaItemId, productId', this.psaItemId, this.productId);
+            this.psaId = currentPageReference.state.c__psaId;
+            this.psaItemId = currentPageReference.state.c__psaItemId;        
+            this.productId = currentPageReference.state.c__productId;
+            this.promotionId = currentPageReference.state.c__promotionId;
+            console.log('[psaitemform.setcurrentpagereference.after] psaItemId, productid', this.psaItemId, this.productId);
+            
+            
+            if (this.wiredProduct != undefined) {
+                refreshApex(this.wiredProduct);
+            }
+
+            console.log('[psaitemform.setcurrentpagereference.after] wiredPSAItem', this.wiredPSAItem);
+            if (this.wiredPSAItem != undefined) {
+                refreshApex(this.wiredPSAItem);
+            }
+        }catch(ex) {
+            console.log('[psaitemform.setcurrentpagereference] exception', ex);
         }
     }
 
@@ -167,12 +181,13 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         } else if (value.data) {
             this.error = undefined;
             this.product = value.data;
+            console.log('[psaitemform.getproductdetails] psaItemId, psaItem', this.psaItemId, this.psaItem);
             if (this.psaItemId == undefined) {
                 this.initialiseItemForm();
             }
             this.finishedLoadingProduct = true;
             if (this.psaItemId == undefined) { this.finishedLoadingDetails = true; }
-            if (this.finishedLoadingDetails && this.finishedLoadingObjectInfo) { this.isWorking = false;}
+            if (this.finishedLoadingDetails && this.finishedLoadingObjectInfo) { this.isWorking = false; }
             console.log('[psaItemForm.getproductdetails] finishedloadingdetails, objectinof, product', this.finishedLoadingDetails, this.finishedLoadingObjectInfo, this.finishedLoadingProduct);
         }
     }
@@ -199,41 +214,37 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 Image_Name__c: value.data.Product_Custom__r.Image_Name__c
             };
             
-            this.discount = value.data.Plan_Rebate__c;
-            this.volumeForecast = value.data.Plan_Volume__c;
-            this.listingFee = value.data.Listing_Fee__c;
-            this.promotionalActivityAmount = value.data.Promotional_Activity_Value__c;
-            this.trainingAdvocacyAmount = value.data.Training_and_Advocacy_Value__c;
+            this.discount = value.data.Plan_Rebate__c || 0;
+            this.volumeForecast = value.data.Plan_Volume__c || 0;
+            this.listingFee = value.data.Listing_Fee__c || 0;
+            this.promotionalActivityAmount = value.data.Promotional_Activity_Value__c || 0;
+            this.trainingAdvocacyAmount = value.data.Training_and_Advocacy_Value__c || 0;
             this.comments = value.data.Comments_Long__c;
 
             //this.brandStatus = value.data.Brand_Status__c;
+            this.brandStatusValues = [];
             if (value.data.Brand_Status__c) {
                 this.brandStatusValues = value.data.Brand_Status__c.split(';');
             }
-            this.selectPicklistValues(this.brandStatusOptions, this.brandStatusValues);
-
+            this.drinkStrategyValues = [];
             if (value.data.Drink_Strategy__c) {
                 this.drinkStrategyValues = value.data.Drink_Strategy__c.split(';');
             }
-            this.selectPicklistValues(this.drinkStrategyOptions, this.drinkStrategyValues);
-
+            this.promotionalActivityValues = [];
             if (value.data.Promotional_Activity__c) {
                 this.promotionalActivityValues = value.data.Promotional_Activity__c.split(';');
             }
-            this.selectPicklistValues(this.promotionalActivityOptions, this.promotionalActivityValues);
-
+            this.trainingAdvocacyValues = [];
             if (value.data.Training_and_Advocacy__c) {
                 this.trainingAdvocacyValues = value.data.Training_and_Advocacy__c.split(';');
             }
-            this.selectPicklistValues(this.trainingAdvocacyOptions, this.trainingAdvocacyValues);
-
+            this.outletToProvideValues = [];
             if (value.data.Outlet_to_Provide__c) {
                 this.outletToProvideValues = value.data.Outlet_to_Provide__c.split(';');
             }
-            this.selectPicklistValues(this.outletToProvideOptions, this.outletToProvideValues);
 
             this.finishedLoadingDetails = true;
-            if (this.finishedLoadingObjectInfo && this.finishedLoadingProduct) { this.isWorking = false; }    
+            if (this.finishedLoadingObjectInfo && this.finishedLoadingProduct) { this.isWorking = false; }
             console.log('[psaItemForm.getpsaitemdetails] finishedloadingdetails, objectinof, product', this.finishedLoadingDetails, this.finishedLoadingObjectInfo, this.finishedLoadingProduct);
 
         }
@@ -274,6 +285,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     promotionalActivityAmount = 0;
     promotionalActivity;
     promotionalActivityOptions;   
+    promotionalActivityValues;
     promotionalActivityLabel = 'Promotional Activity';
     promotionalActivityPlaceholder = ''; 
 
@@ -293,6 +305,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     totalInvestmentLabel = 'Total Investment';
     get totalInvestment() {
         //console.log('total investment calc', this.volumeForecast, this.discount, this.listingFee, this.promotionalActivityAmount, this.trainingAdvocacyAmount);
+        const v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
+        const d = this.discount == undefined || this.discount == '' ? 0 : parseFloat(this.discount);
         const ti = (parseFloat(this.volumeForecast) * parseFloat(this.discount)) + parseFloat(this.listingFee) + parseFloat(this.promotionalActivityAmount) + parseFloat(this.trainingAdvocacyAmount);
         //console.log('totalInvestment', ti);
         return ti;
@@ -373,29 +387,31 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         Object.keys(picklistValues).forEach(picklist => {            
             if (picklist === 'Brand_Status__c') {
                 this.brandStatusOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                if (this.brandStatusValues && this.brandStatusValues.length > 0) {
-                    this.selectPicklistValues(this.brandStatusOptions, this.brandStatusValues);
-                }
+                //if (this.brandStatusValues && this.brandStatusValues.length > 0) {
+                //    const bsoptions = this.selectPicklistValues(this.brandStatusOptions, this.brandStatusValues);
+                //    this.brandStatusOptions = [...bsoptions];
+                //}
             } else if (picklist === 'Drink_Strategy__c') {
                 this.drinkStrategyOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                if (this.drinkStrategyValues && this.drinkStrategyValues.length > 0) {
-                    this.selectPicklistValues(this.drinkStrategyOptions, this.drinkStrategyValues);
-                }
+                //if (this.drinkStrategyValues && this.drinkStrategyValues.length > 0) {
+                //    this.selectPicklistValues(this.drinkStrategyOptions, this.drinkStrategyValues);
+                //}
             } else if (picklist === 'Promotional_Activity__c') {
                 this.promotionalActivityOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                if (this.promotionalActivityValues && this.promotionalActivityValues.length > 0) {
-                    this.selectPicklistValues(this.promotionalActivityOptions, this.promotionalActivityValues);
-                }
+                console.log('[psaitemform.setFieldOptions] promotionalActivityOptions', this.promotionalActivityOptions);
+                //if (this.promotionalActivityValues && this.promotionalActivityValues.length > 0) {
+                //    this.selectPicklistValues(this.promotionalActivityOptions, this.promotionalActivityValues);
+                //}
             } else if (picklist === 'Training_and_Advocacy__c') {
                 this.trainingAdvocacyOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                if (this.trainingAdvocacyValues && this.trainingAdvocacyValues.length > 0) {
-                    this.selectPicklistValues(this.trainingAdvocacyOptions, this.trainingAdvocacyValues);
-                }
+                //if (this.trainingAdvocacyValues && this.trainingAdvocacyValues.length > 0) {
+                //    this.selectPicklistValues(this.trainingAdvocacyOptions, this.trainingAdvocacyValues);
+                //}
             } else if (picklist === 'Outlet_to_Provide__c') {
                 this.outletToProvideOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                if (this.outletToProvideValues && this.outletToProvideValues.length > 0) {
-                    this.selectPicklistValues(this.outletToProvideOptions, this.outletToProvideValues);
-                }
+                //if (this.outletToProvideValues && this.outletToProvideValues.length > 0) {
+                //    this.selectPicklistValues(this.outletToProvideOptions, this.outletToProvideValues);
+                //}
             }
         });
 
@@ -409,7 +425,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     
     setFieldOptionsForField(picklistValues, picklist) {        
-        //console.log('[psaitemform.setFieldOptionsForField] picklist field', picklist);
+        console.log('[psaitemform.setFieldOptionsForField] picklist field', picklist);
         return picklistValues[picklist].values.map(item => ({
             label: item.label,
             value: item.value,
@@ -418,6 +434,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     selectPicklistValues(options, values) {
+        console.log('[psaItemForm.selectPicklistValue] options, values', options, values);
         if (options && options.length > 0 && values != undefined && values.length > 0) {            
             options.forEach(o => {
                 if (values.includes(o.value)) {
@@ -425,11 +442,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 }
             });
         }
+
+        return options;
         //console.log('[psaitemform.selectpicklistvalues] options, values', options, values);
     }
     
     initialiseItemForm() {
         console.log('[psaitemform.initialiseitemform]');
+        /*
         this.brandStatusValues = undefined;
         if (this.brandStatusOptions) {
             this.brandStatusOptions.forEach(p => p.selected = false);
@@ -456,6 +476,52 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.outletToProvideOptions.forEach(p => p.selected = false);
         }
         this.comments = undefined;
+        */
+        this.discount = 0;
+        this.volumeForecast = 0;
+        this.listingFee = 0;
+        this.promotionalActivityAmount = 0;
+        this.trainingAdvocacyAmount = 0;
+        this.comments = '';        
+
+        try {
+            //const bs = this.template.querySelector("select.brandStatus").options;
+            //console.log('[clear] bs1', bs);
+            //for(var i = 0; i < bs.length; i++) {
+            //    bs[i].selected = false;
+            //}
+            /*
+            this.brandStatusValues = [];
+
+            const ds = this.template.querySelector("select.drinkStrategy").options;
+            for(var i = 0; i < ds.length; i++) {
+                ds[i].selected = false;
+            }
+
+            const pa = this.template.querySelector("select.promotionalActivity").options;
+            for(var i = 0; i < pa.length; i++) {
+                pa[i].selected = false;
+            }
+
+            const ta = this.template.querySelector("select.trainingAdvocacy").options;
+            for(var i = 0; i < ta.length; i++) {
+                ta[i].selected = false;
+            }
+
+            const op = this.template.querySelector("select.outletToProvide").options;
+            for(var i = 0; i < op.length; i++) {
+                op[i].selected = false;
+            }
+            */
+            this.brandStatusValues = [];
+            this.drinkStrategyValues = [];
+            this.promotionalActivityValues = [];
+            this.trainingAdvocacyValues = [];
+            this.outletToProvideValues = [];    
+        }catch(ex) {
+            console.log('[clear] exception', ex);
+        }
+
     }
 
     /**
@@ -467,19 +533,27 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleSaveButtonClick() {
         //this.addClickedClassToElement('save');
-        this.workingMessage = this.labels.saving.message;
-        this.isWorking = true;
-        const isValid = this.validateForm();
-        console.log('[psaitemform..handlesavebuttonclick] isValid', isValid);
-        if (isValid) {
-            this.save();
+        try {
+            this.workingMessage = this.labels.saving.message;
+            this.isWorking = true;
+            const isValid = this.validateForm();
+            console.log('[psaitemform..handlesavebuttonclick] isValid', isValid);
+            if (isValid) {
+                this.save();
+            } else {
+                this.isWorking = false;
+            }
+        }catch(ex) {
+            console.log('[psaitemform.handlesavebuttonclick] exception', ex);
         }
     }
     handleDeleteButtonClick() {
         //this.addClickedClassToElement('delete');
         this.delete();
     }
-
+    handleClearButtonClick() {
+        this.initialiseItemForm();
+    }
     handleBSChange(event) {
         const bs = this.template.querySelector("select.brandStatus");
         for(var i = 0; i < bs.selectedOptions.length; i++) {
@@ -491,17 +565,17 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.brandStatusValues = event.detail.value;
     }
     handleVolumeForecastChange(event) {
-        try {
-        this.volumeForecast = event.detail.value;
+        try {            
+            this.volumeForecast = event.detail.value.trim() == '' ? 0 : event.detail.value;
         }catch(ex) {
             console.log('exception', ex);
         }
     }
     handleDiscountChange(event) {
-        this.discount = event.detail.value;
+        this.discount = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleListingFeeChange(event) {
-        this.listingFee = event.detail.value;
+        this.listingFee = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleDrinkStrategyChange(event) {
         this.drinkStrategyValues = event.detail.value;
@@ -510,13 +584,13 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.promotionalActivityValues = event.detail.value;
     }
     handlePromotionalActivityValueChange(event) {
-        this.promotionalActivityAmount = event.detail.value;
+        this.promotionalActivityAmount = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleTrainingAdvocacyChange(event) {
         this.trainingAdvocacyValues = event.detail.value;
     }
     handleTrainingAdvocacyValueChange(event) {
-        this.trainingAdvocacyAmount = event.detail.value;
+        this.trainingAdvocacyAmount = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleOutletToProvideChange(event) {
         this.outletToProvideValues = event.detail.value;
@@ -586,12 +660,102 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         }   
     }
 
+    loadPSAItem() {
+        console.log('[psaItemForm.loadPSAItem]');
+        //const bs = this.template.querySelector("select.brandStatus");     
+        //console.log('[psaItemForm.loadPSAItem] bs', bs);   
+        //if (bs != null) { console.log('[psaItemForm.loadPSAItem] bs.options', bs.options.length, bs.options); }        
+        //const bsoptions = this.selectPicklistValues(this.brandStatusOptions, this.brandStatusValues);    
+        //this.brandStatusOptions = [...bsoptions];
+        //console.log('[psaItemForm.loadPSAItem] brandStatusOptions', this.brandStatusOptions);    
+        /*
+        const ds = this.template.querySelector("select.drinkStrategy");
+        this.selectPicklistValues(this.drinkStrategyOptions, this.drinkStrategyValues);
+
+        const pa = this.template.querySelector("select.promotionalActivity");
+        this.selectPicklistValues(this.promotionalActivityOptions, this.promotionalActivityValues);
+
+        const ta = this.template.querySelector("select.trainingAdvocacy");
+        this.selectPicklistValues(this.trainingAdvocacyOptions, this.trainingAdvocacyValues);
+
+        const op = this.template.querySelector("select.outletToProvide");
+        this.selectPicklistValues(this.outletToProvideOptions, this.outletToProvideValues);
+        */
+        this.isWorking = false;
+    }
+
     validateForm() {
         let msg = 'There are some issues that need your attention\n';
         let isValid = true;
-        const threshold = 0.2;
-        const thresholdString = (threshold * 100) + '%';
 
+        //const brandStatus = this.template.querySelector("select.brandStatus");
+        //const drinkStrategy = this.template.querySelector("select.drinkStrategy");
+        //const promotionalActivity = this.template.querySelector("select.promotionalActivity");
+        //const trainingAdvocacy = this.template.querySelector("select.trainingAdvocacy");
+        //const outletToProvide = this.template.querySelector("select.outletToProvide");
+
+        console.log('[psaitemform.validate] psa', this.psa);
+        const empty_Volume = this.volumeForecast == undefined || this.volumeForecast == 0;
+        const empty_Rebate = this.discount == undefined || this.discount == 0;
+        const empty_ListingFee = this.listingFee == undefined || this.listingFee == 0;
+        const empty_PromotionalActivity = this.promotionalActivityValues == undefined || this.promotionalActivityValues.length == 0;
+        const empty_PromotionalActivityValue = this.promotionalActivityAmount == undefined || this.promotionalActivityAmount == 0;
+        const empty_TrainingAdvocacy = this.trainingAdvocacyValues == undefined || this.trainingAdvocacyValues.length == 0;
+        const empty_TrainingAvvocacyValue = this.trainingAdvocacyAmount == undefined || this.trainingAdvocacyAmount == 0;
+        const empty_BrandStatus = this.brandStatusValues == undefined || this.brandStatusValues.length == 0;
+        const empty_DrinkStrategy = this.drinkStrategyValues == undefined || this.drinkStrategyValues.length == 0;
+        const empty_outletToProvide = this.outletToProvideValues == undefined || this.outletToProvideValues.length == 0;
+        if (empty_Volume && empty_Rebate && empty_ListingFee && empty_PromotionalActivity && empty_PromotionalActivityValue
+            && empty_TrainingAdvocacy && empty_TrainingAvvocacyValue && empty_BrandStatus && empty_DrinkStrategy && empty_outletToProvide) {
+            this.showToast('warning', this.labels.warning.label, this.labels.emptyFormError.message);
+            isValid = false;
+        } else if (this.psa.Is_Approved__c) {
+            let total = 0, v = 0, r = 0, l = 0, p = 0, t = 0;
+            if (this.psa && this.psa.Promotion_Material_Items__r) {
+                this.psa.Promotion_Material_Items__r.forEach(pmi => {
+                    if (pmi.Id != this.psaItem.Id) {
+                        v = parseFloat(pmi.Plan_Volume__c) || 0;
+                        r = parseFloat(pmi.Plan_Rebate__c) || 0;
+                        l = parseFloat(pmi.Listing_Fee__c) || 0;
+                        p = parseFloat(pmi.Promotional_Activity_Value__c) || 0;
+                        t = parseFloat(pmi.Training_and_Advocacy_Value__c) || 0;
+    
+                        total += (v * r) + l + p + t;    
+                    }
+                });    
+            }
+            
+            console.log('[psaitemform.validate] total', total);
+            v = parseFloat(this.volumeForecast) || 0;
+            r = parseFloat(this.discount) || 0;
+            l = parseFloat(this.listingFee) || 0;
+            p = parseFloat(this.promotionalActivityAmount) || 0;
+            t = parseFloat(this.trainingAdvocacyAmount) || 0;
+            total += (v * r) + l + p + t;
+            console.log('[psaitemform.validate] v, r, l, p, t', v, r, l, p, t);
+            console.log('[psaitemform.validate] total', total);
+
+            if (this.psa.Original_Total_Investment__c && this.psa.Original_Total_Investment__c > 0) {
+                const diff = Math.abs(total - this.psa.Original_Total_Investment__c);
+                let threshold = 0;
+                if (this.psa.Market__r.Change_Threshold_Amount__c == undefined) {
+                    const thresholdPercentage = parseFloat(this.psa.Market__r.Promotion_Discount_Threshold__c) || 0;
+                    threshold = parseFloat(this.psa.Original_Total_Investment__c) * 0;
+                } else {
+                    threshold = parseFloat(this.psa.Market__r.Change_Threshold_Amount__c);
+                }
+
+                console.log('[psaitemform.validate] original', this.psa.Original_Total_Investment__c);
+                console.log('[psaitemform.validate] diff', diff);
+                console.log('[psaitemform.validate] threshold', threshold);
+                if (diff > threshold) {
+                    const thresholdString = `${CURRENCY_CODE}  ${threshold}`;
+                    this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.message.replace('{0}', thresholdString));
+                    isValid = false;        
+                }
+            }
+            
+        }
         //if (this.volumeForecast == undefined || this.volumeForecast == 0) {
         //    isValid = false; this.hasVolumeForecastError = true;
         //}
@@ -647,15 +811,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             console.log('[psaitemform.validateform] exception', ex);
         }
         console.log('[psaitems.validate] isvalie, volume, discount', isValid, this.hasVolumeForecastError, this.hasDiscountError);
-        if (!isValid) {
-            this.showToast('error', this.labels.validation.message, msg);            
-        }
+        //if (!isValid) {
+        //    this.showToast('error', this.labels.validation.message, msg);            
+        //}
         return isValid;
     }
     save() {
         console.log('[psaitemform.save]');
         this.isWorking = true;
         try {
+            /*
             this.brandStatusValues = [];
             const bs = this.template.querySelector("select.brandStatus");
             for(var i = 0; i < bs.selectedOptions.length; i++) {
@@ -708,7 +873,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 opo.selected = this.outletToProvideValues.includes(opo.value);
                 return opo;
             });
-
+            */
             const fields = {};
             fields[FIELD_PRODUCT.fieldApiName] = this.productId;
             fields[FIELD_BRAND_STATUS.fieldApiName] = this.brandStatusValues.join(';');
@@ -723,7 +888,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_OUTLET_TO_PROVIDE.fieldApiName] = this.outletToProvideValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
 
-            if (this.psaItem != null) {
+            if (this.psaItemId != null) {
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.psaItem.Plan_Volume__c;
                 fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.psaItem.Plan_Rebate__c;
                 fields[FIELD_PREVIOUS_LISTING_FEE.fieldApiName] = this.psaItem.Listing_Fee__c;
@@ -791,6 +956,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
+                if (this.isApproved) {
+                    this.updatePSAStatus("Updated");
+                }
                 this.updateTotals();
 
                 if (!this.isPhone) {
@@ -829,7 +997,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
-                this.updatePSAStatus("Updated");
+                if (this.isApproved) {
+                    this.updatePSAStatus("Updated");
+                }
                 this.updateTotals();
 
                 try {

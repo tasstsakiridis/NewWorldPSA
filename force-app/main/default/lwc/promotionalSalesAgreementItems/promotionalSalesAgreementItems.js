@@ -323,17 +323,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaItems.handlesavepsa] discount', event.detail.discount);
             console.log('[psaItems.handlesavepsa] investment', event.detail.totalInvestment);
             if (event.detail.psaItemId == undefined) {
-                this.wiredAgreement = refreshApex(this.wiredAgreement);
-                this.thePSA = this.wiredAgreement.data;
-                console.log('[psaItems.handlesavepsa] wiredagreement', this.wiredAgreement);
-                console.log('[psaItems.handlesavepsa] psa', this.thePSA);
-                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                    this.psaItems.clear();
-                    this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
-                        this.psaItems.set(pmi.Product_Custom__c, pmi);
-                    });
-                    console.log('psaItems', this.psaItems);
-                }    
+                refreshApex(this.wiredAgreement);
             } else {  
                 const item = this.psaItems.get(event.detail.productId); 
                 const newItem = Object.assign({}, item);

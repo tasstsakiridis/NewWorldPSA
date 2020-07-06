@@ -43,6 +43,9 @@
                 </lightning-layout-item>
             </template>
             <lightning-layout-item>
+                <lightning-button-icon data-id="clear" icon-name="utility:recycle_bin_empty" label="" title="Clear" alternative-text="Clear" onclick={handleClearButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item>
                 <lightning-button-icon data-id="help" icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right" onclick={handleHelpButtonClick}></lightning-button-icon>
             </lightning-layout-item>
         </lightning-layout>        
@@ -58,18 +61,26 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Brand Status -->
-                <p class="label">{brandStatusLabel}</p>
-                <select class="brandStatus" multiple onchange={handleBSChange}>
+                <!--
+                <p class="label">{brandStatusLabel}</p>                
+                <select class="brandStatus" multiple>
                     <template for:each={brandStatusOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_BrandStatus"
+                                          label={brandStatusLabel}
+                                          options={brandStatusOptions}
+                                          value={brandStatusValues}
+                                          onchange={handleBrandStatusChange}></lightning-checkbox-group>
             </lightning-layout-item>                        
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
                 <lightning-input type="number" name="i_VolumeForecast" 
                                  label={labels.volumeForecast.label}
                                  value={volumeForecast}
+                                 step="0.01"
                                  onchange={handleVolumeForecastChange}>
                 </lightning-input>
                 <template if:true={hasVolumeForecastError}>
@@ -100,21 +111,37 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Drink Strategy -->
+                <!--
                 <p class="label">{drinkStrategyLabel}</p>
                 <select class="drinkStrategy" multiple >
                     <template for:each={drinkStrategyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_DrinkStrategy"
+                                        label={drinkStrategyLabel}
+                                        options={drinkStrategyOptions}
+                                        value={drinkStrategyValues}
+                                        onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
+
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity -->
+                <!--
                 <p class="label">{promotionalActivityLabel}</p>
                 <select class="promotionalActivity" multiple >
                     <template for:each={promotionalActivityOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_PromotionalActivity"
+                                        label={promotionalActivityLabel}
+                                        options={promotionalActivityOptions}
+                                        value={promotionalActivityValues}
+                                        onchange={handlePromotionalActivityChange}></lightning-checkbox-group>
+        
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity Amount -->
@@ -127,12 +154,20 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy -->
+                <!--
                 <p class="label">{trainingAdvocacyLabel}</p>
                 <select class="trainingAdvocacy" multiple>
                     <template for:each={trainingAdvocacyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_TrainingAndAdvocacy"
+                                        label={trainingAdvocacyLabel}
+                                        options={trainingAdvocacyOptions}
+                                        value={trainingAdvocacyValues}
+                                        onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
+            
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy Amount -->
@@ -145,13 +180,20 @@
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Outlet to Provide -->
+                <!--
                 <p class="label">{outletToProvideLabel}</p>
                 <select class="outletToProvide" multiple>
                     <template for:each={outletToProvideOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
-
+            -->
+                <lightning-checkbox-group name="i_OutletToProvide"
+                                        label={outletToProvideLabel}
+                                        options={outletToProvideOptions}
+                                        value={outletToProvideValues}
+                                        onchange={handleOutletToProvideChange}></lightning-checkbox-group>
+            
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <lightning-input name="i_Comments" type="text"

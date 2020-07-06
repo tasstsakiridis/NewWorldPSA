@@ -86,7 +86,51 @@ private class PromotionalSalesAgreementController_Test {
             Promotion_Activity__c psa1 = new Promotion_Activity__c();
             psa1.Name = 'Test PSA 1';
             psa1.RecordTypeId = rtPSAActivity;
-            insert psa1;
+
+            Promotion_Activity__c psa2 = new Promotion_Activity__c();
+            psa2.Name = 'Test PSA 2';
+            psa2.RecordTypeId = rtPSAActivity;
+            psa2.Begin_Date__c = Date.today();
+            psa2.End_Date__c = psa2.Begin_Date__c.addDays(10);
+            psa2.Account__c = parentAccount.Id;
+            psa2.Contact__c = contact1.Id;
+            psa2.Wholesaler_Preferred__c = wholesaler1.Id;
+            psa2.Wholesaler_Preferred_Name__c = wholesaler1.Name;
+            psa2.Is_Length_in_Years__c = false;
+            psa2.Length_of_Agreement__c = 10;
+            psa2.Reminder_Date__c = psa2.Begin_Date__c;
+            psa2.Next_Email_Date__c = psa2.Begin_Date__c;
+
+            Promotion_Activity__c psa3 = new Promotion_Activity__c();
+            psa3.Name = 'Test PSA 3';
+            psa3.RecordTypeId = rtPSAActivity;
+            psa3.Begin_Date__c = Date.today();
+            psa3.End_Date__c = psa3.Begin_Date__c.addYears(1);
+            psa3.Account__c = parentAccount.Id;
+            psa3.Contact__c = contact1.Id;
+            psa3.Wholesaler_Preferred__c = wholesaler1.Id;
+            psa3.Wholesaler_Preferred_Name__c = wholesaler1.Name;
+            psa3.Is_Length_in_Years__c = true;
+            psa3.Length_of_Agreement__c = 1;
+            psa3.Reminder_Date__c = psa3.Begin_Date__c;
+            psa3.Next_Email_Date__c = psa3.End_Date__c.addDays(10);
+
+            Promotion_Activity__c psa4 = new Promotion_Activity__c();
+            psa4.Name = 'Test PSA 4';
+            psa4.RecordTypeId = rtPSAActivity;
+            psa4.Begin_Date__c = Date.today();
+            psa4.End_Date__c = psa4.Begin_Date__c.addMonths(2);
+            psa4.Account__c = parentAccount.Id;
+            psa4.Contact__c = contact1.Id;
+            psa4.Wholesaler_Preferred__c = wholesaler1.Id;
+            psa4.Wholesaler_Preferred_Name__c = wholesaler1.Name;
+            psa4.Is_Length_in_Years__c = true;
+            psa4.Length_of_Agreement__c = 1;
+            psa4.Reminder_Date__c = null;
+            psa4.Next_Email_Date__c = psa4.End_Date__c.addDays(10);
+            
+            Promotion_Activity__c[] l_PSA = new Promotion_Activity__c[]{psa1, psa2, psa3, psa4};
+            insert l_PSA;
 
             ContentVersion cv = new ContentVersion();
             cv.Title = 'Test Document';
@@ -207,11 +251,15 @@ private class PromotionalSalesAgreementController_Test {
             rebate1.rebateType = 'Listing Fee';
             rebate1.rebateAmount = 1000.00;
             rebate1.isVolumeRebate = false;
+            rebate1.hasTotals = true;
+            rebate1.externalKey = pmiId + '_' + rebate1.rebateType;
 
             PromotionalSalesAgreement_Controller.PSARebate rebate2 = new PromotionalSalesAgreement_Controller.PSARebate();
             rebate2.rebateType = 'Volume';
             rebate2.rebateAmount = 10;
             rebate2.isVolumeRebate = true;
+            rebate2.hasTotals = true;
+            rebate2.externalKey = pmiId + '_' + rebate2.rebateType;
 
             List<PromotionalSalesAgreement_Controller.PSARebate> rebates = new List<PromotionalSalesAgreement_Controller.PSARebate>();
             rebates.add(rebate1);
@@ -237,6 +285,21 @@ private class PromotionalSalesAgreementController_Test {
             
             PSAWrapper wrapper2 = new PSAWrapper(psa1);
             System.assertNotEquals(null, wrapper2);
+            
+            UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
+            contractController.setThePSA(psa1);
+            
+            List<Promotion_Activity__c> psaList = new List<Promotion_Activity__c>();
+            psaList.add(psa1);
+            psaList.add(psa2);
+            psaList.add(psa3);
+            psaList.add(psa4);
+            CalculateNextReminderDate.calcNextReminderDate(psaList);
+            CalculateNextActualsReminderDate.calcNextActualsReminderDate(psaList);
+
+            List<String> psaIds = new List<String>();
+            psaIds.add(psa1.Id);
+            BuildInitialActualsForPSA.buildInitialActuals(psaIds);
             
             Test.stopTest();
         }

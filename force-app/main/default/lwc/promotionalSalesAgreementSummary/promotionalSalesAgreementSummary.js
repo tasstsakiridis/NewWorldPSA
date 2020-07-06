@@ -81,10 +81,14 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
-        this.pageRef = currentPageReference;
-        this.currentPageReference = currentPageReference;
-        console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
-        this.psaId = currentPageReference.state.c__psaId;
+        try {
+            this.pageRef = currentPageReference;
+            this.currentPageReference = currentPageReference;
+            console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
+            this.psaId = currentPageReference.state.c__psaId;
+        } catch(ex) {
+            console.log('[psaSummary.setCurrentPageReference] exception', ex);
+        }
     }
 
     isWorking = false;

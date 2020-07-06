@@ -137,7 +137,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         dateRange               : { label: LABEL_DATE_RANGE },
         details                 : { label: LABEL_DETAILS },
         detachFile              : { label: LABEL_DETACH_FILE, successMessage: LABEL_DETACH_FILE_SUCCESS, confirmation: LABEL_DETACH_FILE_CONFIRMATION},
-        docusign                : { label: LABEL_DOCUSIGN },
+        docusign                : { label: 'Send Contract' },
         error                   : { message: LABEL_FORM_ERROR },
         help                    : { label: LABEL_HELP },
         items                   : { label: LABEL_ITEMS },
@@ -225,20 +225,24 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     wiredAgreement;
     @wire(getPSA, {psaId: '$recordId'})
     wiredGetAgreement(value) {
-        this.wiredAgreement = value;
-        console.log('[psa.getagreement] value', value);
-        if (this.isPhone && this.isThisTass) {
-            alert('[psa.getagreement]');
-        }
-        if (value.error) {
-            this.isWorking = false;
-            this.error = value.error;
-            this.thePSA = undefined;
-        } else if (value.data) {
-            this.error = undefined;
-            this.loadPSADetails(value.data);
-            //this.loadAttachedFiles();
-            this.isWorking = false;
+        try {
+            this.wiredAgreement = value;
+            console.log('[psa.getagreement] value', value);
+            if (this.isPhone && this.isThisTass) {
+                alert('[psa.getagreement]');
+            }
+            if (value.error) {
+                this.isWorking = false;
+                this.error = value.error;
+                this.thePSA = undefined;
+            } else if (value.data) {
+                this.error = undefined;
+                this.loadPSADetails(value.data);
+                //this.loadAttachedFiles();
+                this.isWorking = false;
+            }
+        }catch(ex) {
+            console.log('[psa.getagreement] exception', ex);
         }
     }
 
@@ -665,15 +669,19 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         
     }
     handleDocusignButtonClick(event) {
+        this.isWorking = true;
         console.log('[sendwithdocusign] signingcustomerid', this.signingCustomer.Id);
         sendDocuSignEnvelope({psaId: this.psaId, contactId: this.signingCustomer.Id})
         .then(result => {
             console.log('[senddocusignenv] success', result);
+            this.showToast('success', 'Success', 'The PSA has been emailed');
+            this.isWorking = false;
         })
         .catch(error => {
             console.log('[senddocusignenv] error', error);
+            this.showToast('error', 'Warning', 'Error encountered while trying to send the PSA');
+            this.isWorking = false;
         });
-        
         /*
         if (this.user == undefined) {
             this.showToast('error', 'Error', this.labels.userDetails.error);
@@ -1343,6 +1351,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.isLengthInYears = this.isLengthInYears;
         param.parentAccountId = this.parentAccount.Id;
         param.signingCustomerId = this.signingCustomer.Id;
+        param.signingCustomerName = this.signingCustomerName;
+        param.signingCustomerEmail = this.signingCustomer.Email;
         param.comments = this.comments;
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;

@@ -109,6 +109,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     this.createNewActual();
                 }
             } else {
+                console.log('[psaActualsForm.setCurrentPageReference] pmiaId', this.pmiaId);
                 this.loadPMIADetails();
             }  
         }
@@ -649,7 +650,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             }    
         }
 
-        this.approvalStatus = 'New';
+        this.approvalStatus = 'Paid';
         this.paymentDate = new Date();
         this.actualQty = 0;
         this.listingFeePaid = 0;
@@ -763,6 +764,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     fields[FIELD_ACTUAL_QTY.fieldApiName] = this.rebateAmount;
                     fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount * this.plannedDiscount;
                 }
+                console.log('[save] rebateAmount', this.rebateAmount);
+                console.log('[save] fields', fields);
                 const record = { fields };
                 this.updatePMIA(record);
             }
