@@ -1,5 +1,6 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
+import { refreshApex } from '@salesforce/apex';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
@@ -86,6 +87,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             this.currentPageReference = currentPageReference;
             console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
             this.psaId = currentPageReference.state.c__psaId;
+            this.loadPSA();
         } catch(ex) {
             console.log('[psaSummary.setCurrentPageReference] exception', ex);
         }
@@ -99,6 +101,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     error;
     wiredPSA;
     thePSA;
+    /*
     @wire(getPSA, { psaId: '$psaId'} )
     wiredGetPSA(value) {
         this.wiredPSA = value;
@@ -112,7 +115,21 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             this.data = undefined;
         }
     }
-    
+    */
+    loadPSA() {
+        getPSA({psaId: this.psaId})
+        .then(result => {
+            this.error = undefined;
+            this.thePSA = result;
+            this.buildTableData();
+        })
+        .catch(error => {
+            this.error = error;
+            console.log('[psaSummary.loadPSA] error', error);
+            this.data = undefined;
+        });
+    }
+
     get listingFeePaidLabel() {
         return `${LABEL_LISTING_FEE} (${LABEL_PAID})`;
     }

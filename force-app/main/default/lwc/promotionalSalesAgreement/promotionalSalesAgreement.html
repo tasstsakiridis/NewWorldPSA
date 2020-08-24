@@ -123,7 +123,7 @@
                         <template if:true={isPhone}>
                             <lightning-layout multiple-rows="true">
                                 <lightning-layout-item size="12">
-                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" readonly={isLocked} checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType"  checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                                 <lightning-layout-item size="12">
                                     <template if:true={isLengthInYears}>
@@ -153,7 +153,7 @@
                                     </template>            
                                 </lightning-layout-item>
                                 <lightning-layout-item size="3">
-                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" disabled={isLocked} checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                             </lightning-layout>    
                         </template>

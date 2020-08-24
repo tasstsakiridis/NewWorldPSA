@@ -62,10 +62,12 @@
                         <template if:true={showActualsForm}>
                             <c-promotional-sales-agreement-actuals-form 
                                         psa-id={psaId} 
+                                        psa={thePSA}
                                         promotion-id={selectedAccountId} 
                                         pmia-id={selectedPMIAId} 
                                         pmi-id={selectedPMIId}
                                         gl-mappings={glMappings}
+                                        wholesaler-options={wholesalerOptions}
                                         onclose={handleCloseForm}
                                         onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>
                         </template>

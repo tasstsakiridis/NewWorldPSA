@@ -236,8 +236,17 @@ private class PromotionalSalesAgreementController_Test {
             //System.assertNotEquals(null, pmi);
 
             Promotion_Material_Item__c pmi = PromotionalSalesAgreement_Controller.getPSAItemDetails(pmiId);
+            pmi.Proposed_Plan_Rebate__c = 1.25;
+            pmi.Proposed_Plan_Volume__c = 100;
+            pmi.Proposed_Listing_Fee__c = 10000;
+            pmi.Proposed_Promotional_Activity_Value__c = 2500;
+            pmi.Proposed_Training_Advocacy_Value__c = 3000;
+            update pmi;
             System.assertNotEquals(null, pmi);
 
+            psa1.Status__c = 'Approved';
+            update psa1;
+            
             Boolean isSOMUser = PromotionalSalesAgreement_Controller.getIsSOMUser();
             System.assertEquals(false, isSOMUser);
 
@@ -265,7 +274,7 @@ private class PromotionalSalesAgreementController_Test {
             rebates.add(rebate1);
             rebates.add(rebate2);
 
-            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, rebates);
+            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', rebates);
             System.assertNotEquals(0, pmiaIds.size());
 
             msg = PromotionalSalesAgreement_Controller.updateActualTotals(psa1.Id);
@@ -300,6 +309,7 @@ private class PromotionalSalesAgreementController_Test {
             List<String> psaIds = new List<String>();
             psaIds.add(psa1.Id);
             BuildInitialActualsForPSA.buildInitialActuals(psaIds);
+            
             
             Test.stopTest();
         }

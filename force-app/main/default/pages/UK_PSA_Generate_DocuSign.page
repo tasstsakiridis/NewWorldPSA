@@ -1,0 +1,17 @@
+<apex:page standardController="Promotion_Activity__c" extensions="UK_PSA_Generate_DocuSign_Controller">
+    <apex:form >
+    <apex:commandButton action="{!URLFOR('/apex/dfsle__onlineeditordocumentgenerator', 
+                                			null, 
+                                			[sId = psa.Id, 
+                                 			 templateId = 'aAQ3I000000CawAWAS', 
+                                			 recordId = psa.Id, 
+                                			 recordName = psa.Name, 
+                                			 title = 'Generate UK PSA - Tass', 
+                                			 onlineEditorTemplateId = 'd65a6a14-3770-ea11-b80c-48df378a7098']
+                                		)}"
+                        value="Generate DocuSign Document"
+                        id="btn_Generate_DocuSign"/>
+        
+    </apex:form>
+        
+</apex:page>

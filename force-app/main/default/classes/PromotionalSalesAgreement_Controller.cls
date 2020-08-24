@@ -48,6 +48,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
         @AuraEnabled 
         public String externalKey { get; set; }
+
+        @AuraEnabled
+        public String status { get; set; }
     }
 
     @AuraEnabled(Cacheable=true)
@@ -99,7 +102,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                     Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
                                                     Total_Training_and_Advocacy_Paid__c, Original_Plan_Volume__c, Original_Plan_Rebate__c, Original_Listing_Fee__c,
                                                     Original_Promotional_Activity__c, Original_Training_Advocacy__c, Total_Actual_Volume__c, Previous_Plan_Volume__c, 
-                                                    Previous_Plan_Rebate__c, Previous_Listing_Fee__c, Previous_Promotional_Activity__c, Previous_Training_Advocacy__c
+                                                    Previous_Plan_Rebate__c, Previous_Listing_Fee__c, Previous_Promotional_Activity__c, Previous_Training_Advocacy__c,
+                                                    Proposed_Plan_Volume__c, Proposed_Plan_Rebate__c, Proposed_Listing_Fee__c, Proposed_Promotional_Activity_Value__c,
+                                                    Proposed_Training_Advocacy_Value__c                                                    
                                                     FROM Promotion_Material_Items__r), 
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
@@ -219,7 +224,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                        Promotional_Activity_Value__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
                        Total_Investment__c, Product_Custom__r.Image_Name__c, Comments_Long__c, Total_Listing_Fee_Paid__c, 
                        Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c, Original_Plan_Volume__c, Original_Plan_Rebate__c,
-                       Original_Listing_Fee__c, Original_Promotional_Activity__c, Original_Training_Advocacy__c
+                       Original_Listing_Fee__c, Original_Promotional_Activity__c, Original_Training_Advocacy__c, Proposed_Plan_Volume__c,
+                       Proposed_Plan_Rebate__c, Proposed_Listing_Fee__c, Proposed_Promotional_Activity_Value__c, Proposed_Training_Advocacy_Value__c
                   FROM Promotion_Material_Item__c 
                  WHERE Id =:psaItemId];
     }
@@ -300,7 +306,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                        Boomi_Processed__c, LastModifiedDate, Approval_Status__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name,
                        Listing_Fee__c, Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Listing_Fee__c,
                        Promotion_Material_Item__r.Promotional_Activity_Value__c, Promotion_Material_Item__r.Training_and_Advocacy_Value__c,
-                       Rebate_Type__c, Rebate_Amount__c
+                       Rebate_Type__c, Rebate_Amount__c, Promotion_Material_Item__r.Total_Listing_Fee_Paid__c, Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c,
+                       Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c, Promotion_Material_Item__r.Total_Actual_Volume__c
                   FROM PMI_Actual__c 
                  WHERE Id =:pmiaId];
     }
@@ -507,13 +514,14 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled
-    public static List<String> createActuals(String psaId, String recordTypeId, String promotionId, String pmiId, String wholesalerId, Date paymentDate, String externalKey, List<PSARebate> rebates) {
+    public static List<String> createActuals(String psaId, String recordTypeId, String promotionId, String pmiId, String wholesalerId, Date paymentDate, String externalKey, String status, List<PSARebate> rebates) {
         System.debug('psaId: ' + psaId);
         System.debug('recordTypeId: ' + recordTypeId);
         System.debug('promotionId: ' + promotionId);
         System.debug('pmiId: ' + pmiId);
         System.debug('externalKey: ' + externalKey);
         System.debug('paymentDate: ' + paymentDate);
+        System.debug('status: ' + status);
         System.debug('rebates: ' + rebates);
         List<String> returnIds = new List<String>();
 
@@ -527,7 +535,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     pmia.Promotion__c = promotionId;
                     pmia.Promotion_Material_Item__c = pmiId;
                     pmia.Actual_Wholesaler__c = wholesalerId;
-                    pmia.Approval_Status__c = 'Submit';
+                    pmia.Approval_Status__c = status;
                     pmia.Payment_Date__c = paymentDate;
                     pmia.Rebate_Type__c = rebate.rebateType;
                     pmia.SAP_GL_Account__c = rebate.glAccount;

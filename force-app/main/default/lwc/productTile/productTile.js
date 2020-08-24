@@ -61,8 +61,20 @@ export default class ProductTile extends LightningElement {
         console.log('[productTile] psaitem', this.psaItem);
         if (this.psaItem) {            
             let str = '';
-            if (this.psaItem.Plan_Volume__c) { str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; }
-            if (this.psaItem.Plan_Rebate__c) { str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; }
+            if (this.psaItem.Plan_Volume__c) { 
+                if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
+                    str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                } else {
+                    str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                }
+            }
+            if (this.psaItem.Plan_Rebate__c) { 
+                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                    str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                } else {
+                    str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                }
+            }
             return str;
         } else {
             return 'has no psa item details';

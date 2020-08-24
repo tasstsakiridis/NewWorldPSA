@@ -669,8 +669,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         
     }
     handleDocusignButtonClick(event) {
-        this.isWorking = true;
         console.log('[sendwithdocusign] signingcustomerid', this.signingCustomer.Id);
+        
         sendDocuSignEnvelope({psaId: this.psaId, contactId: this.signingCustomer.Id})
         .then(result => {
             console.log('[senddocusignenv] success', result);
@@ -682,17 +682,18 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.showToast('error', 'Warning', 'Error encountered while trying to send the PSA');
             this.isWorking = false;
         });
+        
         /*
         if (this.user == undefined) {
             this.showToast('error', 'Error', this.labels.userDetails.error);
             return;
         }
-
         try {
         this.isWorking = true;
         const defaultValues = encodeDefaultFieldValues({
             sId: this.psaId,
-            templateId: 'aAQ3I000000CawAWAS',
+            templateId: 'aAQ3I000000CbwuWAC',
+            recordId: this.psaId,
             recordName: this.thePSA.Name,
             title: 'Generate UK PSA',
             CRL: 'Email~' + this.user.Email + ';FirstName~' + this.user.FirstName + ';LastName~' + this.user.LastName + ';SignInPersonName~Customer;SignNow~1;RoutingOrder~1;Role~Signer 1, Email~' + this.user.Email + ';FirstName~' + this.user.FirstName + ';LastName~' + this.user.LastName + ';Role~Signer 2;RoutingOrder~2;',
@@ -703,25 +704,41 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });        
 
         const pageReference = {
-            type: 'standard__webPage',
+            type: 'standard__namedPage',
             attributes: {
-                url: '/apex/dfsle__onlineeditordocumentgenerator'
+                pageName: 'UK_PSA_Generate_DocuSign'
             },
             state: {
                 defaultFieldValues: defaultValues
             }
         };
         this.isWorking = false;
+        this[NavigationMixin.Navigate]({
+            type: 'standard__namedPage',
+            attributes: {
+                pageName: 'UK_PSA_Generate_DocuSign',
+                id: this.psaId
+            }
+        });
+        */
+        //window.location.href = '{!URLFOR(\'/apex/dfsle_gendocumentgenerator\',null,[SourceID='+this.psaId+'])';
+        /*
         this[NavigationMixin.GenerateUrl](pageReference)
             .then(url => {
                 console.log('[generateurl] url', url);
-                window.open(url);
+                //window.open(url);
+                this[NavigationMixin.Navigate]({
+                    type: 'standard__webPage',
+                    attributes: {
+                        url: url
+                    }
+                });
             });
-
-        } catch(ex) {
-            console.log('[docusign.exception] ex', ex);
-        }
-        */
+           */ 
+       // } catch(ex) {
+        //    console.log('[docusign.exception] ex', ex);
+        //}
+        
     }
     handleHelpButtonClick(event) {
         this.showToast('info', 'Help', 'Sorry.  Help has not been completed yet.');
@@ -1161,7 +1178,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.hasStartDateError = false;
         this.hasPreferredRTMError = false;
         this.hasParentAccountError = false;
-        this.hasChildAccountError = false;
+        this.hasChildAccountsError = false;
 
         if (this.lengthOfPSA == undefined) {
             this.hasLengthOfPSAError = true;
@@ -1176,10 +1193,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.hasPreferredRTMError = true;
             isValid = false; 
         }
+        console.log('[validatepsa] parentAccount', this.parentAccount);
+        console.log('[validatepsa] isUsingParentAccount', this.isUsingParentAccount);
+        console.log('[validatepsa] selectedAccounts', this.selectedAccounts, this.selectedAccounts.size);
         if (this.parentAccount == undefined) {
             this.hasParentAccountError = true;
             isValid = false; 
-        } else if (this.isUsingParentAccount && (this.selectedAccounts == undefined || this.selectedAccounts.length == 0)) {
+        } else if (this.isUsingParentAccount && (this.selectedAccounts == undefined || this.selectedAccounts.size == 0)) {
             this.hasChildAccountsError = true;
             isValid =  false; 
         }

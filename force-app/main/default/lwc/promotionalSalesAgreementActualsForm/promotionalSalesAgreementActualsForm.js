@@ -53,6 +53,7 @@ import LABEL_PROCESSED from '@salesforce/label/c.Processed';
 import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PROMOTIONAL_ACTIVITY_PAID from '@salesforce/label/c.Promotional_Activity_Paid';
 import LABEL_PURCHASED_FROM from '@salesforce/label/c.Purchased_From';
+import LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR from '@salesforce/label/c.Rebate_Amount_Above_Planned_Error';
 import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_Placeholder';
 import LABEL_SAVE from '@salesforce/label/c.Save';
 import LABEL_SKIP from '@salesforce/label/c.Skip'
@@ -86,6 +87,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         promotionalActivityPaid: { label: LABEL_PROMOTIONAL_ACTIVITY_PAID },
         trainingAndAdvocacyPaid: { label: LABEL_TRAINING_ADVOCACY_PAID },
         rebateAmount  : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
+        rebatePaidAbovePlanned : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
         remaining     : { label: 'remaining' },
         amount        : { label: 'Amount' },
         totalDiscount : { label: LABEL_TOTAL_DISCOUNT }
@@ -96,23 +98,26 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.currentPageReference = currentPageReference;
         console.log('[psaactualsform.setcurrentpagereference] pageref', currentPageReference);
         console.log('[psaactualsform.setcurrentpagereference] ids', this.psaId, this.promotionId, this.pmiId, this.pmiaId);
+        console.log('[psaactualsform.setcurrentpagereference] psa', this.psa);
         this.psaId = currentPageReference.state.c__psaId;
         this.promotionId = currentPageReference.state.c__promotionId;
         this.pmiId = currentPageReference.state.c__pmiId;
-        this.pmiaId = currentPageReference.state.c__pmiaId;
-        console.log('[psaactualsform.setcurrentpagereference] thePSA', this.thePSA);
-        if (this.thePSA != undefined) {
+
+        if (this.pmiaId == currentPageReference.state.c__pmiaId) {
+            refreshApex(this.wiredPMIActual);
+        } else {
+            this.pmiaId = currentPageReference.state.c__pmiaId;
+            this.loadPMIADetails();
+        }
+        /*
+        if (this.psa != undefined) {
             if (this.pmiaId == undefined) {
-                if (this.pmiId == undefined) {
-                    // this.createMultipleActuals();
-                } else {
-                    this.createNewActual();
-                }
+                //this.createNewActual();
             } else {
-                console.log('[psaActualsForm.setCurrentPageReference] pmiaId', this.pmiaId);
                 this.loadPMIADetails();
             }  
         }
+        */
     }
 
     isPhone = CLIENT_FORM_FACTOR === 'Small';    
@@ -126,7 +131,6 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.error = undefined;
             this.objectInfo = data;
             this.getRecordTypeId();
-            //this.setFieldLabels();
         } else if (error) {
             this.error = error;
             this.objectInfo = undefined;
@@ -156,6 +160,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     psaId;
 
     @api 
+    psa;
+
+    @api 
     pmiId;
 
     @api 
@@ -167,106 +174,14 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api
     glMappings;
 
-
-    /*
     @api 
-    createNew(promotionId, pmiId, psaId) {
-        this.promotionId = promotionId;
-        this.pmiId = pmiId;
-        this.thePMIA = undefined;
-        this.createNewActual();    
-    }
+    wholesalerOptions;
 
-    @api 
-    loadPMIA(pmiaId, psaId) {
-        this.pmiaId = pmiaId;
-        console.log('[loadPMIA] pmiaId', pmiaId);
-        console.log('[loadPMIA] psa', this.thePSA);
-        refreshApex(this.wiredPMIActual);
-        this.thePMIA = this.wiredPMIActual.data;
-        this.loadPMIADetails();
-        this.setRemainingTotals();
-    }
-    */
     error;
     thePMIA;
     thePMI;
     theAccount;
     isWorking = false;    
-
-    /*
-    wiredPSA;
-    @wire(getPSA, { psaId: '$psaId' })
-    wiredGetPSA(value) {
-        this.wiredPSA = value;
-        console.log('[psaactualsform.wiredgetpsa] psa', value);
-        if (value.error) {
-            this.error = value.error;
-            this.thePSA = undefined;
-        } else if (value.data) {
-            this.error = undefined;
-            this.thePSA = value.data;
-
-            this.wholesalerOptions = [
-                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true },
-                { label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c }
-            ];
-                
-            this.setRemainingTotals();
-
-            if (this.pmiaId == undefined) {                    
-                this.createNewActual();
-            }
-
-        }
-    }
-
-    wiredPMIActual;
-    @wire(getPMIADetails, { pmiaId: '$pmiaId' })
-    wiredGetPMIActuals(value) {      
-        console.log('[psaactualform.getpmiadetails] psa', this.thePSA);  
-        this.wiredPMIActual = value;
-        console.log('[psaactualform.getpmiadetails] pmia', value);
-        if (value.error) {
-            this.error = value.error;
-            this.thePMIA = undefined;
-        } else if (value.data) {
-            this.error = undefined;
-            this.thePMIA = value.data;
-            this.loadPMIADetails();
-            this.setRemainingTotals();
-        }
-    }
-    */
-    /*
-    getPMIA() {
-        console.log('[getPMIA] pmiaId', this.pmiaId);
-        getPMIADetails({pmiaId: this.pmiaId})
-            .then(record => {
-                console.log('[getPMIA] record', record);
-                this.error = undefined;
-                this.thePMIA = record;
-                this.productName = this.thePMIA.Product_Name__c;
-                this.accountName = this.thePMIA.Account_Name__c;
-                this.actualQty = this.thePMIA.Act_Qty__c;
-                this.paymentDate = this.thePMIA.Payment_Date__c;
-                this.approvalStatus = this.thePMIA.Approval_Status__c;
-                this.processed = this.thePMIA.Boomi_Processed__c;
-                this.processedDate = this.thePMIA.Processed_Date__c;
-                this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c;
-                this.plannedDiscount = this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c;
-                this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
-                this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
-    
-            })
-            .catch(error => {
-                this.error = error;
-                this.thePMIA = undefined;
-    
-            });
-    }
-    */
-    isFinanceUser = false;
 
     productName;
     productLabel;
@@ -275,15 +190,16 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     accountLabel;
     
     wholesaler;
-    wholesalerOptions;
 
     plannedDiscount;
     plannedVolume;
+    totalActualVolume;
     totalDiscount;
 
     rebateType;
     rebateLabel;
     rebateAmount;
+    remainingRebate;
 
     actualQty;
     actualQtyLabel;
@@ -300,27 +216,22 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }
     }
 
+    listingFeePlanned;
     listingFeePaid;
     listingFeeRemaining;
-    get listingFeePaidLabel() {
-        //return `${this.labels.listingFeePaid.label} [${this.labels.remaining.label}: ${this.listingFeeRemaining}]`;
-    }
+    totalListingFeePaid;
+
+    promotionalActivityPlanned;
     promotionalActivityPaid;
     promotionalActivityRemaining;
-    get promotionalActivityPaidLabel() {
-        //return `${this.labels.promotionalActivityPaid.label} [${this.labels.remaining.label}: ${this.promotionalActivityRemaining}]`;
-    }
+    totalPromotionalActivityPaid;
 
+    trainingAndAdvocacyPlanned;
     trainingAndAdvocacyPaid;
     trainingAndAdvocacyRemaining;
-    get trainingAndAdvocacyPaidLabel() {
-        //return `${this.labels.trainingAndAdvocacyPaid.label} [${this.labels.remaining.label}: ${this.trainingAndAdvocacyRemaining}]`;
-    }
+    totalTrainingAndAdvocacyPaid;
 
     paymentDate;
-    paymentDateLabel;
-    paymentDatePlaceholder;
-    paymentDateErrorMessage = this.labels.paymentDate.error;
     hasPaymentDateError;
     get formattedPaymentDate() {
         console.log('[actuals.formattedpaymentdate]');
@@ -335,11 +246,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         return 'Processed on';
     }
 
-    processedDate;
-    processedDateLabel;    
-
     approvalStatus;
-    approvalStatusLabel;
     approvalStatusOptions;
     get canEdit() {
         console.log('[canEdit]');
@@ -424,24 +331,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[handleActualQtyChange] actualqty', this.actualQty);
         this.totalDiscount = this.actualQty * this.plannedDiscount;
     }
-    handleListingFeeChange(event) {
-        this.listingFeePaid = event.detail.value;
-    }
-    handlePromotionalActivityChange(event) {
-        this.promotionalActivityPaid = event.detail.value;
-    }
-    handleTrainingAndAdvocacyChange(event) {
-        this.trainingAndAdvocacyPaid = event.detail.value;
-    }
     handlePaymentDateChange(event) {
         this.paymentDate = new Date(event.detail.value);
     }
     handleWholesalerChange(event) {
         this.wholesaler = event.detail.value;
-        if (this.wholesaler === this.thePSA.Wholesaler_Preferred__c) {
-            this.wholesalerName = this.thePSA.Wholesaler_Preferred_Name__c;
+        if (this.wholesaler === this.psa.Wholesaler_Preferred__c) {
+            this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c;
         } else {
-            this.wholesalerName = this.thePSA.Wholesaler_Alternate_Name__c;
+            this.wholesalerName = this.psa.Wholesaler_Alternate_Name__c;
         }
     }
     handleRebateAmountChange(event) {
@@ -451,6 +349,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             const type = event.currentTarget.dataset.rebateType;
             console.log('[handleRebateAmountChange] type: ', type);
             this.rebates.forEach(rebate => {
+                console.log('[handleRebateAmountChange] rebate.rebateType, remaining', rebate.rebateType, rebate.remaining);
                 if (rebate.rebateType == type) {
                     rebate.rebateAmount = event.detail.value;
                     return true;
@@ -479,31 +378,6 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }    
     }
 
-    setFieldLabels() {
-        /*
-        console.log('[setFieldLabels] objectInfo', this.objectInfo);
-        if (this.objectInfo.fields["Approval_Status__c"]) {
-            this.approvalStatusLabel = this.objectInfo.fields["Approval_Status__c"].label;
-            this.approvalStatusPlaceholder = this.objectInfo.fields["Approval_Status__c"].inlineHelpText;
-        }
-        if (this.objectInfo.fields["Act_Qty__c"]) {
-            this.actualQtyLabel = this.objectInfo.fields["Act_Qty__c"].label;
-            this.actualQtyPlaceholder = this.objectInfo.fields["Act_Qty__c"].inlineHelpText;
-            console.log('[setFieldLabels] actualQtyLabel', this.actualQtyLabel);
-        }
-        if (this.objectInfo.fields["Payment_Date__c"]) {
-            this.paymentDateLabel = this.objectInfo.fields["Payment_Date__c"].label;
-            this.paymentDatePlaceholder = this.objectInfo.fields["Payment_Date__c"].inlineHelpText;
-        }
-        if (this.objectInfo.fields["Account__c"]) {
-            this.accountLabel = this.objectInfo.fields["Account__c"].label;
-        }
-        if (this.objectInfo.fields["Product__c"]) {
-            this.productLabel = this.objectInfo.fields["Product__c"].label;
-        }
-        */
-
-    }
 
     setFieldOptions(picklistValues) {
         console.log('[setFieldOptions] picklistValues', picklistValues);
@@ -517,14 +391,20 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     rebateType: item.value, 
                     label: item.value + ' [' + this.labels.remaining.label + ' : %0]',
                     isVolumeRebate: item.value == 'Volume', 
-                    rebateAmount: 0                    
+                    rebateAmount: 0,
+                    remaining: 0                   
                 }));
             }
         });
 
-        console.log('[setFieldOptions] finished loading field options.  will load the psa');
-        this.loadPSA();
-        
+        console.log('[setFieldOptions] finished loading field options.  pmiaId', this.pmiaId);
+        //this.loadPSA();
+
+        if (this.pmiaId == undefined) {
+            this.createNewActual();
+        //} else {
+        //    this.loadPMIADetails();
+        }
     }
     
     setFieldOptionsForField(picklistValues, picklist) {        
@@ -535,19 +415,21 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }));
     }
 
+    /*
     loadPSA() {
         console.log('[loadPSA]');
         getPSA({psaId: this.psaId})
         .then(result => {
             this.error = undefined;
             this.thePSA = result;
-
+            console.log('[loadPSA] thePSA', this.thePSA);
             this.wholesalerOptions = [
-                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true },
-                { label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c }
+                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true }    
             ];
+            if (this.thePSA.Wholesaler_Alternate__c != undefined) {
+                this.wholesalerOptions.push({ label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c });
+            }
                 
-            //this.setRemainingTotals();
             console.log('[loadPSA] pmiaId', this.pmiaId);
             if (this.pmiaId == undefined) {                    
                 this.createNewActual();
@@ -561,38 +443,54 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.thePSA = undefined;
         });
     }
-    
+    */
+   
     loadPMIADetails() {
         getPMIADetails({pmiaId: this.pmiaId})
         .then(result => {
+            console.log('[pmiaForm.loadPMIADetails] result', result);
             this.thePMIA = result;
             this.productName = this.thePMIA.Product_Name__c;
             this.accountName = this.thePMIA.Account_Name__c;
             this.promotionId = this.thePMIA.Promotion__c;
             this.pmiId = this.thePMIA.Promotion_Material_Item__c;
-            //this.actualQty = this.thePMIA.Act_Qty__c;
-            //this.listingFeePaid = this.thePMIA.Listing_Fee__c;
-            //this.promotionalActivityPaid = this.thePMIA.Promotional_Activity__c;
-            //this.trainingAndAdvocacyPaid = this.thePMIA.Training_and_Advocacy__c;
             this.paymentDate = this.thePMIA.Payment_Date__c;
             this.approvalStatus = this.thePMIA.Approval_Status__c;
             this.processed = this.thePMIA.Boomi_Processed__c;
             this.processedDate = this.thePMIA.Processed_Date__c;
-            this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c;
-            this.plannedDiscount = this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c;
+            this.plannedVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c);
+            this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
             this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
             this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
             this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
-            this.rebateAmount = this.isVolumeRebate ? this.thePMIA.Act_Qty__c : this.thePMIA.Rebate_Amount__c;
+            this.rebateAmount = this.isVolumeRebate ? parseFloat(this.thePMIA.Act_Qty__c) : parseFloat(this.thePMIA.Rebate_Amount__c);
             this.rebateType = this.thePMIA.Rebate_Type__c;    
+            this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);
+            this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c);
+            this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c);
+            this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c);
+            this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c);
+            this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c);
+            this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c);
             
             try {
-                let key = this.rebateType.replace('&','and');
-                key = key.replace(/ /g,"_");
-                const total = this.thePSA['Total_'+key+'__c'] || 0;
-                const paid = this.thePSA['Total_'+key+'_Paid__c'] || 0;
-                const remaining = total - paid;
-                this.rebateLabel = this.rebateType + ' [' + this.labels.remaining.label + ' : ' + remaining + ']';    
+                this.remainingRebate = 0;
+                if (this.rebateType == 'Volume') {
+                    this.remainingRebate = this.plannedVolume - this.totalActualVolume;
+                } else if (this.rebateType == 'Listing Fee') {
+                    this.remainingRebate = this.listingFeePlanned - this.listingFeePaid;
+                } else if (this.rebateType == 'Promotional Activity') {
+                    this.remainingRebate = this.promotionalActivityPlanned - this.promotionalActivityPaid;
+                } else if (this.rebateType == 'Training & Advocacy') {
+                    this.remainingRebate = this.trainingAndAdvocacyPlanned - this.trainingAndAdvocacyPaid;
+                }
+                this.rebateLabel = this.rebateType + ' [' + this.labels.remaining.label + ' : ' + this.remainingRebate + ']';    
+                if (this.rebates != undefined) {
+                    const rebate = this.rebates.find(r => r.rebateType == this.rebateType);
+                    if (rebate) {
+                        rebate.remaining = this.remainingRebate;
+                    }    
+                }
             }catch(ex) {
                 console.log('[loadPMIADetails] exception', ex);
             }
@@ -603,52 +501,32 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         });    
     }
 
-    setRemainingTotals() {
-        /*
-        console.log('[actuals.setremainingtotals] psa, pmia', this.thePSA, this.thePMIA);
-        if (this.thePSA != undefined) {
-            if (this.thePMIA == undefined) {
-                const pmi = this.thePSA.Promotion_Material_Items__r.find(pmi => pmi.Id === this.pmiId);
-                this.listingFeeRemaining = pmi.Listing_Fee__c - (pmi.Total_Listing_Fee_Paid__c == undefined ? 0 : pmi.Total_Listing_Fee_Paid__c);
-                this.promotionalActivityRemaining = pmi.Promotional_Activity_Value__c - (pmi.Total_Promotional_Activity_Paid__c == undefined ? 0 : pmi.Total_Promotional_Activity_Paid__c);
-                this.trainingAndAdvocacyRemaining = pmi.Training_and_Advocacy_Value__c - (pmi.Total_Training_and_Advocacy_Paid__c == undefined ? 0 : pmi.Total_Training_and_Advocacy_Paid__c);
-            } else {
-                const pmi = this.thePSA.Promotion_Material_Item__r.find(pmi => pmi.Id === this.thePMIA.Promotion_Material_Item__c);
-                console.log('[actuals.setremainingtotals] p', p);
-                if (pmi) {
-                    this.listingFeeRemaining = this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c - (pmi.Total_Listing_Fee_Paid__c == undefined ? 0 : pmi.Total_Listing_Fee_Paid__c);
-                    this.promotionalActivityRemaining = this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c - (pmi.Total_Promotional_Activity_Paid__c == undefined ? 0 : pmi.Total_Promotional_Activity_Paid__c);
-                    this.trainingAndAdvocacyRemaining = this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c - (pmi.Total_Training_and_Advocacy_Paid__c == undefined ? 0 : pmi.Total_Training_and_Advocacy_Paid__c);
-                }    
-            }
-        }
-        */
-    }
 
     createNewActual() {
-        console.log('createNewActual.thePSa', this.thePSA);
-        this.wholesaler = this.thePSA.Wholesaler_Preferred__c;
-        this.wholesalerName = this.thePSA.Wholesaler_Preferred_Name__c;
+        console.log('createNewActual.psa', this.psa);
+        console.log('createNewActual.wholesalerOptions', this.wholesalerOptions);
+        this.wholesaler = this.psa.Wholesaler_Preferred__c;
+        this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c;
         
-        this.theAccount = this.thePSA.Promotions__r.find(p => p.Id === this.promotionId);
+        this.theAccount = this.psa.Promotions__r.find(p => p.Id === this.promotionId);
         if (this.theAccount) {
             this.accountName = this.theAccount.AccountName__c;
         }
-        if (this.pmiId == undefined) {
-            this.pmiRecords = this.thePSA.Promotion_Material_Items__r;
-            this.pmiIndex = 0;
-            this.totalPMIRecords = this.pmiRecords.length;
-            this.productName = this.pmiRecords[0].Product_Name__c;
-            this.plannedVolume = this.pmiRecords[0].Plan_Volume__c;
-            this.plannedDiscount = this.pmiRecords[0].Plan_Rebate__c;
-        } else {
-            this.thePMI = this.thePSA.Promotion_Material_Items__r.find(p => p.Id === this.pmiId);
-            if (this.thePMI) {
-                this.productName = this.thePMI.Product_Name__c;
-                this.plannedDiscount = this.thePMI.Plan_Rebate__c;
-                this.plannedVolume = this.thePMI.Plan_Volume__c;
-            }    
-        }
+
+        this.thePMI = this.psa.Promotion_Material_Items__r.find(p => p.Id === this.pmiId);
+        console.log('[createnewactuals] thePMI', this.thePMI);
+        if (this.thePMI) {
+            this.productName = this.thePMI.Product_Name__c;
+            this.plannedDiscount = parseFloat(this.thePMI.Plan_Rebate__c);
+            this.plannedVolume = parseFloat(this.thePMI.Plan_Volume__c);
+            this.totalActualVolume = parseFloat(this.thePMI.Total_Actual_Volume__c || 0);
+            this.listingFeePlanned = parseFloat(this.thePMI.Listing_Fee__c);
+            this.totalListingFeePaid = parseFloat(this.thePMI.Total_Listing_Fee_Paid__c || 0);
+            this.promotionalActivityPlanned = parseFloat(this.thePMI.Promotional_Activity_Value__c || 0);
+            this.totalPromotionalActivityPaid = parseFloat(this.thePMI.Total_Promotional_Activity_Paid__c || 0);
+            this.trainingAndAdvocacyPlanned = parseFloat(this.thePMI.Training_and_Advocacy_Value__c || 0);
+            this.totalTrainingAndAdvocacyPaid = parseFloat(this.thePMI.Total_Training_and_Advocacy_Paid__c || 0);
+        }    
 
         this.approvalStatus = 'Paid';
         this.paymentDate = new Date();
@@ -661,21 +539,17 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             try {
                 this.rebates.forEach(rebate => {
                     rebate.rebateAmount = 0;
-                    let key = rebate.rebateType.replace("&", "and");
-                    key = key.replace(/ /g, "_");
-                    console.log('[createnewactuals] key', key);
-                    let total = this.thePSA["Total_"+key+"__c"] || 0;
-                    let paid = this.thePSA["Total_"+key+"_Paid__c"] || 0;
-                    let remaining = total - paid;
-                    console.log('[createnewactuals] total, paid', total, paid);
-                    rebate.label = rebate.label.replace("%0", remaining);
+                    if (rebate.rebateType == 'Volume') {
+                        rebate.remaining = this.plannedVolume - this.totalActualVolume;
+                    } else if (rebate.rebateType == 'Listing Fee') {
+                        rebate.remaining = this.listingFeePlanned - this.totalListingFeePaid;
+                    } else if (rebate.rebateType == 'Promotional Activity') {
+                        rebate.remaining = this.promotionalActivityPlanned - this.totalPromotionalActivityPaid;
+                    } else if (rebate.rebateType == 'Training & Advocacy') {
+                        rebate.remaining = this.trainingAndAdvocacyPlanned - this.totalTrainingAndAdvocacyPaid;
+                    }
+                    rebate.label = rebate.label.replace("%0", rebate.remaining);
                     console.log('rebatelabel', rebate.label);
-                    /*
-                    if (rebate.rebateType == 'Listing Fee') {
-                        remaining = this.thePSA.Total_Listing_Fee__c - this.thePSA.Total_Listing_Fee_Paid__c;
-                        rebate.label = rebate.label.replace('%0', remaining);
-                    } else if (rebate.rebateType == 'Promotional Activity')
-                    */
                 });    
                 console.log('rebates', this.rebates);
     
@@ -717,6 +591,47 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
         //this.hasActualQtyError = (this.actualQty == undefined || this.actualQty == 0);
         this.hasPaymentDateError = (this.paymentDate == undefined);
+
+        let hasRebateError = false;
+        if (this.isNew) {
+            this.rebates.forEach(rebate => {
+                if (rebate.remaining < parseFloat(rebate.rebateAmount)) {
+                    hasRebateError = true;
+                    return true;                                      
+                }                        
+            });
+        } else {
+            console.log('[validateForm] rebateAmount, remainingRebate', this.rebateAmount, this.remainingRebate);
+            let total = 0;
+            if (this.rebateType == 'Volume') {
+                total = this.remainingRebate + this.totalActualVolume;
+                hasRebateError = parseFloat(this.rebateAmount) > total;
+                console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualVolume, total);
+            } else if (this.rebateType == 'Listing Fee') {
+                total = this.remainingRebate + this.totalListingFeePaid;
+                hasRebateError = parseFloat(this.rebateAmount) > total;
+                console.log('[validateForm] rebateAmount, remainingRebate, totalListingFeePaid', this.rebateAmount, this.remainingRebate, this.totalListingFeePaid, total);
+            } else if (this.rebateType == 'Promotional Activity') {
+                total = this.remainingRebate + this.totalPromotionalActivityPaid;
+                hasRebateError = parseFloat(this.rebateAmount) > total;
+                console.log('[validateForm] rebateAmount, remainingRebate, totalPromotionalActivityPaid', this.rebateAmount, this.remainingRebate, this.totalPromotionalActivityPaid, total);
+            } else if (this.rebateType == 'Training & Advocacy') {
+                total = this.remainingRebate + this.totalTrainingAndAdvocacyPaid;
+                hasRebateError = parseFloat(this.rebateAmount) > total;
+                console.log('[validateForm] rebateAmount, remainingRebate, totalTrainingAndAdvocacyPaid', this.rebateAmount, this.remainingRebate, this.totalTrainingAndAdvocacyPaid, total);
+            }
+
+        }
+        if (hasRebateError) {
+            isValid = false;
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: this.labels.rebatePaidAbovePlanned.error,
+                    variant: 'error' 
+                }),
+            );  
+        }
 
         if (this.hasActualQtyError || this.hasPaymentDateError) { isValid = false; }
         return isValid;
@@ -786,10 +701,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 console.log('[pmiaform.createNewPMIA] glmapping', glMapping);
                 r.glAccount = glMapping == null ? '' : glMapping.SoldTo_Code__c;    
             }
-            if (this.thePSA.PMI_Actuals__r == undefined || this.thePSA.PMI_Actuals__r.length == 0) {
+            if (this.psa.PMI_Actuals__r == undefined || this.psa.PMI_Actuals__r.length == 0) {
                 r.hasTotals = true;
             } else {                
-                const pmia = this.thePSA.PMI_Actuals__r.filter(pmia => pmia.Promotion_Material_Item__c == pmiId && pmia.Rebate_Type__c == r.rebateType);
+                const pmia = this.psa.PMI_Actuals__r.filter(pmia => pmia.Promotion_Material_Item__c == pmiId && pmia.Rebate_Type__c == r.rebateType);
                 console.log('[pmiaForm.createNewPMIA] rebateType, pmiId, pmia', r.rebateType, pmiId, pmia);
                 //r.hasTotals = pmia == null;
                 if (pmia == null || pmia.length == 0) {
@@ -810,6 +725,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                             wholesalerId: record.fields[FIELD_ACTUAL_WHOLESALER.fieldApiName],
                             paymentDate: record.fields[FIELD_PAYMENT_DATE.fieldApiName],
                             externalKey: record.fields[FIELD_EXTERNAL_KEY.fieldApiName],
+                            status: record.fields[FIELD_APPROVAL_STATUS.fieldApiName],
                             rebates: this.rebates })
             .then(result => {
                 console.log('[createnewpmia.createactuals] result', result);
@@ -862,63 +778,6 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     })
                 );
             });
-        /*
-        createRecord(record)
-            .then(pmiaItem => {
-                console.log('[pmiaForm.createRecord] pmiaItem', pmiaItem);
-                this.isWorking = false;
-                this.pmiaId = pmiaItem.id;
-
-                this.updateTotals();
-
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Actuals created successfully',
-                        variant: 'success'
-                    }),
-                );
-
-                if (this.isPhone) {
-                    this[NavigationMixin.Navigate]({
-                        type: 'standard__component',
-                        attributes: {
-                            componentName: 'c__PromotionalSalesAgreementActualsContainer'
-                        },
-                        state: {
-                            c__psaId: this.psaId
-                        }
-                    });
-                } else {
-                    const saveEvent = new CustomEvent('save', {
-                        detail: pmiaItem
-                    });
-                    this.dispatchEvent(saveEvent);
-                    this[NavigationMixin.Navigate](this.getUpdatedPageReference({
-                        c__psaId: this.psaId,
-                        c__pmiaId: pmiaItem.id 
-                    }), true);
-                }
-                    
-                if (this.pmiRecords != undefined && this.pmiRecords.length > 0) {
-                    this.pmiIndex = this.pmiIndex + 1;
-                } else {
-                    this.pmiaItem = pmiaItem;
-                    this.pmiaId = pmiaItem.Id;
-                }
-            })
-            .catch(error => {
-                this.isWorking = false;
-                console.log('[psaItemForm.createNewPSAItem] error', error);
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error creating Actuals',
-                        message: error.body.message,
-                        variant: 'error'
-                    }),
-                );
-            });
-        */
     }
     updatePMIA(record) {
         console.log('[pmiaForm.update] record', record);
@@ -940,6 +799,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 try {
                 if (!this.isPhone) {
                     refreshApex(this.wiredPMIActual);
+                    console.log('[pmiaForm.update] refreshedApex');
                     const saveEvent = new CustomEvent('save', {
                         detail: record
                     });

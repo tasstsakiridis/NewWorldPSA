@@ -51,6 +51,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     marketId;
     thePSA;
     wiredPSA;
+    wholesalerOptions;
+
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
         this.wiredPSA = value;
@@ -62,6 +64,14 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.error = undefined;
             this.thePSA = value.data;
             this.marketId = this.thePSA.Market__c;
+            this.wholesalerOptions = [
+                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true }    
+            ];
+            if (this.thePSA.Wholesaler_Alternate__c != undefined) {
+                this.wholesalerOptions.push({ label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c });
+            }
+
+            console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.buildTree();
         }
     }
@@ -180,36 +190,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     c__pmiId: parts[1],
                     c__showActualsForm: true
                 };
-            } else if (parts[0] === 'newaccount') {
-                newState = { 
-                        c__psaId: this.psaId,
-                        c__pmiaId: undefined,
-                        c__promotionId: parts[2],
-                        c__pmiId: undefined,
-                        c__showActualsForm: true
-                }
-                /*
-                this.selectedAccountId = parts[1];
-                this.selectedPMIId = undefined;
-                this.selectedPMIAId = undefined;
-                if (this.showActualsForm) {
-                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').createNew(this.selectedAccountId, this.psaId);
-                } else {
-                    this.showActualsForm = true;
-                }
-                */
             } else if (parts[0] === 'pmia') {
-                //this.selectedAccountId = undefined;
-                //this.selectedPMIId = undefined;
-                //this.selectedPMIAId = parts[1];
-                /*
-                this.currentPageReference = this.getUpdatedPageReference({
-                    c__psaId: this.psaId,
-                    c__pmiaId: parts[1],
-                    c__promotionId: undefined,
-                    c__pmiId: undefined,
-                    c__showActualsForm: true 
-                });*/
                 newState = {
                     c__psaId: this.psaId,
                     c__pmiaId: parts[1],
@@ -217,15 +198,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     c__pmiId: undefined,
                     c__showActualsForm: true
                 };
-                //this[NavigationMixin.Navigate](this.currentPageReference, true);
-                /*
-                if (this.showActualsForm) {
-                    this.template.querySelector('c-promotional-sales-agreement-actuals-form').loadPMIA(this.selectedPMIAId, this.psaId);
-                } else {
-                    this.showActualsForm = true;
-                }
-                */
-            }
+            }            
             if (this.isPhone) {
                 this[NavigationMixin.Navigate]({
                     type: 'standard__component',
@@ -289,47 +262,51 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                             
                             actualsForPMI.forEach(actual => {
                                 console.log('[buildtree] actual', actual);
-                                const pd = new Date(actual.Payment_Date__c);
-                                let metatext = '';
-                                if (actual.Rebate_Type__c == 'Volume') {
-                                    metatext += 'Actual Qty: ' + actual.Act_Qty__c;
-                                } else {
-                                    metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
-                                }
-                                let found = false;
-                                pmiTree.items.forEach(item => {
-                                    if (item.paymentDate == actual.Payment_Date__c) {
-                                        found = true;
-                                        item.items.push({
-                                            label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
-                                            metatext: metatext,
-                                            name: 'pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
-                                            disabled: false,
-                                            expanded: false,
-                                            items: []    
-                                        });
-                                        return true;
+                                console.log('[buildtree] has totals', actual.Has_Totals__c);
+                                if (actual.Has_Totals__c == false) {
+                                    const pd = new Date(actual.Payment_Date__c);
+                                    let metatext = '';
+                                    if (actual.Rebate_Type__c == 'Volume') {
+                                        metatext += 'Actual Qty: ' + actual.Act_Qty__c;
+                                    } else {
+                                        metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
                                     }
-                                });
-                                console.log('[buildtree] found', found);
-                                console.log('[buildtree] pmiTree', pmiTree);
-                                if (!found) {
-                                    pmiTree.items.push({
-                                        paymentDate: actual.Payment_Date__c,
-                                        label: pd.toLocaleDateString(userLocale, dateOptions),
-                                        metatext: actual.Actual_Wholesaler__r.Name,
-                                        name: 'pmia_'+actual.Id,
-                                        disabled: false,
-                                        expanded: true,
-                                        items: [
-                                            { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                    let found = false;
+                                    pmiTree.items.forEach(item => {
+                                        if (item.paymentDate == actual.Payment_Date__c) {
+                                            found = true;
+                                            item.items.push({
+                                                label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
                                                 metatext: metatext,
-                                                name: 'pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                                name: 'pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
                                                 disabled: false,
                                                 expanded: false,
-                                                items: []
-                                        }]
+                                                items: []    
+                                            });
+                                            return true;
+                                        }
                                     });
+                                    console.log('[buildtree] found', found);
+                                    console.log('[buildtree] pmiTree', pmiTree);
+                                    if (!found) {
+                                        pmiTree.items.push({
+                                            paymentDate: actual.Payment_Date__c,
+                                            label: pd.toLocaleDateString(userLocale, dateOptions),
+                                            metatext: actual.Actual_Wholesaler__r.Name,
+                                            name: 'pmia_'+actual.Id,
+                                            disabled: false,
+                                            expanded: true,
+                                            items: [
+                                                { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                                    metatext: metatext,
+                                                    name: 'pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                                    disabled: false,
+                                                    expanded: false,
+                                                    items: []
+                                            }]
+                                        });
+                                    }
+    
                                 }
                             });
                         } else {
@@ -341,33 +318,10 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     pmiTree.items.splice(0, 0, createNew);
                     return pmiTree;
                 });
-                //const createNewForAccount = { label:this.labels.createNewForAllProducts.label, name:'newaccount_'+account.Account__c, disabled:false, expanded:false, items:[] };
-                //pmiItems.splice(0, 0, createNewForAccount);
                 accountTree.items = pmiItems;
             }
               
             this.treeItems = [accountTree];
-        /*
-        if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
-            const items = this.thePSA.Promotions__r.map(account => {
-                //const isExpanded = account.Id == this.selectedAccountId;
-                console.log('[buildtree] account', account);
-                const accountTree = {
-                    label: account.AccountName__c,
-                    name: account.Id,
-                    disabled: false,
-                    expanded: true,
-                    items: []
-                };
-                console.log('[buildTree] accountTree', accountTree);
-        
-                return accountTree;
-            });
-        
-            this.treeItems = items;
-            console.log('[actuals.buildtree] treeitems', items);
-        }
-        */
         } catch (ex) {
             console.log('[actuals.buildtree] exception', ex);
         }
