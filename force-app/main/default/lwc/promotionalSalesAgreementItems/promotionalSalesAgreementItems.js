@@ -314,6 +314,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         }
     }
     handlePSAUpdated() {
+        console.log('[psaItems.handlePSAUpdated]');
         this.wiredAgreement = refreshApex(this.wiredAgreement);
         this.thePSA = this.wiredAgreement.data;
     }

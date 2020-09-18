@@ -298,6 +298,13 @@ private class PromotionalSalesAgreementController_Test {
             UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
             contractController.setThePSA(psa1);
             
+            ApexPages.StandardController stdController = new ApexPages.StandardController(psa1);
+            PageReference docuSignPage = new PageReference('/apex/UK_PSA_Generate_DocuSign');
+            docuSignPage.getParameters().put('id', psa1.Id);        
+            Test.setCurrentPage(docuSignPage);
+            
+            UK_PSA_Generate_DocuSign_Controller docuSignController = new UK_PSA_Generate_DocuSign_Controller(stdController);
+
             List<Promotion_Activity__c> psaList = new List<Promotion_Activity__c>();
             psaList.add(psa1);
             psaList.add(psa2);

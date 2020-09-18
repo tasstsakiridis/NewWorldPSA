@@ -61,14 +61,16 @@ export default class ProductTile extends LightningElement {
         console.log('[productTile] psaitem', this.psaItem);
         if (this.psaItem) {            
             let str = '';
-            if (this.psaItem.Plan_Volume__c) { 
+            console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
+            if (this.psaItem.Plan_Volume__c != undefined) { 
                 if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
                     str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
                 } else {
                     str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
                 }
             }
-            if (this.psaItem.Plan_Rebate__c) { 
+            console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);
+            if (this.psaItem.Plan_Rebate__c != undefined) { 
                 if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
                     str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
                 } else {
@@ -98,13 +100,15 @@ export default class ProductTile extends LightningElement {
         //this.selectTile();
     }
     handlePSAUpdate(detail) {
-        console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem.Id);
         try {
         if (detail.psaItemId === this.psaItem.Id) {   
+            console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem);
             const newItem = Object.assign({}, this.psaItem);                     
             newItem.Plan_Rebate__c = detail.discount;
             newItem.Plan_Volume__c = detail.volume;
             newItem.Total_Investment__c = detail.totalInvestment;
+            newItem.Proposed_Plan_Volume__c = detail.proposedVolume;
+            newItem.Proposed_Plan_Rebate__c = detail.proposedRebate;
             this.psaItem = Object.assign({}, newItem);
             console.log('[producttile.handlepsaupdated] psaitem', this.psaItem);
         }

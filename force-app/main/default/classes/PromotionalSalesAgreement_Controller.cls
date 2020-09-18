@@ -91,7 +91,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Total_Listing_Fee__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy__c, Evaluation_Comments__c, Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, 
                                             Total_Actual_Volume__c, Purchase_Order__c, MPO_Prestige__c, Original_Total_Investment__c, Market__r.Change_Threshold_Amount__c,
-                                            Market__r.Promotion_Discount_Threshold__c, Reminder_Date__c, Next_Email_Date__c,
+                                            Market__r.Promotion_Discount_Threshold__c, Reminder_Date__c, Next_Email_Date__c, 
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 

@@ -212,7 +212,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.error = undefined;
             this.psaItem = value.data;
 
-            this.psaItemId = value.data.Id;
+            //this.psaItemId = value.data.Id;
             this.productId = value.data.Product_Custom__c;
             this.product = {
                 Id: value.data.Product_Custom__c,
@@ -220,45 +220,29 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 Image_Name__c: value.data.Product_Custom__r.Image_Name__c
             };
             
-            this.discount = 0;
-            if (value.data.Plan_Rebate__c) {
-                this.discount = value.data.Plan_Rebate__c;
-                if (value.data.Proposed_Plan_Rebate__c && value.data.Proposed_Plan_Rebate__c != value.data.Plan_Rebate__c) {
-                    this.discount = value.data.Proposed_Plan_Rebate__c;
-                }
+            this.discount = value.data.Plan_Rebate__c || 0;
+            if (value.data.Proposed_Plan_Rebate__c && value.data.Proposed_Plan_Rebate__c != value.data.Plan_Rebate__c) {
+                this.discount = value.data.Proposed_Plan_Rebate__c;
             }
 
-
-            this.volumeForecast = 0;
-            if (value.data.Plan_Volume__c) {
-                this.volumeForecast = value.data.Plan_Volume__c;
-                if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
-                    this.volumeForecast = value.data.Proposed_Plan_Volume__c;
-                }
+            this.volumeForecast = value.data.Plan_Volume__c || 0;
+            if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
+                this.volumeForecast = value.data.Proposed_Plan_Volume__c;
             }
 
-            this.listingFee = 0;
-            if (value.data.Listing_Fee__c) {
-                this.listingFee = value.data.Listing_Fee__c;
-                if (value.data.Proposed_Listing_Fee__c && value.data.Proposed_Listing_Fee__c != value.data.Listing_Fee__c) {
-                    this.listingFee = value.data.Proposed_Listing_Fee__c;
-                }
+            this.listingFee = value.data.Listing_Fee__c || 0;
+            if (value.data.Proposed_Listing_Fee__c && value.data.Proposed_Listing_Fee__c != value.data.Listing_Fee__c) {
+                this.listingFee = value.data.Proposed_Listing_Fee__c;
             }
 
-            this.promotionalActivityAmount = 0;
-            if (value.data.Promotional_Activity_Value__c) {
-                this.promotionalActivityAmount = value.data.Promotional_Activity_Value__c;
-                if (value.data.Proposed_Promotional_Activity_Value__c && value.data.Proposed_Promotional_Activity_Value__c != value.data.Promotional_Activity_Value__c) {
-                    this.promotionalActivityAmount = value.data.Proposed_Promotional_Activity_Value__c;
-                }
+            this.promotionalActivityAmount = value.data.Promotional_Activity_Value__c || 0;
+            if (value.data.Proposed_Promotional_Activity_Value__c && value.data.Proposed_Promotional_Activity_Value__c != value.data.Promotional_Activity_Value__c) {
+                this.promotionalActivityAmount = value.data.Proposed_Promotional_Activity_Value__c;
             }
 
-            this.trainingAdvocacyAmount = 0;
-            if (value.data.Training_and_Advocacy_Value__c) {
-                this.trainingAdvocacyAmount = value.data.Training_and_Advocacy_Value__c;
-                if (value.data.Proposed_Advocacy_Training_Value__c && value.data.Proposed_Training_Advocacy_Value__c != value.data.Training_and_Advocacy_Value__c) {
-                    this.trainingAdvocacyAmount = value.data.Proposed_Advocacy_Training_Value__c;
-                }
+            this.trainingAdvocacyAmount = value.data.Training_and_Advocacy_Value__c || 0;
+            if (value.data.Proposed_Advocacy_Training_Value__c && value.data.Proposed_Training_Advocacy_Value__c != value.data.Training_and_Advocacy_Value__c) {
+                this.trainingAdvocacyAmount = value.data.Proposed_Advocacy_Training_Value__c;
             }
 
             this.comments = value.data.Comments_Long__c;
@@ -297,11 +281,20 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return this.psaItem != undefined;
     }
 
+    get psaTotalInvestment() {
+        return this.psaItem == undefined ? 0 : parseFloat(this.psa.Total_Investment__c);
+    }
+    get psaOriginalTotalInvestment() {
+        return this.psaItem = undefined ? 0 : parseFloat(this.psa.Original_Total_Investment__c);
+    }
+
     finishedLoadingDetails = false;
     finishedLoadingObjectInfo = false;
     finishedLoadingProduct = false;
     isWorking = true;
-    workingMessage = this.labels.loading.message;    
+    workingMessage = this.labels.loading.message;  
+    requiresApproval = false;  
+    isChangeAboveThreshold = false;
 
     brandStatusValues;
     brandStatusOptions;
@@ -690,7 +683,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 let threshold = 0;
                 if (this.psa.Market__r.Change_Threshold_Amount__c == undefined) {
                     const thresholdPercentage = parseFloat(this.psa.Market__r.Promotion_Discount_Threshold__c) || 0;
-                    threshold = parseFloat(this.psa.Original_Total_Investment__c) * 0;
+                    threshold = parseFloat(this.psa.Original_Total_Investment__c);
                 } else {
                     threshold = parseFloat(this.psa.Market__r.Change_Threshold_Amount__c);
                 }
@@ -700,11 +693,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 console.log('[psaitemform.validate] threshold', threshold);
                 if (diff > threshold) {
                     const thresholdString = `${CURRENCY_CODE}  ${threshold}`;
-                    this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.message.replace('{0}', thresholdString));
-                    isValid = false;        
+                    this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.message.replace('{0}', thresholdString));                                                      
+                    this.isChangeAboveThreshold = true;
                 }
             }
-            
+    
         }
         console.log('[psaitems.validate] isvalie, volume, discount', isValid, this.hasVolumeForecastError, this.hasDiscountError);
         return isValid;
@@ -738,12 +731,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             }
             
             if (this.psaItemId != null) {
-                if (this.isApproved == false) {
+                if (!this.isChangeAboveThreshold) {
                     fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
                     fields[FIELD_VOLUME_FORECAST.fieldApiName] = this.volumeForecast;
                     fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                     fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
-                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;    
+                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;                                                  
                 }
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.psaItem.Plan_Volume__c;
                 fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.psaItem.Plan_Rebate__c;
@@ -852,7 +845,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
-                if (this.isApproved) {
+                console.log('[updatePSAItem] isapproved, ischangeabovethreshold', this.isApproved, this.isChangeAboveThreshold);
+                if (this.isApproved && this.isChangeAboveThreshold) {
                     this.updatePSAStatus("Updated");
                 }
                 this.updateTotals();
@@ -873,9 +867,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     const detail = {
                         psaItemId: this.psaItemId,
                         productId: this.productId,
-                        volume: this.volumeForecast,
-                        discount: this.discount,
-                        totalInvestment: this.totalInvestment
+                        volume: record.fields.Plan_Volume__c,
+                        discount: record.fields.Plan_Rebate__c,
+                        totalInvestment: this.totalInvestment,
+                        proposedVolume: record.fields.Proposed_Plan_Volume__c,
+                        proposedRebate: record.fields.Proposed_Plan_Rebate__c
                     };
                     fireEvent(this.currentPageReference, 'psaupdated', detail);
                 }
@@ -944,6 +940,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         fields[FIELD_PROMOTION_ACTIVITY_STATUS.fieldApiName] = status;
         fields[FIELD_HAS_ACTUAL_TOTALS.fieldApiName] = false;
 
+        console.log('[psaItemForm.updatePSAStatus] fields', fields);
         const record = { fields };
         updateRecord(record)
             .then(() => {                
