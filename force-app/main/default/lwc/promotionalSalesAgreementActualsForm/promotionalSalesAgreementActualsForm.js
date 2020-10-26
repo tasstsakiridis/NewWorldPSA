@@ -694,6 +694,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[pmiaForm.createNewPMIA] record', record);
         console.log('[pmiaForm.createNewPMIA] glMappings', this.glMappings);
         const pmiId = record.fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName];
+        const promotionId = record.fields[FIELD_PROMOTION_ID.fieldApiName];
         this.rebates.forEach(r => {
             r.plannedRebate = this.plannedDiscount;            
             if (this.glMappings != undefined) {
@@ -703,17 +704,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             }
             if (this.psa.PMI_Actuals__r == undefined || this.psa.PMI_Actuals__r.length == 0) {
                 r.hasTotals = true;
-            } else {                
+            } else {           
                 const pmia = this.psa.PMI_Actuals__r.filter(pmia => pmia.Promotion_Material_Item__c == pmiId && pmia.Rebate_Type__c == r.rebateType);
                 console.log('[pmiaForm.createNewPMIA] rebateType, pmiId, pmia', r.rebateType, pmiId, pmia);
                 //r.hasTotals = pmia == null;
-                if (pmia == null || pmia.length == 0) {
-                    r.hasTotals = true;
-                    r.externalKey = pmiId + '-' + r.rebateType;
-                } else {
-                    r.hasTotals = false;
-                    r.externalKey = pmiId + '-' + r.rebateType + '-' + pmia.length;
-                }
+                var index = pmia == null ? 0 : pmia.length;
+                r.hasTotals = index == 0;
+                r.externalKey = promotionId + '_' + pmiId + '_' + rebateType + '-' + index;
             }
         });
         console.log('[pmiaForm.createNewPMIA] rebates', this.rebates);

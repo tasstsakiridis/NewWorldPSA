@@ -161,7 +161,7 @@ private class PromotionalSalesAgreementController_Test {
             Product__c prod1 = PromotionalSalesAgreement_Controller.getProductDetails(products[0].Id);
             System.assertNotEquals(null, prod1, 'get product details failed');
 
-            PagedResult pr3 = PromotionalSalesAgreement_Controller.getProducts(1);
+            PagedResult pr3 = PromotionalSalesAgreement_Controller.getProducts(1, brand.Id);
             System.assertNotEquals(null, pr3.records, 'get products failed');
 
             PagedResult pr4 = PromotionalSalesAgreement_Controller.getBrands(1);

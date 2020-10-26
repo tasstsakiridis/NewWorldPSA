@@ -238,10 +238,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled(cacheable=true)
-    public static PagedResult getProducts(Integer pageNumber) {
+    public static PagedResult getProducts(Integer pageNumber, String brandsSelected) {
         Integer pageSize = 50;
         Integer offset = (pageNumber - 1) * pageSize;
         
+        System.debug('brandsSelected:' + brandsSelected);
+
         String marketName = 'Australia';
         User u = [SELECT Id, Market__c FROM User WHERE Id =:UserInfo.getUserId()];
         if (u.Market__c != null) { marketName = u.Market__c; }
@@ -249,12 +251,17 @@ public with sharing class PromotionalSalesAgreement_Controller {
         String marketId = market.Id;
 
         String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c FROM Product__c WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\'';
+        if (brandsSelected.length() > 0) {
+            brandsSelected = '\'' + brandsSelected + '\'';
+            brandsSelected = brandsSelected.replaceAll(',', '\',\'');    
+            soql += ' AND Brand__c IN (' + brandsSelected + ')';
+        }
         soql += ' WITH SECURITY_ENFORCED ORDER BY Name LIMIT :pageSize OFFSET :offset';
         PagedResult result = new PagedResult();
         result.pageSize = pageSize;
         result.records = Database.query(soql);
 
-        result.totalItemCount = result.records.size();
+        result.totalItemCount = Database.countQuery('SELECT COUNT() FROM Product__c WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\' WITH SECURITY_ENFORCED');
 
         return result;
     }

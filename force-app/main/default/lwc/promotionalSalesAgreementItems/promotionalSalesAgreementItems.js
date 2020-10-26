@@ -162,11 +162,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     };
 
     brands;
+    brandsSelected = '';
     products = {
         records: []
     };
     wiredProducts;
-    @wire(getProducts, {pageNumber: '$pageNumber'})
+    @wire(getProducts, {pageNumber: '$pageNumber', brandsSelected: '$brandsSelected'})
     wiredGetProducts(value) {
         this.wiredProducts = value;
         console.log('[wiredgetproducts] value', value);
@@ -385,6 +386,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         console.log('[productItems.handleBrandsSelected] brands', brandsSelected);
         console.log('[productItems.handleBrandsSelected] wiredProducts', this.wiredProducts.data);
         try {
+            if (brandsSelected.length == 0) {
+                this.brandsSelected = '';
+            } else {
+                this.brandsSelected = brandsSelected.join(',');
+            }
+            /*
             this.brandsSelected = brandsSelected;
             let filteredProducts;
 
@@ -413,8 +420,17 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 totalItemCount: newList == null ? 0 : newList.length
             };
             console.log('[productItems.handleBrandsSelected] products', this.products);
+            */
         }catch(ex) {
             console.log('[productItems.handleBrandsSelected] exception', ex);
         }
+        
+    }
+
+    handleNextPage(event) {
+        this.pageNumber++;
+    }
+    handlePreviousPage(event) {
+        this.pageNumber--;
     }
 }
