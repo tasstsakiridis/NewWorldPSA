@@ -305,6 +305,7 @@ private class PromotionalSalesAgreementController_Test {
             
             UK_PSA_Generate_DocuSign_Controller docuSignController = new UK_PSA_Generate_DocuSign_Controller(stdController);
 
+            /*
             List<Promotion_Activity__c> psaList = new List<Promotion_Activity__c>();
             psaList.add(psa1);
             psaList.add(psa2);
@@ -312,7 +313,8 @@ private class PromotionalSalesAgreementController_Test {
             psaList.add(psa4);
             CalculateNextReminderDate.calcNextReminderDate(psaList);
             CalculateNextActualsReminderDate.calcNextActualsReminderDate(psaList);
-
+            */
+            
             List<String> psaIds = new List<String>();
             psaIds.add(psa1.Id);
             BuildInitialActualsForPSA.buildInitialActuals(psaIds);

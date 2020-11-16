@@ -95,6 +95,12 @@ export default class ProductTile extends LightningElement {
         }
     }
 
+    @api 
+    selectTile(isSelected) {
+        this.isSelected = isSelected;
+        this.setTileClass();
+    }
+
     handleSelectTile(isSelected) {
         this.isSelected = isSelected;
         //this.selectTile();
@@ -123,10 +129,10 @@ export default class ProductTile extends LightningElement {
         try {
         console.log('[productTile.handleClick] product', this.product.Id, this.psaItem);
         this.isSelected = !this.isSelected;
-        this.selectTile();
+        this.setTileClass();
         
         const selectedEvent = new CustomEvent('selected', {
-            detail: { productId: this.product.Id, psaItemId: this.psaItemId }
+            detail: { productId: this.product.Id, productName: this.product.Name, psaItemId: this.psaItemId }
         });
         this.dispatchEvent(selectedEvent);
         }catch(ex) {
@@ -134,7 +140,8 @@ export default class ProductTile extends LightningElement {
         }
     }
 
-    selectTile() {
+    setTileClass() {
+        console.log('[productTile.selectTile] isselected', this.isSelected);
         if (this.keepSelection && this.isSelected) {
             this.tileClass = 'selected';
         } else {

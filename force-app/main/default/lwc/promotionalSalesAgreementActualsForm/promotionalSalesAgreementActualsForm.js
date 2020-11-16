@@ -710,7 +710,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 //r.hasTotals = pmia == null;
                 var index = pmia == null ? 0 : pmia.length;
                 r.hasTotals = index == 0;
-                r.externalKey = promotionId + '_' + pmiId + '_' + rebateType + '-' + index;
+                r.externalKey = promotionId + '_' + pmiId + '_' + r.rebateType + '-' + index;
             }
         });
         console.log('[pmiaForm.createNewPMIA] rebates', this.rebates);
