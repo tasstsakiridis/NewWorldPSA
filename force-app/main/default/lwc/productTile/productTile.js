@@ -25,6 +25,25 @@ export default class ProductTile extends LightningElement {
     @api
     product;
 
+    @api 
+    quantityFieldName;
+
+    @api 
+    quantityFieldLabel;
+
+    @api 
+    priceFieldName;
+
+    @api 
+    priceFieldLabel;
+
+    quantityFieldValue = 0;
+    priceFieldValue = 0;
+
+    get showQtyOrPriceFields() {
+        return this.quantityFieldName != undefined || this.priceFieldName != undefined;
+    }
+
     get productName() {
         return this.product ? this.product.Name : '';
     }
@@ -149,4 +168,16 @@ export default class ProductTile extends LightningElement {
         }
     }
 
+    handleQuantityFieldValueCHange(event) {
+        this.quantityFieldValue = event.detail.value;
+        const updateEvent = new CustomEvent('qtyupdate', {
+            detail: { productId: this.productId, qty: this.quantityFieldValue }
+        });
+    }
+    handlePriceFieldValueCHange(event) {
+        this.priceFieldValue = event.detail.value;
+        const updateEvent = new CustomEvent('priceupdate', {
+            detail: { productId: this.productId, price: this.quantityFieldValue }
+        });
+    }
 }

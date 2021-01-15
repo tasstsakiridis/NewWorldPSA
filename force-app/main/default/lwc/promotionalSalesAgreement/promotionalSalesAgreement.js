@@ -670,7 +670,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleDocusignButtonClick(event) {
         console.log('[sendwithdocusign] signingcustomerid', this.signingCustomer.Id);
-        
+        /*
         sendDocuSignEnvelope({psaId: this.psaId, contactId: this.signingCustomer.Id})
         .then(result => {
             console.log('[senddocusignenv] success', result);
@@ -682,7 +682,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.showToast('error', 'Warning', 'Error encountered while trying to send the PSA');
             this.isWorking = false;
         });
-        
+        */
         /*
         if (this.user == undefined) {
             this.showToast('error', 'Error', this.labels.userDetails.error);
@@ -722,7 +722,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
         */
         //window.location.href = '{!URLFOR(\'/apex/dfsle_gendocumentgenerator\',null,[SourceID='+this.psaId+'])';
-        /*
+        
+        const pageReference = {
+            type: 'standard__webPage',
+            attributes: {
+                url: '/apex/dsfs__DocuSign_CreateEnvelope?SourceId=Promotion_Activity__c.Id,DSEID=\'0\',OCO=\'Tag\',LF=\'1\',CES=\'Electronic Agreement - Brown-Forman\',CEM=\'Please sign the agreement with your signature\',CRL=\'Email~'+this.signingCustomerEmail+';FirstName~'+this.signcus+';LastName~'+contactLastName+';RoutingOrder~1;Role~Signer 1,Email~'+ownerEmail+';FirstName~'+ownerFirstName+';LastName~'+ownerLastName+';Role~Signer 2;RoutingOrder~2;\',CCRM=\'Signer 1~Customer;Signer 2~Sales Executive\''
+            }
+        };
         this[NavigationMixin.GenerateUrl](pageReference)
             .then(url => {
                 console.log('[generateurl] url', url);
@@ -734,7 +740,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     }
                 });
             });
-           */ 
+           
        // } catch(ex) {
         //    console.log('[docusign.exception] ex', ex);
         //}
