@@ -54,6 +54,7 @@ import LABEL_DETACH_FILE_SUCCESS from '@salesforce/label/c.Detach_File_Success';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
 import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
+import LABEL_FOUR_PAYMENT_HELPTEXT from '@salesforce/label/c.Four_Payments_HelpText';
 import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_INFO from '@salesforce/label/c.Info';
 import LABEL_ITEMS from '@salesforce/label/c.Items';
@@ -69,7 +70,9 @@ import LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT from '@salesforce/label/c.No_Accounts_
 import LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT from '@salesforce/label/c.No_Decision_Makers_found_for_Account';
 import LABEL_NONE from '@salesforce/label/c.None';
 import LABEL_NONE_PICKLIST_VALUE from '@salesforce/label/c.None_Picklist_Value';
+import LABEL_NUMBER_OF_PAYMENTS from '@salesforce/label/c.Number_of_Payments';
 import LABEL_OK from '@salesforce/label/c.OK';
+import LABEL_ONE_PAYMENT_HELPTEXT from '@salesforce/label/c.One_Payment_HelpText';
 import LABEL_PARENT_ACCOUNT from '@salesforce/label/c.Parent_Account';
 import LABEL_PARENT_ACCOUNT_ERROR from '@salesforce/label/c.Parent_Account_Error';
 import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Parent_Account_Search_Results_Message';
@@ -94,6 +97,8 @@ import LABEL_STATUS from '@salesforce/label/c.Status';
 import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 import LABEL_SUCCESS from '@salesforce/label/c.Success';
 import LABEL_SUMMARY from '@salesforce/label/c.Summary';
+import LABEL_THREE_PAYMENT_HELPTEXT from '@salesforce/label/c.Three_Payments_HelpText';
+import LABEL_TWO_PAYMENT_HELPTEXT from '@salesforce/label/c.Two_Payments_HelpText';
 import LABEL_UPLOAD_AND_ATTACH from '@salesforce/label/c.Upload_and_Attach';
 import LABEL_UPLOAD_AND_ATTACH_HELPTEXT from '@salesforce/label/c.Upload_and_Attach_HelpText';
 import LABEL_UPLOAD_AND_ATTACH_SUCCESS from '@salesforce/label/c.Upload_and_Attach_Success';
@@ -117,6 +122,7 @@ import FIELD_WHOLESALER_ALTERNATE from '@salesforce/schema/Promotion_Activity__c
 import FIELD_PROMOTION_ACCOUNT from '@salesforce/schema/Promotion__c';
 
 const invalidStatusSelections = ['New','Submitted','Pending Approval','Updated'];
+const numberOfPaymentOptions = [{'label':'1','value':'1'},{'label':'2','value':'2'},{'label':'3','value':'3'},{'label':'4','value':'4'}];
 
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
@@ -150,9 +156,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         noAccountsFound         : { label: LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT },
         none                    : { label: LABEL_NONE, picklistLabel: LABEL_NONE_PICKLIST_VALUE },
         noSigningCustomers      : { message: LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT },
+        numberOfPayments        : { label: LABEL_NUMBER_OF_PAYMENTS },
         ok                      : { label: LABEL_OK },
         parentAccount           : { label: LABEL_PARENT_ACCOUNT, error: LABEL_PARENT_ACCOUNT_ERROR },
         parentAccountSearchResults : { label: LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR },
+        payments                : { oneHelpText: LABEL_ONE_PAYMENT_HELPTEXT, twoHelpText: LABEL_TWO_PAYMENT_HELPTEXT, threeHelpText: LABEL_THREE_PAYMENT_HELPTEXT, fourHelpText: LABEL_FOUR_PAYMENT_HELPTEXT },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         purchaseOrder           : { label: LABEL_PURCHASE_ORDER },
         recall                  : { label: LABEL_RECALL, recalledMessage: LABEL_RECALL_SUCCESS.replace('%0', 'PSA') },
@@ -204,6 +212,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isSearchingForParent = true;
     isMPOPrestige = false;
     hasMultipleAccountPages = true;
+    captureNumberOfPayments = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -215,6 +224,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     wiredAccount;
     purchaseOrder;
     comments;
+    numberOfPayments = 1;
 
     isWorking = true;
     workingMessage = this.labels.working.message;    
@@ -264,6 +274,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     @wire(getIsSOMUser)
     isSOMUser;
 
+    numberOfPaymentOptions = numberOfPaymentOptions;
     statusOptions;
     recordTypeId;
     picklistValuesMap;
@@ -291,6 +302,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.error = undefined;
             this.marketId = this.market.Id;
             this.maximumLengthOfPSA = this.market.Maximum_Agreement_Length__c == undefined ? 3 : this.market.Maximum_Agreement_Length__c;            
+            this.captureNumberOfPayments = this.market.Capture_Number_of_Payments__c == undefined ? false : this.market.Capture_Number_of_Payments__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -381,6 +393,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get canChangeStatus() {
         console.log('[canChangestatus] status, isSOMUser', this.status, this.isSOMUser);
         return this.status != 'New' && this.status != 'Submitted' && this.status != 'Updated' && this.isSOMUser;
+    }
+    get captureMPO() {
+        return this.market == undefined || (this.market != undefined && this.market.Name == 'United Kingdom');
     }
 
     error;
@@ -532,6 +547,19 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
 
+    get isOnePayment() {
+        return this.numberOfPayments == 1;
+    }
+    get isTwoPayments() {
+        return this.numberOfPayments == 2;
+    }
+    get isThreePayments() {
+        return this.numberOfPayments == 3;
+    }
+    get isFourPayments() {
+        return this.numberOfPayments == 4;
+    }
+
     /*
         Constructor
     */
@@ -670,7 +698,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleDocusignButtonClick(event) {
         console.log('[sendwithdocusign] signingcustomerid', this.signingCustomer.Id);
-        /*
+        
         sendDocuSignEnvelope({psaId: this.psaId, contactId: this.signingCustomer.Id})
         .then(result => {
             console.log('[senddocusignenv] success', result);
@@ -682,7 +710,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.showToast('error', 'Warning', 'Error encountered while trying to send the PSA');
             this.isWorking = false;
         });
-        */
+        
         /*
         if (this.user == undefined) {
             this.showToast('error', 'Error', this.labels.userDetails.error);
@@ -722,13 +750,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
         */
         //window.location.href = '{!URLFOR(\'/apex/dfsle_gendocumentgenerator\',null,[SourceID='+this.psaId+'])';
-        
-        const pageReference = {
-            type: 'standard__webPage',
-            attributes: {
-                url: '/apex/dsfs__DocuSign_CreateEnvelope?SourceId=Promotion_Activity__c.Id,DSEID=\'0\',OCO=\'Tag\',LF=\'1\',CES=\'Electronic Agreement - Brown-Forman\',CEM=\'Please sign the agreement with your signature\',CRL=\'Email~'+this.signingCustomerEmail+';FirstName~'+this.signcus+';LastName~'+contactLastName+';RoutingOrder~1;Role~Signer 1,Email~'+ownerEmail+';FirstName~'+ownerFirstName+';LastName~'+ownerLastName+';Role~Signer 2;RoutingOrder~2;\',CCRM=\'Signer 1~Customer;Signer 2~Sales Executive\''
-            }
-        };
+        /*
         this[NavigationMixin.GenerateUrl](pageReference)
             .then(url => {
                 console.log('[generateurl] url', url);
@@ -740,7 +762,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     }
                 });
             });
-           
+           */ 
        // } catch(ex) {
         //    console.log('[docusign.exception] ex', ex);
         //}
@@ -797,6 +819,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.thePSA.Is_Approved__c) { 
             this.status = 'Updated';
         }
+    }
+    handleNumberOfPaymentsChange(ev) {
+        console.log('[handleNumberOfPaymentsChange] value', ev.detail.value);
+        this.numberOfPayments = ev.detail.value;
     }
 
     handlePreviousPage() {
@@ -1028,6 +1054,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     el.checked = this.isUsingParentAccount;
                 }
                 //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
+            }
+            if (data.Number_of_Payments__c != undefined) {
+                this.numberOfPayments = data.Number_of_Payments__c.toString();
             }
             this.isMPOPrestige = data.MPO_Prestige__c;
             this.status = data.Status__c;
@@ -1375,6 +1404,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.endDate = this.endDate;
         param.lengthOfPSA = this.lengthOfPSA;
         param.isLengthInYears = this.isLengthInYears;
+        param.numberOfPayments = this.numberOfPayments;
         param.parentAccountId = this.parentAccount.Id;
         param.signingCustomerId = this.signingCustomer.Id;
         param.signingCustomerName = this.signingCustomerName;

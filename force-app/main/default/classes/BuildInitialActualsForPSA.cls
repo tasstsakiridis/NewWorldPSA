@@ -2,10 +2,14 @@ public with sharing class BuildInitialActualsForPSA {
     @InvocableMethod
     public static void buildInitialActuals(List<String> activityIds) {
         String rtUKPSA = '';
+        String rtBRAPSA = '';
         
         Map<String, Schema.RecordTypeInfo> rtiList = PMI_Actual__c.SObjectType.getDescribe().getRecordTypeInfosByName();
         if (rtiList.containsKey('UK - PSA')) {
             rtUKPSA = rtiList.get('UK - PSA').getRecordTypeId();
+        }
+        if (rtiList.containsKey('BRA - PSA')) {
+            rtBRAPSA = rtiList.get('BRA - PSA').getRecordTypeId();
         }
 
         
@@ -20,7 +24,8 @@ public with sharing class BuildInitialActualsForPSA {
 
         List<PMI_Actual__c> actuals = new List<PMI_Actual__c>();
         Set<String> s_PSAWithActuals = new Set<String>();
-        List<Promotion_Material_Item__c> items = [SELECT Id, Activity__c, Promotion__c, Activity__r.Wholesaler_Preferred__c, Activity__r.Market__c
+        List<Promotion_Material_Item__c> items = [SELECT Id, Activity__c, Promotion__c, Activity__r.Wholesaler_Preferred__c, 
+                                                        Activity__r.Market__c, Activity__r.Market_Name__c
                                                     FROM Promotion_Material_Item__c 
                                                    WHERE Activity__c =:activityIds];
 
@@ -45,12 +50,25 @@ public with sharing class BuildInitialActualsForPSA {
             String externalKey = '';
             Boolean addedActuals = false;
             Boolean keyExists = false;
+            String recordTypeId = rtUKPSA;
             PMI_Actual__c newActual;
             if (items != null && items.size() > 0) {
                 for(Promotion_Material_Item__c pmi : items) {
+                    switch on pmi.Activity__r.Market_Name__c {
+                        when 'Brazil' {
+                            recordTypeId = rtBRAPSA;
+                        }
+                        when 'United Kingdom' {
+                            recordTypeId = rtUKPSA;
+                        }
+                        when else {
+                            recordTypeId = rtUKPSA;
+                        }
+                    }
+
                     addedActuals = false;
                     //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
-                    newActual = createPMIActual(pmi, 'Volume', rtUKPSA, configs);
+                    newActual = createPMIActual(pmi, 'Volume', recordTypeId, configs);
                     keyExists = externalKeys.contains(newActual.External_Key__c);
                     System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
                     if (!keyExists) {
@@ -58,7 +76,7 @@ public with sharing class BuildInitialActualsForPSA {
                         addedActuals = true;
                     }
                     //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Listing Fee-0';
-                    newActual = createPMIActual(pmi, 'Listing Fee', rtUKPSA, configs);
+                    newActual = createPMIActual(pmi, 'Listing Fee', recordTypeId, configs);
                     keyExists = externalKeys.contains(newActual.External_Key__c);
                     System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
                     if (!keyExists) {
@@ -66,7 +84,7 @@ public with sharing class BuildInitialActualsForPSA {
                         addedActuals = true;
                     }
                     //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Promotional Activity-0';
-                    newActual = createPMIActual(pmi, 'Promotional Activity', rtUKPSA, configs);
+                    newActual = createPMIActual(pmi, 'Promotional Activity', recordTypeId, configs);
                     keyExists = externalKeys.contains(newActual.External_Key__c);
                     System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
                     if (!keyExists) {
@@ -74,7 +92,7 @@ public with sharing class BuildInitialActualsForPSA {
                         addedActuals = true;
                     }
                     //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Training & Advocacy-0';
-                    newActual = createPMIActual(pmi, 'Training & Advocacy', rtUKPSA, configs);
+                    newActual = createPMIActual(pmi, 'Training & Advocacy', recordTypeId, configs);
                     keyExists = externalKeys.contains(newActual.External_Key__c);
                     System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
                     if (!keyExists) {
@@ -98,6 +116,7 @@ public with sharing class BuildInitialActualsForPSA {
             for(Promotion_Activity__c pa : l) {
                 pa.Has_Actual_Totals__c = true;
             }
+            System.debug('activities to update: ' + l);
             update l;
 
         }catch(System.Exception ex) {

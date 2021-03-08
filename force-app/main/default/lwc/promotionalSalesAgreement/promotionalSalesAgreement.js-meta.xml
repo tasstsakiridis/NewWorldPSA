@@ -11,8 +11,8 @@
     <targetConfigs>
         <targetConfig targets="lightning__AppPage">
             <supportedFormFactors>
-                <supportedFormFactor type="Large" />
-                <supportedFormFactor type="Small" />
+                <supportedFormFactor type="Large"/>
+                <supportedFormFactor type="Small"/>
             </supportedFormFactors>
         </targetConfig>
         <targetConfig targets="lightning__RecordPage">
@@ -23,8 +23,9 @@
                 <object>Promotion_Material_A_P__c</object>
             </objects>
             <supportedFormFactors>
-                <supportedFormFactor type="Large" />
+                <supportedFormFactor type="Large"/>
             </supportedFormFactors>
-        </targetConfig>        
+        </targetConfig>
+                
     </targetConfigs>
 </LightningComponentBundle>

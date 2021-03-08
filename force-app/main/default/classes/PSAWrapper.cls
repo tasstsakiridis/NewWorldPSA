@@ -108,6 +108,9 @@ public with sharing class PSAWrapper {
     public Boolean mpoPrestige { get; set; }
 
     @AuraEnabled 
+    public Integer numberOfPayments { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -141,6 +144,7 @@ public with sharing class PSAWrapper {
         this.purchaseOrder = '';
         this.comments = '';
         this.mpoPrestige = false;
+        this.numberOfPayments = 1;
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -171,5 +175,6 @@ public with sharing class PSAWrapper {
         this.status = psa.Status__c;
         this.purchaseOrder = psa.Purchase_Order__c;
         this.comments = psa.Evaluation_Comments__c;
+        this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
     }
 }

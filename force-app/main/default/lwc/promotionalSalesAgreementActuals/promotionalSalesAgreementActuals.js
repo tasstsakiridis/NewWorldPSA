@@ -52,6 +52,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     thePSA;
     wiredPSA;
     wholesalerOptions;
+    captureVolumeInBottles;
 
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
@@ -70,6 +71,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             if (this.thePSA.Wholesaler_Alternate__c != undefined) {
                 this.wholesalerOptions.push({ label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c });
             }
+            this.captureVolumeInBottles = this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
 
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.buildTree();
@@ -267,7 +269,11 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                     const pd = new Date(actual.Payment_Date__c);
                                     let metatext = '';
                                     if (actual.Rebate_Type__c == 'Volume') {
-                                        metatext += 'Actual Qty: ' + actual.Act_Qty__c;
+                                        if (this.thePSA.Market__r.Capture_Volume_in_Bottles__c) {
+                                            metatext += 'Actual Qty: ' + (actual.Act_Qty__c * actual.Product_Pack_Qty__c);
+                                        } else {
+                                            metatext += 'Actual Qty: ' + actual.Act_Qty__c;
+                                        }
                                     } else {
                                         metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
                                     }

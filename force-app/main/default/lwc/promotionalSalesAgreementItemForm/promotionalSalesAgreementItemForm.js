@@ -41,13 +41,13 @@ import FIELD_PROMOTIONAL_ACTIVITY_VALUE from '@salesforce/schema/Promotion_Mater
 import FIELD_ORIGINAL_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Original_Promotional_Activity__c';
 import FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Previous_Promotional_Activity__c';
 import FIELD_PROPOSED_PROMOTIONAL_ACTIVITY from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Promotional_Activity_Value__c';
-import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Training_And_Advocacy__c';
-import FIELD_TRAINING_ADVOCACY_VALUE from '@salesforce/schema/Promotion_Material_Item__c.Training_And_Advocacy_Value__c';
+import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Training_and_Advocacy__c';
+import FIELD_TRAINING_ADVOCACY_VALUE from '@salesforce/schema/Promotion_Material_Item__c.Training_and_Advocacy_Value__c';
 import FIELD_ORIGINAL_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Original_Training_Advocacy__c';
 import FIELD_PREVIOUS_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Previous_Training_Advocacy__c';
 import FIELD_PROPOSED_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Training_Advocacy_Value__c';
 import FIELD_DRINK_STRATEGY from '@salesforce/schema/Promotion_Material_Item__c.Drink_Strategy__c';
-import FIELD_OUTLET_TO_PROVIDE from '@salesforce/schema/Promotion_Material_Item__c.Outlet_To_Provide__c';
+import FIELD_OUTLET_TO_PROVIDE from '@salesforce/schema/Promotion_Material_Item__c.Outlet_to_Provide__c';
 import FIELD_COMMENTS from '@salesforce/schema/Promotion_Material_Item__c.Comments_Long__c';
 
 import getProductDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProductDetails';
@@ -57,6 +57,7 @@ import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controll
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_PERCENTAGE_CHANGE_ERROR from '@salesforce/label/c.Percentage_Change_Error';
 import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
+import LABEL_VOLUME_FORECAST_BTL from '@salesforce/label/c.VolumeBottle';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
@@ -71,6 +72,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     labels = {
         back                    : { label: LABEL_BACK },
         volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
+        volumeForecastBtl       : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },
         discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
         drinkStrategy           : { help: 'Drink Strategy help' },
         promotionalActivity     : { help: 'Promotional Activity help' },
@@ -96,6 +98,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api promotionId;
     @api isLocked;
     @api isApproved;
+    @api captureVolumeInBottles;
 
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
@@ -225,10 +228,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 this.discount = value.data.Proposed_Plan_Rebate__c;
             }
 
-            this.volumeForecast = value.data.Plan_Volume__c || 0;
+            let volume = value.data.Plan_Volume__c || 0;
             if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
-                this.volumeForecast = value.data.Proposed_Plan_Volume__c;
+                volume = value.data.Proposed_Plan_Volume__c;
             }
+            if (this.captureVolumeInBottles) {
+                volume = volume * (value.data.Product_Pack_Qty__c == undefined ? 1 : value.data.Product_Pack_Qty__c);
+            }
+            this.volumeForecast = volume;
 
             this.listingFee = value.data.Listing_Fee__c || 0;
             if (value.data.Proposed_Listing_Fee__c && value.data.Proposed_Listing_Fee__c != value.data.Listing_Fee__c) {
@@ -276,6 +283,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         }
     }
     
+    get isUKMarket() {
+        return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'United Kingdom';
+    }
+
     get canDelete() {
         return false;
         return this.psaItem != undefined;
@@ -538,7 +549,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.brandStatusValues = event.detail.value;
     }
     handleVolumeForecastChange(event) {
-        try {            
+        try {      
             this.volumeForecast = event.detail.value.trim() == '' ? 0 : event.detail.value;
         }catch(ex) {
             console.log('exception', ex);
@@ -716,14 +727,20 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_OUTLET_TO_PROVIDE.fieldApiName] = this.outletToProvideValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
 
-            fields[FIELD_PROPOSED_PLAN_VOLUME.fieldApiName] = this.volumeForecast;
+            let volume = this.volumeForecast;
+            if (this.captureVolumeInBottles) {
+                volume = this.volumeForecast / this.product.Pack_Quantity__c;
+            }
+            console.log('[psaItemForm.save] captureVolumeInBottles', this.captureVolumeInBottles);
+            console.log('[psaItemForm.save] volume', volume);
+            fields[FIELD_PROPOSED_PLAN_VOLUME.fieldApiName] = volume;
             fields[FIELD_PROPOSED_PLAN_REBATE.fieldApiName] = this.discount;
             fields[FIELD_PROPOSED_LISTING_FEE.fieldApiName] = this.listingFee;
             fields[FIELD_PROPOSED_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
             fields[FIELD_PROPOSED_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
 
             if (this.isApproved == false || this.psaItemId == null) {
-                fields[FIELD_ORIGINAL_PLAN_VOLUME.fieldApiName] = this.volumeForecast;
+                fields[FIELD_ORIGINAL_PLAN_VOLUME.fieldApiName] = volume;
                 fields[FIELD_ORIGINAL_PLAN_REBATE.fieldApiName] = this.discount;
                 fields[FIELD_ORIGINAL_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_ORIGINAL_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
@@ -733,7 +750,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             if (this.psaItemId != null) {
                 if (!this.isChangeAboveThreshold) {
                     fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
-                    fields[FIELD_VOLUME_FORECAST.fieldApiName] = this.volumeForecast;
+                    fields[FIELD_VOLUME_FORECAST.fieldApiName] = volume;
                     fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                     fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                     fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;                                                  
@@ -745,12 +762,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_PREVIOUS_TRAINING_ADVOCACY.fieldApiName] = this.psaItem.Training_and_Advocacy_Value__c;
             } else {
                 fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
-                fields[FIELD_VOLUME_FORECAST.fieldApiName] = this.volumeForecast;
+                fields[FIELD_VOLUME_FORECAST.fieldApiName] = volume;
                 fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                 fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;    
 
-                fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.volumeForecast;
+                fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = volume;
                 fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.discount;
                 fields[FIELD_PREVIOUS_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;

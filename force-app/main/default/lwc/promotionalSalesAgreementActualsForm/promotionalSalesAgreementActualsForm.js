@@ -41,6 +41,7 @@ import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_ERROR from '@salesforce/label/c.Error';
 import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
 import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
 import LABEL_NEXT from '@salesforce/label/c.Next';
 import LABEL_NINELITREVOLUME from '@salesforce/label/c.NineLitreVolume';
@@ -60,6 +61,7 @@ import LABEL_SKIP from '@salesforce/label/c.Skip'
 import LABEL_STATUS from '@salesforce/label/c.Status';
 import LABEL_TOTAL_DISCOUNT from '@salesforce/label/c.Total_Discount';
 import LABEL_TRAINING_ADVOCACY_PAID from '@salesforce/label/c.Training_and_Advocacy_Paid';
+import LABEL_VOLUME_FORECAST_BTL from '@salesforce/label/c.VolumeBottle';
 import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
  
 export default class PromotionalSalesAgreementActualsForm extends NavigationMixin(LightningElement) {
@@ -90,7 +92,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         rebatePaidAbovePlanned : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
         remaining     : { label: 'remaining' },
         amount        : { label: 'Amount' },
-        totalDiscount : { label: LABEL_TOTAL_DISCOUNT }
+        totalDiscount : { label: LABEL_TOTAL_DISCOUNT },
+        volumeBtl       : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },        
     };    
 
     @wire(CurrentPageReference)
@@ -177,6 +180,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     wholesalerOptions;
 
+    @api 
+    captureVolumeInBottles;
+
     error;
     thePMIA;
     thePMI;
@@ -209,11 +215,17 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[actualQtyFormattedLabel] actualqtylabel', this.labels.actualQty.label);
         console.log('[actualQtyFormattedLabel] isPhone', this.isPhone);
         console.log('[actualQtyFormattedLabel] plannedVolume', this.plannedVolume);
-        if (this.isPhone) {
-            return this.labels.nineLitreVolume.label;
-        } else {
-            return this.labels.nineLitreVolume.label + ' [' + this.labels.planned.label.toUpperCase() + ' : ' + this.plannedVolume + ']';
+        console.log('[actualQtyFormattedLabel] captureVolumeInBottles', this.captureVolumeInBottles);
+        let lbl = this.labels.nineLitreVolume.label;
+        if (this.captureVolumeInBottles) {
+            lbl = this.labels.volumeBtl.label;
         }
+
+        if (!this.isPhone) {
+            lbl += ' [' + this.labels.planned.label.toUpperCase() + ' : ' + this.plannedVolume + ']';
+        }
+
+        return lbl;
     }
 
     listingFeePlanned;
@@ -269,6 +281,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
     get multipleRecordsMessage() {
         return (this.pmiIndex + 1) + ' : ' + this.totalPMIRecords;
+    }
+
+    get productPackQty() {
+        return this.thePMI == undefined || this.thePMI.Product_Pack_Qty__c == undefined ? 1 : this.thePMI.Product_Pack_Qty__c;
     }
 
    rebates;
@@ -372,7 +388,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             console.log('[get recordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
             console.log('[get recordtypeid] rtis', rtis);
-            this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
+            if (this.psa.Market__r.Name == 'United Kingdom') {
+                this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
+            } else if (this.psa.Market__r.Name == 'Brazil') {
+                this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'BRA - PSA');
+            }
             console.log('[get recordtypeid] rtis', Object.keys(rtis));
             console.log('[get recordtypeid] recordtypeid', this.recordTypeId);
         }    
@@ -465,14 +485,20 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
             this.rebateAmount = this.isVolumeRebate ? parseFloat(this.thePMIA.Act_Qty__c) : parseFloat(this.thePMIA.Rebate_Amount__c);
             this.rebateType = this.thePMIA.Rebate_Type__c;    
-            this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);
+            this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);            
             this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c);
             this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c);
             this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c);
             this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c);
             this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c);
             this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c);
-            
+
+            console.log('[loadPMIADetails] captureVolumeInBottles', this.captureVolumeInBottles);
+            if (this.captureVolumeInBottles) {
+                this.plannedVolume = this.plannedVolume * this.productPackQty;
+                this.totalActualVolume = this.totalActualVolume * this.productPackQty;
+            }
+
             try {
                 this.remainingRebate = 0;
                 if (this.rebateType == 'Volume') {
@@ -526,6 +552,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.totalPromotionalActivityPaid = parseFloat(this.thePMI.Total_Promotional_Activity_Paid__c || 0);
             this.trainingAndAdvocacyPlanned = parseFloat(this.thePMI.Training_and_Advocacy_Value__c || 0);
             this.totalTrainingAndAdvocacyPaid = parseFloat(this.thePMI.Total_Training_and_Advocacy_Paid__c || 0);
+
+            if (this.captureVolumeInBottles) {
+                this.plannedVolume = this.plannedVolume * this.productPackQty;
+                this.totalActualVolume = this.totalActualVolume * this.productPackQty;
+            }
         }    
 
         this.approvalStatus = 'Paid';
@@ -594,6 +625,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
         let hasRebateError = false;
         if (this.isNew) {
+            console.log('[validateform] rebates', this.rebates);
             this.rebates.forEach(rebate => {
                 if (rebate.remaining < parseFloat(rebate.rebateAmount)) {
                     hasRebateError = true;
@@ -601,7 +633,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 }                        
             });
         } else {
-            console.log('[validateForm] rebateAmount, remainingRebate', this.rebateAmount, this.remainingRebate);
+            console.log('[validateForm] rebateType, rebateAmount, remainingRebate', this.rebateType, this.rebateAmount, this.remainingRebate);
             let total = 0;
             if (this.rebateType == 'Volume') {
                 total = this.remainingRebate + this.totalActualVolume;
@@ -676,7 +708,12 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 fields[FIELD_ID.fieldApiName] = this.pmiaId;
                 fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount;                
                 if (this.rebateType == 'Volume') {
-                    fields[FIELD_ACTUAL_QTY.fieldApiName] = this.rebateAmount;
+                    let actQty = this.rebateAmount;
+                    if (this.captureVolumeInBottles) {
+                        let packQty = this.thePMI.Product_Pack_Qty__c == undefined ? 1 : this.thePMI.Product_Pack_Qty__c;
+                        actQty = this.rebateAmount / packQty;
+                    }
+                    fields[FIELD_ACTUAL_QTY.fieldApiName] = actQty;
                     fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount * this.plannedDiscount;
                 }
                 console.log('[save] rebateAmount', this.rebateAmount);
@@ -723,6 +760,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                             paymentDate: record.fields[FIELD_PAYMENT_DATE.fieldApiName],
                             externalKey: record.fields[FIELD_EXTERNAL_KEY.fieldApiName],
                             status: record.fields[FIELD_APPROVAL_STATUS.fieldApiName],
+                            captureVolumeInBottles: this.captureVolumeInBottles,
+                            productPackQty: this.productPackQty,
                             rebates: this.rebates })
             .then(result => {
                 console.log('[createnewpmia.createactuals] result', result);

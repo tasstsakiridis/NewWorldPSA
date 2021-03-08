@@ -37,6 +37,9 @@ export default class ProductTile extends LightningElement {
     @api 
     priceFieldLabel;
 
+    @api 
+    captureVolumeInBottles;
+
     quantityFieldValue = 0;
     priceFieldValue = 0;
 
@@ -77,15 +80,25 @@ export default class ProductTile extends LightningElement {
     }
 
     get psaItemSummary() {
-        console.log('[productTile] psaitem', this.psaItem);
+        console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
+        console.log('[productTile] product', this.product == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.product)));
+        console.log('[productTile] captureVolumeInBottles', this.captureVolumeInBottles);
         if (this.psaItem) {            
             let str = '';
             console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
             if (this.psaItem.Plan_Volume__c != undefined) { 
                 if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
-                    str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                    if (this.captureVolumeInBottles) {
+                        str = '<b>'+this.psaItem.Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c)+'</b> bottles';
+                    } else {
+                        str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                    }
                 } else {
-                    str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                    if (this.captureVolumeInBottles) {
+                        str = '<b>'+this.psaItem.Proposed_Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c)+'</b> bottles';
+                    } else {
+                        str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                    }
                 }
             }
             console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);

@@ -177,10 +177,31 @@
                                 </lightning-layout-item>
                                 -->
                             </template>
-                            <lightning-layout-item size="12" padding="around-small">
-                                <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.mpoPrestige.label}</h2>
-                                <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
-                            </lightning-layout-item>
+                            <template if:true={captureNumberOfPayments}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
+                                    <!--<lightning-combobox name="i_NumberOfPayments" label={labels.numberOfPayments.label} value={numberOfPayments} options={numberOfPaymentOptions} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-combobox>-->
+                                </lightning-layout-item>
+                                <template if:true={isOnePayment}>
+                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                </template>
+                                <template if:true={isTwoPayments}>
+                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
+                                </template>
+                                <template if:true={isThreePayments}>
+                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
+                                </template>
+                                <template if:true={isFourPayments}>
+                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                </template>
+                            </template>                                
+
+                            <template if:true={captureMPO}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.mpoPrestige.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </template>
                         </lightning-layout>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">

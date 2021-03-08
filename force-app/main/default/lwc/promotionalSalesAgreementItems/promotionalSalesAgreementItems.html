@@ -91,6 +91,7 @@
                                     <c-product-tile key={product.id} 
                                                 product={product.product}
                                                 psa-item={product.psaItem} 
+                                                capture-volume-in-bottles={captureVolumeInBottles}
                                                 onselected={handleProductSelected} ></c-product-tile>
                                 </template>    
                             </div>
@@ -113,6 +114,7 @@
                                             promotion-id={promotionId}
                                             is-locked="false"
                                             is-approved={isApproved}
+                                            capture-volume-in-bottles={captureVolumeInBottles}
                                             psa={thePSA}
                                             onsave={handleSavePSADetails}
                                             onupdated={handlePSAUpdated}

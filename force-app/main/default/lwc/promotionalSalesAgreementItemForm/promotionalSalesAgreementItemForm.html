@@ -77,29 +77,45 @@
             </lightning-layout-item>                        
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
-                <lightning-input type="number" name="i_VolumeForecast" 
-                                 label={labels.volumeForecast.label}
-                                 value={volumeForecast}
-                                 step="0.01"
-                                 onchange={handleVolumeForecastChange}>
-                </lightning-input>
-                <template if:true={hasVolumeForecastError}>
-                    <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                <template if:false={captureVolumeInBottles}>
+                    <lightning-input type="number" name="i_VolumeForecast" 
+                                    label={labels.volumeForecast.label}
+                                    value={volumeForecast}
+                                    step="0.01"
+                                    onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template if:true={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                    </template>
+    
+                </template>
+                <template if:true={captureVolumeInBottles}>
+                    <lightning-input type="number" name="i_VolumeForecast" 
+                                    label={labels.volumeForecastBtl.label}
+                                    value={volumeForecast}
+                                    step="0.01"
+                                    onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template if:true={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecastBtl.error}</span>
+                    </template>
                 </template>
             </lightning-layout-item>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Discounts per Case -->
-                <lightning-input type="number" name="i_DiscountPerCase" 
-                                 label={labels.discountPerCase.label}                                 
-                                 value={discount}
-                                 step="0.01"
-                                 onchange={handleDiscountChange}
-                                 formatter="currency">
-                </lightning-input>
-                <template if:true={hasDiscountError}>
-                    <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
-                </template>
-            </lightning-layout-item>
+            <template if:true={isUKMarket}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Discounts per Case -->
+                    <lightning-input type="number" name="i_DiscountPerCase" 
+                                    label={labels.discountPerCase.label}                                 
+                                    value={discount}
+                                    step="0.01"
+                                    onchange={handleDiscountChange}
+                                    formatter="currency">
+                    </lightning-input>
+                    <template if:true={hasDiscountError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                    </template>
+                </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Listing Fee -->
                 <lightning-input type="number" name="i_ListingFee" 
@@ -143,15 +159,17 @@
                                         onchange={handlePromotionalActivityChange}></lightning-checkbox-group>
         
             </lightning-layout-item>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Promotional Activity Amount -->
-                <lightning-input type="number" name="i_PromotionalActivityAmount" 
-                                 label={promotionalActivityLabel}
-                                 value={promotionalActivityAmount}
-                                 onchange={handlePromotionalActivityValueChange}
-                                 formatter="currency">
-                </lightning-input>
-            </lightning-layout-item>
+            <template if:true={isUKMarket}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Promotional Activity Amount -->
+                    <lightning-input type="number" name="i_PromotionalActivityAmount" 
+                                    label={promotionalActivityLabel}
+                                    value={promotionalActivityAmount}
+                                    onchange={handlePromotionalActivityValueChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy -->
                 <!--

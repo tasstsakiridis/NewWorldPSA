@@ -13,7 +13,7 @@ import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.g
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PRODUCTS from '@salesforce/label/c.Products';
 
@@ -73,6 +73,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     }
     get isApproved() {
         return this.thePSA != null && this.thePSA.Is_Approved__c;
+    }
+    get captureVolumeInBottles() {
+        return this.thePSA != null && this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
     }
 
     pageRef;
@@ -224,6 +227,10 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     
     get psaItemCount() {
         return this.psaItems ? this.psaItems.length : 0;
+    }
+
+    get isUKMarket() {
+        return this.thePSA != undefined && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Name == 'United Kingdom';
     }
 
     /** 
