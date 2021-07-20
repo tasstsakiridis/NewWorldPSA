@@ -15,6 +15,7 @@ import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
 import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
 import LABEL_PAID from '@salesforce/label/c.Paid';
+import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
 import LABEL_PLANNED from '@salesforce/label/c.Planned';
 import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
 import LABEL_PRINT from '@salesforce/label/c.Factsheet_Print';
@@ -22,6 +23,7 @@ import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
 import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
 import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
+import LABEL_SPLIT from '@salesforce/label/c.Split';
 import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
 import LABEL_SUMMARY from '@salesforce/label/c.Summary';
 import LABEL_TOTAL from '@salesforce/label/c.Total';
@@ -41,10 +43,12 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         listingFee:             { label: LABEL_LISTING_FEE },
         numberOfQuarters:       { label: LABEL_NUMBEROFQUARTERS },
         paid:                   { label: LABEL_PAID },
+        payments:               { label: LABEL_PAYMENTS },
         planned:                { label: LABEL_PLANNED },
         print:                  { label: LABEL_PRINT },
         promotionalActivity:    { label: LABEL_PROMOTIONAL_ACTIVITY },
         psaSummary:             { label: LABEL_PSASUMMARY },
+        split:                  { label: LABEL_SPLIT },
         start:                  { label: LABEL_START_DATE },
         summary:                { label: LABEL_SUMMARY },
         trainingAdvocacy:       { label: LABEL_TRAINING_ADVOCACY },
@@ -67,6 +71,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }},
         { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }},
+        { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.listingFeeBalanceLabel, fieldName: 'listingFeeBalance', type: 'currency', cellAttributes: { alignment: 'right' }},
@@ -74,6 +79,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: LABEL_TRAINING_ADVOCACY, fieldName: 'trainingAdvocacy', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.trainingAdvocacyPaidLabel, fieldName: 'trainingAdvocacyPaid', type: 'currency', cellAttributes: { alignment: 'right' }},    
+        { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: LABEL_TOTAL_INVESTMENT, fieldName: 'totalInvestment', type: 'currency', cellAttributes: { alignment: 'right' } },
         { label: this.totalInvestment9lLabel, fieldName: 'totalInvestment9L', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: this.totalInvestmentActualLabel, fieldName: 'totalInvestmentActual', type: 'currency', cellAttributes: { alignment: 'right' }},
@@ -101,6 +107,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     error;
     wiredPSA;
     thePSA;
+    showListingFee = true;
+    showPromotionalActivity = true;
+    showTrainingAndAdvocacy = true;
+    showPayments = true;
+
     /*
     @wire(getPSA, { psaId: '$psaId'} )
     wiredGetPSA(value) {
@@ -172,6 +183,19 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         console.log('[volumebalance] v, totalvolume, totalactualvolume', v, this.totalVolume, this.totalActualVolume);
         return v;
     }
+    get activityBudget() {
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get paymentsPaid() {
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Payments_Paid__c);
+    }
+    get paymentsBalance() {
+        let v = this.activityBudget - (this.paymentsPaid == null ? 0 : this.paymentsPaid);
+        console.log('paymentsBalance', v);
+        console.log('activityBudget', this.activityBudget);
+        console.log('paymentsPaid', this.paymentsPaid);
+        return v;
+    }
     get listingFee() {
         return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Listing_Fee__c);
     }
@@ -198,6 +222,18 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     }
     get trainingAdvocacyBalance() {
         return this.trainingAdvocacy - (this.trainingAdvocacyPaid == null ? 0 : this.trainingAdvocacyPaid);
+    }
+    get totalBudget() {
+        return this.thePSA == undefined || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get totalPlannedSpend() {
+        return this.thePSA == undefined || this.thePSA.Total_Planned_Spend__c == undefined ? 0 : parseFloat(this.thePSA.Total_Planned_Spend__c);
+    }
+    get captureVolumeInBottles() {
+        return this.thePSA == undefined || this.thePSA.Market__r == undefined || this.thePSA.Market__r.Capture_Volume_in_Bottles__c == undefined ? false : this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
+    }
+    get showProductSplit() {
+        return this.thePSA == undefined || this.thePSA.Market__r == undefined || this.thePSA.Market__r.Calculate_PSA_Product_Split__c == undefined ? false : this.thePSA.Market__r.Calculate_PSA_Product_Split__c;
     }
 
     /**
@@ -274,6 +310,21 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
        // if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
        //     this.thePSA.Promotions__r.forEach(p => {                            
         //console.log('[summary.buildtabledata] promotion', p);
+        console.log('[summary.buildTableData] thePSA', this.thePSA);
+        if (this.showProductSplit) {
+            this.showPromotionalActivity = false;
+            this.showTrainingAndAdvocacy = false;
+            this.showListingFee = false;
+            let cols = this.columns.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
+            cols = cols.filter(c => c.fieldName != 'discount');
+            cols = cols.filter(c => c.fieldName != 'quartersCaptured');
+
+            this.columns = [...cols];
+        } else {
+            this.showPayments = false;
+            const cols = this.columns.filter(c => c.fieldName != 'productSplit' && c.fieldName != 'payment');
+            this.columns = [...cols];
+        } 
         this.isWorking = true;
         const account = { id: this.thePSA.Account__c, 
                             name: this.thePSA.Account__r.Name, 
@@ -316,7 +367,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     promotionalActivityPaid: parseFloat(pmi.Total_Promotional_Activity_Paid__c),
                     trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
                     trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
-                    totalInvestment: parseFloat(pmi.Total_Investment__c)
+                    totalInvestment: parseFloat(pmi.Total_Investment__c),
+                    packQuantity: parseInt(pmi.Product_Pack_Qty__c),
+                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c)
                 });
             });
         }
@@ -351,6 +404,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         */
         const data = [];
         let index = 0;
+        var volume = 0;
         //accountsMap.forEach((account, key, map) => {
             console.log('[summary.buildtabledata] account', account);
             index = 0;
@@ -363,7 +417,12 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     row.account = '';
                 } 
                 row.product = pmi.product;
-                row.plannedVolume = pmi.plannedVolume;
+
+                volume = pmi.plannedVolume;
+                if (this.captureVolumeInBottles) {
+                    volume = pmi.plannedVolume * pmi.packQuantity;
+                }
+                row.plannedVolume = volume;
                 row.discount = pmi.discount;
                 row.listingFee = pmi.listingFee;
                 row.promotionalActivity = pmi.promotionalActivity;
@@ -383,6 +442,15 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     row.totalInvestmentActual9L = row.actualVolume > 0 ? row.totalInvestmentActual / row.actualVolume : 0;    
                 }
         
+                const nineLtrCases = pmi.plannedVolume / 9;
+                const plannedPrice = nineLtrCases * pmi.grossProfit;
+                row.productSplit = (plannedPrice / this.totalPlannedSpend) * this.totalBudget;
+                console.log('9ltr cases: ' + nineLtrCases);
+                console.log('plannedPrice: ' + plannedPrice);
+                console.log('grossProfit: ' + pmi.grossProfit);
+                console.log('totalBudget: ' + this.totalBudget);
+                console.log('totalPlannedSpend: ' + this.totalPlannedSpend);
+
                 data.push(row);
                 index++;
             });

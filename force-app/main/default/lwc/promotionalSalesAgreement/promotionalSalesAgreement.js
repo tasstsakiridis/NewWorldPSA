@@ -37,6 +37,7 @@ import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
 import LABEL_ALTERNATE_RTM_ERROR from '@salesforce/label/c.Alternate_RTM_Error';
 import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
 import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_BUDGET from '@salesforce/label/c.Budget';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
@@ -132,6 +133,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         agreementEndDate        : { label: LABEL_AGREEMENT_END_DATE },
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
         back                    : { label: LABEL_BACK },
+        budget                  : { label: LABEL_BUDGET },
         cancel                  : { label: LABEL_CANCEL },
         change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
         clear                   : { label: LABEL_CLEAR },
@@ -213,6 +215,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isMPOPrestige = false;
     hasMultipleAccountPages = true;
     captureNumberOfPayments = false;
+    captureTotalBudget = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -225,6 +228,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     purchaseOrder;
     comments;
     numberOfPayments = 1;
+    totalBudget = 0;
 
     isWorking = true;
     workingMessage = this.labels.working.message;    
@@ -303,6 +307,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.marketId = this.market.Id;
             this.maximumLengthOfPSA = this.market.Maximum_Agreement_Length__c == undefined ? 3 : this.market.Maximum_Agreement_Length__c;            
             this.captureNumberOfPayments = this.market.Capture_Number_of_Payments__c == undefined ? false : this.market.Capture_Number_of_Payments__c;
+            this.captureTotalBudget = this.market.Capture_PSA_Budget__c == undefined ? false : this.market.Capture_PSA_Budget__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -444,11 +449,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[enddate] islengthinyears', this.isLengthInYears, this.lengthOfPSA, newDate);
         if (this.isLengthInYears) {
             newDate.setFullYear(newDate.getFullYear() + parseInt(this.lengthOfPSA));
+            if (newDate > theDate) {
+                newDate.setDate(newDate.getDate() - 1);
+            }
         } else {
             newDate.setMonth(newDate.getMonth() + parseInt(this.lengthOfPSA));
-        }
-        if (newDate > theDate) {
-            newDate.setDate(newDate.getDate() - 1);
         }
         console.log('[endDate] theDate', theDate, year, month, day, newDate);
         return newDate;
@@ -938,6 +943,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handlePurchaseOrderChange(event) {
         this.purchaseOrder = event.detail.value;
     }
+    handleTotalBudgetChange(event) {
+        this.totalBudget = event.detail.value;
+    }
     handleStatusChange(event) {
         this.status = event.detail.value;
         console.log('this.status', this.status);
@@ -1058,6 +1066,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             if (data.Number_of_Payments__c != undefined) {
                 this.numberOfPayments = data.Number_of_Payments__c.toString();
             }
+            this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
             this.status = data.Status__c;
             this.purchaseOrder = data.Purchase_Order__c;
@@ -1428,6 +1437,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         param.purchaseOrder = this.purchaseOrder;
         param.status = this.status;
+        param.totalBudget = this.totalBudget;
 
         param.accounts = [];
         param.promotionsToDelete = [];

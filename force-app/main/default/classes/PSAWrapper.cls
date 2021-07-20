@@ -51,6 +51,9 @@ public with sharing class PSAWrapper {
     public String recordTypeId  { get; set; }
 
     @AuraEnabled 
+    public String recordTypeName  { get; set; }
+
+    @AuraEnabled 
     public String marketId  { get; set; }
 
     @AuraEnabled 
@@ -111,6 +114,9 @@ public with sharing class PSAWrapper {
     public Integer numberOfPayments { get; set; }
 
     @AuraEnabled 
+    public Decimal totalBudget { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -125,6 +131,7 @@ public with sharing class PSAWrapper {
     public PSAWrapper() {
         this.id = '';
         this.recordTypeId = '';
+        this.recordTypeName = '';
         this.marketId = '';
         this.marketName = '';
         this.parentAccountId = '';
@@ -145,6 +152,7 @@ public with sharing class PSAWrapper {
         this.comments = '';
         this.mpoPrestige = false;
         this.numberOfPayments = 1;
+        this.totalBudget = 0;
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -155,6 +163,7 @@ public with sharing class PSAWrapper {
     public PSAWrapper(Promotion_Activity__c psa) {
         this.id = psa.Id;
         this.recordTypeId = psa.RecordTypeId;
+        this.recordTypeName = psa.RecordType.Name;
         this.marketId = psa.Market__c;
         this.marketName = psa.Market__r.Name;
         this.parentAccountId = psa.Account__c;
@@ -176,5 +185,6 @@ public with sharing class PSAWrapper {
         this.purchaseOrder = psa.Purchase_Order__c;
         this.comments = psa.Evaluation_Comments__c;
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
+        this.totalBudget = psa.Activity_Budget__c;
     }
 }

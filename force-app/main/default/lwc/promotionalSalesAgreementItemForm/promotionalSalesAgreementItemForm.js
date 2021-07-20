@@ -62,11 +62,13 @@ import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
+import LABEL_SPLIT from '@salesforce/label/c.Split';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
 import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
 import LABEL_EMPTYFORM_SAVE_ERROR from '@salesforce/label/c.EmptyForm_Save_Error';
 import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
+import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.Total_Investment';
 
 export default class PromotionalSalesAgreementItemForm extends NavigationMixin(LightningElement) {
     labels = {
@@ -87,18 +89,32 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
         thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR },
         warning                 : { label: LABEL_WARNING },
-        emptyFormError          : { message: LABEL_EMPTYFORM_SAVE_ERROR }
+        emptyFormError          : { message: LABEL_EMPTYFORM_SAVE_ERROR },
+        split                   : { label: LABEL_SPLIT },
+        totalInvestment         : { label: LABEL_TOTAL_INVESTMENT }
     };
 
     @api psa;
     @api psaId;
     @api psaItemId;
+    @api psaRecordTypeName;
     @api productId;
     @api productName;
     @api promotionId;
     @api isLocked;
     @api isApproved;
     @api captureVolumeInBottles;
+    @api calcSplit;
+    @api totalBudget;
+
+    _totalPlannedSpend = 0;
+    @api 
+    get totalPlannedSpend() {
+        return this._totalPlannedSpend;
+    }
+    set totalPlannedSpend(value) {
+        this._totalPlannedSpend = value;
+    }
 
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
@@ -223,6 +239,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 Image_Name__c: value.data.Product_Custom__r.Image_Name__c
             };
             
+            this.totalPlannedSpend = value.data.Activity__r.Total_Planned_Spend__c;
             this.discount = value.data.Plan_Rebate__c || 0;
             if (value.data.Proposed_Plan_Rebate__c && value.data.Proposed_Plan_Rebate__c != value.data.Plan_Rebate__c) {
                 this.discount = value.data.Proposed_Plan_Rebate__c;
@@ -232,11 +249,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
                 volume = value.data.Proposed_Plan_Volume__c;
             }
-            if (this.captureVolumeInBottles) {
+            if (this.captureVolumeInBottles || value.data.Activity__r.Market__r.Capture_Volume_in_Bottles__c) {
                 volume = volume * (value.data.Product_Pack_Qty__c == undefined ? 1 : value.data.Product_Pack_Qty__c);
             }
             this.volumeForecast = volume;
-
+            console.log('[psaItemForm] captureVolumeInBottles', this.captureVolumeInBottles);
+            console.log('[psaItemForm] volumeForecast', volume);
             this.listingFee = value.data.Listing_Fee__c || 0;
             if (value.data.Proposed_Listing_Fee__c && value.data.Proposed_Listing_Fee__c != value.data.Listing_Fee__c) {
                 this.listingFee = value.data.Proposed_Listing_Fee__c;
@@ -357,6 +375,37 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         //console.log('totalInvestment', ti);
         return ti;
     }
+    
+    get thisProductSplit() {
+        const pq = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
+        const gp = this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
+        const v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
+        const case9lt = (v / pq) / 9;
+        const goalPrice = case9lt * gp;
+        let tps = 0;
+        if (this.totalPlannedSpend == 0) {
+            tps = goalPrice;
+        } else {
+            tps = this.totalPlannedSpend;
+            if (this.psaItem == null || this.psaItemId == undefined || this.psaItemId == '') {
+                tps += goalPrice;
+            }
+        } 
+        let productSplit = (goalPrice / tps) * this.totalBudget;
+
+        console.log('[psaItemForm.thisProductSplit] psaItem', this.pasItem);
+        console.log('[psaItemForm.thisProductSplit] psaItemId', this.pasItemId);
+        console.log('[psaItemForm.thisProductSplit] totalPlannedSpend', this.totalPlannedSpend);
+        console.log('[psaItemForm.thisProductSplit] packQty', this.product.Pack_Quantity__c);
+        console.log('[psaItemForm.thisProductSplit] gp', this.product.Gross_Profit_per_Case__c);
+        console.log('[psaItemForm.thisProductSplit] volume', v);
+        console.log('[psaItemForm.thisProductSplit] 9lt cases', case9lt);
+        console.log('[psaItemForm.thisProductSplit] goalPrice', goalPrice);
+        console.log('[psaItemForm.thisProductSplit] tps', tps);
+        console.log('[psaItemForm.thisProductSplit] productSplit', productSplit);
+        
+        return productSplit;
+    }
 
     /**
      * Lifecycle events
@@ -380,7 +429,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             //console.log('[psaitemform.getrecordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
             //console.log('[psaitemform.getrecordtypeid] rtis', rtis);
-            this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
+            let rtKey = this.psaRecordTypeName == undefined ? 'UK - PSA' : this.psaRecordTypeName;
+            this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === rtKey);
             //console.log('[psaitemform.getrecordtypeid] rtis', Object.keys(rtis));
             //console.log('[psaitemform.getrecordtypeid] recordtypeid', this.recordTypeId);
         }    
@@ -922,12 +972,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 );
 
                 this.updateTotals();
-                if (!this.isPhone) {
-                    const saveEvent = new CustomEvent('save', {
-                        detail: this.psaItem
-                    });
-                    this.dispatchEvent(saveEvent);
-                }
             })
             .catch(error => {
                 this.dispatchEvent(
@@ -944,6 +988,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         updatePMITotals({psaId: this.psaId})
             .then((status) => {
                 console.log('[updateTotals] status', status);
+                if (!this.isPhone) {
+                    const saveEvent = new CustomEvent('save', {
+                        detail: this.psaItem
+                    });
+                    this.dispatchEvent(saveEvent);
+                }
             })
             .catch((error) => {
                 console.log('[updateTotals] error', error);

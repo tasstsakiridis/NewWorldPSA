@@ -28,6 +28,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     };    
     
     @api psaId;
+    @api recordTypeName;
 
     thePSA; 
     promotionId;
@@ -77,6 +78,21 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get captureVolumeInBottles() {
         return this.thePSA != null && this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
     }
+    get calcProductSplit() {
+        if (this.thePSA != undefined) {
+            console.log('[psaItems] calcProductSplit', this.thePSA.Market__r.Calculate_PSA_Product_Split__c);
+        }
+        return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c;
+    }
+    get showTotalInvestment() {
+        return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c == false;
+    }
+    get totalBudget() {
+        return this.thePSA == null || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get totalPlannedSpend() {
+        return this.thePSA == null || this.thePSA.Total_Planned_Spend__c == undefined ? 0 : parseFloat(this.thePSA.Total_Planned_Spend__c);
+    }
 
     pageRef;
     @wire(CurrentPageReference)
@@ -114,6 +130,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         } else if (value.data) {
             this.error = undefined;
             this.thePSA = value.data;
+            this.recordTypeName = this.thePSA.RecordType.Name;
             if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
                 this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__r.RecordType.Name == 'Parent').Id;
             } else {
@@ -328,6 +345,8 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     }
     handleSavePSADetails(event) {
         try {
+            console.log('[psaItems.handlesavepsa] detail', JSON.parse(JSON.stringify(event.detail)));
+            console.log('[psaItems.handlesavepsa] psaItemId', event.detail.psaItemId);
             console.log('[psaItems.handlesavepsa] volume', event.detail.volume);
             console.log('[psaItems.handlesavepsa] discount', event.detail.discount);
             console.log('[psaItems.handlesavepsa] investment', event.detail.totalInvestment);

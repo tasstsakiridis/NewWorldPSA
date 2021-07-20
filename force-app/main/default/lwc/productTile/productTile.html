@@ -44,7 +44,9 @@
                         <template if:true={psaItem}>
                             <div class="slds-border_top">
                                 <p><lightning-formatted-rich-text value={psaItemSummary}></lightning-formatted-rich-text></p>
-                                <p><b><lightning-formatted-number value={totalInvestment} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b> total investment</p>
+                                <template if:true={showTotalInvestment}>
+                                    <p><b><lightning-formatted-number value={totalInvestment} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b> total investment</p>
+                                </template>
                             </div>
                         </template>
                     </lightning-layout-item>

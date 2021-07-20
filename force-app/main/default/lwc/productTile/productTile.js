@@ -3,6 +3,7 @@ import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+import LABEL_SPLIT from '@salesforce/label/c.Split';
 
 export default class ProductTile extends LightningElement {
 
@@ -39,6 +40,12 @@ export default class ProductTile extends LightningElement {
 
     @api 
     captureVolumeInBottles;
+
+    @api 
+    calcSplit;
+
+    @api 
+    showTotalInvestment;
 
     quantityFieldValue = 0;
     priceFieldValue = 0;
@@ -102,11 +109,16 @@ export default class ProductTile extends LightningElement {
                 }
             }
             console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);
+            console.log('[productTile] calcSplit', this.calcSplit);
             if (this.psaItem.Plan_Rebate__c != undefined) { 
-                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
-                    str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                if (this.calcSplit) {
+                    str += ' @ <b>' + this.psaItem.CurrencyIsoCode + ' ' + parseFloat(this.psaItem.Product_Split__c).toFixed(2) + '</b> ' + LABEL_SPLIT;
                 } else {
-                    str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                    if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                        str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                    } else {
+                        str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                    }    
                 }
             }
             return str;

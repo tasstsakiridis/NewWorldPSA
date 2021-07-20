@@ -177,6 +177,11 @@
                                 </lightning-layout-item>
                                 -->
                             </template>
+                            <template if:true={captureTotalBudget}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} onchange={handleTotalBudgetChange}></lightning-input>
+                                </lightning-layout-item>
+                            </template>
                             <template if:true={captureNumberOfPayments}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>

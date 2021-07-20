@@ -1,0 +1,991 @@
+<apex:component layout="none" access="global" controller="Brazil_PSA_Contract_Controller" >
+    <apex:attribute name="psa" description="the activity record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
+    
+<html>
+
+        <head>
+            <style>
+                                @page {
+                                    margin: 1cm;
+                                }
+
+                                @media screen {
+                                    div.page-break {
+                                        border-top: 7px solid #ADD8E6;
+                                        border-bottom: 0 none;
+                                        padding: 1cm 1cm 0px !important;
+                                        width: 21cm !important;
+                                    }
+
+                                    div.rodap {
+                                        padding: 0 1cm 1cm 1cm !important;
+                                        width: 21cm !important;
+                                    }
+
+                                    body.cke_editable {
+                                        background-color: #ADD8E6;
+                                    }
+
+                                    .destaque_screen {
+                                        background-color: yellow;
+                                    }
+
+                                    .msg_screen {
+                                        background-color: #A8CC9C;
+                                    }
+
+                                    .alert_screen {
+                                        background-color: #ffdddd;
+                                    }
+                                }
+
+                                @media print {
+                                    .no_print {
+                                        display: none;
+                                    }
+                                }
+
+                                thead {
+                                    display: table-header-group;
+                                }
+
+                                tfoot {
+                                    display: table-footer-group;
+                                }
+
+                                .cabecalh {
+                                    left: 0px;
+                                    position: relative;
+                                    top: 0px;
+                                }
+
+                                .rodap {
+                                    background-color: white;
+                                    bottom: 0px;
+                                    left: 0px;
+                                    page-break-after: always;
+                                    position: relative;
+                                    width: 19cm;
+                                }
+
+                                .content {
+                                    margin-bottom: 100px;
+                                    margin-top: 100px;
+                                }
+
+                                .rodape {
+                                    background-color: #323849;
+                                    padding: 5px;
+                                    width: 100%;
+                                }
+
+                                    .rodape button span {
+                                        float: left;
+                                        white-space: nowrap;
+                                    }
+
+                                #header h1 {
+                                    border: 0px none;
+                                    margin: 0px;
+                                }
+
+                                .ui-menu {
+                                    width: 250px;
+                                }
+
+                                .ui-widget {
+                                    font-size: 0.9em;
+                                    z-index: 2;
+                                }
+
+                                .linha {
+                                    border: 1px solid #AAAAAA;
+                                }
+
+                                    .linha label {
+                                        display: inline-block;
+                                        padding: 4px;
+                                        text-align: left;
+                                    }
+
+                                    .linha input {
+                                        margin: 0px;
+                                    }
+
+                                #menu {
+                                    z-index: 1;
+                                }
+
+                                #header {
+                                    background: none repeat scroll 0px 0px #323849;
+                                    color: #E6E6FA;
+                                    font-size: small;
+                                    width: 100%;
+                                    z-index: 10;
+                                }
+
+                                    #header h2 {
+                                        margin: 0px;
+                                        text-align: center;
+                                    }
+
+                                a[href="#menu"] {
+                                    border: 0px none !important;
+                                    right: 6px !important;
+                                    top: 6px !important;
+                                    z-index: 11;
+                                }
+
+                                footer {
+                                    color: #E6E6FA;
+                                    font-size: small;
+                                    text-align: center;
+                                }
+
+                                #campo_filtro {
+                                    margin-left: 10%;
+                                    width: 80%;
+                                }
+
+                                div.page-break {
+                                    background-color: white;
+                                    background-image: none;
+                                    height: 26cm;
+                                    overflow: hidden;
+                                    padding: 0px;
+                                    width: 19cm;
+                                }
+
+                                ol li ol li {
+                                    margin-left: -1em;
+                                    padding: 0px;
+                                }
+
+                                img {
+                                    max-width: 99%;
+                                }
+
+                                p {
+                                    margin-bottom: 0.25cm;
+                                    direction: ltr;
+                                    line-height: 120%;
+                                    text-align: left;
+                                }
+
+                                    p.western {
+                                        font-family: "Arial",serif;
+                                        font-size: 9pt;
+                                    }
+
+                                    p.cjk {
+                                        font-size: 9pt;
+                                    }
+
+                                a:link {
+                                    color: rgb(5, 99, 193);
+                                }
+
+                                a.no_print {
+                                    /*
+                    border: 3px outset blue;
+                    background-color: green;
+                    padding: 4px 10px;
+                    color: black;
+                */
+                                    text-decoration: none;
+                                    align: center;
+                                    font-size: 1.3em;
+                                    padding: 3px 15px;
+                                    vertical-align: text-bottom;
+                                    font-weight: bold;
+                                    border: 2px solid #000000;
+                                    background-color: #8A7E6E;
+                                    color: #FFFFFF;
+                                    margin-bottom: 3px;
+                                    border-radius: 5px 5px 5px 5px;
+                                }
+
+                                p.bf {
+                                    margin-bottom: 0cm;
+                                    line-height: 115%;
+                                    font-size: 12pt;
+                                    text-align: justify;
+                                }
+
+                                p.ni1 {
+                                    font-weight: bold;
+                                }
+
+                                ol {
+                                    list-style-type: none;
+                                    counter-reset: item;
+                                    margin: 0;
+                                    padding: 0;
+                                }
+
+                                    ol > li {
+                                        display: table;
+                                        counter-increment: item;
+                                        margin-bottom: 0.6em;
+                                    }
+
+                                        ol > li:before {
+                                            content: counters(item, ".") ". ";
+                                            display: table-cell;
+                                            padding-right: 0.6em;
+                                        }
+
+                                li ol > li {
+                                    margin: 0;
+                                }
+
+                                    li ol > li:before {
+                                        content: counters(item, ".") " ";
+                                    }
+            </style>
+        </head>
+        <body>
+            <table border="0" align="center" width="100%">
+                <thead><tr><th width="100%"><div class="cabecalh"><p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US"><span style="font-family:times new roman,times,serif;"><span style="font-size:24px;"><font color="#663300"><font style="font-size: 24pt"><span lang="pt-BR"><b>Brown-Forman</b></span></font></font></span><br></br></span></p><p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US"><span style="font-size:14px;"><span style="font-family: times new roman,times,serif;"><font style="font-size: 14pt"><span lang="pt-BR">CONTRATO DE PARCERIA "ON PREMISE"</span></font></span></span><br></br></p></div></th></tr></thead>
+                <tfoot><tr><td width="100%">&nbsp;</td></tr></tfoot>
+                <tbody>
+                    <tr>
+                        <td width="100%">
+                            <div style="font-family: &#39;Times New Roman, serif&#39;">
+                                <p align="justify" class="bf">Pelo presente instrumento particular (<b>CONTRATO</b>), acordam de um lado
+                                <span align="justify" class="bf"><b>BROWN-FORMAN BEVERAGES WORLDWIDE COMÉRCIO DE BEBIDAS LTDA.</b>,
+                                    inscrita no CNPJ/MF sob n° 00.305.765/0001-30 e com Inscrição Estadual sob n°. 114.379.123.114, estabelecida na Cidade de São Paulo,
+                                    Estado de São Paulo, na AV. Presidente Juscelino Kubitscheck, 1909 Torre Sul - 7 andar - CJ 71A - Vila Nova Conceição CEP 04543-907 - São Paulo - SP,
+                                    neste ato representada na forma do seu contrato social e denominada <b>“BROWN-FORMAN BRASIL”</b>e, de outro lado,   </span>
+
+                             
+
+                                <span align="justify" class="bf"><b><span><apex:outputText value="{!thePSA.Account__r.English_Name__c}" /></span>,</b>inscrita no CNPJ/MF sob o n° 
+                                    <apex:outputText value="{!thePSA.Account__r.ILN_Code__c}" />
+                                    <!--<span class="destaque_screen">14.467.584/0001-14</span>--> 
+                                    e com Inscrição Estadual sob n°. 
+									<apex:outputText value="{!thePSA.Account__r.Tax_Number_PL__c}" />
+                                    <!--<span class="destaque_screen">146.616.520.110</span>-->
+                                    , estabelecida na <span class="destaque_screen"><apex:outputText value="{!thePSA.Account__r.ShippingStreet}" /> </span>
+                                    - CEP: <span class="destaque_screen"><apex:outputText value="{!thePSA.Account__r.ShippingPostalCode}" /> </span>
+                                    <!--<span class="destaque_screen">05426-100</span>-->
+                                    ,neste ato representada na forma do seu contrato social e denominada por seu representante legal e denominada <b>"PARCEIRA"</b></span></p>
+
+                                <p align="justify" class="bf">Para fins deste Contrato, cada parte será isoladamente denominada “Parte” e, quando em conjunto, “Partes”</p>
+
+                                <p align="justify" class="bf">Considerando que:</p>
+                                &nbsp;
+
+                                <ol type="a">
+                                    <li>A <b>BROWN FORMAN BRASIL</b> é pessoa jurídica de direito privado que se dedica à fabricação, comercialização, importação e exportação de bebidas alcoólicas em geral;</li>
+                                    <li>A <b>PARCEIRA</b> é pessoa jurídica de direito privado que se dedica ao comércio varejista de bebidas alcoólicas, restaurantes e similares;</li>
+                                    <li>A <b>BROWN FORMAN BRASIL</b> pretende que a <b>PARCEIRA</b>, utilizando seu fundo de comércio, mão de obra qualificada e experiência no ramo, execute o objeto do presente Contrato, adiante especificado;</li>
+                                    <li>A <b>PARCEIRA</b>, conhecendo as necessidades da <b>BROWN FORMAN BRASIL</b> e já dispondo de recursos e meios próprios, declara possuir todas as condições para executar o objeto do presente Contrato, adiante especificado;</li>
+                                </ol>
+
+                                <p align="justify" class="bf">As Partes resolvem, de comum acordo, celebrar o presente Contrato, que será regido pelas seguintes Cláusulas:</p>
+
+                                <ol>
+                                    <!-- CLAUSULA 1ERA -->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA PRIMEIRA – OBJETO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf ni2">O presente Contrato tem como objeto a parceria comercial entre as Partes, na qual a <b>PARCEIRA</b> se compromete a promover, comercializar e distribuir o portfólio de produtos da <b>BROWN FORMAN BRASIL</b>, incluindo os produtos abaixo relacionados (<b>“Produtos”</b>), dentro de seu(s) estabelecimento(s) (<b>“Estabelecimento(s)”</b>), bem como em eventuais eventos por ela realizados:</p>
+                                                <b>
+                                                    <span >
+                                                        <!--
+                                                        <ul class="destaque_screen">
+                                                            <li>WHISKEY JACK DANIELS C/CARTUCHO 1000ML</li>
+                                                            <li>LICOR JACK DANIELS HONEY 1000ML</li>
+                                                            <li>LICOR JACK DANIELS FIRE 1000ML</li>
+                                                            <li>WHISKEY GENTLEMAN JACK 1000ML</li>
+                                                            <li>WHISKEY JACK DANIELS SINGLE BARREL 750ML</li>
+                                                            <li>TEQUILA EL JIMADOR REPOSADO 750ML</li></ul>
+                                                        -->
+                                                        <apex:dataTable cellpadding="5" border="0" var="i" value="{!promotionMaterialItems}">
+
+                                                            <apex:column value="{!i.Product_Name__c}" headerValue="Produtos:" width="100px" />
+
+                                                        </apex:dataTable>
+                                                    </span>
+                                                </b>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <!-- CLAUSULA 2DA -->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA SEGUNDA - OBRIGAÇÕES DA PARCEIRA</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf ni2">De modo a executar, da melhor forma possível, os serviços objeto do presente Contrato, a <b>PARCEIRA</b> compromete-se a:</p>
+
+                                                <ol>
+                                                    <li>
+                                                        <p align="justify" class="bf">Ceder espaço à <b>BROWN FORMAN BRASIL</b> para a divulgação dos <b>Produtos</b> no interior de seu(s) <b>Estabelecimento(s),</b> colocando materiais de divulgação e/ou peças <i>tailor-made</i>, bem como <i>back-lights</i>, desde que isso não conflite com a harmonia visual do local, conforme consenso entre as Partes;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Submeter à aprovação prévia da <b>BROWN FORMAN BRASIL</b> todos os desenhos, imagens, posters, banners, peças e demais materiais de divulgação relacionados aos <b>Produtos</b>, bem como as respectivas disposições no ambiente e layout, a serem utilizados no(s) <b>Estabelecimento(s)</b>;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Priorizar a venda, promoção e exposição dos <b>Produtos</b> da <b>BROWN FORMAN BRASIL</b> no interior de seu(s) <b>Estabelecimento(s)</b> para melhor visualização, pelos consumidores, dos <b>Produtos</b>;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Quando aplicável, confeccionar o(s) cardápio(s) de seu(s) <b>Estabelecimento(s)</b>, de modo a encabeçá-lo com o logotipo das marcas dos <b>Produtos</b> indicados pela <b>BROWN FORMAN BRASIL</b>, estando o(s) referido(s) cardápios(s) também sujeito(s) à prévia aprovação da <b>BROWN FORMAN BRASIL</b>, conforme cláusula 2.12 acima;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Quando aplicável, manter seu(s) cardápios devidamente atualizados;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Cumprir a meta de vendas, pelo período do contrato (em garrafas), estipulada por marca, conforme abaixo:</p>
+                                                        <b><span class="destaque_screen">
+                                                            
+                                                            <!--<li>240 gfs de WHISKEY JACK DANIELS C/CARTUCHO 1000ML</li>
+                                                            <li>36 gfs de LICOR JACK DANIELS HONEY 1000ML</li>
+                                                            <li>36 gfs de LICOR JACK DANIELS FIRE 1000ML</li>
+                                                            <li>12 gfs de WHISKEY GENTLEMAN JACK 1000ML</li>
+                                                            <li>01 gfs de WHISKEY JACK DANIELS SINGLE BARREL 750ML</li>
+                                                            <li>200 gfs de TEQUILA EL JIMADOR REPOSADO 750ML</li>-->
+                                                            <ul>
+                                                            <apex:repeat value="{!promotionMaterialItems}" var="pmi">
+                                                                <li>
+                                                                <apex:outputText value="{0, number, 0} gfs de {1}">
+                                                                    <apex:param value="{!pmi.Plan_Volume_Bottles__c}" />
+                                                                    <apex:param value="{!pmi.Product_Name__c}" />
+                                                                </apex:outputText>
+                                                                </li>
+                                                            </apex:repeat>
+                                                            </ul>
+                                                            <!--
+                                                               <apex:dataTable cellpadding="5" border="0" var="i" value="{!promotionMaterialItems}">
+
+                                                                   <apex:column value="{!i.Plan_Volume__c, number, 0.00} gfs de {!i.Product_Name__c}" headerValue="" width="100px" />
+
+                                                               </apex:dataTable>
+                                                               -->
+                                                            </span>
+                                                        </b>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Quando aplicável, garantir que todos os bares, quiosques ou outros pontos de vendas dos <b>Produtos</b> dentro do(s) <b>Estabelecimento(s)</b> estejam com, <b>no mínimo <span class="destaque_screen">30</span>% (<span class="destaque_screen">trinta por cento</span>) </b>de sua visibilidade ocupada com os <b>Produtos</b> da <b>BROWN FORMAN BRASIL</b>;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Utilizar todos os materiais e equipamentos fornecidos pela <b>BROWN FORMAN BRASIL</b>, de acordo com as instruções da <b>BROWN FORMAN BRASIL</b>;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Elaborar a política de preços dos <b>Produtos</b> comercializados dentro de seu(s) <b>Estabelecimento(s)</b>, garantindo, porém, o reposicionamento de preços dos <b>Produtos</b>, de acordo com sugestão e orientação da <b>BROWN FORMAN BRASIL</b>;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Adquirir os <b>Produtos</b> preferencialmente de distribuidores indicados pela <b>BROWN FORMAN BRASIL</b>;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Fornecer à <b>BROWN FORMAN BRASIL</b> relatório de volume de vendas e preços dos <b>Produtos</b> do mês corrente, até 5º dia do mês subsequente, sempre solicitado pela <b>BROWN FORMAN BRASIL</b>;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Garantir a correta estocagem e armazenamento dos <b>Produtos</b>, observando, inclusive, as temperaturas adequadas de cada bebida;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Possuir os registros e as autorizações necessárias à execução do objeto do presente Contrato;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Permitir que a <b>BROWN FORMAN BRASIL</b>, sempre que lhe convier, verifique junto aos <b>Estabelecimentos</b> da <b>PARCEIRA</b> se as obrigações assumidas neste Contrato estão sendo cumpridas, autorizando o acesso dos representantes da <b>BROWN FORMAN BRASIL</b> ao(s) <b>Estabelecimento(s)</b>, fornecendo relatórios e informações relativas ao cumprimento deste Contrato sempre que solicitado pela <b>BROWN FORMAN BRASIL</b>, e comparecendo a reuniões convocadas para tal fim;</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Não divulgar ou utilizar, por qualquer modo ou para qualquer fim, nenhuma informação recebida em decorrência deste Contrato, tendo em vista sua atividade comercial, mesmo depois de esgotado o prazo de sua vigência, sob pena de responsabilização civil e criminal, inclusive por prática de concorrência desleal.</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">A <b>PARCEIRA</b> declara que a administração de seu(s) <b>Estabelecimento(s)</b> e a que a execução de eventos, bem como a segurança de seus clientes, são de sua inteira responsabilidade, isentando e indenizando a <b>BROWN FORMAN BRASIL</b> de quaisquer responsabilidades por eventuais prejuízos que porventura os clientes presentes no(s) <b>Estabelecimento(s)</b> e/ou participantes dos eventos possam vir a sofrer, sejam eles de que natureza for.</p>
+                                                    </li>
+                                                    <li style="color:black;">
+                                                        <p align="justify" class="bf">Sempre que possível, conceder tarifas e/ou descontos especiais para os empregados da Brown-Forman, os quais deverão apresentar identificação de empregado;</p>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <!-- CLAUSULA 3RA -->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA TERCEIRA - DIREITOS E OBRIGAÇÕES DA BROWN FORMAN BRASIL</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf ni2">A <b>BROWN FORMAN BRASIL</b> obriga-se a efetuar os pagamentos na forma e condições previstas por este Contrato, bem como a fornecer todos os dados, informações e condições necessárias para o melhor desenvolvimento e execução dos trabalhos pela <b>PARCEIRA</b>, em qualquer fase do empreendimento, desde que estejam sob a sua responsabilidade.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>BROWN FORMAN BRASIL</b> poderá, quando aplicável, fiscalizar a promoção, comercialização e distribuição dos <b>Produtos</b> pela <b>PARCEIRA</b>, a qualquer tempo e independentemente de autorização da <b>PARCEIRA.</b></p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>BROWN FORMAN BRASIL</b>poderá realizar ações promocionais dos <b>Produtos</b> dentro do(s) <b>Estabelecimentos</b> da <b>PARCEIRA</b>, desde que haja concordância da <b>PARCEIRA</b>.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <!-- CLAUSULA 4TA -->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA QUARTA - PRODUTOS</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>BROWN FORMAN BRASIL</b> poderá realizar a inclusão ou exclusão dos <b>Produtos</b> listados na Cláusula 1, a seu exclusivo critério e mediante notificação prévia e por escrito à <b>PARCEIRA</b>.</p>
+                                            </li>
+                                            <!--<li>
+                                                <p align="justify" class="bf">A remuneração estipulada na cláusula 5 será alocada da seguinte forma:</p>
+                                                <b><span class="destaque_screen">
+                                                    <ul class="destaque_screen"><li>
+                                                        <div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">36.290,14</div>
+                                                        <div style="display: table-cell;"> WHISKEY JACK DANIELS C/CARTUCHO 1000ML</div>
+                                                        </li><li><div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">5.114,89</div>
+                                                        <div style="display: table-cell;"> LICOR JACK DANIELS HONEY 1000ML</div>
+                                                        </li><li><div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">5.834,43</div>
+                                                        <div style="display: table-cell;"> LICOR JACK DANIELS FIRE 1000ML</div></li><li>
+                                                        <div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">1.703,32</div>
+                                                        <div style="display: table-cell;"> WHISKEY GENTLEMAN JACK 1000ML</div></li><li>
+                                                        <div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">135,90</div>
+                                                        <div style="display: table-cell;"> WHISKEY JACK DANIELS SINGLE BARREL 750ML</div></li><li>
+                                                        <div style="display: table-cell;">R$</div>
+                                                        <div style="display: table-cell;text-align: right;width: 70px;">25.921,32</div>
+                                                        <div style="display: table-cell;"> TEQUILA EL JIMADOR REPOSADO 750ML</div></li>
+                                                    </ul>
+                                                    </span>
+                                                </b>
+                                            </li>-->
+                                        </ol>
+                                    </li>
+                                    <!-- CLAUSULA 5TA -->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA QUINTA – REMUNERAÇÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">O valor total do presente contrato é de <b>
+                                                    (<span class="destaque_screen"> <apex:outputText value="{!totalBudget}" /> </span>),</b> 
+                                                com todos os tributos inclusos, a ser pago pela <b>BROWN FORMAN BRASIL</b>,
+                                                 da seguinte forma:
+                                                </p>
+												
+												
+                                                <ol>
+                                                    <li>
+													
+													<apex:outputPanel rendered="{!numberOfPayments==1}">
+													
+                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        <span class="destaque_screen">
+                                                            <ul><li>
+                                                            <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}), 30 dias após a assinatura do contrato">
+                                                                <apex:param value="{!totalBudget}" />
+                                                                <apex:param value="{!formattedTotalBudget}" />
+                                                            </apex:outputText>
+                                                            </li></ul>
+                                                        </span>
+                                                        <p align="justify" class="bf">
+                                                            Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
+
+                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                        </p>
+													</apex:outputPanel>
+                                                    
+													<apex:outputPanel rendered="{!numberOfPayments==2}">
+													
+                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        <span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}), 30 dias após a assinatura do contrato" >
+                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                        <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                        <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														
+														
+                                                        <p align="justify" class="bf">
+                                                            Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
+
+                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                        </p>
+													</apex:outputPanel>
+                                                    
+													<apex:outputPanel rendered="{!numberOfPayments==3}">
+													
+                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        <span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}) 30 dias após a assinatura do contrato," >
+                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                        <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                        <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #3 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!thirdPaymentAmount}" />
+                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>														
+														
+                                                        <p align="justify" class="bf">
+                                                            Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
+
+                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                        </p>
+													</apex:outputPanel>
+                                                    
+													<apex:outputPanel rendered="{!numberOfPayments==4}">
+													
+                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        <span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}) 30 dias após a assinatura do contrato," >
+                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                        <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                        <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #3 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!thirdPaymentAmount}" />
+                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>														
+														<span class="destaque_screen">
+                                                            <ul>
+                                                                <li>
+                                                                    <apex:outputText value="Parcela #4 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
+                                                                        <apex:param value="{!fourthPaymentAmount}" />
+                                                                        <apex:param value="{!formattedFourthPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
+                                                        </span>														
+
+														
+                                                        <p align="justify" class="bf">
+                                                            Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
+
+                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                        </p>
+													</apex:outputPanel>
+													
+                                                    </li>
+
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA SEXTA - MULTA CONTRATUAL</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">Fica estipulada multa não compensatória no valor equivalente a 30% (trinta por cento) do total do valor envolvido no presente Contrato, a ser suportada pela parte infratora, no caso de descumprimento de uma ou mais cláusulas, não sanado no prazo de 15 (quinze) dias corridos a contar da notificação da parte inocente, excetuando-se as hipóteses de caso fortuito e força maior.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA SÉTIMA – DURAÇÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">O presente contrato tem prazo de duração de 
+                                                
+												 <apex:outputText value="{!thePSA.Length_of_Agreement__c}">
+												 
+												 </apex:outputText>
+												  &nbsp;
+												 <apex:outputText value="{!formattedLengthOfAgreement}">
+												 
+												 </apex:outputText>
+												 
+												 &nbsp;
+												 
+												 <apex:outputPanel rendered="{!thePSA.Is_Length_in_Years__c}">
+													años,
+												 </apex:outputPanel>
+												 <apex:outputPanel rendered="{!Not(thePSA.Is_Length_in_Years__c)}">
+													meses,
+												 </apex:outputPanel>
+												 
+												
+												
+												<!--
+												*Just the number
+												<span class="destaque_screen">11</span> 
+												
+												*Numbers to Words
+												(<span class="destaque_screen">onze</span>) 
+												
+												*Depending on years/months
+												meses,
+												-->
+												
+												contados a partir de <span class="destaque_screen">
+												<apex:outputText value="{0, date, dd/MM/yyyy}">
+													<apex:param value="{!thePSA.Begin_Date__c}" /> 
+												</apex:outputText>
+												a 										
+												End of Contract
+												
+												<apex:outputText value="{0, date, dd/MM/yyyy}">
+													<apex:param value="{!thePSA.End_Date__c}" /> 
+												</apex:outputText>
+                                                </span>
+												<!--
+												*Start of Contract
+												01/06/2018</span> a 
+												<span class="destaque_screen">
+												
+												*End of Contract
+												30/04/2019</span>
+												.
+												-->
+                                                </p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA OITAVA - ALTERAÇÕES CONTRATUAIS</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">O presente Contrato poderá ser aditado a qualquer tempo, em comum acordo entre as Partes, mediante aditivo contratual escrito e devidamente assinado.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA NONA – RESOLUÇÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">No caso de descumprimento de qualquer cláusula deste Contrato, por qualquer uma das partes, não sanada no prazo de 15 (quinze) dias corridos após notificação, a outra poderá considerá-lo resolvido de pleno direito, independentemente de notificação judicial ou extrajudicial, sem prejuízo da multa não compensatória.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">Qualquer das Partes poderá resilir o presente Contrato, mediante comunicação prévia à outra, com antecedência mínima de 30 (trinta) dias corridos.</p>
+
+                                                <ol>
+                                                    <li>
+                                                        <p align="justify" class="bf">Caso a resilição ocorra por iniciativa da <b>PARCEIRA</b>, a <b>PARCEIRA</b> deverá devolver imediatamente à <b>BROWN FORMAN BRASIL</b>, no prazo de até 5 (cinco) dias corridos da notificação de resilição, os <b>Produtos</b>, materiais e equipamentos que eventualmente tenham-lhe sido adiantados pela <b>BROWN FORMAN BRASIL</b>, bem como realizar a restituição proporcional dos valores recebidos a título de remuneração.</p>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">O Contrato será resolvido, independentemente de notificação prévia, nos seguintes casos:</p>
+
+                                                <ul>
+                                                    <li>
+                                                        <p align="justify" class="bf">Pela proibição a qualquer das Partes de continuarem executando atividades relacionadas ao objeto do presente Contrato, quando tal proibição for imposta por força de Lei ou decisão judicial;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Quando qualquer das Partes der causa, por culpa, negligência, imprudência ou imperícia, a fato que, tornando-se do conhecimento público ou não, possa resultar em impedimento à continuidade dos serviços ora contratados;</p>
+                                                    </li>
+                                                    <li>
+                                                        <p align="justify" class="bf">Pelo cometimento de atos por qualquer das Partes que resultem negativamente à imagem, <b>Produtos</b>, nome comercial, marca, e negócio da outra;</p>
+                                                    </li>
+                                                </ul>
+
+                                                <ol>
+                                                    <li>
+                                                        <p align="justify" class="bf">Pela insolvência notória /liquidação, início de qualquer procedimento que vise à recuperação extrajudicial ou judicial, e/ou decretação de falência de qualquer das Partes.</p>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">Cada Parte obriga-se a comunicar à outra, imediatamente, a ocorrência de qualquer fato ou ato que a desqualifique ou a impeça de cumprir as obrigações atribuídas pelo Contrato.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">Em caso de resolução do presente Contrato, a <b>PARCEIRA</b> ficará obrigada a cessar o uso de quaisquer insígnias comerciais, folhetos, materiais publicitários, <i>banners</i>, <i>posters</i> e impressos em geral e equipamentos referentes aos <b>Produtos</b>, com exceção de estar a <b>PARCEIRA</b> expressamente autorizada pela <b>BROWN FORMAN BRASIL</b>, por escrito e em instrumento apartado, a continuar o uso.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA - DEVOLUÇÃO DE VALORES E MATERIAIS</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">Caso o presente Contrato seja resilido por iniciativa da <b>PARCEIRA</b> ou resolvido antecipadamente por descumprimento contratual da <b>PARCEIRA</b> ou por qualquer outro ato ou fato que lhe seja imputável, a <b>BROWN FORMAN BRASIL</b> poderá exigir da <b>PARCEIRA</b>, independentemente de multa contratual não compensatória, a devolução, proporcional ao tempo decorrido do Contrato, dos <b>Produtos</b>, materiais promocionais, equipamentos e valores transferidos à <b>PARCEIRA</b>.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA PRIMEIRA - A PROPRIEDADE INTELECTUAL</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">Os <b>Produtos</b> apenas poderão ser divulgados pela PARCEIRA no contexto de sua respectiva comercialização, dentro do(s) <b>Estabelecimento(s)</b>, assim como o uso de insígnias comerciais, folhetos, materiais publicitários, <i>banners</i>, <i>posters</i> e impressos em geral, os quais estarão limitados ao uso somente no interior do(s) <b>Estabelecimento(s)</b>.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>PARCEIRA</b> reconhece que a <b>BROWN FORMAN BRASIL</b> (e/ou suas coligadas) é a legítima detentora das marcas e dos direitos de propriedade intelectual / industrial referentes aos <b>Produtos</b> e que o presente Contrato não implica quaisquer licenças e autorizações de uso, para além do que está definido neste Contrato, bem como não constitui nenhuma cessão de direitos ou de ativos do patrimônio da <b>BROWN FORMAN BRASIL</b> para o patrimônio da <b>PARCEIRA</b>.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA SEGUNDA – CESSÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">As Partes não poderão ceder, nem total nem parcialmente, os direitos e obrigações oriundas do presente Contrato sem o consentimento prévio e por escrito da outra Parte.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA TERCEIRA - VÍNCULO EMPREGATÍCIO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">O presente Contrato não cria qualquer vínculo empregatício entre as Partes, tampouco da <b>BROWN FORMAN BRASIL</b> perante terceiros vinculados à <b>PARCEIRA</b>.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">Caso a <b>BROWN FORMAN BRASIL</b> venha a ser acionada extra ou judicialmente por quaisquer empregados, prepostos, representantes ou prestadores de serviços da <b>PARCEIRA</b>, a <b>PARCEIRA</b> será responsável pelo pagamento dos honorários advocatícios, custas e despesas necessárias à defesa da <b>BROWN FORMAN BRASIL</b>, assim como por eventual condenação que venha a ser direcionada à <b>BROWN FORMAN BRASIL</b>.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA QUARTA - INEXISTÊNCIA DE SERVIÇOS SUBJACENTES</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>PARCEIRA</b> declara, incondicionalmente, que os serviços ora contratados se limitam a aqueles descritos na Cláusula Primeira, não havendo qualquer direito ou obrigação subjacente acordados pelo presente Contrato.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">Em razão do disposto no <i>caput</i> desta Cláusula, a <b>PARCEIRA</b> declara que não lhe assiste qualquer direito à remuneração ou indenização adicional, resultante de serviços paralelos implicitamente acordados neste Contrato.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA QUINTA – DECLARAÇÕES E PRÁTICAS ANTI-CORRUPÇÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">As Partes assumem possíveis riscos em razão de acontecimentos extraordinários e imprevisíveis que possam modificar as vantagens e desvantagens contratuais, estabelecendo, desde já que os seguintes eventos, sem limitação, não serão considerados fatos imprevisíveis: a) crise de energia; b) desvalorização da moeda; c) redução de investimentos estrangeiros no país; d) criação ou aumento de tributos.</p>
+                                            </li>
+                                            <li>
+                                                <p align="justify" class="bf">A <b>PARCEIRA</b> declara e garante que ela e suas afiliadas, executivos e funcionários: a) cumpre e continuará cumprindo todas as leis aplicáveis às atividades contempladas por este Contrato, inclusive, sem limitação, a Lei nº 8.429/1992; b) não fez, fará, permitiu e permitirá que quaisquer pagamentos, empréstimos, presentes, promessas ou ofertas de pagamentos, empréstimos, presentes ou promessas a agente público ou terceira pessoa a ele relacionada, de forma a obter, direta ou indiretamente, vantagem indevida; c) não burla qualquer controle interno de contabilidade, nem falsifica qualquer livro ou registro contábil.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+									<!--   16th CLAUSE-->
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA SEXTA - NOTIFICAÇÕES</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">Todas as notificações ou comunicações relativas a este Contrato serão consideradas devidamente entregues se feitas por escrito e enviadas por e-mail ou Correios, com aviso de recebimento, aos endereços das Partes indicados no preâmbulo.</p>
+ 
+                                                <ol>
+                                                    <li>
+                                                        <p align="justify" class="bf">As notificações ou comunicações exigidas neste Contrato deverão ser direcionadas às seguintes pessoas:</p>
+
+                                                        <ol>
+                                                            <li>
+                                                                <p align="justify" class="bf">Pela <b>BROWN FORMAN BRASIL:</b></p>
+
+                                                                <p align="justify" class="bf">Nome: 
+																<!-- OWNER NAME-->
+																<span class="destaque_screen">
+																<apex:outputText value="{!thePSA.CreatedBy.Name}"/>
+																
+																</span></p>
+																
+																<!-- OWNER MOBILE-->
+                                                                <p align="justify" class="bf">Telefone: 
+																<span class="destaque_screen">
+																<apex:outputText value="{!thePSA.CreatedBy.MobilePhone}"/>
+																</span>
+																</p>
+																<!-- OWNER EMAIL-->
+                                                                <p align="justify" class="bf">Endereço eletrônico: 
+																<span class="destaque_screen">
+																<apex:outputText value="{!thePSA.CreatedBy.Email}"/>
+																</span></p>
+                                                            </li>
+                                                            <li>
+                                                                <p align="justify" class="bf">Pela<b> PARCEIRA:</b></p>
+																<!-- CONTACT NAME-->
+                                                                <p align="justify" class="bf">Nome: <span class="destaque_screen">
+																<apex:outputText value="{!thePSA.Contact__r.Name}"/>
+                                                                </span></p>
+																<!-- CONTACT MOBILE-->
+                                                                <p align="justify" class="bf">Telefone: <span class="destaque_screen">
+																<apex:outputText value="{!thePSA.Contact__r.MobilePhone}"/></span></p>
+																<!-- CONTACT EMAIL-->
+                                                                <p align="justify" class="bf">Endereço eletrônico: <span class="destaque_screen">
+																<apex:outputText value="{!thePSA.Contact__r.Email}"/></span></p>
+                                                            </li>
+                                                        </ol>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p align="justify" class="bf ni1">CLÁUSULA DÉCIMA SÉTIMA - FORO DE ELEIÇÃO</p>
+
+                                        <ol>
+                                            <li>
+                                                <p align="justify" class="bf">As Partes elegem o foro da Comarca de São Paulo - SP, para dirimir qualquer controvérsia oriunda deste Contrato, com prevalência sobre qualquer outro, por mais privilegiado que seja.</p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                </ol>
+
+                                <p align="justify" style="page-break-before: always;" class="bf">E, assim, por estarem de comum acordo, os Partes assinam o presente instrumento particular em 2 (duas) vias de igual teor, na presença de duas testemunhas abaixo subscritas, que a tudo presenciaram.</p>
+                                &nbsp;
+
+                                <p align="justify" class="bf"><span class="destaque_screen">São Paulo</span>, <span class="destaque_screen">19 de Junho de 2018</span></p>
+
+                                <table style="width:90%; margin-left: 5%">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                <br></br>
+                                                <br></br>
+                                                &nbsp;
+                                                <hr></hr>
+                                            </td>
+                                            <td>
+                                                <br></br>
+                                                <br></br>
+                                                &nbsp;
+                                                <hr></hr>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>BROWN-FORMAN BRASIL</td>
+                                            <td><span class="destaque_screen">{!thePSA.Account__r.English_Name__c}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Representante Legal</td>
+                                            <td>Representante Legal</td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td><br />
+                                            <br />
+                                            &nbsp;
+                                            <hr /></td>
+                                        </tr>
+                                        <tr>
+                                            <td>BROWN-FORMAN BRASIL</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Depto de Marketing</td>
+                                        </tr>-->
+                                    </tbody>
+                                </table>
+
+                                <p align="justify" class="bf">Testemunhas</p>
+
+                                <table style="width:90%; margin-left: 5%">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                <br></br>
+                                                <br></br>
+                                                &nbsp;
+                                                <hr></hr>
+                                            </td>
+                                            <td>
+                                                <br></br>
+                                                <br></br>
+                                                &nbsp;
+                                                <hr></hr>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Nome: <span class="destaque_screen">{!ownerName} </span></td>
+                                            <td>Nome: <span class="destaque_screen">{!ownerManagerName} </span></td>
+                                        </tr>
+                                        <tr>
+                                            <!-- <td>CPF: <span class="destaque_screen"> </span></td> -->
+                                            <td>CPF: <span class="destaque_screen"> </span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div>
+                <ul>
+                    <apex:repeat value="{!psaApprovalHistory.items}" var="h" id="approvalHistory">
+                        <li>
+                        <apex:outputText value="Criado por: {0} em {1, date, dd/mm/yyyy}" rendered="{!h.Status=='Started'}">
+                            <apex:param value="{!h.Actor}" />
+                            <apex:param value="{!h.RawCompletedDate}" />
+                        </apex:outputText>
+                        <apex:outputText value="Aprovado pela {0} por {1} em {2, date, dd/mm/yyy}" rendered="{!h.Status!='Started'}">
+                            <apex:param value="{!h.ActorRole}" />
+                            <apex:param value="{!h.Actor}" />
+                            <apex:param value="{!h.RawCompletedDate}" />
+                        </apex:outputText>
+                        </li>
+                    </apex:repeat>
+                    <!--
+                    <li>Criado por: Rodrigo Porfirio em 19/06/2018</li>
+                    <li>Aprovado pela Gerencia On Trade por Marcos Cutolo em 19/06/2018</li>
+                    <li>Aprovado pelo National sales manager Usuario desconhecido em data desconhecida</li>
+                    <li>Aprovado pela Gerencia de Marketing por Giuliano Odone em 19/06/2018</li>
+                    <li>Aprovado pela Controladoria por Nelson Ferlini em 20/06/2018</li>
+                    -->
+                </ul>
+            </div>
+            <center>
+                <a class="no_print" href="https://www.bfso.com.br/index_contratos.php">Voltar</a>
+            </center>
+
+        </body>
+</html>
+
+</apex:component>

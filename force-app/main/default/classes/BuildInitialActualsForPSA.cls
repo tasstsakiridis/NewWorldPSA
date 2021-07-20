@@ -100,6 +100,12 @@ public with sharing class BuildInitialActualsForPSA {
                         addedActuals = true;
                     }
         
+                    newActual = createPMIActual(pmi, 'Payment', recordTypeId, configs);
+                    keyExists = externalKeys.contains(newActual.External_Key__c);
+                    if (!keyExists) {
+                        actuals.add(newActual);
+                        addedActuals = true;
+                    }
                     if (addedActuals) {
                         s_PSAWithActuals.add(pmi.Activity__c);
                     }

@@ -120,9 +120,11 @@
                             <template for:each={rebates} for:item="rebate">                        
                                 <lightning-layout-item key={rebate.rebateType} size="12" padding="around-small" class="slds-m-top_small">                                                                                                
                                     <template if:true={rebate.isVolumeRebate}>
-                                        <div class="slds-m-bottom_x-small">
-                                            <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number></p>
-                                        </div>
+                                        <template if:true={showTotalDiscount}>
+                                            <div class="slds-m-bottom_x-small">
+                                                <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number></p>
+                                            </div>    
+                                        </template>
                                         
                                         <template if:true={isPhone}>
                                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
