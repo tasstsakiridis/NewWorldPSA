@@ -745,8 +745,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 if (this.rebateType == 'Volume') {
                     let actQty = this.rebateAmount;
                     if (this.captureVolumeInBottles) {
-                        let packQty = this.thePMI.Product_Pack_Qty__c == undefined ? 1 : this.thePMI.Product_Pack_Qty__c;
-                        actQty = this.rebateAmount / packQty;
+                        actQty = this.rebateAmount / this.productPackQty;
                     }
                     fields[FIELD_ACTUAL_QTY.fieldApiName] = actQty;
                     fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount * this.plannedDiscount;

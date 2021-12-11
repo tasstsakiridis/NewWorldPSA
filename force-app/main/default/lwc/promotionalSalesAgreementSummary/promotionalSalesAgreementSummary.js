@@ -173,10 +173,29 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         return this.thePSA == undefined ? null : this.thePSA.End_Date__c;
     }
     get totalVolume() {
-        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        let val = 0;
+        if (this.thePSA != undefined) {
+            if (this.captureVolumeInBottles) {
+                val = parseFloat(this.thePSA.Total_Volume_Bottles__c);
+            } else {
+                val = parseFloat(this.thePSA.Total_Volume__c);
+            }
+        }
+        //return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        return val;
     }
     get totalActualVolume() {
-        return this.thePSA == undefined || this.thePSA.Total_Actual_Volume__c == undefined ? null : parseFloat(this.thePSA.Total_Actual_Volume__c);
+        let val = 0;
+        if (this.thePSA != undefined) {
+            if (this.captureVolumeInBottles) {
+                val = parseFloat(this.thePSA.Total_Actual_Volume_Bottles__c);
+            } else {
+                val = parseFloat(this.thePSA.Total_Actual_Volume__c);
+            }
+        }
+        //return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        return val;
+//        return this.thePSA == undefined || this.thePSA.Total_Actual_Volume__c == undefined ? null : parseFloat(this.thePSA.Total_Actual_Volume__c);
     }
     get volumeBalance() {
         const v = this.totalVolume - (this.totalActualVolume == null ? 0 : this.totalActualVolume);
@@ -328,7 +347,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.isWorking = true;
         const account = { id: this.thePSA.Account__c, 
                             name: this.thePSA.Account__r.Name, 
-                            actualVolume: parseFloat(this.thePSA.Total_Actual_Volume__c),
+                            actualVolume: this.totalActualVolume,
                             plannedVolume: 0,
                             listingFee: 0,
                             listingFeePaid: parseFloat(this.thePSA.Total_Listing_Fee_Paid__c),
@@ -338,12 +357,18 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                             trainingAdvocacyPaid: parseFloat(this.thePSA.Total_Training_and_Advocacy_Paid__c),
                             pmi: new Map() };                
                 
+        var packQty = 1;
         if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
             this.thePSA.Promotion_Material_Items__r.forEach((pmi, index) => {
                 console.log('[summary.buildtabledata] pmi, index', pmi, index);
-
+                
                 if (pmi.Plan_Volume__c != undefined) {
-                    account.plannedVolume += pmi.Plan_Volume__c;
+                    if (this.captureVolumeInBottles) {
+                        packQty = pmi.Product_Pack_Qty__c == undefined ? 1 : pmi.Product_Pack_Qty__c;
+                        account.plannedVolume += (pmi.Plan_Volume__c * packQty);
+                    } else {
+                        account.plannedVolume += pmi.Plan_Volume__c;
+                    }
                 }
                 if (pmi.Listing_Fee__c != undefined) {
                     account.listingFee += pmi.Listing_Fee__c;
@@ -369,7 +394,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
                     totalInvestment: parseFloat(pmi.Total_Investment__c),
                     packQuantity: parseInt(pmi.Product_Pack_Qty__c),
-                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c)
+                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c),
+                    payment: parseFloat(pmi.Total_Payments_Paid__c)
                 });
             });
         }
@@ -405,6 +431,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         const data = [];
         let index = 0;
         var volume = 0;
+        var actualVolume = 0;
         //accountsMap.forEach((account, key, map) => {
             console.log('[summary.buildtabledata] account', account);
             index = 0;
@@ -419,19 +446,22 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 row.product = pmi.product;
 
                 volume = pmi.plannedVolume;
+                actualVolume = pmi.actualVolume;
                 if (this.captureVolumeInBottles) {
                     volume = pmi.plannedVolume * pmi.packQuantity;
+                    actualVolume = pmi.actualVolume * pmi.packQuantity;
                 }
                 row.plannedVolume = volume;
                 row.discount = pmi.discount;
                 row.listingFee = pmi.listingFee;
                 row.promotionalActivity = pmi.promotionalActivity;
                 row.trainingAdvocacy = pmi.trainingAdvocacy;
-                row.actualVolume = pmi.actualVolume; 
+                row.actualVolume = actualVolume; 
                 row.listingFeePaid = pmi.listingFeePaid;
                 row.promotionalActivityPaid = pmi.promotionalActivityPaid;
                 row.trainingAdvocacyPaid = pmi.trainingAdvocacyPaid;
                 row.totalInvestment = pmi.totalInvestment;
+                row.payment = pmi.payment;
 
                 row.quartersCaptured = 0;  // Need to calculate or capture how many quarters are captured
                 row.listingFeeBalance = row.listingFee - row.listingFeePaid;

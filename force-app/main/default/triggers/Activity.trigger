@@ -1,4 +1,6 @@
-/* Description  : Activity used for roll up summary activity to parent market campaign on each activity created,edited, deleted.
+/* 
+ * Description  : Activity used for roll up summary activity to parent market campaign on each activity created,edited, deleted.
+ * Test Class   : PreEvaluationForm_Controller_Test
  * */
 trigger Activity on Promotion_Activity__c (before insert, before update, after insert, after update, before delete, after delete) {
     /*
@@ -20,6 +22,13 @@ trigger Activity on Promotion_Activity__c (before insert, before update, after i
 
     //----------
 
+    if ((Trigger.isInsert || Trigger.isUpdate) && Trigger.isBefore) {
+        for (Promotion_Activity__c pa : Trigger.new) {
+            if (pa.Promo_Brands__c != null) {
+                pa.Promo_Brands_Description__c = pa.Promo_Brands__c.left(255);
+            }
+        }
+    }
     if (Trigger.isInsert && Trigger.isAfter) {
         System.debug('New Activity ' + Trigger.newMap.size());
         MRM_MarketCampaign_Helper.addMarketCampaignSummary(Trigger.newMap);
@@ -34,6 +43,26 @@ trigger Activity on Promotion_Activity__c (before insert, before update, after i
         System.debug('Delete old Activity ' + Trigger.oldMap.size());
         MRM_MarketCampaign_Helper.subtractMarketCampaignSummary(Trigger.oldMap);
     } else if (Trigger.isUpdate) {
+        if (Trigger.isBefore) {
+            for(Promotion_Activity__c pa : Trigger.new) {
+                System.debug('market filteer: ' + pa.Market_Filter__c);
+                System.debug('recordtype: ' + pa.RecordType.Name + ', recordtypename: ' + pa.RecordTypeName__c);
+                System.debug('status: ' + pa.Status__c);
+                if (pa.Market_Filter__c == 'Australia' && pa.RecordTypeName__c == 'CRM - Australia' && pa.Status__c == 'Rejected') {
+                    pa.Status__c = 'Draft';
+                    pa.Incremental_Gross_Profit_Previous__c = pa.Incremental_Gross_Profit__c;
+                    pa.Incremental_Gross_Profit__c = null;
+                    if (pa.Project_Manager__c != pa.Commercial_Lead_Review_Entered_By__c) {
+    	                pa.Incremental_Gross_Profit_Sales_Previous__c = pa.Incremental_Gross_Profit_Sales__c;
+	                    pa.Incremental_Gross_Profit_Sales__c = null;                        
+                    }
+                    
+                    System.debug('status: ' + pa.Status__c);
+                    System.debug('Incremental Gross Profit: ' + pa.Incremental_Gross_Profit__c + ', previous: ' + pa.Incremental_Gross_Profit_Previous__c);
+                    System.debug('Incremental Gross Profit Sales: ' + pa.Incremental_Gross_Profit_Sales__c + ', previous: ' + pa.Incremental_Gross_Profit_Sales_Previous__c);
+                }
+            }
+        }
         Map<Id, Promotion_Activity__c> oldActivityMap = Trigger.oldMap;
         Map<Id, Promotion_Activity__c> newActivityMap = Trigger.newMap;
         if (Trigger.isBefore) {

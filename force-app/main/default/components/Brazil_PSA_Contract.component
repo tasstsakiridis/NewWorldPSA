@@ -3,280 +3,308 @@
     
 <html>
 
-        <head>
-            <style>
-                                @page {
-                                    margin: 1cm;
-                                }
+    <head>
+        <style>
+            body {
+                overflow: hidden;
+            }
 
-                                @media screen {
-                                    div.page-break {
-                                        border-top: 7px solid #ADD8E6;
-                                        border-bottom: 0 none;
-                                        padding: 1cm 1cm 0px !important;
-                                        width: 21cm !important;
-                                    }
+            @page {
+                margin: 1cm;
+            }
+            
+            .title {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 2em;
+                font-weight: bold;
+                color: #603000;
+            }
+            .important-text {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 14pt;
+                font-weight: bold;
+            }
+            
+            @media screen {
+                .highlight-text {
+                    background-color: yellow;
+                }
+                /*
+                div.page-break {
+                    border-top: 7px solid #ADD8E6;
+                    border-bottom: 0 none;
+                    padding: 1cm 1cm 0px !important;
+                    width: 21cm !important;
+                }
 
-                                    div.rodap {
-                                        padding: 0 1cm 1cm 1cm !important;
-                                        width: 21cm !important;
-                                    }
+                div.rodap {
+                    padding: 0 1cm 1cm 1cm !important;
+                    width: 21cm !important;
+                }
 
-                                    body.cke_editable {
-                                        background-color: #ADD8E6;
-                                    }
+                body.cke_editable {
+                    background-color: #ADD8E6;
+                }
 
-                                    .destaque_screen {
-                                        background-color: yellow;
-                                    }
+                .destaque_screen {
+                    background-color: yellow;
+                }
 
-                                    .msg_screen {
-                                        background-color: #A8CC9C;
-                                    }
+                .msg_screen {
+                    background-color: #A8CC9C;
+                }
 
-                                    .alert_screen {
-                                        background-color: #ffdddd;
-                                    }
-                                }
+                .alert_screen {
+                    background-color: #ffdddd;
+                }
+                */
+            }
+            
+            @media print {
+                .no_print {
+                    display: none;
+                }
+            }
 
-                                @media print {
-                                    .no_print {
-                                        display: none;
-                                    }
-                                }
+            thead {
+                display: table-header-group;
+            }
 
-                                thead {
-                                    display: table-header-group;
-                                }
+            tfoot {
+                display: table-footer-group;
+            }
 
-                                tfoot {
-                                    display: table-footer-group;
-                                }
+            .cabecalh {
+                left: 0px;
+                position: relative;
+                top: 0px;
+            }
 
-                                .cabecalh {
-                                    left: 0px;
-                                    position: relative;
-                                    top: 0px;
-                                }
+            .rodap {
+                background-color: white;
+                bottom: 0px;
+                left: 0px;
+                page-break-after: always;
+                position: relative;
+                width: 19cm;
+            }
 
-                                .rodap {
-                                    background-color: white;
-                                    bottom: 0px;
-                                    left: 0px;
-                                    page-break-after: always;
-                                    position: relative;
-                                    width: 19cm;
-                                }
+            .content {
+                margin-bottom: 100px;
+                margin-top: 100px;
+            }
 
-                                .content {
-                                    margin-bottom: 100px;
-                                    margin-top: 100px;
-                                }
+            .rodape {
+                background-color: #323849;
+                padding: 5px;
+                width: 100%;
+            }
 
-                                .rodape {
-                                    background-color: #323849;
-                                    padding: 5px;
-                                    width: 100%;
-                                }
+            .rodape button span {
+                float: left;
+                white-space: nowrap;
+            }
 
-                                    .rodape button span {
-                                        float: left;
-                                        white-space: nowrap;
-                                    }
+            #header h1 {
+                border: 0px none;
+                margin: 0px;
+            }
 
-                                #header h1 {
-                                    border: 0px none;
-                                    margin: 0px;
-                                }
+            .ui-menu {
+                width: 250px;
+            }
 
-                                .ui-menu {
-                                    width: 250px;
-                                }
+            .ui-widget {
+                font-size: 0.9em;
+                z-index: 2;
+            }
 
-                                .ui-widget {
-                                    font-size: 0.9em;
-                                    z-index: 2;
-                                }
+            .linha {
+                border: 1px solid #AAAAAA;
+            }
 
-                                .linha {
-                                    border: 1px solid #AAAAAA;
-                                }
+            .linha label {
+                display: inline-block;
+                padding: 4px;
+                text-align: left;
+            }
 
-                                    .linha label {
-                                        display: inline-block;
-                                        padding: 4px;
-                                        text-align: left;
-                                    }
+            .linha input {
+                margin: 0px;
+            }
 
-                                    .linha input {
-                                        margin: 0px;
-                                    }
+            #menu {
+                z-index: 1;
+            }
 
-                                #menu {
-                                    z-index: 1;
-                                }
+            #header {
+                background: none repeat scroll 0px 0px #323849;
+                color: #E6E6FA;
+                font-size: small;
+                width: 100%;
+                z-index: 10;
+            }
 
-                                #header {
-                                    background: none repeat scroll 0px 0px #323849;
-                                    color: #E6E6FA;
-                                    font-size: small;
-                                    width: 100%;
-                                    z-index: 10;
-                                }
+            #header h2 {
+                margin: 0px;
+                text-align: center;
+            }
 
-                                    #header h2 {
-                                        margin: 0px;
-                                        text-align: center;
-                                    }
+            a[href="#menu"] {
+                border: 0px none !important;
+                right: 6px !important;
+                top: 6px !important;
+                z-index: 11;
+            }
 
-                                a[href="#menu"] {
-                                    border: 0px none !important;
-                                    right: 6px !important;
-                                    top: 6px !important;
-                                    z-index: 11;
-                                }
+            footer {
+                color: #E6E6FA;
+                font-size: small;
+                text-align: center;
+            }
 
-                                footer {
-                                    color: #E6E6FA;
-                                    font-size: small;
-                                    text-align: center;
-                                }
+            #campo_filtro {
+                margin-left: 10%;
+                width: 80%;
+            }
 
-                                #campo_filtro {
-                                    margin-left: 10%;
-                                    width: 80%;
-                                }
+            div.page-break {
+                background-color: white;
+                background-image: none;
+                height: 26cm;
+                overflow: hidden;
+                padding: 0px;
+                width: 19cm;
+            }
+                        
+            img {
+                max-width: 99%;
+            }
 
-                                div.page-break {
-                                    background-color: white;
-                                    background-image: none;
-                                    height: 26cm;
-                                    overflow: hidden;
-                                    padding: 0px;
-                                    width: 19cm;
-                                }
+            p {
+                margin-bottom: 0.25cm;
+                direction: ltr;
+                line-height: 120%;
+                text-align: left;
+            }
 
-                                ol li ol li {
-                                    margin-left: -1em;
-                                    padding: 0px;
-                                }
+            p.western {
+                font-family: "Arial",serif;
+                font-size: 9pt;
+            }
 
-                                img {
-                                    max-width: 99%;
-                                }
+            p.cjk {
+                font-size: 9pt;
+            }
 
-                                p {
-                                    margin-bottom: 0.25cm;
-                                    direction: ltr;
-                                    line-height: 120%;
-                                    text-align: left;
-                                }
+            a:link {
+                color: rgb(5, 99, 193);
+            }
 
-                                    p.western {
-                                        font-family: "Arial",serif;
-                                        font-size: 9pt;
-                                    }
-
-                                    p.cjk {
-                                        font-size: 9pt;
-                                    }
-
-                                a:link {
-                                    color: rgb(5, 99, 193);
-                                }
-
-                                a.no_print {
-                                    /*
+            a.no_print {
+                /*
                     border: 3px outset blue;
                     background-color: green;
                     padding: 4px 10px;
                     color: black;
                 */
-                                    text-decoration: none;
-                                    align: center;
-                                    font-size: 1.3em;
-                                    padding: 3px 15px;
-                                    vertical-align: text-bottom;
-                                    font-weight: bold;
-                                    border: 2px solid #000000;
-                                    background-color: #8A7E6E;
-                                    color: #FFFFFF;
-                                    margin-bottom: 3px;
-                                    border-radius: 5px 5px 5px 5px;
-                                }
+                text-decoration: none;
+                align: center;
+                font-size: 1.3em;
+                padding: 3px 15px;
+                vertical-align: text-bottom;
+                font-weight: bold;
+                border: 2px solid #000000;
+                background-color: #8A7E6E;
+                color: #FFFFFF;
+                margin-bottom: 3px;
+                border-radius: 5px 5px 5px 5px;
+            }
 
-                                p.bf {
-                                    margin-bottom: 0cm;
-                                    line-height: 115%;
-                                    font-size: 12pt;
-                                    text-align: justify;
-                                }
+            p.bf {
+                margin-bottom: 0cm;
+                line-height: 115%;
+                font-size: 12pt;
+                text-align: justify;
+            }
 
-                                p.ni1 {
-                                    font-weight: bold;
-                                }
+            p.ni1 {
+                font-weight: bold;
+            }
 
-                                ol {
-                                    list-style-type: none;
-                                    counter-reset: item;
-                                    margin: 0;
-                                    padding: 0;
-                                }
-
-                                    ol > li {
-                                        display: table;
-                                        counter-increment: item;
-                                        margin-bottom: 0.6em;
-                                    }
-
-                                        ol > li:before {
-                                            content: counters(item, ".") ". ";
-                                            display: table-cell;
-                                            padding-right: 0.6em;
-                                        }
-
-                                li ol > li {
-                                    margin: 0;
-                                }
-
-                                    li ol > li:before {
-                                        content: counters(item, ".") " ";
-                                    }
-            </style>
-        </head>
+            ol {
+                list-style-type: none;
+                counter-reset: item;
+                margin: 0;
+                padding: 0;
+            }
+            ol > li {
+                display: table;
+                counter-increment: item;
+                margin-bottom: 0.6em;
+            }
+            ol > li:before {
+                content: counters(item, ".") ". ";
+                display: table-cell; 
+                padding-right: 0.6em;  
+                width: 30px;           
+            }
+            li ol > li {
+                margin: 0;
+            }
+            li ol > li:before {
+                content: counters(item, ".") " ";  
+            }
+            
+            ul.circle {
+                list-style-type: circle;
+                font-size: 12pt;
+            }
+        </style>
+    </head>
         <body>
             <table border="0" align="center" width="100%">
-                <thead><tr><th width="100%"><div class="cabecalh"><p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US"><span style="font-family:times new roman,times,serif;"><span style="font-size:24px;"><font color="#663300"><font style="font-size: 24pt"><span lang="pt-BR"><b>Brown-Forman</b></span></font></font></span><br></br></span></p><p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US"><span style="font-size:14px;"><span style="font-family: times new roman,times,serif;"><font style="font-size: 14pt"><span lang="pt-BR">CONTRATO DE PARCERIA "ON PREMISE"</span></font></span></span><br></br></p></div></th></tr></thead>
+                <thead>
+                    <tr>
+                        <th width="100%">
+                            <p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US">
+                                <span class="title" lang="pt_BR">Brown-Forman</span>
+                            </p>
+                            <p style="margin-bottom: 0cm; line-height: 100%; text-align: center;" lang="en-US">
+                                <span class="important-text" lang="pt-BR">CONTRATO DE PARCERIA "ON PREMISE"</span>
+                            </p>
+                        </th>
+                    </tr>
+                </thead>
                 <tfoot><tr><td width="100%">&nbsp;</td></tr></tfoot>
                 <tbody>
                     <tr>
                         <td width="100%">
                             <div style="font-family: &#39;Times New Roman, serif&#39;">
-                                <p align="justify" class="bf">Pelo presente instrumento particular (<b>CONTRATO</b>), acordam de um lado
-                                <span align="justify" class="bf"><b>BROWN-FORMAN BEVERAGES WORLDWIDE COMÉRCIO DE BEBIDAS LTDA.</b>,
+                                <p align="justify" class="bf">Pelo presente instrumento particular (<b>CONTRATO</b>), acordam </p>
+                                <p align="justify" class="bf">de um lado</p>
+                                <p align="justify" class="bf">
+                                    <b>BROWN-FORMAN BEVERAGES WORLDWIDE COMÉRCIO DE BEBIDAS LTDA.</b>,
                                     inscrita no CNPJ/MF sob n° 00.305.765/0001-30 e com Inscrição Estadual sob n°. 114.379.123.114, estabelecida na Cidade de São Paulo,
                                     Estado de São Paulo, na AV. Presidente Juscelino Kubitscheck, 1909 Torre Sul - 7 andar - CJ 71A - Vila Nova Conceição CEP 04543-907 - São Paulo - SP,
-                                    neste ato representada na forma do seu contrato social e denominada <b>“BROWN-FORMAN BRASIL”</b>e, de outro lado,   </span>
-
-                             
-
-                                <span align="justify" class="bf"><b><span><apex:outputText value="{!thePSA.Account__r.English_Name__c}" /></span>,</b>inscrita no CNPJ/MF sob o n° 
-                                    <apex:outputText value="{!thePSA.Account__r.ILN_Code__c}" />
-                                    <!--<span class="destaque_screen">14.467.584/0001-14</span>--> 
-                                    e com Inscrição Estadual sob n°. 
-									<apex:outputText value="{!thePSA.Account__r.Tax_Number_PL__c}" />
-                                    <!--<span class="destaque_screen">146.616.520.110</span>-->
-                                    , estabelecida na <span class="destaque_screen"><apex:outputText value="{!thePSA.Account__r.ShippingStreet}" /> </span>
-                                    - CEP: <span class="destaque_screen"><apex:outputText value="{!thePSA.Account__r.ShippingPostalCode}" /> </span>
-                                    <!--<span class="destaque_screen">05426-100</span>-->
-                                    ,neste ato representada na forma do seu contrato social e denominada por seu representante legal e denominada <b>"PARCEIRA"</b></span></p>
+                                    neste ato representada na forma do seu contrato social e denominada <b>“BROWN-FORMAN BRASIL”</b>
+                                    <p align="justify" style="font-size: 12pt;">e, de outro lado, </p>                       
+                                     			
+                                    <p align="justify" style="font-size: 12pt;"><b><apex:outputText value="{!thePSA.Account__r.English_Name__c}" styleClass="highlight-text"/>,</b>inscrita no CNPJ/MF sob o n° &nbsp;  
+                                    <apex:outputText value="{!thePSA.Account__r.ILN_Code__c}" styleClass="highlight-text"/>
+                                    e com Inscrição Estadual sob n° &nbsp;  
+									<apex:outputText value="{!thePSA.Account__r.Tax_Number_PL__c}" styleClass="highlight-text" />
+                                    , estabelecida na &nbsp;  <apex:outputText value="{!thePSA.Account__r.ShippingStreet}" styleClass="highlight-text" />
+                                    - CEP: <apex:outputText value="{!thePSA.Account__r.ShippingPostalCode}" styleClass="highlight-text" />
+                                    ,neste ato representada na forma do seu contrato social e denominada por seu representante legal e denominada <b>"PARCEIRA"</b></p>
+                                </p>
 
                                 <p align="justify" class="bf">Para fins deste Contrato, cada parte será isoladamente denominada “Parte” e, quando em conjunto, “Partes”</p>
 
                                 <p align="justify" class="bf">Considerando que:</p>
                                 &nbsp;
 
-                                <ol type="a">
+                                <ol style="font-size: 12pt;">
                                     <li>A <b>BROWN FORMAN BRASIL</b> é pessoa jurídica de direito privado que se dedica à fabricação, comercialização, importação e exportação de bebidas alcoólicas em geral;</li>
                                     <li>A <b>PARCEIRA</b> é pessoa jurídica de direito privado que se dedica ao comércio varejista de bebidas alcoólicas, restaurantes e similares;</li>
                                     <li>A <b>BROWN FORMAN BRASIL</b> pretende que a <b>PARCEIRA</b>, utilizando seu fundo de comércio, mão de obra qualificada e experiência no ramo, execute o objeto do presente Contrato, adiante especificado;</li>
@@ -284,7 +312,7 @@
                                 </ol>
 
                                 <p align="justify" class="bf">As Partes resolvem, de comum acordo, celebrar o presente Contrato, que será regido pelas seguintes Cláusulas:</p>
-
+                                <br />
                                 <ol>
                                     <!-- CLAUSULA 1ERA -->
                                     <li>
@@ -293,6 +321,7 @@
                                         <ol>
                                             <li>
                                                 <p align="justify" class="bf ni2">O presente Contrato tem como objeto a parceria comercial entre as Partes, na qual a <b>PARCEIRA</b> se compromete a promover, comercializar e distribuir o portfólio de produtos da <b>BROWN FORMAN BRASIL</b>, incluindo os produtos abaixo relacionados (<b>“Produtos”</b>), dentro de seu(s) estabelecimento(s) (<b>“Estabelecimento(s)”</b>), bem como em eventuais eventos por ela realizados:</p>
+                                                <br />
                                                 <b>
                                                     <span >
                                                         <!--
@@ -304,11 +333,13 @@
                                                             <li>WHISKEY JACK DANIELS SINGLE BARREL 750ML</li>
                                                             <li>TEQUILA EL JIMADOR REPOSADO 750ML</li></ul>
                                                         -->
-                                                        <apex:dataTable cellpadding="5" border="0" var="i" value="{!promotionMaterialItems}">
+                                                        <ul class="circle">
+                                                            <apex:repeat var="i" value="{!promotionMaterialItems}">
 
-                                                            <apex:column value="{!i.Product_Name__c}" headerValue="Produtos:" width="100px" />
+                                                                <li><apex:outputText value="{!i.Product_Name__c}" styleClass="highlight-text" /></li>
 
-                                                        </apex:dataTable>
+                                                            </apex:repeat>
+                                                        </ul>
                                                     </span>
                                                 </b>
                                             </li>
@@ -348,10 +379,10 @@
                                                             <li>12 gfs de WHISKEY GENTLEMAN JACK 1000ML</li>
                                                             <li>01 gfs de WHISKEY JACK DANIELS SINGLE BARREL 750ML</li>
                                                             <li>200 gfs de TEQUILA EL JIMADOR REPOSADO 750ML</li>-->
-                                                            <ul>
+                                                            <ul style="font-size: 12pt;">
                                                             <apex:repeat value="{!promotionMaterialItems}" var="pmi">
                                                                 <li>
-                                                                <apex:outputText value="{0, number, 0} gfs de {1}">
+                                                                <apex:outputText value="{0, number, 0} gfs de {1}" styleClass="highlight-text">
                                                                     <apex:param value="{!pmi.Plan_Volume_Bottles__c}" />
                                                                     <apex:param value="{!pmi.Product_Name__c}" />
                                                                 </apex:outputText>
@@ -369,7 +400,13 @@
                                                         </b>
                                                     </li>
                                                     <li style="color:black;">
-                                                        <p align="justify" class="bf">Quando aplicável, garantir que todos os bares, quiosques ou outros pontos de vendas dos <b>Produtos</b> dentro do(s) <b>Estabelecimento(s)</b> estejam com, <b>no mínimo <span class="destaque_screen">30</span>% (<span class="destaque_screen">trinta por cento</span>) </b>de sua visibilidade ocupada com os <b>Produtos</b> da <b>BROWN FORMAN BRASIL</b>;</p>
+                                                        <p align="justify" class="bf">Quando aplicável, garantir que todos os bares, quiosques ou outros pontos de vendas dos <b>Produtos</b> dentro do(s) <b>Estabelecimento(s)</b> estejam com, no mínimo <b> 
+                                                         <span class="destaque_screen">                                             
+                                                            <apex:outputText value="{0, number, 0}%" styleClass="highlight-text" >
+                                                                <apex:param value="{!percentageVisibility}" />
+                                                            </apex:outputText> 
+                                                         </span>
+                                                         </b>de sua visibilidade ocupada com os <b>Produtos</b> da <b>BROWN FORMAN BRASIL</b>;</p>
                                                     </li>
                                                     <li style="color:black;">
                                                         <p align="justify" class="bf">Utilizar todos os materiais e equipamentos fornecidos pela <b>BROWN FORMAN BRASIL</b>, de acordo com as instruções da <b>BROWN FORMAN BRASIL</b>;</p>
@@ -464,164 +501,152 @@
                                         <ol>
                                             <li>
                                                 <p align="justify" class="bf">O valor total do presente contrato é de <b>
-                                                    (<span class="destaque_screen"> <apex:outputText value="{!totalBudget}" /> </span>),</b> 
+                                                    <span class="destaque_screen"> 
+                                                        <apex:outputText value="R${0} ({1})" styleClass="highlight-text" >
+                                                            <apex:param value="{!totalBudget}" />
+                                                            <apex:param value="{!formattedTotalBudget}" />
+                                                        </apex:outputText>
+                                                    </span></b> 
                                                 com todos os tributos inclusos, a ser pago pela <b>BROWN FORMAN BRASIL</b>,
                                                  da seguinte forma:
                                                 </p>
+                                                <br />
 												
-												
-                                                <ol>
+                                                <ul>
                                                     <li>
 													
 													<apex:outputPanel rendered="{!numberOfPayments==1}">
 													
-                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        
                                                         <span class="destaque_screen">
-                                                            <ul><li>
-                                                            <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}), 30 dias após a assinatura do contrato">
-                                                                <apex:param value="{!totalBudget}" />
-                                                                <apex:param value="{!formattedTotalBudget}" />
-                                                            </apex:outputText>
-                                                            </li></ul>
+                                                            <ul class="circle">
+                                                                <li>
+                                                                    <span class="highlight-text">Parcela #1</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), 45 dias após a assinatura do contrato;">
+                                                                        <apex:param value="{!totalBudget}" />
+                                                                        <apex:param value="{!formattedTotalBudget}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                            </ul>
                                                         </span>
                                                         <p align="justify" class="bf">
                                                             Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
 
-                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                            Banco: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Bank__c}</span> Agência: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Agency__c}</span> Conta-corrente: <span class="destaque_screen"><apex:outputText value="{!thePSA.Account__r.Payment_Account__c}" styleClass="highlight-text" /></span>
                                                         </p>
 													</apex:outputPanel>
                                                     
 													<apex:outputPanel rendered="{!numberOfPayments==2}">
 													
-                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        
                                                         <span class="destaque_screen">
-                                                            <ul>
+                                                            <ul class="circle">
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}), 30 dias após a assinatura do contrato" >
-                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #1</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), 45 dias após a assinatura do contrato;" >
                                                                         <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                        <apex:param value="{!translatedFirstPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
-                                                            </ul>
-                                                        </span>
-														
-														<span class="destaque_screen">
-                                                            <ul>
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #2</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 60% das metas estipuladas;" >
                                                                         <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                        <apex:param value="{!translatedSecondPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
                                                             </ul>
                                                         </span>
-														
-														
+																												
                                                         <p align="justify" class="bf">
                                                             Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
 
-                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                            Banco: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Bank__c}</span> Agência: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Agency__c}</span> Conta-corrente: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account__c}</span>
                                                         </p>
 													</apex:outputPanel>
                                                     
 													<apex:outputPanel rendered="{!numberOfPayments==3}">
 													
-                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        
                                                         <span class="destaque_screen">
-                                                            <ul>
+                                                            <ul classs="circle">
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}) 30 dias após a assinatura do contrato," >
-                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #1</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), 45 dias após a assinatura do contrato;" >
                                                                         <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                        <apex:param value="{!translatedFirstPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
-                                                            </ul>
-                                                        </span>
-														
-														<span class="destaque_screen">
-                                                            <ul>
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #2</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 50% das metas estipuladas;" >
                                                                         <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                        <apex:param value="{!translatedSecondPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="highlight-text">Parcela #3</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 80% das metas estipuladas;" >
+                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
+                                                                        <apex:param value="{!translatedThirdPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
                                                             </ul>
                                                         </span>
-														<span class="destaque_screen">
-                                                            <ul>
-                                                                <li>
-                                                                    <apex:outputText value="Parcela #3 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!thirdPaymentAmount}" />
-                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
-                                                                    </apex:outputText>
-                                                                </li>
-                                                            </ul>
-                                                        </span>														
 														
                                                         <p align="justify" class="bf">
                                                             Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
 
-                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                            Banco: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Bank__c}</span> Agência: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Agency__c}</span> Conta-corrente: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account__c}</span>
                                                         </p>
 													</apex:outputPanel>
                                                     
 													<apex:outputPanel rendered="{!numberOfPayments==4}">
 													
-                                                        <p align="justify" class="bf"> <span class="destaque_screen">Uma</span> parcelas à serem pagas da seguinte forma:</p>
+                                                        
                                                         <span class="destaque_screen">
-                                                            <ul>
+                                                            <ul class="circle">
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #1 no valor de R$ {0, number, currency} ({1}) 30 dias após a assinatura do contrato," >
-                                                                        <apex:param value="{!firstPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #1</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), 45 dias após a assinatura do contrato;" >
                                                                         <apex:param value="{!formattedFirstPaymentAmount}" />
+                                                                        <apex:param value="{!translatedFirstPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
-                                                            </ul>
-                                                        </span>
-														
-														<span class="destaque_screen">
-                                                            <ul>
                                                                 <li>
-                                                                    <apex:outputText value="Parcela #2 no valor de R$ {0, number, currency} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!secondPaymentAmount}" />
+                                                                    <span class="highlight-text">Parcela #2</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 40% das metas estipuladas;" >
                                                                         <apex:param value="{!formattedSecondPaymentAmount}" />
+                                                                        <apex:param value="{!translatedSecondPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="highlight-text">Parcela #3</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 60% das metas estipuladas;" >
+                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
+                                                                        <apex:param value="{!translatedThirdPaymentAmount}" />
+                                                                    </apex:outputText>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="highlight-text">Parcela #4</span>
+                                                                    <apex:outputText value=" no valor de R${0} ({1}), quando atingir 80% das metas estipuladas;" >
+                                                                        <apex:param value="{!formattedFourthPaymentAmount}" />
+                                                                        <apex:param value="{!translatedFourthPaymentAmount}" />
                                                                     </apex:outputText>
                                                                 </li>
                                                             </ul>
                                                         </span>
-														<span class="destaque_screen">
-                                                            <ul>
-                                                                <li>
-                                                                    <apex:outputText value="Parcela #3 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!thirdPaymentAmount}" />
-                                                                        <apex:param value="{!formattedThirdPaymentAmount}" />
-                                                                    </apex:outputText>
-                                                                </li>
-                                                            </ul>
-                                                        </span>														
-														<span class="destaque_screen">
-                                                            <ul>
-                                                                <li>
-                                                                    <apex:outputText value="Parcela #4 no valor de R$ {0} ({1}), -at 60% accomplishment- após a assinatura do contrato" >
-                                                                        <apex:param value="{!fourthPaymentAmount}" />
-                                                                        <apex:param value="{!formattedFourthPaymentAmount}" />
-                                                                    </apex:outputText>
-                                                                </li>
-                                                            </ul>
-                                                        </span>														
-
 														
                                                         <p align="justify" class="bf">
                                                             Mediante depósito bancário em conta corrente de titularidade da <b>PARCEIRA</b>:<br></br>
 
-                                                            Banco: <span class="destaque_screen">BRADESCO</span> Agência: <span class="destaque_screen">2861</span> Conta-corrente: <span class="destaque_screen">12992-5</span>
+                                                            Banco: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Bank__c}</span> Agência: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account_Agency__c}</span> Conta-corrente: <span class="destaque_screen highlight-text">{!thePSA.Account__r.Payment_Account__c}</span>
                                                         </p>
 													</apex:outputPanel>
 													
                                                     </li>
 
-                                                </ol>
+                                                </ul>
                                             </li>
                                         </ol>
                                     </li>
@@ -639,48 +664,16 @@
 
                                         <ol>
                                             <li>
-                                                <p align="justify" class="bf">O presente contrato tem prazo de duração de 
-                                                
-												 <apex:outputText value="{!thePSA.Length_of_Agreement__c}">
-												 
-												 </apex:outputText>
-												  &nbsp;
-												 <apex:outputText value="{!formattedLengthOfAgreement}">
-												 
-												 </apex:outputText>
-												 
-												 &nbsp;
-												 
-												 <apex:outputPanel rendered="{!thePSA.Is_Length_in_Years__c}">
-													años,
-												 </apex:outputPanel>
-												 <apex:outputPanel rendered="{!Not(thePSA.Is_Length_in_Years__c)}">
-													meses,
-												 </apex:outputPanel>
-												 
+                                                <p align="justify" class="bf">  
 												
-												
-												<!--
-												*Just the number
-												<span class="destaque_screen">11</span> 
-												
-												*Numbers to Words
-												(<span class="destaque_screen">onze</span>) 
-												
-												*Depending on years/months
-												meses,
-												-->
-												
-												contados a partir de <span class="destaque_screen">
-												<apex:outputText value="{0, date, dd/MM/yyyy}">
-													<apex:param value="{!thePSA.Begin_Date__c}" /> 
-												</apex:outputText>
-												a 										
-												End of Contract
-												
-												<apex:outputText value="{0, date, dd/MM/yyyy}">
-													<apex:param value="{!thePSA.End_Date__c}" /> 
-												</apex:outputText>
+												<span class="destaque_screen">O presente contrato terá início em 
+                                                    <apex:outputText value=" {0, date, dd/MM/yyyy}" styleClass="highlight-text">
+                                                        <apex:param value="{!thePSA.Begin_Date__c}" /> 
+                                                    </apex:outputText>
+                                                    , ficando vigente até
+                                                    <apex:outputText value=" {0, date, dd/MM/yyyy}" styleClass="highlight-text">
+                                                        <apex:param value="{!thePSA.End_Date__c}" /> 
+                                                    </apex:outputText>
                                                 </span>
 												<!--
 												*Start of Contract
@@ -722,8 +715,8 @@
                                             </li>
                                             <li>
                                                 <p align="justify" class="bf">O Contrato será resolvido, independentemente de notificação prévia, nos seguintes casos:</p>
-
-                                                <ul>
+                                                
+                                                <ul class="circle">
                                                     <li>
                                                         <p align="justify" class="bf">Pela proibição a qualquer das Partes de continuarem executando atividades relacionadas ao objeto do presente Contrato, quando tal proibição for imposta por força de Lei ou decisão judicial;</p>
                                                     </li>
@@ -834,34 +827,34 @@
                                                                 <p align="justify" class="bf">Nome: 
 																<!-- OWNER NAME-->
 																<span class="destaque_screen">
-																<apex:outputText value="{!thePSA.CreatedBy.Name}"/>
+																<apex:outputText value="{!thePSA.CreatedBy.Name}" styleClass="highlight-text" />
 																
 																</span></p>
 																
 																<!-- OWNER MOBILE-->
                                                                 <p align="justify" class="bf">Telefone: 
 																<span class="destaque_screen">
-																<apex:outputText value="{!thePSA.CreatedBy.MobilePhone}"/>
+																<apex:outputText value="{!thePSA.CreatedBy.MobilePhone}" styleClass="highlight-text" />
 																</span>
 																</p>
 																<!-- OWNER EMAIL-->
                                                                 <p align="justify" class="bf">Endereço eletrônico: 
 																<span class="destaque_screen">
-																<apex:outputText value="{!thePSA.CreatedBy.Email}"/>
+																<apex:outputText value="{!thePSA.CreatedBy.Email}" styleClass="highlight-text" />
 																</span></p>
                                                             </li>
                                                             <li>
                                                                 <p align="justify" class="bf">Pela<b> PARCEIRA:</b></p>
 																<!-- CONTACT NAME-->
                                                                 <p align="justify" class="bf">Nome: <span class="destaque_screen">
-																<apex:outputText value="{!thePSA.Contact__r.Name}"/>
+																<apex:outputText value="{!thePSA.Contact__r.Name}" styleClass="highlight-text" />
                                                                 </span></p>
 																<!-- CONTACT MOBILE-->
                                                                 <p align="justify" class="bf">Telefone: <span class="destaque_screen">
-																<apex:outputText value="{!thePSA.Contact__r.MobilePhone}"/></span></p>
+																<apex:outputText value="{!thePSA.Contact__r.MobilePhone}" styleClass="highlight-text" /></span></p>
 																<!-- CONTACT EMAIL-->
                                                                 <p align="justify" class="bf">Endereço eletrônico: <span class="destaque_screen">
-																<apex:outputText value="{!thePSA.Contact__r.Email}"/></span></p>
+																<apex:outputText value="{!thePSA.Contact__r.Email}" styleClass="highlight-text" /></span></p>
                                                             </li>
                                                         </ol>
                                                     </li>
@@ -882,8 +875,8 @@
 
                                 <p align="justify" style="page-break-before: always;" class="bf">E, assim, por estarem de comum acordo, os Partes assinam o presente instrumento particular em 2 (duas) vias de igual teor, na presença de duas testemunhas abaixo subscritas, que a tudo presenciaram.</p>
                                 &nbsp;
-
-                                <p align="justify" class="bf"><span class="destaque_screen">São Paulo</span>, <span class="destaque_screen">19 de Junho de 2018</span></p>
+                            
+                                <p align="justify"><span class="destaque_screen highlight-text">São Paulo</span>, <span class="destaque_screen highlight-text"><apex:outputText value="{!dateCreated}" /></span></p>
 
                                 <table style="width:90%; margin-left: 5%">
                                     <tbody>
@@ -903,7 +896,7 @@
                                         </tr>
                                         <tr>
                                             <td>BROWN-FORMAN BRASIL</td>
-                                            <td><span class="destaque_screen">{!thePSA.Account__r.English_Name__c}</span></td>
+                                            <td><span class="destaque_screen highlight-text">{!thePSA.Account__r.English_Name__c}</span></td>
                                         </tr>
                                         <tr>
                                             <td>Representante Legal</td>
@@ -943,13 +936,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Nome: <span class="destaque_screen">{!ownerName} </span></td>
-                                            <td>Nome: <span class="destaque_screen">{!ownerManagerName} </span></td>
+                                            <td>Nome: <span class="destaque_screen highlight-text">{!ownerName} </span></td>
+                                            <td>Nome: <span class="destaque_screen highlight-text">{!ownerManagerName} </span></td>
                                         </tr>
-                                        <tr>
-                                            <!-- <td>CPF: <span class="destaque_screen"> </span></td> -->
-                                            <td>CPF: <span class="destaque_screen"> </span></td>
-                                        </tr>
+                                       
                                     </tbody>
                                 </table>
                             </div>
@@ -958,14 +948,14 @@
                 </tbody>
             </table>
             <div>
-                <ul>
+                <ul style="font-size: 10pt;">
                     <apex:repeat value="{!psaApprovalHistory.items}" var="h" id="approvalHistory">
                         <li>
-                        <apex:outputText value="Criado por: {0} em {1, date, dd/mm/yyyy}" rendered="{!h.Status=='Started'}">
+                        <apex:outputText value="Criado por: {0} em {1, date, dd/MM/yyyy}" rendered="{!h.Status=='Started'}">
                             <apex:param value="{!h.Actor}" />
                             <apex:param value="{!h.RawCompletedDate}" />
                         </apex:outputText>
-                        <apex:outputText value="Aprovado pela {0} por {1} em {2, date, dd/mm/yyy}" rendered="{!h.Status!='Started'}">
+                        <apex:outputText value="Aprovado por {0} por {1} em {2, date, dd/MM/yyyy}" rendered="{!h.Status!='Started'}">
                             <apex:param value="{!h.ActorRole}" />
                             <apex:param value="{!h.Actor}" />
                             <apex:param value="{!h.RawCompletedDate}" />
@@ -974,17 +964,13 @@
                     </apex:repeat>
                     <!--
                     <li>Criado por: Rodrigo Porfirio em 19/06/2018</li>
-                    <li>Aprovado pela Gerencia On Trade por Marcos Cutolo em 19/06/2018</li>
-                    <li>Aprovado pelo National sales manager Usuario desconhecido em data desconhecida</li>
-                    <li>Aprovado pela Gerencia de Marketing por Giuliano Odone em 19/06/2018</li>
-                    <li>Aprovado pela Controladoria por Nelson Ferlini em 20/06/2018</li>
+                    <li>Aprovado por Gerencia On Trade por Marcos Cutolo em 19/06/2018</li>
+                    <li>Aprovado por National sales manager Usuario desconhecido em data desconhecida</li>
+                    <li>Aprovado por Gerencia de Marketing por Giuliano Odone em 19/06/2018</li>
+                    <li>Aprovado por Controladoria por Nelson Ferlini em 20/06/2018</li>
                     -->
                 </ul>
             </div>
-            <center>
-                <a class="no_print" href="https://www.bfso.com.br/index_contratos.php">Voltar</a>
-            </center>
-
         </body>
 </html>
 

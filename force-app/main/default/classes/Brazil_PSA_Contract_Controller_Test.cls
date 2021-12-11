@@ -94,9 +94,11 @@ public with sharing class Brazil_PSA_Contract_Controller_Test {
             psa1.Length_of_Agreement__c = 10;
             psa1.Reminder_Date__c = psa1.Begin_Date__c;
             psa1.Next_Email_Date__c = psa1.Begin_Date__c;
-            psa1.Number_of_Payments__c = 2;
+            psa1.Number_of_Payments__c = 4;
             psa1.Status__c = 'New';
             psa1.Total_Listing_Fee__c = 100000;
+            psa1.Activity_Budget__c = 100000;
+            psa1.Date_Approved__c = Date.today();
             
             Promotion_Activity__c[] l_PSA = new Promotion_Activity__c[]{psa1};
             insert l_PSA;
@@ -144,6 +146,21 @@ public with sharing class Brazil_PSA_Contract_Controller_Test {
             Approval.ProcessResult result2 = Approval.process(workItem);
 
             Brazil_PSA_Contract_Controller contractController = new Brazil_PSA_Contract_Controller();
+            contractController.setThePSA(psa1);
+
+            psa1.Number_of_Payments__c = 3;
+            psa1.Date_Approved__c = psa1.Date_Approved__c.addMonths(1);
+            update psa1;
+            contractController.setThePSA(psa1);
+
+            psa1.Number_of_Payments__c = 2;
+            psa1.Date_Approved__c = psa1.Date_Approved__c.addMonths(1);
+            update psa1;
+            contractController.setThePSA(psa1);
+
+            psa1.Number_of_Payments__c = 1;
+            psa1.Date_Approved__c = psa1.Date_Approved__c.addMonths(1);
+            update psa1;
             contractController.setThePSA(psa1);
 
             Test.stopTest();

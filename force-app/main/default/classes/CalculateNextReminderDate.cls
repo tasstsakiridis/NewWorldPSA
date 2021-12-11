@@ -22,14 +22,7 @@ public with sharing class CalculateNextReminderDate {
             }
         }
         if (activities.size() > 0) {
-            List<Promotion_Activity__c> paList = new List<Promotion_Activity__c>();
-            for(Promotion_Activity__c pa : activities) {
-                paList.add(new Promotion_Activity__c(
-                                    Id=pa.Id, 
-                                    Reminder_Date__c = pa.Reminder_Date__c
-                            ));
-            }
-            update paList;
+            update activities;
         }
     }
 }

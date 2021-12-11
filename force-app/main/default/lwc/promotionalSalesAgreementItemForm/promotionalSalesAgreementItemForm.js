@@ -306,8 +306,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     get canDelete() {
-        return false;
-        return this.psaItem != undefined;
+        return (!this.isApproved)
+        //return this.psaItem != undefined;
     }
 
     get psaTotalInvestment() {
@@ -874,14 +874,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 if (this.isApproved) {
                     this.updatePSAStatus("Updated");
                 }
-                this.updateTotals();
+                this.updateTotals('save');
 
+                /*
                 if (!this.isPhone) {
                     const saveEvent = new CustomEvent('save', {
                         detail: psaItem
                     });
                     this.dispatchEvent(saveEvent);
                 }
+                */
             })
             .catch(error => {
                 this.isWorking = false;
@@ -916,8 +918,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 if (this.isApproved && this.isChangeAboveThreshold) {
                     this.updatePSAStatus("Updated");
                 }
-                this.updateTotals();
+                this.updateTotals('update');
 
+                /*
                 try {
                 if (!this.isPhone) {
                     //const updatedRecord = refreshApex(this.wiredPSAItem);
@@ -945,7 +948,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 }catch(ex){
                     console.log('[updateRecord success] dispatchevent exception', ex);                    
                 }
-
+                */
             })
             .catch(error => {
                 this.isWorking = false;
@@ -961,8 +964,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     delete() {
+        this.isWorking = true;
+        this.initialiseItemForm();
         deleteRecord(this.psaItemId) 
             .then(() => {
+                this.isWorking = false;
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
@@ -971,9 +977,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
-                this.updateTotals();
+                this.updateTotals('delete');
             })
             .catch(error => {
+                this.isWorking = false;
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Error deleting Promotional Sales Agreement Item',
@@ -984,13 +991,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             });
     }
 
-    updateTotals() {
+    updateTotals(action) {
         updatePMITotals({psaId: this.psaId})
             .then((status) => {
                 console.log('[updateTotals] status', status);
                 if (!this.isPhone) {
                     const saveEvent = new CustomEvent('save', {
-                        detail: this.psaItem
+                        detail: {
+                            action: action,
+                            psaItem: this.psaItem
+                        }
                     });
                     this.dispatchEvent(saveEvent);
                 }

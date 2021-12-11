@@ -1,47 +1,42 @@
-import { LightningElement, api } from 'lwc';
-import { reduceErrors } from 'c/ldsUtils';
+import { LightningElement, api, track } from "lwc";
+import { reduceErrors } from "c/ldsUtils";
 
 const VARIANTS = {
-    info: 'utility:info',
-    success: 'utility:success',
-    warning: 'utility:warning',
-    error: 'utility:error'
+  info: "utility:info",
+  success: "utility:success",
+  warning: "utility:warning",
+  error: "utility:error"
 };
 
-import SHOW_DETAILS_LABEL from '@salesforce/label/c.Show_Details';
-import ERROR_MESSAGE from '@salesforce/label/c.Error_Getting_Data';
-
 export default class InlineMessage extends LightningElement {
-    labels = {
-        errorMessage: { message: ERROR_MESSAGE },
-        showDetails: { label: SHOW_DETAILS_LABEL }
-    };
+  /** Generic / user-friendly message */
+  @api message = "Error retrieving data";
 
-    @api message;
-    @api errors;
+  @track iconName = VARIANTS.info;
 
-    iconName = VARIANTS.info;
-
-    _variant = 'info';
-    @api
-    get variant() {
-        return this._variant;
+  _variant = "info";
+  @api
+  get variant() {
+    return this._variant;
+  }
+  set variant(value) {
+    if (VARIANTS[value]) {
+      this._variant = value;
+      this.iconName = VARIANTS[value];
     }
-    set variant(value) {
-        if (VARIANTS[value]) {
-            this._variant = value;
-            this.iconName = VARIANTS[value];
-        }
-    }
+  }
 
-    viewDetails = false;
+  @track viewDetails = false;
 
-    get errorMessages() {
-        return reduceErrors(this.errors);
-    }
+  /** Single or array of LDS errors */
+  @api errors;
 
-    handleCheckboxChange(event) {
-        this.viewDetails = event.target.checked;
-    }
-    
+  get errorMessages() {
+    return reduceErrors(this.errors);
+  }
+
+  handleCheckboxChange(event) {
+    console.log('The other handle checkbox change.');
+    this.viewDetails = event.target.checked;
+  }
 }
