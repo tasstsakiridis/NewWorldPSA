@@ -20,14 +20,7 @@ public with sharing class CalculateNextActualsReminderDate {
 
         }
         if (activities.size() > 0) {
-            List<Promotion_Activity__c> paList = new List<Promotion_Activity__c>();
-            for(Promotion_Activity__c pa : activities) {
-                paList.add(new Promotion_Activity__c(
-                                    Id=pa.Id, 
-                                    Next_Email_Date__c = pa.Next_Email_Date__c
-                            ));
-            }
-            update paList;
+            update activities;
         }
     }
 }

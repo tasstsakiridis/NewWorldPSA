@@ -76,11 +76,11 @@
         <br />
         <div style="margin-top: 20px;">
             <p>Dear {!psa.Contact__r.Name}</p>
-            <p>Promotional Support Agreement between Brown-Forman Beverages Europe Limited trading as Brown-Forman United Kingdom (“BF”, “we”, “us” or “our”) and Auto Insert copied company name from above line in green] (“you” or “your”)</p>
+            <p>Promotional Support Agreement between Brown-Forman Beverages Europe Limited trading as Brown-Forman United Kingdom ("BF", "we", "us" or "our") and {!psa.Account__r.Name} ("you" or "your")</p>
             <p style="margin-top: 10px;">
-                Further to the discussions between you and us, I am pleased to set out the following terms, which form a Promotional Support Agreement (“PSA”) between BF and you.
+                Further to the discussions between you and us, I am pleased to set out the following terms, which form a Promotional Support Agreement ("PSA") between BF and you.
                 <br />
-                This PSA will include the outlets listed in Appendix 2 (the “Estate”). You will promptly inform BF in writing of any change in this list.
+                This PSA will include the outlets listed in Appendix 2 (the "Estate"). You will promptly inform BF in writing of any change in this list.
             </p> 
         </div>
         <br />
@@ -102,29 +102,37 @@
                     <apex:column value="{!i.Brand_Status__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Brand_Status__c.Label}" width="100px"  />
                     <apex:column value="{!i.Plan_Volume__c}" headerValue="Forecast Volume (9litre cases)" width="100px" />
                     <apex:column value="{!i.Listing_Fee__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Listing_Fee__c.Label}" width="150px" />
-                    <!--<apex:column value="{!i.Promotional_Activity_Value__c}" headerValue="Promotional Support" width="150px" />-->
+                    <apex:column value="{!i.Promotional_Activity_Value__c}" headerValue="Promotional Support" width="150px" />
                     <apex:column value="{!i.Training_and_Advocacy_Value__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Training_and_Advocacy__c.Label}" width="150px" />
-                    <!--<apex:column value="{!i.Plan_Rebate__c}" headerValue="Rebate (per 9litre case)" width="150px" />-->
+                    <apex:column value="{!i.Plan_Rebate__c}" headerValue="Rebate (per 9litre case)" width="150px" />
                     <apex:column value="{!i.Total_Investment__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Total_Investment__c.Label}" width="150px" />
-                    <apex:column value="{!i.Comments_Long__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Comments_Long__c.Label}" width="150px"/>
                 </apex:dataTable>
             </apex:outputPanel>                
         </div>
         <div style="page-break-before:always;">
             <h4 class="section-title">Comments</h4>
-            <p>{!psa.Evaluation_Comments__c}</p>
         </div>
         <br />
         <div>
-            <apex:outputPanel title="Items" layout="block">
-                <apex:dataTable cellpadding="5" border="1" var="i" value="{!psa.Promotion_Material_Items__r}">
-                    <apex:column value="{!i.Product_Name__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Product__c.Label}" width="300px" style="color:blue;" />
-                    <apex:column value="{!i.Drink_Strategy__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Drink_Strategy__c.Label}" width="100px"  />
-                    <apex:column value="{!i.Promotional_Activity__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Promotional_Activity__c.Label}" width="100px" />
-                    <apex:column value="{!i.Training_and_Advocacy__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Training_and_Advocacy__c.Label}" width="150px" />
-                    <apex:column value="{!i.Outlet_to_Provide__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Outlet_to_Provide__c.Label}" width="150px" />
-                </apex:dataTable>
-            </apex:outputPanel>                
+            <h4 class="section-title">Summary of Activity Table</h4>
+            <table>
+                <tr>
+                    <td><h4>Drink Strategy and cocktail menu inclusion</h4></td>
+                    <td>{!drinkStrategies}</td>
+                </tr>
+                <tr>
+                    <td><h4>Promotional Activity</h4></td>
+                    <td>{!promotionalActivities}</td>
+                </tr>
+                <tr>
+                    <td><h4>Training and Advocacy</h4></td>
+                    <td>{!trainingAndAdvocacies}</td>
+                </tr>
+                <tr>
+                    <td><h4>Outlet to provide</h4></td>
+                    <td>{!outletToProvideValues}</td>
+                </tr>
+            </table>
         </div>
 
         <br />

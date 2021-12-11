@@ -54,12 +54,14 @@
             <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
                 <lightning-layout>
                     <lightning-layout-item size="6" small-device-size="12" medium-device-size="6">
-                        <!-- Total Investment -->                
-                        <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
-                        <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
-                                                    format-style="currency"
-                                                    currency-display-as="symbol">
-                        </lightning-formatted-number>
+                        <!-- Total Investment -->      
+                        <div if:true={isUKMarket}>
+                            <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
+                            <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>    
+                        </div>          
                     </lightning-layout-item>
                     <template if:true={calcSplit}>
                         <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
@@ -106,7 +108,7 @@
                     <lightning-input type="number" name="i_VolumeForecast" 
                                     label={labels.volumeForecastBtl.label}
                                     value={volumeForecast}
-                                    step="0.01"
+                                    step="1"
                                     onchange={handleVolumeForecastChange}>
                     </lightning-input>
                     <template if:true={hasVolumeForecastError}>

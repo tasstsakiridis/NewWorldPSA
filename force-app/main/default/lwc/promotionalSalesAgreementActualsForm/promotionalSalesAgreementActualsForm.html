@@ -129,13 +129,27 @@
                                         <template if:true={isPhone}>
                                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                         </template>
-                                        <lightning-input type="number" 
-                                                        label={actualQtyFormattedLabel} 
-                                                        name="i_ActQty" value={rebate.rebateAmount} 
-                                                        placeholder={labels.actualQty.placeholder} 
-                                                        data-rebate-type={rebate.rebateType}
-                                                        step="0.01"
-                                                        onchange={handleRebateAmountChange}></lightning-input>
+                                        <template if:true={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="1"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template if:false={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="0.01"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                
+                                        </template>
                                         <template if:true={hasActualQtyError}>
                                             <span class="error">{labels.actualQty.error}</span>
                                         </template>

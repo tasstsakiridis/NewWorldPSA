@@ -338,10 +338,13 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaitems.handleClosePSAForm] exception', ex);
         }
     }
-    handlePSAUpdated() {
-        console.log('[psaItems.handlePSAUpdated]');
+    handlePSAUpdated(event) {
+        console.log('[psaItems.handlePSAUpdated] event', JSON.parse(JSON.stringify(event)));
         this.wiredAgreement = refreshApex(this.wiredAgreement);
         this.thePSA = this.wiredAgreement.data;
+        if (event.action == 'delete') {
+            this.showPSADetailsForm = false;
+        }
     }
     handleSavePSADetails(event) {
         try {
@@ -350,6 +353,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaItems.handlesavepsa] volume', event.detail.volume);
             console.log('[psaItems.handlesavepsa] discount', event.detail.discount);
             console.log('[psaItems.handlesavepsa] investment', event.detail.totalInvestment);
+
+            refreshApex(this.wiredAgreement);
+            if (event.detail.action == 'delete') {
+                this.showPSADetailsForm = false;
+            }
+            /*
             if (event.detail.psaItemId == undefined) {
                 refreshApex(this.wiredAgreement);
             } else {  
@@ -364,16 +373,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                     if (p.product.Id === event.detail.productId) {
                         p.psaItem = newItem;
                         console.log('[psaitems.handlesave] product found updating psaitem');
-                        /*
-                        p.psaItem.Plan_Rebate__c = event.detail.discount; 
-                        p.psaItem.Volume_Forecast__c = event.detail.volume;
-                        p.psaItem.Total_Investment__c = event.detail.totalInvestment;
-                        */
                         return true;
                     }
                 });
             }
-            
+            */
             //this.getAgreement(false);
 
 

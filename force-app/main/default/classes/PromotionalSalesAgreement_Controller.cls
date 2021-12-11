@@ -1,3 +1,6 @@
+/**
+ * Test Class: PromotionalSalesAgreementController_Test
+ */
 public with sharing class PromotionalSalesAgreement_Controller {
     static INTEGER PAGE_SIZE = 20;
 
@@ -97,7 +100,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Total_Actual_Volume__c, Purchase_Order__c, MPO_Prestige__c, Original_Total_Investment__c, Market__r.Change_Threshold_Amount__c,
                                             Market__r.Promotion_Discount_Threshold__c, Reminder_Date__c, Next_Email_Date__c, Market__r.Capture_Volume_in_Bottles__c,
                                             Number_of_Payments__c, Activity_Budget__c, Market__r.Capture_PSA_Budget__c, Market__r.Calculate_PSA_Product_Split__c,
-                                            Total_Planned_Spend__c, Total_Payments_Paid__c,
+                                            Total_Planned_Spend__c, Total_Payments_Paid__c, Percentage_Visibility__c, Total_Volume_Bottles__c, Total_Actual_Volume_Bottles__c,
+                                            Market__r.Capture_End_Date__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -403,6 +407,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Evaluation_Comments__c = psaData.comments;
             psa.MPO_Prestige__c = psaData.mpoPrestige;
             psa.Activity_Budget__c = psaData.totalBudget;
+            psa.Percentage_Visibility__c = psaData.percentageVisibility;
 
             if (psaData.marketId == null || psaData.marketId == '') {
                 String marketName = psaData.marketName;
@@ -613,6 +618,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         try {
             Promotion_Activity__c psa = [SELECT Id, Total_Actual_Volume__c, Total_Actual_Discount__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy_Paid__c, Market__r.Capture_Volume_in_Bottles__c, Activity_Budget__c, Total_Payments_Paid__c,
+                                            Total_Actual_Volume_Bottles__c,
                                                 (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                                         Total_Training_and_Advocacy_Paid__c, Total_Planned_Discount__c, Total_Actual_Discount__c, Total_Planned_Qty__c 
                                                         FROM Promotions__r),
@@ -628,6 +634,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                         WHERE Id =:psaId];
             
             psa.Total_Actual_Volume__c = 0;
+            psa.Total_Actual_Volume_Bottles__c = 0;
             psa.Total_Actual_Discount__c = 0;
             psa.Total_Listing_Fee_Paid__c = 0;
             psa.Total_Promotional_Activity_Paid__c = 0;
@@ -659,6 +666,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             Decimal trainingAndAdvocacy = 0;
             Decimal actualInvestment = 0;
             Decimal totalDiscount = 0;
+            Decimal packQty = 0;
 
             Promotion__c p;
             Promotion_Material_Item__c pmi;
@@ -693,10 +701,16 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     pmi.Total_Payments_Paid__c += rebateAmount;
                 } else if (pmia.Rebate_Type__c == 'Volume') {
                     actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
+                    packQty = pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
+                    //if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                    //    actualQty = actualQty * packQty;
+                    //}
+                    
                     System.debug('[actualQty: ' + actualQty);
                     totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
 
-                    psa.Total_Actual_Volume__c += actualQty;                    
+                    psa.Total_Actual_Volume__c += actualQty;        
+                    psa.Total_Actual_Volume_Bottles__c += actualQty * packQty;            
                     psa.Total_Actual_Discount__c += totalDiscount;
                     //p.Total_Actual_Discount__c += totalDiscount;
                     pmi.Total_Actual_Volume__c += actualQty;
@@ -733,7 +747,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         try {
             Promotion_Activity__c psa = [SELECT Id, Total_Volume__c, Total_Discount__c, Total_Listing_Fee__c, Total_Promotional_Activity__c, Total_Training_and_Advocacy__c, Total_Investment__c,
                                             Original_Total_Investment__c, Status__c, Is_Approved__c, Market__r.Capture_Volume_in_Bottles__c, Total_Planned_Spend__c,
-                                            Market__r.Calculate_PSA_Product_Split__c, Activity_Budget__c,
+                                            Market__r.Calculate_PSA_Product_Split__c, Activity_Budget__c, Total_Volume_Bottles__c,
                                                 (SELECT Id, Total_Listing_Fee__c, Total_Promotional_Activity__c, Total_Training_and_Advocacy__c, Total_Planned_Discount__c 
                                                    FROM Promotions__r),
                                                 (SELECT Id, Promotion__c, Product_Custom__c, Plan_Volume__c, Plan_Rebate__c, Listing_Fee__c, Promotional_Activity_Value__c, 
@@ -744,6 +758,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                         WHERE Id =:psaId];
             
             psa.Total_Volume__c = 0;
+            psa.Total_Volume_Bottles__c = 0;
             psa.Total_Discount__c = 0;
             psa.Total_Listing_Fee__c = 0;
             psa.Total_Promotional_Activity__c = 0;
@@ -784,11 +799,12 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 System.debug('volume: ' + volume);
 
                 packQty = pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
-                if (psa.Market__r.Capture_Volume_in_Bottles__c) {
-                    volume = volume * packQty;
-                }
+                //if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                //    volume = volume * packQty;
+                //}
     
                 psa.Total_Volume__c += volume;
+                psa.Total_Volume_Bottles__c += volume * packQty;
                 psa.Total_Discount__c += volume * rebate;
                 psa.Total_Listing_Fee__c += listingFee;
                 psa.Total_Promotional_Activity__c += promotionalActivity;

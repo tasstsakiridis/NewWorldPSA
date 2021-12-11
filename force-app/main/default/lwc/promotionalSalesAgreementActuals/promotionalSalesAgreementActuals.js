@@ -11,7 +11,7 @@ import getGLMappings from '@salesforce/apex/PromotionalSalesAgreement_Controller
 import userLocale from '@salesforce/i18n/locale';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_CREATE_NEW from '@salesforce/label/c.CreateNew';
 import LABEL_PSA_UPDATED_ACTUALS_MESSAGE from '@salesforce/label/c.PSA_Updated_Actuals_Message';
 

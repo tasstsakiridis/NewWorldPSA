@@ -54,6 +54,7 @@ import LABEL_DETACH_FILE_CONFIRMATION from '@salesforce/label/c.Detach_File_Conf
 import LABEL_DETACH_FILE_SUCCESS from '@salesforce/label/c.Detach_File_Success';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
+import LABEL_END_DATE_ERROR from '@salesforce/label/c.End_Date_Error';
 import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
 import LABEL_FOUR_PAYMENT_HELPTEXT from '@salesforce/label/c.Four_Payments_HelpText';
 import LABEL_HELP from '@salesforce/label/c.Help';
@@ -77,6 +78,7 @@ import LABEL_ONE_PAYMENT_HELPTEXT from '@salesforce/label/c.One_Payment_HelpText
 import LABEL_PARENT_ACCOUNT from '@salesforce/label/c.Parent_Account';
 import LABEL_PARENT_ACCOUNT_ERROR from '@salesforce/label/c.Parent_Account_Error';
 import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Parent_Account_Search_Results_Message';
+import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibility';
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
 import LABEL_PSA_RETAIL_ACCOUNTS_HEADING from '@salesforce/label/c.PSA_Retail_Accounts_Heading';
@@ -146,6 +148,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         details                 : { label: LABEL_DETAILS },
         detachFile              : { label: LABEL_DETACH_FILE, successMessage: LABEL_DETACH_FILE_SUCCESS, confirmation: LABEL_DETACH_FILE_CONFIRMATION},
         docusign                : { label: 'Send Contract' },
+        endDate                 : { label: LABEL_AGREEMENT_END_DATE, error: LABEL_END_DATE_ERROR },
         error                   : { message: LABEL_FORM_ERROR },
         help                    : { label: LABEL_HELP },
         items                   : { label: LABEL_ITEMS },
@@ -163,6 +166,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         parentAccount           : { label: LABEL_PARENT_ACCOUNT, error: LABEL_PARENT_ACCOUNT_ERROR },
         parentAccountSearchResults : { label: LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR },
         payments                : { oneHelpText: LABEL_ONE_PAYMENT_HELPTEXT, twoHelpText: LABEL_TWO_PAYMENT_HELPTEXT, threeHelpText: LABEL_THREE_PAYMENT_HELPTEXT, fourHelpText: LABEL_FOUR_PAYMENT_HELPTEXT },
+        percentageVisibility    : { label: LABEL_PERCENTAGE_VISIBILITY },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         purchaseOrder           : { label: LABEL_PURCHASE_ORDER },
         recall                  : { label: LABEL_RECALL, recalledMessage: LABEL_RECALL_SUCCESS.replace('%0', 'PSA') },
@@ -203,12 +207,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     errors;
     hasLengthOfPSAError = false;
     hasStartDateError = false;
+    hasEndDateError = false;
     hasAlternateRTMError = false;
     hasPreferredRTMError = false;
     hasParentAccountError = false;
     hasChildAccountsError = false;
     thePSA;
     startDate = new Date();
+    i_endDate = new Date();
     isSearching = false;
     isUsingParentAccount = true;
     isSearchingForParent = true;
@@ -216,6 +222,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     hasMultipleAccountPages = true;
     captureNumberOfPayments = false;
     captureTotalBudget = false;
+    captureEndDate = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -229,6 +236,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     comments;
     numberOfPayments = 1;
     totalBudget = 0;
+    percentageVisibility = 0;
 
     isWorking = true;
     workingMessage = this.labels.working.message;    
@@ -308,6 +316,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.maximumLengthOfPSA = this.market.Maximum_Agreement_Length__c == undefined ? 3 : this.market.Maximum_Agreement_Length__c;            
             this.captureNumberOfPayments = this.market.Capture_Number_of_Payments__c == undefined ? false : this.market.Capture_Number_of_Payments__c;
             this.captureTotalBudget = this.market.Capture_PSA_Budget__c == undefined ? false : this.market.Capture_PSA_Budget__c;
+            this.captureEndDate = this.market.Capture_End_Date__c == undefined ? false : this.market.Capture_End_Date__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -385,6 +394,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get canViewSummary() {
         return this.thePSA != null;
     }
+    get hasPreview() {
+        return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
+    }
     get isLocked() {
         if (this.thePSA == undefined) {
             return false;
@@ -401,6 +413,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get captureMPO() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'United Kingdom');
+    }
+    get capturePercentageVisibility() {
+        return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
     }
 
     error;
@@ -438,6 +453,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     get formattedStartDate() {
         var theDate = this.startDate == null ? new Date() : this.startDate;
+        return theDate.toISOString();
+    }
+    get formattedEndDate() {
+        var theDate = this.i_endDate == null ? new Date() : this.i_endDate;
         return theDate.toISOString();
     }
     get endDate() {
@@ -701,6 +720,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         });
         
     }
+    handlePreviewButtonClick() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: '/apex/PromotionalSalesAgreement_Preview?id='+this.recordId
+            }
+        });
+    }
     handleDocusignButtonClick(event) {
         console.log('[sendwithdocusign] signingcustomerid', this.signingCustomer.Id);
         
@@ -817,6 +844,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleStartDateChange(ev) {
         this.startDate = new Date(ev.detail.value);
         console.log('startdate', this.startDate);
+    }
+    handleEndDateChange(ev) {
+        this.i_endDate = new Date(ev.detail.value);
     }
     handleLengthOfPSAChange(ev) {
         console.log('[handleLengthOfPSAChange] value', ev.detail.value);
@@ -946,6 +976,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleTotalBudgetChange(event) {
         this.totalBudget = event.detail.value;
     }
+    handlePercentageVisibilityChange(event) {
+        this.percentageVisibility = event.detail.value;
+    }
     handleStatusChange(event) {
         this.status = event.detail.value;
         console.log('this.status', this.status);
@@ -1066,6 +1099,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             if (data.Number_of_Payments__c != undefined) {
                 this.numberOfPayments = data.Number_of_Payments__c.toString();
             }
+            this.percentageVisibility = data.Percentage_Visibility__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
             this.status = data.Status__c;
@@ -1075,6 +1109,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.comments = data.Evaluation_Comments__c
             if (data.Begin_Date__c) {
                 this.startDate = new Date(data.Begin_Date__c);
+            }
+            if (data.End_Date__c) {
+                this.i_endDate = new Date(data.End_Date__c);
             }
             if (data.Is_Length_in_Years__c != undefined) {
                 this.isLengthInYears = data.Is_Length_in_Years__c;
@@ -1220,18 +1257,27 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
         this.hasLengthOfPSAError = false;
         this.hasStartDateError = false;
+        this.hasEndDateError = false;
         this.hasPreferredRTMError = false;
         this.hasParentAccountError = false;
         this.hasChildAccountsError = false;
 
-        if (this.lengthOfPSA == undefined) {
-            this.hasLengthOfPSAError = true;
-            isValid = false; 
-        } else if (this.isLengthInYears == false) {
-            if (this.lengthOfPSA / 12 > this.maximumLengthOfPSA) {
-                this.hasLengthOfPSAError = true;
+        if (this.captureEndDate) {
+            if (this.i_endDate.getTime() < this.startDate.getTime()) {
+                this.hasEndDateError = true;    
+                isValid = false;            
             }
+        } else {
+            if (this.lengthOfPSA == undefined) {
+                this.hasLengthOfPSAError = true;
+                isValid = false; 
+            } else if (this.isLengthInYears == false) {
+                if (this.lengthOfPSA / 12 > this.maximumLengthOfPSA) {
+                    this.hasLengthOfPSAError = true;
+                }
+            }    
         }
+
         console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             this.hasPreferredRTMError = true;
@@ -1410,7 +1456,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         
         param.beginDate = this.startDate;
-        param.endDate = this.endDate;
+        param.endDate = this.captureEndDate ? this.i_endDate : this.endDate;
         param.lengthOfPSA = this.lengthOfPSA;
         param.isLengthInYears = this.isLengthInYears;
         param.numberOfPayments = this.numberOfPayments;
@@ -1438,6 +1484,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.purchaseOrder = this.purchaseOrder;
         param.status = this.status;
         param.totalBudget = this.totalBudget;
+        param.percentageVisibility = this.percentageVisibility;
 
         param.accounts = [];
         param.promotionsToDelete = [];
@@ -1458,7 +1505,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 });
             }
         } else {
-            param.accounts.push({id:'', itemId:param.parentAccountId});
+            let pId = '';
+            if (this.thePSA.Promotions__r != undefined) {
+                console.log('[save] promotions', this.thePSA.Promotions__r);
+                const p = this.thePSA.Promotions__r.find(p => p.Account__c == param.parentAccountId);
+                console.log('[save] found promotion', p);
+                if (p != undefined) {
+                    pId = p.Id;
+                }
+            }
+            param.accounts.push({id:pId, itemId:param.parentAccountId});
         }
         
         console.log('[save] param', param);
