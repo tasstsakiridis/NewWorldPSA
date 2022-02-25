@@ -1,0 +1,9 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,lightning:actionOverride,lightning:isUrlAddressable">
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="recordTypeId" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <c:depletionEntryForm recordId="{!v.accountId}" recordTypeId="{!v.recordTypeId}" />
+
+</aura:component>

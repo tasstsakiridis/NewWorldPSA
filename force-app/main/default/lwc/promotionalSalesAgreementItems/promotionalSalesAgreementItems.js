@@ -13,7 +13,7 @@ import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.g
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_HELP from '@salesforce/label/c.help';
+import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PRODUCTS from '@salesforce/label/c.Products';
 
@@ -28,6 +28,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     };    
     
     @api psaId;
+    @api recordTypeName;
 
     thePSA; 
     promotionId;
@@ -71,6 +72,27 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted' || this.thePSA.Status__c == 'Pending Approval' || this.thePSA.Is_Approved__c;
         }
     }
+    get isApproved() {
+        return this.thePSA != null && this.thePSA.Is_Approved__c;
+    }
+    get captureVolumeInBottles() {
+        return this.thePSA != null && this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
+    }
+    get calcProductSplit() {
+        if (this.thePSA != undefined) {
+            console.log('[psaItems] calcProductSplit', this.thePSA.Market__r.Calculate_PSA_Product_Split__c);
+        }
+        return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c;
+    }
+    get showTotalInvestment() {
+        return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c == false;
+    }
+    get totalBudget() {
+        return this.thePSA == null || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get totalPlannedSpend() {
+        return this.thePSA == null || this.thePSA.Total_Planned_Spend__c == undefined ? 0 : parseFloat(this.thePSA.Total_Planned_Spend__c);
+    }
 
     pageRef;
     @wire(CurrentPageReference)
@@ -108,6 +130,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         } else if (value.data) {
             this.error = undefined;
             this.thePSA = value.data;
+            this.recordTypeName = this.thePSA.RecordType.Name;
             if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
                 this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__r.RecordType.Name == 'Parent').Id;
             } else {
@@ -140,6 +163,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
 
                 console.log('products', this.products);
     
+            } else {
+                this.psaItems.clear();
+                if (this.products != undefined && this.products.records != undefined) {
+                    this.products.records.forEach(p => p.psaItem = {});
+                }
             }
 
             if (this.loadProducts) {
@@ -154,13 +182,15 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     };
 
     brands;
+    brandsSelected = '';
     products = {
         records: []
     };
     wiredProducts;
-    @wire(getProducts, {pageNumber: '$pageNumber'})
+    @wire(getProducts, {pageNumber: '$pageNumber', brandsSelected: '$brandsSelected'})
     wiredGetProducts(value) {
         this.wiredProducts = value;
+        console.log('[wiredgetproducts] value', value);
         if (value.error) {
             this.error = value.error;
             this.products = undefined;
@@ -214,6 +244,10 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     
     get psaItemCount() {
         return this.psaItems ? this.psaItems.length : 0;
+    }
+
+    get isUKMarket() {
+        return this.thePSA != undefined && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Name == 'United Kingdom';
     }
 
     /** 
@@ -304,23 +338,29 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaitems.handleClosePSAForm] exception', ex);
         }
     }
+    handlePSAUpdated(event) {
+        console.log('[psaItems.handlePSAUpdated] event', JSON.parse(JSON.stringify(event)));
+        this.wiredAgreement = refreshApex(this.wiredAgreement);
+        this.thePSA = this.wiredAgreement.data;
+        if (event.action == 'delete') {
+            this.showPSADetailsForm = false;
+        }
+    }
     handleSavePSADetails(event) {
         try {
+            console.log('[psaItems.handlesavepsa] detail', JSON.parse(JSON.stringify(event.detail)));
+            console.log('[psaItems.handlesavepsa] psaItemId', event.detail.psaItemId);
             console.log('[psaItems.handlesavepsa] volume', event.detail.volume);
             console.log('[psaItems.handlesavepsa] discount', event.detail.discount);
             console.log('[psaItems.handlesavepsa] investment', event.detail.totalInvestment);
+
+            refreshApex(this.wiredAgreement);
+            if (event.detail.action == 'delete') {
+                this.showPSADetailsForm = false;
+            }
+            /*
             if (event.detail.psaItemId == undefined) {
-                this.wiredAgreement = refreshApex(this.wiredAgreement);
-                this.thePSA = this.wiredAgreement.data;
-                console.log('[psaItems.handlesavepsa] wiredagreement', this.wiredAgreement);
-                console.log('[psaItems.handlesavepsa] psa', this.thePSA);
-                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                    this.psaItems.clear();
-                    this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
-                        this.psaItems.set(pmi.Product_Custom__c, pmi);
-                    });
-                    console.log('psaItems', this.psaItems);
-                }    
+                refreshApex(this.wiredAgreement);
             } else {  
                 const item = this.psaItems.get(event.detail.productId); 
                 const newItem = Object.assign({}, item);
@@ -333,16 +373,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                     if (p.product.Id === event.detail.productId) {
                         p.psaItem = newItem;
                         console.log('[psaitems.handlesave] product found updating psaitem');
-                        /*
-                        p.psaItem.Plan_Rebate__c = event.detail.discount; 
-                        p.psaItem.Volume_Forecast__c = event.detail.volume;
-                        p.psaItem.Total_Investment__c = event.detail.totalInvestment;
-                        */
                         return true;
                     }
                 });
             }
-            
+            */
             //this.getAgreement(false);
 
 
@@ -381,6 +416,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         console.log('[productItems.handleBrandsSelected] brands', brandsSelected);
         console.log('[productItems.handleBrandsSelected] wiredProducts', this.wiredProducts.data);
         try {
+            if (brandsSelected.length == 0) {
+                this.brandsSelected = '';
+            } else {
+                this.brandsSelected = brandsSelected.join(',');
+            }
+            /*
             this.brandsSelected = brandsSelected;
             let filteredProducts;
 
@@ -409,8 +450,17 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 totalItemCount: newList == null ? 0 : newList.length
             };
             console.log('[productItems.handleBrandsSelected] products', this.products);
+            */
         }catch(ex) {
             console.log('[productItems.handleBrandsSelected] exception', ex);
         }
+        
+    }
+
+    handleNextPage(event) {
+        this.pageNumber++;
+    }
+    handlePreviousPage(event) {
+        this.pageNumber--;
     }
 }

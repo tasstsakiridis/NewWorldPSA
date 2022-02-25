@@ -1,0 +1,7 @@
+<aura:component implements="lightning:isUrlAddressable">
+    <aura:attribute name="psaId" type="String" required="true"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <c:promotionalSalesAgreementItems psaId="{!v.psaId}" />
+</aura:component>	

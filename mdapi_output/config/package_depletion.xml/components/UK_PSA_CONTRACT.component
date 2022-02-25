@@ -1,0 +1,336 @@
+<apex:component layout="none" access="global" controller="UK_PSA_CONTRACT_Controller">
+    <apex:attribute name="psa" description="the psa record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
+    <head>
+        <style type="text/css" media="print">
+            @page {
+            	@top-center {
+            		content: element(header);
+            	}
+            }
+            img.header {
+            	position: running(header);
+            	text-align: center;
+            }
+            .pagenumber:before {
+            	content: counter(page);
+            }
+            .pagecount:before {
+            	content: counter(page);
+            }
+            body { 
+            	font-family: "Calibri (Body)";
+            	font-size: 10pt;
+            }
+            .centered {
+            	text-align: center;
+            }
+            .section-title {
+            	font-weight: bold;
+            	text-decoration: underline;
+           	}
+            .bold {
+            	font-weight: bold;
+           	}
+            table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }  
+            dl {
+                width: 100%;
+                overflow: hidden;
+                padding: 0;
+                margin: 0;
+            }
+            dt {
+                float: left;
+                width: 10%;
+                padding: 0;
+                margin: 0;
+            }
+            dd {
+                float: left;
+                width: 90%;
+                padding: 0;
+                margin: 0;
+            }
+        </style>       
+    </head>
+    <center><img class="pageHeader" src="{!$Resource.bflogo}"/></center>
+    <div class="content">
+        <br />
+        <div style="margin-top: 10px;">
+            <p>Ref: <span style="margin-left: 10px;">{!psa.Name}</span></p>
+            <p><span style="margin-right: 10px;">Date:</span>
+                    <apex:outputText value="{0,date,EEEE',' MMMM d',' yyyy}">
+                        <apex:param value="{!psa.Begin_Date__c}" />
+                    </apex:outputText>
+            </p>
+            <p><span style="margin-right: 10px;">PO Number</span>{!psa.Purchase_Order__c}</p>
+        </div>
+        <br />
+        <div style="margin-top: 25px;line-height:1em;">
+            <p style="margin-top: 25px;font-size: 14pt;"><strong>{!psa.Contact__r.Name}</strong></p>            
+            <p style="font-size: 12pt;"><strong>{!psa.Account__r.Name}</strong></p>
+            <p style="font-size: 11pt;"><strong><apex:outputField value="{!psa.Account__r.ShippingStreet}" /></strong></p>
+        </div>
+        <br />
+        <div style="margin-top: 20px;">
+            <p>Dear {!psa.Contact__r.Name}</p>
+            <p>Promotional Support Agreement between Brown-Forman Beverages Europe Limited trading as Brown-Forman United Kingdom ("BF", "we", "us" or "our") and {!psa.Account__r.Name} ("you" or "your")</p>
+            <p style="margin-top: 10px;">
+                Further to the discussions between you and us, I am pleased to set out the following terms, which form a Promotional Support Agreement ("PSA") between BF and you.
+                <br />
+                This PSA will include the outlets listed in Appendix 2 (the "Estate"). You will promptly inform BF in writing of any change in this list.
+            </p> 
+        </div>
+        <br />
+        <div class="section-header">
+            <h4 class="section-title">Duration</h4>
+            <p>The Term of this PSA will be {!psa.Length_of_Agreement__c} years from 
+                <apex:outputText value="{0,date,EEEE',' MMMM d',' yyyy}">
+                    <apex:param value="{!psa.Begin_Date__c}" />
+                </apex:outputText>
+                (the <strong><i>'Commencement Date'</i></strong>). Each 12-month period from the Commencement Date shall be hereafter referred to as <strong>"Contract Year"</strong>
+            </p>        
+        </div>
+        <br />
+        <div>
+            <apex:outputPanel id="items" title="Items" layout="block">
+                <h4 class="section-title">Summary of Agreement Table</h4>
+                <apex:dataTable cellpadding="5" border="1" var="i" value="{!psa.Promotion_Material_Items__r}">
+                    <apex:column value="{!i.Brand__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Brand__c.Label}" width="300px" style="color:blue;" />
+                    <apex:column value="{!i.Brand_Status__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Brand_Status__c.Label}" width="100px"  />
+                    <apex:column value="{!i.Plan_Volume__c}" headerValue="Forecast Volume (9litre cases)" width="100px" />
+                    <apex:column value="{!i.Listing_Fee__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Listing_Fee__c.Label}" width="150px" />
+                    <apex:column value="{!i.Promotional_Activity_Value__c}" headerValue="Promotional Support" width="150px" />
+                    <apex:column value="{!i.Training_and_Advocacy_Value__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Training_and_Advocacy__c.Label}" width="150px" />
+                    <apex:column value="{!i.Plan_Rebate__c}" headerValue="Rebate (per 9litre case)" width="150px" />
+                    <apex:column value="{!i.Total_Investment__c}" headerValue="{!$ObjectType.Promotion_Material_Item__c.Fields.Total_Investment__c.Label}" width="150px" />
+                </apex:dataTable>
+            </apex:outputPanel>                
+        </div>
+        <div style="page-break-before:always;">
+            <h4 class="section-title">Comments</h4>
+        </div>
+        <br />
+        <div>
+            <h4 class="section-title">Summary of Activity Table</h4>
+            <table>
+                <tr>
+                    <td><h4>Drink Strategy and cocktail menu inclusion</h4></td>
+                    <td>{!drinkStrategies}</td>
+                </tr>
+                <tr>
+                    <td><h4>Promotional Activity</h4></td>
+                    <td>{!promotionalActivities}</td>
+                </tr>
+                <tr>
+                    <td><h4>Training and Advocacy</h4></td>
+                    <td>{!trainingAndAdvocacies}</td>
+                </tr>
+                <tr>
+                    <td><h4>Outlet to provide</h4></td>
+                    <td>{!outletToProvideValues}</td>
+                </tr>
+            </table>
+        </div>
+
+        <br />
+        <div>
+            <h4 class="section-title">Payment Schedule and Invoicing Criteria</h4>
+            <p>Retrospective payments to you shall be paid quarterly in arrears from the Commencement Date, so please submit invoices to BF within 3 months of the end of the relevant quarter.</p>
+            <p>The same dates will be used for subsequent years of the term of this PSA, where applicable</p>
+            <p>We are happy to be invoiced for a proportion of the Promotional Support Budget as the agreed spend for any activity is incurred, provided that we are satisfied that the Brand Status (as referred to below) in this PSA have been, and continue to be, adhered to.</p>
+            <p>Payments will only be made to you if you provide BF with:</p>
+            <dl>
+                <dt>(i)</dt>
+                <dd>an invoice setting out the sums due (split out into discounts, promotional support and listing fees, each by individual brand), and</dd>
+                <dt>(ii)</dt>
+                <dd>individual brand/SKU transfer data showing volumes of BF products purchased from your Nominated Supplier(s)(<strong>"Products"</strong>), to the reasonable satisfaction of BF</dd>
+                <dt>(iii)</dt>
+                <dd>A copy of the mutually agreed Activity and/or brand visibility as applicable.</dd>
+            </dl>
+            <p>Payment shall be made by BF to you, within 60 days of receipt of the invoice and the individual brand/SKU transfer data, directly to your nominated bank account. No renumeration will be due in the absence of
+            communication of the proofs and/or in the event of non-actual realisation of the agreed service.</p>
+            <p>TIME IS OF THE ESSENCE IN SEEKING PAYMENTS FROM BF.  IF BF DOES NOT RECEIVE THE INVOICE AND THE SUPPORTING INDIVIDUAL BRAND/SKU TRANSFER DATA FROM YOU WITHIN THREE MONTHS OF THE END OF THE RELEVANT QUARTER,
+            BF WILL NOT PAY THE SUMS OTHERWISE DUE FOR DISCOUNTS, PROMOTIONAL SUPPORT AND/OR LISTING FEES.</p>
+            <p>Unless otherwise notified, please send all invoices to: <strong>apinvoices@b-f.com</strong></p>
+
+        </div> 
+        <br /><br />
+        <div>
+            <h4 class="section-title">Discounts</h4>
+            <p>Your self-nominated supplier(s) are {!psa.Wholesaler_Preferred__r.Name} (<strong>"Nominated Supplier(s)"</strong>).
+            Only non-price-marked pack Products purchased from your Nominated Supplier(s) qualify for the discounts set out in this PSA.
+            </p>        
+        </div>
+        <br />
+        <div style="page-break-before:always;">
+            <h4 class="section-title">Brand Details and Promotional Support Budget</h4>
+            <p>Per BF brand, the parties agree the following (please note that the terms used in the <strong>"Brand Status"</strong> column are defined in the Appendix at the end of this PSA and the reference in this PSA to <strong>"Promotional Support Budget"</strong> mean the total investment as per the table below):</p>
+        </div>
+        <br />
+        <div>
+            <h4 class="section-title">Additional Details</h4>
+            <p>The Brand Status list, as set out in the 'Summary of Agreement table', shall apply throughout <strong>(Pull through from paragraph 3 and (D))</strong>.</p>            
+            <p>Should your estate change at any time by greater than 10% (by reference to the number of outlets compared to the number of outlets in the estate or fascia at the date of this PSA), both parties reserve the right to review the contractual terms agreed and should the outcome become unfavourable to either side, each party shall have the right to terminate this agreement with no less than 3 calendar months notice.
+            </p>
+            <p>All volumes stated are for the sole purpose of illustrating the total discount applicable should your sales forecast during the relevant year of the term of this PSA be achieved.
+            For the avoidance of doubt, the case discounts payable under this PSA by BF are payable per case irrespective of the actual volume purchased by you, up to and including 150% of your total annual sales forecast beyond which we have the right to reduce, suspend or declare non-payable all further discounts.
+            </p>
+            <p>Duty and other Government imposed increases in respect of the price of the Products will not alter the discounts applicable.</p>
+        </div>               
+        <div style="line-height: 1em;">
+            <h4 class="section-title">Promotional Support</h4>
+            <p>The Promotional Support Budget will be managed by your sales representative in BF and will be reviewed at regular meetings.  Any unused balance of the Promotional Support Budget remaining at the end of a Contract Year or at the end of the Term, as agreed with BF, will be deemed unused and non-payable.</p>
+            <p>The Promotional Support Budget set out in this PSA Summary of Payments table is available to you provided that the Brand Status is maintained throughout the Term. In the event of a failure to maintain the Brand Status the parties will consult, with a view to agreeing a course of action to rectify the position.</p>
+            <p>If you fail to restore the Brand Status of the affected brand(s) within 30 days of such failure being notified to you in writing (or such longer period as may be agreed by BF), we may:</p>
+            <dl>
+                <dt>a.</dt>
+                <dd>invoice you for all, or a direct proportion of, the Promotional Support Budget for the affected brand(s), relative to the proportional shortfall in distribution; and/or</dd>
+                <dt>b.</dt>
+                <dd>suspend all future promotional activity and expenditure with you until such time as the matter has been concluded to our satisfaction; and/or</dd>
+                <dt>c.</dt>
+                <dd>set off any monies which we would be entitled to invoice you under subparagraph a. above against any further promotional support activity and expenditure in relation to any brand covered by this PSA until such time as the matter has been concluded to our satisfaction.</dd>
+            </dl>        
+        </div>
+        <div>
+            <h4 class="section-title">Training</h4>
+            <p>We will, as part of this PSA invest the amount specified in Training and Advocacy within the summary of payment table for on-going staff training.  We consider that it is vital to train and educate the staff on all our brands stocked in your outlets, including new products and brands.</p>        
+        </div>
+        <div>
+            <h4 class="section-title"><b>Display Space</b></h4>
+            <p>Where we have agreed brands to have Brand Status within outlets, including ‘Preferred pouring’ and ‘Must stock pouring’ we require the brands visible to consumers on back bars at all times even if they are also in the Speed Rail.</p>        
+        </div>        
+        <div style="page-break-before:always;">
+            <h4 class="section-title"><b>Supply</b></h4>
+            <p>The terms of this PSA are based on our understanding that you currently purchase BF brands from the Nominated Supplier(s) and that it is your intention to continue sourcing Products from this/these supplier(s). Only Products purchased from your Nominated Supplier(s) qualify for the discounts set out in this PSA. Price-marked packs purchased from your Nominated Supplier(s) do NOT qualify for the discounts set out in this PSA.  You are not restricted in any way from purchasing BF brands from other sources, but you shall not be entitled to discounts on those purchases.  By entering into this PSA, you authorise us to obtain, and your Nominated Supplier(s) to provide, details of the volumes of Products purchased from your Nominated Supplier(s).</p>
+            <p>In the event of a change in Nominated Supplier(s), we may review, revise and/or withdraw the discounts and/or promotional support provided under this PSA from the date of that change in light of any implications that your new supply arrangements might have on the level of BF support from which you benefit indirectly through your Nominated Supplier(s). If you change your Nominated Supplier(s) for Products, please notify us in writing as soon as reasonably practicable, and no later than 12 weeks from the date of change.  On receipt of such notice, you also authorise us to obtain details of the new supply arrangements from your new Nominated Supplier(s). 
+            </p>
+            <p>Other than in the event of a change of Nominated Supplier or a termination event, we will aim to provide you with 4 weeks’ notice of any revision to the level of discounts and/or promotional support provided under this PSA. Nothing in this PSA is intended to impose a minimum or fixed price at which you resell BF brands to consumers.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Confidentiality</b></h4>
+            <p>Both parties agree to keep the terms of this PSA confidential and agree not to disclose the existence or terms of this PSA to any third parties, without the other’s written consent.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Intellectual Property</b></h4>
+            <p>No right, title or interest in or as to the use of any our intellectual property or any intellectual property of any of our group, affiliated or associated companies is granted to you. You will only use the names, logos or trademarks applied to the Products for the only purpose of identifying the Products when marketing and re-selling those.</p>
+            <p>You may not, sell, dispose of or describe the Products under or by reference to any name or description other than the name or description applied to the Products and no trademarks, other than the trademarks applied to the Products by us, will be marked on or applied or used in relation to the Products.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Inspection of Records</b></h4>
+            <p>You will maintain, and where your Nominated Supplier is part of the same group of companies, you will procure that the Nominated Supplier will maintain, complete and accurate books, files and records and all sources of information relating to all BF products, discounts, financial claims and payments made pursuant to this Agreement (the “Records”). You will maintain the Records for a period of six (6) years from the date the Records were generated.  During such retention period, and upon reasonable prior written notice, you agree that the Records will be available for inspection and copying by us and/or our duly authorised representatives (at no extra charge to us) at your offices or your group company Nominated Supplier’s offices during regular business hours.  You shall render all reasonable assistance to us (and our authorised representatives) in reviewing and auditing any Records or processes relating to the promotional support.  Should such audit reveal that we have overpaid you, we will be entitled, within 7 days, to a refund in the amount of the overcharge plus interest on such amount at an annual rate of 4% above the prevailing base rate of our principal bankers, which interest shall accrue on a daily basis from the date the relevant overcharge was made until we have received a refund of the overcharge together with all interest that has accrued, plus the cost of the audit. </p>
+            <p>Exercise by us of this right to audit and any subsequent payments will be without prejudice to any of our rights or remedies and will not bar us from thereafter disputing the accuracy of any payment and you will remain liable for any amounts to be due under this PSA.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Termination</b></h4>
+            <p>The PSA will terminate automatically, and with immediate effect, if either party or a Nominated Supplier(s) becomes insolvent or goes into liquidation (whether compulsory or voluntary (except for the purpose of solvent reconstruction or amalgamation)) or if a receiver or administrative receiver or administrator is appointed in respect of the whole or any part of its assets or if that party or Nominated Supplier makes an assignment for the benefit of or composition with its creditors generally or enters into any corporate voluntary arrangement or threatens to do any of these.</p>
+            <p>We may terminate this PSA with immediate effect if: (i) there is a change of control of your company or business, (ii) there is a failure to comply with the agreed Brand Status and/or Brand Distribution Levels which remains unrectified within 30 days of evidence of such failure being notified to you in writing; (iii) you commit a material breach of this PSA, including but not limited to infringement of intellectual property rights or using BF brands in promotions and/or activities which contravene responsible marketing codes; or (iv) in the sole opinion of BF, you commit any fraudulent activity relating to discounts, promotional support money and/or listing fees, or you bring the reputation of BF brands into disrepute, each a <strong>“Termination Event”</strong>.  In each case, rebates and discounts shall cease to be payable from the date of the Termination Event.</p>
+            <p>We may at any time terminate this PSA by giving you not less than six months notice in writing.</p>
+            <p>If we terminate this PSA, written notice shall be sent to you at the address stated in this PSA or such other address (or email address or facsimile number) as may be specified by you in writing from time to time.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Data Protection</b></h4>
+            <p>In order to execute our obligations under this PSA and provide you information about our brands, we will process the personal data you provide us with, including, your (or your employees) first name and surname, email address, telephone number, company name and job title. Your personal data will be processed in accordance with our <strong><u>privacy policy</u></strong> and applicable legislation.</p>
+            <p>The controller of your personal data is BF UK. The recipients of your personal data are employees and subcontractors, and potentially our group affiliates (list available <a href="https://investors.brown-forman.com/static-files/6027345b-d41b-4341-907e-8cfd08762e48">here</a>) as well as other service providers including logistics service providers assisting us in our business operations. Your personal data will be retained for 6 years in accordance with applicable legislation.</p>
+            <p>You have a right to access, rectify, erase, restrict or object to the processing of your personal data by contacting us at Privacy@b-f.com.</p>
+        </div>        
+        <div>
+            <h4 class="section-title"><b>Other</b></h4>
+            <p>This PSA shall constitute the entire agreement and understanding between the parties with respect to all matters, which are referred to and shall supersede any previous Promotional Support Agreements between the parties in relation to the brands covered.</p>
+            <p>You shall ensure that all your activities involving BF brands comply with alcohol advertising laws, codes and regulations, including but not limited to The Portman Group Code and the British Beer &amp; Pub Association (BBPA) guidelines for responsible drinking and promotions.</p>
+            <p>We will not conclude any PSA or other agreement with you which requires any whiskey products of competitors to be excluded from your outlets, or which requires Solus status, Solus Pouring status or Solus Optic Status for Jack Daniel\'s Tennessee Whiskey.</p>
+        </div>        
+        
+        <div>
+            <p>The PSA will be effective from the Commencement Date.</p>
+            <p>Please read full Promotional Sales Agreement terms and conditions before signing</p>
+
+            <table style="width: 100%;">
+                <tr>
+                    <td style="padding: 10px;width: 50%">
+                        <p>Yours sincerely</p>
+                        <br />
+                        <p>BROWN-FORMAN BEVERAGES EUROPE LTD</p>
+                        <p>Signed on behalf of</p>
+                    </td>
+                    <td style="padding: 10px;width: 50%;">
+                        <p>&nbsp;</p>
+                        <p>Signed on behalf of</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;width: 50%;">Brown-Forman Beverages Europe Ltd</td>
+                    <td style="padding: 10px;width: 50%;">{!psa.Account__r.Name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;width: 50%;">By: {!psa.CreatedBy.Name}</td>
+                    <td style="padding: 10px;width: 50%;">By: {!psa.Contact__r.Name}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;width: 50%;">Date Signed:</td>
+                    <td style="padding: 10px;width: 50%;">Date Signed:</td>
+                </tr>
+            </table>
+    
+        </div>
+        
+        <div style="page-break-before: always;line-height: 1em;">
+            <center><h4 class="section-title"><b>APPENDIX 1</b></h4></center>
+            <p><b>The words used to describe Brand Status in this Agreement shall have the following meanings:</b></p>
+            <div style="line-height:80%;">
+                <h4><strong>BY THE BOTTLE</strong></h4>
+                <span>the account will list the brand on their “by the bottle” drinks menu.  It does not entail any restriction on the stocking, display or promotion of any other product (on the “by the bottle” menu or otherwise).</span>
+            </div>
+            <p style="margin-top: 10px;">
+                <h4><b>MAY STOCK</b></h4>
+                <span>the brand will be available for any outlet within the estate to stock, but without any obligation. It does not entail any restriction on the stocking, display or promotion of any other product.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>MUST STOCK</b></h4>
+                <span>the brand must be available and visible on the back bar in the outlet, but the level of display or merchandising is undefined.  It does not entail any restriction on the stocking, display or promotion of any other product, nor does it prevent other products from receiving greater priority in the outlet than the brand in question.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>MUST STOCK POURING</b></h4>
+                <span>if the consumer does not specify a particular brand within the relevant type, then the brand will be one of the brands offered. The brand will also be visible on the back bar within the outlet. This status does not involve any restriction on the stocking or display of other products.  An outlet may have more than one “pouring” brand and may also have other brands on back bar or optic.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>PREFERRED PREMIUM</b></h4>
+                <span>where a brand is stocked and visible in outlet as the premium to the 'pouring brand' chosen by the outlet.  Bar Staff will encourage consumers asking for 'house vodka, gin' etc. to trade up, or ‘upsell’ to one of their premium alternatives, explaining why it is felt to be premium and that it is slightly more expensive.  This does not preclude the account from having other premium alternatives, from stocking display or promotion of any other brand and does not affect the pouring brands status.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>PREFERED POURING</b></h4>
+                <span>if the consumer does not specify a particular brand within the relevant type, then this brand will be offered as the prefered brand in that product type stocked on the speed rail and used as house pour in each outlet, the brand must also be visible on the back bar. This does not entail any restriction on the stocking, display or promotion of any other product in that product type in the outlet.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>SOLUS</b></h4>
+                <span>the brand is the only brand within the relevant product type stocked or offered for sale in the outlet.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>SOLUS POURING</b></h4>
+                <span>the brand is the only brand that is served to customers who do not specify a brand within the relevant product type.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>SOLUS OPTIC</b></h4>
+                <span>the brand is the only brand within the relevant product type displayed on optic in the retail premises without any other stipulations as to display or status.</span>
+            </p>
+            <p style="margin-top:10px;">
+                <h4><b>SOLUS BY THE BOTTLE</b></h4>
+                <span>the brand is the only brand within the relevant product type listed by the account on their “by the bottle” drinks menu.</span>
+            </p>
+        </div>
+
+        <div style="page-break-before:always;">
+            <center><b>APPENDIX 2</b></center>
+            <br />
+            <apex:outputPanel id="accounts" title="" layout="block">
+                <apex:dataTable cellpadding="5" border="1" var="i" value="{!psa.Promotions__r}">
+                    <apex:column value="{!i.AccountName__c}" headerValue="{!$ObjectType.Account.Label}" width="300px" style="color:blue;" />
+                    <apex:column value="{!i.Account__r.ShippingStreet}" headerValue="{!$ObjectType.Account.Fields.ShippingStreet.Label}" width="300px"  />
+                    <apex:column value="{!i.Account__r.ShippingCity}" headerValue="{!$ObjectType.Account.Fields.ShippingCity.Label}" width="200px" />
+                </apex:dataTable>
+            </apex:outputPanel>                
+         </div>        
+    </div>
+</apex:component>

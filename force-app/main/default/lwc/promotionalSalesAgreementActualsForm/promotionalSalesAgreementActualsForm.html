@@ -87,14 +87,19 @@
                         <p class="slds-text-title_caps">{labels.promotionalActivityPaid.label}</p>
                         <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
+                    <!--
                     <lightning-layout-item size="12" padding="around-small">
                         <p class="slds-text-title_caps">{labels.trainingAdvocacyPaid.label}</p>
                         <lightning-formatted-number value={trainingAndAdvocacyPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
-
+                    -->
                     <lightning-layout-item size="12" padding="around-small">
                         <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
                         <span class="slds-text-heading_medium">{wholesalerName}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.comments.label}</p>
+                        <span class="slds-text-heading_medium">{comments}</span>
                     </lightning-layout-item>
                 </template>
                 <template if:true={canEdit}>
@@ -119,26 +124,43 @@
                             <template for:each={rebates} for:item="rebate">                        
                                 <lightning-layout-item key={rebate.rebateType} size="12" padding="around-small" class="slds-m-top_small">                                                                                                
                                     <template if:true={rebate.isVolumeRebate}>
-                                        <div class="slds-m-bottom_x-small">
-                                            <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number></p>
-                                        </div>
+                                        <template if:true={showTotalDiscount}>
+                                            <div class="slds-m-bottom_x-small">
+                                                <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number></p>
+                                            </div>    
+                                        </template>
                                         
                                         <template if:true={isPhone}>
                                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                         </template>
-                                        <lightning-input type="number" 
-                                                        label={actualQtyFormattedLabel} 
-                                                        name="i_ActQty" value={rebate.rebateAmount} 
-                                                        placeholder={labels.actualQty.placeholder} 
-                                                        data-rebate-type={rebate.rebateType}
-                                                        onchange={handleRebateAmountChange}></lightning-input>
+                                        <template if:true={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="1"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template if:false={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="0.01"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                
+                                        </template>
                                         <template if:true={hasActualQtyError}>
                                             <span class="error">{labels.actualQty.error}</span>
                                         </template>
                                     </template>
                                     <template if:false={rebate.isVolumeRebate}>
                                         <lightning-input type="currency" 
-                                            label={rebate.rebateType} 
+                                            label={rebate.label} 
                                             name="i_rebateAmount" value={rebate.rebateAmount} 
                                             placeholder={labels.rebateAmount.placeholder} 
                                             data-rebate-type={rebate.rebateType}
@@ -159,6 +181,15 @@
                                 options={wholesalerOptions}
                                 onchange={handleWholesalerChange}>
                             </lightning-combobox>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-textarea name="i_Comments"
+                                    label={labels.comments.label}
+                                    value={comments}
+                                    maxlength="1024"
+                                    message-when-too-long={labels.comments.toolongMessage}
+                                    onchange={handleCommentsChange}>
+                            </lightning-textarea>
                         </lightning-layout-item>
 
                     </template>
@@ -202,14 +233,15 @@
                                                 label={actualQtyFormattedLabel} 
                                                 name="i_ActQty" value={rebateAmount} 
                                                 placeholder={labels.actualQty.placeholder} 
-                                                onchange={handleActualQtyChange}></lightning-input>
+                                                step="0.01"
+                                                onchange={handleRebateAmountChange}></lightning-input>
                                 <template if:true={hasActualQtyError}>
                                     <span class="error">{labels.actualQty.error}</span>
                                 </template>    
                             </template>
                             <template if:false={isVolumeRebate}>
                                 <lightning-input type="currency" 
-                                    label={rebateType} 
+                                    label={rebateLabel} 
                                     name="i_rebateAmount" value={rebateAmount} 
                                     placeholder={labels.rebateAmount.placeholder} 
                                     data-rebate-type={rebateType}
@@ -229,6 +261,15 @@
                                     onchange={handleWholesalerChange}>
                                 </lightning-combobox>
                             </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-textarea name="i_Comments"
+                                    label={labels.comments.label}
+                                    value={comments}
+                                    maxlength="1024"
+                                    message-when-too-long={labels.comments.toolongMessage}
+                                    onchange={handleCommentsChange}>
+                            </lightning-textarea>
                         </lightning-layout-item>
                     </template>
                 </template>                

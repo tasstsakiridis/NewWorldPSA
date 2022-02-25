@@ -14,7 +14,7 @@
                                 <div class="slds-page-header__name-title">
                                     <h1>
                                         <span>&nbsp;</span>
-                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}</span>                                        
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                        
                                     </h1>
                                 </div>
                             </div>
@@ -42,30 +42,39 @@
     </template>
 
 
-    <div class="card-body slds-m-top_small">        
-        <lightning-layout>
-            <lightning-layout-item size="12" small-device-size="12" large-device-size="7" padding="around-small" class="right-border">
-                <!-- Tree -->
-                <template if:true={treeItems}>
-                    <div class="pageLeftMargin" >
-                        <lightning-tree items={treeItems} header={psaName} class="" onselect={handleOnSelect}></lightning-tree>
-                    </div>
-                </template>
-            </lightning-layout-item>
-            <template if:false={isPhone}>
-                <lightning-layout-item size="12" small-device-size="12" large-device-size="5" padding="around-small">
-                    <!-- Actuals record-->
-                    <template if:true={showActualsForm}>
-                        <c-promotional-sales-agreement-actuals-form 
-                                    psa-id={psaId} 
-                                    promotion-id={selectedAccountId} 
-                                    pmia-id={selectedPMIAId} 
-                                    pmi-id={selectedPMIId}
-                                    onclose={handleCloseForm}
-                                    onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>
+    <div class="card-body slds-m-top_small">   
+        <template if:false={canEdit}>
+            <p class="warning">{labels.psaUpdated.message}</p>
+        </template>
+        <template if:true={canEdit}>
+            <lightning-layout>
+                <lightning-layout-item size="12" small-device-size="12" large-device-size="7" padding="around-small" class="right-border">
+                    <!-- Tree -->
+                    <template if:true={treeItems}>
+                        <div class="pageLeftMargin" >
+                            <lightning-tree items={treeItems} header={psaName} class="" onselect={handleOnSelect}></lightning-tree>
+                        </div>
                     </template>
                 </lightning-layout-item>
-            </template>
-        </lightning-layout>
+                <template if:false={isPhone}>
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size="5" padding="around-small">
+                        <!-- Actuals record-->
+                        <template if:true={showActualsForm}>
+                            <c-promotional-sales-agreement-actuals-form 
+                                        psa-id={psaId} 
+                                        psa={thePSA}
+                                        promotion-id={selectedAccountId} 
+                                        pmia-id={selectedPMIAId} 
+                                        pmi-id={selectedPMIId}
+                                        gl-mappings={glMappings}
+                                        wholesaler-options={wholesalerOptions}
+                                        capture-volume-in-bottles={captureVolumeInBottles}
+                                        onclose={handleCloseForm}
+                                        onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>
+                        </template>
+                    </lightning-layout-item>
+                </template>
+            </lightning-layout>
+        </template>             
     </div>
 </template>
