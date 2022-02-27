@@ -24,7 +24,7 @@
 
     <template if:true={isWorking}>
         <div class="slds-m-around_medium slds-align_absolute-center">
-            <lightning-spinner alternative-text="Saving. Please wait..."></lightning-spinner>
+            <lightning-spinner alternative-text={labels.saving.message}></lightning-spinner>
             <p class="slds-text-title_caps">{workingMessage}</p>
         </div>
     </template>
@@ -35,9 +35,7 @@
                 <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Back" alternative-text="Back" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <lightning-layout-item>
-                <template if:false={isLocked}>
-                    <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
-                </template>
+                <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
             </lightning-layout-item>
             <template if:true={canDelete}>
                 <lightning-layout-item>
@@ -45,119 +43,194 @@
                 </lightning-layout-item>
             </template>
             <lightning-layout-item>
+                <lightning-button-icon data-id="clear" icon-name="utility:recycle_bin_empty" label="" title="Clear" alternative-text="Clear" onclick={handleClearButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item>
                 <lightning-button-icon data-id="help" icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right" onclick={handleHelpButtonClick}></lightning-button-icon>
             </lightning-layout-item>
         </lightning-layout>        
 
         <lightning-layout multiple-rows="true" horizontal-align="center">
             <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
-                <!-- Total Investment -->
-                <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
-                <lightning-formatted-number label="Total Investment" value={totalInvestment}
-                                            format-style="currency"
-                                            currency-display-as="symbol">
-                </lightning-formatted-number>
+                <lightning-layout>
+                    <lightning-layout-item size="6" small-device-size="12" medium-device-size="6">
+                        <!-- Total Investment -->      
+                        <div if:true={isUKMarket}>
+                            <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
+                            <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>    
+                        </div>          
+                    </lightning-layout-item>
+                    <template if:true={calcSplit}>
+                        <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
+                            <p class="slds-text-heading_small">{labels.split.label}</p>
+                            <lightning-formatted-number label={labels.split.label} value={thisProductSplit}
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                </lightning-layout>
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Brand Status -->
-                <p class="label">{brandStatusLabel}</p>
-                <select class="brandStatus" disabled={isLocked} multiple onchange={handleBSChange}>
+                <!--
+                <p class="label">{brandStatusLabel}</p>                
+                <select class="brandStatus" multiple>
                     <template for:each={brandStatusOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_BrandStatus"
+                                          label={brandStatusLabel}
+                                          options={brandStatusOptions}
+                                          value={brandStatusValues}
+                                          onchange={handleBrandStatusChange}></lightning-checkbox-group>
             </lightning-layout-item>                        
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
-                <lightning-input type="number" name="i_VolumeForecast" 
-                                 label={labels.volumeForecast.label}
-                                 value={volumeForecast}
-                                 disabled={isLocked}
-                                 onchange={handleVolumeForecastChange}>
-                </lightning-input>
-                <template if:true={hasVolumeForecastError}>
-                    <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                <template if:false={captureVolumeInBottles}>
+                    <lightning-input type="number" name="i_VolumeForecast" 
+                                    label={labels.volumeForecast.label}
+                                    value={volumeForecast}
+                                    step="0.01"
+                                    onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template if:true={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                    </template>
+    
+                </template>
+                <template if:true={captureVolumeInBottles}>
+                    <lightning-input type="number" name="i_VolumeForecast" 
+                                    label={labels.volumeForecastBtl.label}
+                                    value={volumeForecast}
+                                    step="1"
+                                    onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template if:true={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecastBtl.error}</span>
+                    </template>
                 </template>
             </lightning-layout-item>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Discounts per Case -->
-                <lightning-input type="number" name="i_DiscountPerCase" 
-                                 label={labels.discountPerCase.label}                                 
-                                 value={discount}
-                                 disabled={isLocked}
-                                 onchange={handleDiscountChange}
-                                 formatter="currency">
-                </lightning-input>
-                <template if:true={hasDiscountError}>
-                    <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
-                </template>
-            </lightning-layout-item>
+            <template if:true={isUKMarket}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Discounts per Case -->
+                    <lightning-input type="number" name="i_DiscountPerCase" 
+                                    label={labels.discountPerCase.label}                                 
+                                    value={discount}
+                                    step="0.01"
+                                    onchange={handleDiscountChange}
+                                    formatter="currency">
+                    </lightning-input>
+                    <template if:true={hasDiscountError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                    </template>
+                </lightning-layout-item>
+            </template>
+            <template if:true={isUKMarket}>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Listing Fee -->
                 <lightning-input type="number" name="i_ListingFee" 
                                  label={listingFeeLabel}
                                  value={listingFee}
                                  onchange={handleListingFeeChange}
-                                 disabled={isLocked}
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Drink Strategy -->
+                <!--
                 <p class="label">{drinkStrategyLabel}</p>
-                <select class="drinkStrategy" multiple disabled={isLocked}>
+                <select class="drinkStrategy" multiple >
                     <template for:each={drinkStrategyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_DrinkStrategy"
+                                        label={drinkStrategyLabel}
+                                        options={drinkStrategyOptions}
+                                        value={drinkStrategyValues}
+                                        onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
+
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Promotional Activity -->
+                <!--
                 <p class="label">{promotionalActivityLabel}</p>
-                <select class="promotionalActivity" multiple disabled={isLocked}>
+                <select class="promotionalActivity" multiple >
                     <template for:each={promotionalActivityOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_PromotionalActivity"
+                                        label={promotionalActivityLabel}
+                                        options={promotionalActivityOptions}
+                                        value={promotionalActivityValues}
+                                        onchange={handlePromotionalActivityChange}></lightning-checkbox-group>
+        
             </lightning-layout-item>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Promotional Activity Amount -->
-                <lightning-input type="number" name="i_PromotionalActivityAmount" 
-                                 label={promotionalActivityLabel}
-                                 value={promotionalActivityAmount}
-                                 onchange={handlePromotionalActivityValueChange}
-                                 disabled={isLocked}
-                                 formatter="currency">
-                </lightning-input>
-            </lightning-layout-item>
+            <template if:true={isUKMarket}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Promotional Activity Amount -->
+                    <lightning-input type="number" name="i_PromotionalActivityAmount" 
+                                    label={promotionalActivityLabel}
+                                    value={promotionalActivityAmount}
+                                    onchange={handlePromotionalActivityValueChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Training & Advocacy -->
+                <!--
                 <p class="label">{trainingAdvocacyLabel}</p>
-                <select class="trainingAdvocacy" disabled={isLocked} multiple>
+                <select class="trainingAdvocacy" multiple>
                     <template for:each={trainingAdvocacyOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
+            -->
+                <lightning-checkbox-group name="i_TrainingAndAdvocacy"
+                                        label={trainingAdvocacyLabel}
+                                        options={trainingAdvocacyOptions}
+                                        value={trainingAdvocacyValues}
+                                        onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
+            
             </lightning-layout-item>
+            <!-- Training & Advocacy Amount -->
+            <!--
             <lightning-layout-item size="12" padding="around-small">
-                <!-- Training & Advocacy Amount -->
                 <lightning-input type="number" name="i_TrainingAdvocacyAmount" 
                                  label={trainingAdvocacyLabel}
                                  value={trainingAdvocacyAmount}
-                                 disabled={isLocked}
                                  onchange={handleTrainingAdvocacyValueChange}
                                  formatter="currency">
                 </lightning-input>
             </lightning-layout-item>
+            -->
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Outlet to Provide -->
+                <!--
                 <p class="label">{outletToProvideLabel}</p>
-                <select class="outletToProvide" disabled={isLocked} multiple>
+                <select class="outletToProvide" multiple>
                     <template for:each={outletToProvideOptions} for:item="bs">
                         <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
                     </template>
                 </select>
-
+            -->
+                <lightning-checkbox-group name="i_OutletToProvide"
+                                        label={outletToProvideLabel}
+                                        options={outletToProvideOptions}
+                                        value={outletToProvideValues}
+                                        onchange={handleOutletToProvideChange}></lightning-checkbox-group>
+            
             </lightning-layout-item>
             <lightning-layout-item size="12" padding="around-small">
                 <lightning-input name="i_Comments" type="text"
@@ -165,7 +238,6 @@
                                  value={comments}
                                  label={labels.comments.label}
                                  placeholder={labels.comments.placeholder}
-                                 disabled={isLocked}
                                  onchange={handleCommentsChange}>
                 </lightning-input>
             </lightning-layout-item>

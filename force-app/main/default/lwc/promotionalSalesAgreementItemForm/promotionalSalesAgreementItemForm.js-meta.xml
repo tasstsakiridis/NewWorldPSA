@@ -8,8 +8,8 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AppPage">
-            <property name="psaItemId" type="String" />
-            <property name="productId" type="String" />
+            <property name="psaItemId" type="String"/>
+            <property name="productId" type="String"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

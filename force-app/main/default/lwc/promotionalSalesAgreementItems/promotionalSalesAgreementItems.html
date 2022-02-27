@@ -91,6 +91,9 @@
                                     <c-product-tile key={product.id} 
                                                 product={product.product}
                                                 psa-item={product.psaItem} 
+                                                capture-volume-in-bottles={captureVolumeInBottles}
+                                                show-total-investment={showTotalInvestment}
+                                                calc-split={calcProductSplit}
                                                 onselected={handleProductSelected} ></c-product-tile>
                                 </template>    
                             </div>
@@ -108,11 +111,19 @@
                                 <c-promotional-sales-agreement-item-form 
                                             psa-id={psaId} 
                                             psa-item-id={selectedPSAItemId} 
+                                            psa-record-type-name={recordTypeName}
                                             product-id={selectedProductId} 
                                             product-name={selectedProductName} 
                                             promotion-id={promotionId}
-                                            is-locked={isLocked}
+                                            is-locked="false"
+                                            is-approved={isApproved}
+                                            capture-volume-in-bottles={captureVolumeInBottles}
+                                            calc-split={calcProductSplit}
+                                            total-budget={totalBudget}
+                                            total-planned-spend={totalPlannedSpend}
+                                            psa={thePSA}
                                             onsave={handleSavePSADetails}
+                                            onupdated={handlePSAUpdated}
                                             onclose={handleClosePSADetailForm}></c-promotional-sales-agreement-item-form>
                             </lightning-layout-item>
                         </template>    

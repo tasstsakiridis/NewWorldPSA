@@ -1,0 +1,4 @@
+.required-fld:before {
+    content: '*';
+    color: red;   
+}

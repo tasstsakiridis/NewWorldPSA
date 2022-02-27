@@ -1,49 +1,60 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
+import { refreshApex } from '@salesforce/apex';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
-import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_CANCEL from '@salesforce/label/c.Cancel';
-import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
-import LABEL_END_DATE from '@salesforce/label/c.End_Date';
-import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
-import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
-import LABEL_PRODUCT from '@salesforce/label/c.Product';
-import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
-import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
-import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
-import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
-import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
-import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
-import LABEL_TRAINING_ADVOCACY from '@salesforce/label/c.Training_and_Advocacy';
-import LABEL_BALANCE from '@salesforce/label/c.Balance';
-import LABEL_PAID from '@salesforce/label/c.Paid';
-import LABEL_SUMMARY from '@salesforce/label/c.Summary';
-import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
 import LABEL_ACTUAL from '@salesforce/label/c.Actual';
+import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
+import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_BALANCE from '@salesforce/label/c.Balance';
+import LABEL_DETAILS from '@salesforce/label/c.Details2';
+import LABEL_END_DATE from '@salesforce/label/c.End_Date';
+import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
+import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
+import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
+import LABEL_PAID from '@salesforce/label/c.Paid';
+import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
+import LABEL_PLANNED from '@salesforce/label/c.Planned';
+import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
+import LABEL_PRINT from '@salesforce/label/c.Factsheet_Print';
+import LABEL_PRODUCT from '@salesforce/label/c.Product';
+import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
+import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
+import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
+import LABEL_SPLIT from '@salesforce/label/c.Split';
+import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
+import LABEL_SUMMARY from '@salesforce/label/c.Summary';
+import LABEL_TOTAL from '@salesforce/label/c.Total';
+import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+import LABEL_TRAINING_ADVOCACY from '@salesforce/label/c.Training_and_Advocacy';
+import LABEL_VOLUME from '@salesforce/label/c.Volume_Title';
+import LABEL_WORKING from '@salesforce/label/c.Working_PleaseWait';
 
 export default class PromotionalSalesAgreementSummary extends NavigationMixin(LightningElement) { 
     labels = {
-        back: { label: LABEL_BACK },
-        cancel: { label: LABEL_CANCEL },
-        start: { label: LABEL_START_DATE },
-        end: { label: LABEL_END_DATE },
-        account: { label: LABEL_ACCOUNT },
-        psaSummary: { label: LABEL_PSASUMMARY },
-        numberOfQuarters: { label: LABEL_NUMBEROFQUARTERS },
-        summary: { label: LABEL_SUMMARY },
-        volume: { label: 'Volume' },
-        planned: { label: 'Planned' },
-        actual: { label: LABEL_ACTUAL },
-        listingFee: { label: LABEL_LISTING_FEE },
-        promotionalActivity: { label: LABEL_PROMOTIONAL_ACTIVITY },
-        trainingAdvocacy: { label: LABEL_TRAINING_ADVOCACY },
-        balance: { label: LABEL_BALANCE },
-        total: { label: 'Total' },
-        paid: { label: LABEL_PAID },
-        details: { label: 'Details' }        
+        account:                { label: LABEL_ACCOUNT },
+        actual:                 { label: LABEL_ACTUAL },
+        back:                   { label: LABEL_BACK },
+        balance:                { label: LABEL_BALANCE },
+        details:                { label: LABEL_DETAILS },
+        end:                    { label: LABEL_END_DATE },
+        listingFee:             { label: LABEL_LISTING_FEE },
+        numberOfQuarters:       { label: LABEL_NUMBEROFQUARTERS },
+        paid:                   { label: LABEL_PAID },
+        payments:               { label: LABEL_PAYMENTS },
+        planned:                { label: LABEL_PLANNED },
+        print:                  { label: LABEL_PRINT },
+        promotionalActivity:    { label: LABEL_PROMOTIONAL_ACTIVITY },
+        psaSummary:             { label: LABEL_PSASUMMARY },
+        split:                  { label: LABEL_SPLIT },
+        start:                  { label: LABEL_START_DATE },
+        summary:                { label: LABEL_SUMMARY },
+        trainingAdvocacy:       { label: LABEL_TRAINING_ADVOCACY },
+        total:                  { label: LABEL_TOTAL },
+        volume:                 { label: LABEL_VOLUME },
+        working:                { message: LABEL_WORKING }
     };
     
     @api 
@@ -60,6 +71,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }},
         { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }},
+        { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.listingFeeBalanceLabel, fieldName: 'listingFeeBalance', type: 'currency', cellAttributes: { alignment: 'right' }},
@@ -67,6 +79,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: LABEL_TRAINING_ADVOCACY, fieldName: 'trainingAdvocacy', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.trainingAdvocacyPaidLabel, fieldName: 'trainingAdvocacyPaid', type: 'currency', cellAttributes: { alignment: 'right' }},    
+        { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: LABEL_TOTAL_INVESTMENT, fieldName: 'totalInvestment', type: 'currency', cellAttributes: { alignment: 'right' } },
         { label: this.totalInvestment9lLabel, fieldName: 'totalInvestment9L', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: this.totalInvestmentActualLabel, fieldName: 'totalInvestmentActual', type: 'currency', cellAttributes: { alignment: 'right' }},
@@ -75,12 +88,18 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
-        this.pageRef = currentPageReference;
-        this.currentPageReference = currentPageReference;
-        console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
-        this.psaId = currentPageReference.state.c__psaId;
+        try {
+            this.pageRef = currentPageReference;
+            this.currentPageReference = currentPageReference;
+            console.log('[psasummary.setcurrentpagerefernce] pageref', currentPageReference);
+            this.psaId = currentPageReference.state.c__psaId;
+            this.loadPSA();
+        } catch(ex) {
+            console.log('[psaSummary.setCurrentPageReference] exception', ex);
+        }
     }
 
+    isWorking = false;
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortBy;
@@ -88,6 +107,12 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     error;
     wiredPSA;
     thePSA;
+    showListingFee = true;
+    showPromotionalActivity = true;
+    showTrainingAndAdvocacy = false;
+    showPayments = true;
+
+    /*
     @wire(getPSA, { psaId: '$psaId'} )
     wiredGetPSA(value) {
         this.wiredPSA = value;
@@ -101,7 +126,21 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             this.data = undefined;
         }
     }
-    
+    */
+    loadPSA() {
+        getPSA({psaId: this.psaId})
+        .then(result => {
+            this.error = undefined;
+            this.thePSA = result;
+            this.buildTableData();
+        })
+        .catch(error => {
+            this.error = error;
+            console.log('[psaSummary.loadPSA] error', error);
+            this.data = undefined;
+        });
+    }
+
     get listingFeePaidLabel() {
         return `${LABEL_LISTING_FEE} (${LABEL_PAID})`;
     }
@@ -134,14 +173,46 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         return this.thePSA == undefined ? null : this.thePSA.End_Date__c;
     }
     get totalVolume() {
-        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        let val = 0;
+        if (this.thePSA != undefined) {
+            if (this.captureVolumeInBottles) {
+                val = parseFloat(this.thePSA.Total_Volume_Bottles__c);
+            } else {
+                val = parseFloat(this.thePSA.Total_Volume__c);
+            }
+        }
+        //return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        return val;
     }
     get totalActualVolume() {
-        return this.thePSA == undefined || this.thePSA.Total_Actual_Volume__c == undefined ? null : parseFloat(this.thePSA.Total_Actual_Volume__c);
+        let val = 0;
+        if (this.thePSA != undefined) {
+            if (this.captureVolumeInBottles) {
+                val = parseFloat(this.thePSA.Total_Actual_Volume_Bottles__c);
+            } else {
+                val = parseFloat(this.thePSA.Total_Actual_Volume__c);
+            }
+        }
+        //return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Volume__c);
+        return val;
+//        return this.thePSA == undefined || this.thePSA.Total_Actual_Volume__c == undefined ? null : parseFloat(this.thePSA.Total_Actual_Volume__c);
     }
     get volumeBalance() {
         const v = this.totalVolume - (this.totalActualVolume == null ? 0 : this.totalActualVolume);
         console.log('[volumebalance] v, totalvolume, totalactualvolume', v, this.totalVolume, this.totalActualVolume);
+        return v;
+    }
+    get activityBudget() {
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get paymentsPaid() {
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Payments_Paid__c);
+    }
+    get paymentsBalance() {
+        let v = this.activityBudget - (this.paymentsPaid == null ? 0 : this.paymentsPaid);
+        console.log('paymentsBalance', v);
+        console.log('activityBudget', this.activityBudget);
+        console.log('paymentsPaid', this.paymentsPaid);
         return v;
     }
     get listingFee() {
@@ -171,6 +242,18 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     get trainingAdvocacyBalance() {
         return this.trainingAdvocacy - (this.trainingAdvocacyPaid == null ? 0 : this.trainingAdvocacyPaid);
     }
+    get totalBudget() {
+        return this.thePSA == undefined || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
+    }
+    get totalPlannedSpend() {
+        return this.thePSA == undefined || this.thePSA.Total_Planned_Spend__c == undefined ? 0 : parseFloat(this.thePSA.Total_Planned_Spend__c);
+    }
+    get captureVolumeInBottles() {
+        return this.thePSA == undefined || this.thePSA.Market__r == undefined || this.thePSA.Market__r.Capture_Volume_in_Bottles__c == undefined ? false : this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
+    }
+    get showProductSplit() {
+        return this.thePSA == undefined || this.thePSA.Market__r == undefined || this.thePSA.Market__r.Calculate_PSA_Product_Split__c == undefined ? false : this.thePSA.Market__r.Calculate_PSA_Product_Split__c;
+    }
 
     /**
      * Handle local events
@@ -178,6 +261,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     handleCancelButtonClick(event) {
         console.log('[handleCancelButtonClick]');
         try {
+            this.isWorking = true;
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
@@ -193,7 +277,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             }
         }
     }
-    handlePrintButtonClick() {
+    handlePrintButtonClick() {        
         window.print();
     }
 
@@ -240,70 +324,92 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     }
     */
     buildTableData() {
-        const accountsMap = new Map();
+        //const accountsMap = new Map();
 
-        if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
-            this.thePSA.Promotions__r.forEach(p => {                            
-                console.log('[summary.buildtabledata] promotion', p);
-                const account = { id: p.Id, 
-                                  name: p.AccountName__c, 
-                                  actualVolume: parseFloat(p.Total_Actual_Qty__c),
-                                  plannedVolume: 0,
-                                  listingFee: 0,
-                                  listingFeePaid: parseFloat(p.Total_Listing_Fee_Paid__c),
-                                  promotionalActivity: 0,
-                                  promotionalActivityPaid: parseFloat(p.Total_Promotional_Activity_Paid__c),
-                                  trainingAdvocacy: 0,
-                                  trainingAdvocacyPaid: parseFloat(p.Total_Training_and_Advocacy_Paid__c),
-                                  pmi: new Map() };                
+       // if (this.thePSA.Promotions__r && this.thePSA.Promotions__r.length > 0) {
+       //     this.thePSA.Promotions__r.forEach(p => {                            
+        //console.log('[summary.buildtabledata] promotion', p);
+        console.log('[summary.buildTableData] thePSA', this.thePSA);
+        if (this.showProductSplit) {
+            this.showPromotionalActivity = false;
+            this.showListingFee = false;
+            let cols = this.columns.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
+            cols = cols.filter(c => c.fieldName != 'discount');
+            cols = cols.filter(c => c.fieldName != 'quartersCaptured');
+
+            this.columns = [...cols];
+        } else {
+            this.showPayments = false;
+            const cols = this.columns.filter(c => c.fieldName != 'productSplit' && c.fieldName != 'payment');
+            this.columns = [...cols];
+        } 
+        this.isWorking = true;
+        const account = { id: this.thePSA.Account__c, 
+                            name: this.thePSA.Account__r.Name, 
+                            actualVolume: this.totalActualVolume,
+                            plannedVolume: 0,
+                            listingFee: 0,
+                            listingFeePaid: parseFloat(this.thePSA.Total_Listing_Fee_Paid__c),
+                            promotionalActivity: 0,
+                            promotionalActivityPaid: parseFloat(this.thePSA.Total_Promotional_Activity_Paid__c),
+                            trainingAdvocacy: 0,
+                            trainingAdvocacyPaid: parseFloat(this.thePSA.Total_Training_and_Advocacy_Paid__c),
+                            pmi: new Map() };                
                 
-                if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
-                    this.thePSA.Promotion_Material_Items__r.forEach((pmi, index) => {
-                        console.log('[summary.buildtabledata] pmi, index', pmi, index);
-
-                        if (pmi.Plan_Volume__c != undefined) {
-                            account.plannedVolume += pmi.Plan_Volume__c;
-                        }
-                        if (pmi.Listing_Fee__c != undefined) {
-                            account.listingFee += pmi.Listing_Fee__c;
-                        }
-                        if (pmi.Promotional_Activity__c != undefined) {
-                            account.promotionalActivity += pmi.Promotional_Activity__c;                            
-                        }
-                        if (pmi.Training_and_Advocacy__c != undefined) {
-                            account.trainingAdvocacy += pmi.Training_and_Advocacy__c;
-                        }
-
-                        account.pmi.set(pmi.Id, {
-                            id: pmi.Id, 
-                            product: pmi.Product_Name__c, 
-                            plannedVolume: parseFloat(pmi.Plan_Volume__c),
-                            discount: parseFloat(pmi.Plan_Rebate__c),
-                            listingFee: parseFloat(pmi.Listing_Fee__c),
-                            promotionalActivity: parseFloat(pmi.Promotional_Activity_Value__c),
-                            trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
-                            totalInvestment: parseFloat(pmi.Total_Investment__c)
-                        });
-                    });
+        var packQty = 1;
+        if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
+            this.thePSA.Promotion_Material_Items__r.forEach((pmi, index) => {
+                console.log('[summary.buildtabledata] pmi, index', pmi, index);
+                
+                if (pmi.Plan_Volume__c != undefined) {
+                    if (this.captureVolumeInBottles) {
+                        packQty = pmi.Product_Pack_Qty__c == undefined ? 1 : pmi.Product_Pack_Qty__c;
+                        account.plannedVolume += (pmi.Plan_Volume__c * packQty);
+                    } else {
+                        account.plannedVolume += pmi.Plan_Volume__c;
+                    }
+                }
+                if (pmi.Listing_Fee__c != undefined) {
+                    account.listingFee += pmi.Listing_Fee__c;
+                }
+                if (pmi.Promotional_Activity__c != undefined) {
+                    account.promotionalActivity += pmi.Promotional_Activity__c;                            
+                }
+                if (pmi.Training_and_Advocacy__c != undefined) {
+                    account.trainingAdvocacy += pmi.Training_and_Advocacy__c;
                 }
 
-                accountsMap.set(p.Id, account);
+                account.pmi.set(pmi.Id, {
+                    id: pmi.Id, 
+                    product: pmi.Product_Name__c, 
+                    plannedVolume: parseFloat(pmi.Plan_Volume__c),
+                    actualVolume: parseFloat(pmi.Total_Actual_Volume__c),
+                    discount: parseFloat(pmi.Plan_Rebate__c),
+                    listingFee: parseFloat(pmi.Listing_Fee__c),
+                    listingFeePaid: parseFloat(pmi.Total_Listing_Fee_Paid__c),
+                    promotionalActivity: parseFloat(pmi.Promotional_Activity_Value__c),
+                    promotionalActivityPaid: parseFloat(pmi.Total_Promotional_Activity_Paid__c),
+                    trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
+                    trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
+                    totalInvestment: parseFloat(pmi.Total_Investment__c),
+                    packQuantity: parseInt(pmi.Product_Pack_Qty__c),
+                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c),
+                    payment: parseFloat(pmi.Total_Payments_Paid__c)
+                });
             });
         }
 
-        console.log('[summary.buildtabledata] accountsMap', accountsMap);
+        //accountsMap.set(p.Id, account);
+            //});
+        //}
+
+        //console.log('[summary.buildtabledata] accountsMap', accountsMap);
+        /*
         if (this.thePSA.PMI_Actuals__r && this.thePSA.PMI_Actuals__r.length > 0) {
             this.thePSA.PMI_Actuals__r.forEach(pmia => {
                 console.log('[summary.buildtabledata] pmia', pmia);
-                let account = accountsMap.get(pmia.Promotion__c);
+                //let account = accountsMap.get(pmia.Promotion__c);
                 let pmi = account.pmi.get(pmia.Promotion_Material_Item__c);
-                /*
-                const newPMI = {...pmi};
-                newPMI.actualVolume += pmia.Act_Qty__c;
-                newPMI.listingFeePaid += pmia.Listing_Fee__c;
-                newPMI.promotionalActivityPaid += pmia.Promotional_Activity__c;
-                newPMI.trainingAndAdvocacyPaid += pmia.Training_and_Advocacy__c;
-                */
                 if (pmia.Act_Qty__c != undefined) {
                     pmi.actualVolume = (pmi.actualVolume == undefined ? 0 : pmi.actualVolume) + parseFloat(pmia.Act_Qty__c);
                 }
@@ -320,10 +426,12 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 console.log('[summary.buildtabledata] newPMI', pmi);
             });            
         }
-
+        */
         const data = [];
         let index = 0;
-        accountsMap.forEach((account, key, map) => {
+        var volume = 0;
+        var actualVolume = 0;
+        //accountsMap.forEach((account, key, map) => {
             console.log('[summary.buildtabledata] account', account);
             index = 0;
             account.pmi.forEach(pmi => {
@@ -335,16 +443,24 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     row.account = '';
                 } 
                 row.product = pmi.product;
-                row.plannedVolume = pmi.plannedVolume;
+
+                volume = pmi.plannedVolume;
+                actualVolume = pmi.actualVolume;
+                if (this.captureVolumeInBottles) {
+                    volume = pmi.plannedVolume * pmi.packQuantity;
+                    actualVolume = pmi.actualVolume * pmi.packQuantity;
+                }
+                row.plannedVolume = volume;
                 row.discount = pmi.discount;
                 row.listingFee = pmi.listingFee;
                 row.promotionalActivity = pmi.promotionalActivity;
                 row.trainingAdvocacy = pmi.trainingAdvocacy;
-                row.actualVolume = pmi.actualVolume; 
+                row.actualVolume = actualVolume; 
                 row.listingFeePaid = pmi.listingFeePaid;
                 row.promotionalActivityPaid = pmi.promotionalActivityPaid;
                 row.trainingAdvocacyPaid = pmi.trainingAdvocacyPaid;
                 row.totalInvestment = pmi.totalInvestment;
+                row.payment = pmi.payment;
 
                 row.quartersCaptured = 0;  // Need to calculate or capture how many quarters are captured
                 row.listingFeeBalance = row.listingFee - row.listingFeePaid;
@@ -355,6 +471,15 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     row.totalInvestmentActual9L = row.actualVolume > 0 ? row.totalInvestmentActual / row.actualVolume : 0;    
                 }
         
+                const nineLtrCases = pmi.plannedVolume / 9;
+                const plannedPrice = nineLtrCases * pmi.grossProfit;
+                row.productSplit = (plannedPrice / this.totalPlannedSpend) * this.totalBudget;
+                console.log('9ltr cases: ' + nineLtrCases);
+                console.log('plannedPrice: ' + plannedPrice);
+                console.log('grossProfit: ' + pmi.grossProfit);
+                console.log('totalBudget: ' + this.totalBudget);
+                console.log('totalPlannedSpend: ' + this.totalPlannedSpend);
+
                 data.push(row);
                 index++;
             });
@@ -373,10 +498,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                                  trainingAdvocacyPaid: account.trainingAdvocacyPaid };
             data.push(accountRow);
             */
-        });
+        //});
         
         this.psaData = data;
         console.log('[summary.buildtabledata] data', data);
+        this.isWorking = false;
     }
 
 }

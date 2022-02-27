@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Activities</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Activities</shortDescription>
+        <value>Activities</value>
+    </labels>
+    <labels>
+        <fullName>Activity</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Activity</shortDescription>
+        <value>Activity</value>
+    </labels>
+    <labels>
+        <fullName>AreYouSure</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>AreYouSure</shortDescription>
+        <value>Are you sure?</value>
+    </labels>
+    <labels>
+        <fullName>Wholesaler</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Wholesaler</shortDescription>
+        <value>Wholesaler</value>
+    </labels>
+</CustomLabels>

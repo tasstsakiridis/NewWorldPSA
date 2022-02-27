@@ -2,6 +2,8 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
+import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+
 export default class ProductTile extends LightningElement {
 
     tileClass = 'tile';
@@ -40,7 +42,6 @@ export default class ProductTile extends LightningElement {
     }
     get pictureUrl() {
         var pictureUrl;
-        console.log('[productTile] product', this.product);
         if (this.product && this.product.Image_Name__c) {
             //pictureUrl = PRODUCT_IMAGES + '/ProductImages/' + this.product.Image_Name__c;
             pictureUrl = 'https://salesforce-static.b-fonline.com/images/'+this.product.Image_Name__c;
@@ -60,8 +61,22 @@ export default class ProductTile extends LightningElement {
         console.log('[productTile] psaitem', this.psaItem);
         if (this.psaItem) {            
             let str = '';
-            if (this.psaItem.Plan_Volume__c) { str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; }
-            if (this.psaItem.Plan_Rebate__c) { str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; }
+            console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
+            if (this.psaItem.Plan_Volume__c != undefined) { 
+                if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
+                    str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                } else {
+                    str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                }
+            }
+            console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);
+            if (this.psaItem.Plan_Rebate__c != undefined) { 
+                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                    str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                } else {
+                    str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                }
+            }
             return str;
         } else {
             return 'has no psa item details';
@@ -76,23 +91,24 @@ export default class ProductTile extends LightningElement {
     }
     get totalInvestmentSummary() {
         if (this.psaItem && this.psaItem.Total_Investment__c) {
-            return '$' + parseFloat(this.psaItem.Total_Investment__c) + ' total investment';
+            return '$' + parseFloat(this.psaItem.Total_Investment__c) + ' ' + LABEL_TOTAL_INVESTMENT.toLowerCase();
         }
     }
 
     handleSelectTile(isSelected) {
-        console.log('[producttile] selectTile method called');
         this.isSelected = isSelected;
         //this.selectTile();
     }
     handlePSAUpdate(detail) {
-        console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem.Id);
         try {
         if (detail.psaItemId === this.psaItem.Id) {   
+            console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem);
             const newItem = Object.assign({}, this.psaItem);                     
             newItem.Plan_Rebate__c = detail.discount;
             newItem.Plan_Volume__c = detail.volume;
             newItem.Total_Investment__c = detail.totalInvestment;
+            newItem.Proposed_Plan_Volume__c = detail.proposedVolume;
+            newItem.Proposed_Plan_Rebate__c = detail.proposedRebate;
             this.psaItem = Object.assign({}, newItem);
             console.log('[producttile.handlepsaupdated] psaitem', this.psaItem);
         }

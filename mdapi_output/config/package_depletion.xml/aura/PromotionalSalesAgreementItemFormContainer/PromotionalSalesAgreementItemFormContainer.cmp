@@ -1,0 +1,10 @@
+<aura:component implements="lightning:isUrlAddressable">
+    <aura:attribute name="psaId" type="String" required="true" />
+    <aura:attribute name="productId" type="String" required="true" />
+    <aura:attribute name="promotionId" type="String" />
+    <aura:attribute name="psaItemId" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <c:promotionalSalesAgreementItemForm psaId="{!v.psaId}" productId="{!v.productId}" psaItemId="{!v.psaItemId}" />
+</aura:component>	
