@@ -1,0 +1,10 @@
+<messaging:emailTemplate subject="Brown Forman - Promotional Support Agreement" recipientType="User" relatedToType="Promotion_Activity__c" replyTo="{!relatedTo.Owner.Email}">
+<messaging:attachment renderAs="PDF" filename="{!relatedTo.Name}">
+    <c:Brazil_PSA_Contract psa="{!relatedTo}" />
+</messaging:attachment>
+<messaging:plainTextEmailBody >
+Attached are the details of this Promotional Support Agreement.  Click the link to review and sign.
+
+{!relatedTo.Detail_Link__c}
+</messaging:plainTextEmailBody>
+</messaging:emailTemplate>

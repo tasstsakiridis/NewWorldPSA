@@ -1,0 +1,135 @@
+<template>
+    <lightning-card title={accountName}>
+        <lightning-button-group slot="actions">
+            <lightning-button name="btn_loadFromActivity" icon-name="utility:data_mapping" label={loadFromActivityLabel} onclick={toggleActivityList}></lightning-button>
+            <lightning-button name="btn_add" variant="brand" label={labels.new.label} icon-name="utility:new" alternative-text="Add" onclick={addNewRow}></lightning-button>
+        </lightning-button-group>
+
+        <lightning-layout>
+            <lightning-layout-item size="8">
+                <lightning-datatable
+                        key-field="id"
+                        data={depletionData}
+                        columns={depletionColumns}
+                        onrowaction={handleRowAction}>
+                </lightning-datatable>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small" class="slds-border_left">
+                <template if:true={showActivityList}>
+                    <lightning-radio-group name="rgActivity"
+                                            label={labels.activity.labelPlural}
+                                            options={allActivities}
+                                            value={selectedActivity}
+                                            type="radio"
+                                            onchange={handleAllActivitiesChange}>
+                    </lightning-radio-group>
+                </template>
+                
+                <template if:true={showHowToMessage}>
+                    <p>Click + button to add new depletion or select a depletion to edit</p>
+                </template>
+                <template if:true={depletion}>
+                    <template if:true={isWorking}>
+                        <lightning-spinner alternative-text="saving..." size="small"></lightning-spinner>
+                    </template>
+                    <lightning-card title="New Depletion">
+                        <lightning-button-group slot="actions">
+                            <lightning-button-icon name="btn_save" icon-name="utility:save" alternative-text="Save" onclick={save}></lightning-button-icon>
+                            <template if:false={isNew}>
+                                <lightning-button-icon name="btn_delete" icon-name="utility:delete" alternative-text="Delete" onclick={deleteRow}></lightning-button-icon>
+                            </template>
+                            <template if:true={showSkipButton}>
+                                <lightning-button-icon name="btn_skip" icon-name="utility:jump_to_right" alternative-text="Skip" onclick={skip}></lightning-button-icon>
+                            </template>
+                            <lightning-button-icon name="btn_cancel_edit" icon-name="utility:back" alternative-text="Cancel" onclick={cancelEdit}></lightning-button-icon>                                    
+                        </lightning-button-group>
+
+                        <template if:true={selectedActivity}>
+                            <div class="slds-m-around_small">
+                                <span class="slds-text-title_caps slds-float_right">{productIndexLabel}</span>
+                            </div>
+                        </template>
+                        <div class="slds-m-around_small">
+                            <template if:true={hasMultipleRecordTypes}>
+                                <lightning-combobox label={labels.recordType.label}
+                                        class="required-fld"
+                                        value={depletion.recordTypeId}
+                                        options={recordTypes}
+                                        readonly={isEditing}
+                                        onchange={handleRecordTypeChange}>
+                                </lightning-combobox>
+                            </template>
+                            <template if:false={hasMultipleRecordTypes}>
+                                <p class="slds-text-title_caps">{recordTypeName}</p>
+                            </template>
+                        </div>
+
+                        <div class="slds-m-around_small">
+                            <lightning-combobox label={labels.product.label} name="productCombo"
+                                    class="required-fld"
+                                    value={depletion.product}
+                                    options={productOptions}
+                                    readonly={isEditing}
+                                    onchange={handleProductChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-m-around_small">
+                            <template if:false={captureInBottles}>
+                                <lightning-input label={labels.volume.label} name="volumeText"
+                                    class="required-field"
+                                    value={depletion.volume}
+                                    placeholder={labels.volume.placeholder}
+                                    onchange={handleVolumeChange}>
+                                </lightning-input>
+                            </template>
+                            <template if:true={captureInBottles}>
+                                <lightning-input label={labels.bottles.label} name="bottleText"
+                                    class="required-field"
+                                    value={depletion.bottles}
+                                    placeholder={labels.bottles.placeholder}
+                                    onchange={handleBottlesChange}>
+                                </lightning-input>
+                            </template>
+                        </div>
+                        <div class="slds-m-around_small">
+                            <!--
+                            <lightning-input label={labels.month.label} name="monthText"
+                                            value={depletion.month}
+                                            placeholder={labels.month.placeholder}
+                                            onchange={handleMonthChange}>
+                            </lightning-input>
+                        -->
+                            <lightning-combobox label={labels.month.label} name="monthCombo"
+                                        value={depletion.month}
+                                        options={months}
+                                        onchange={handleMonthChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-m-around_small">
+                            <template if:true={hasAccessToActivity}>
+                                <lightning-combobox label={labels.activity.label} name="activityCombo"
+                                                    value={depletion.activity}
+                                                    placeholder={labels.activity.placeholder}
+                                                    options={activityOptions}
+                                                    readonly={isEditing}
+                                                    onchange={handlePromotionActivityChange}>
+                                </lightning-combobox>                                    
+                            </template>
+                        </div>
+                        <div class="slds-m-around_small">
+                            <template if:true={hasAccessToWholesaler}>
+                                <lightning-combobox label={labels.wholesaler.label} name="wholesalerCombo"
+                                                    value={depletion.wholesaler}
+                                                    placeholder={labels.wholesaler.placeholder}
+                                                    options={wholesalerOptions}
+                                                    onchange={handleWholesalerChange}>
+                                </lightning-combobox>
+                            </template>
+                        </div>
+                    </lightning-card>    
+                </template>
+            </lightning-layout-item>
+        </lightning-layout>
+        
+    </lightning-card>
+</template>
