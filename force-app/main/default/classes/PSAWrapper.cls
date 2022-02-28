@@ -1,3 +1,6 @@
+/**
+ * Test Class:  PromotionalSalesAgreementController_Test
+ */
 public with sharing class PSAWrapper {
     public class PSAItemWrapper {
         @AuraEnabled 
@@ -117,6 +120,9 @@ public with sharing class PSAWrapper {
     public Decimal totalBudget { get; set; }
 
     @AuraEnabled 
+    public Decimal percentageVisibility { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -153,6 +159,7 @@ public with sharing class PSAWrapper {
         this.mpoPrestige = false;
         this.numberOfPayments = 1;
         this.totalBudget = 0;
+        this.percentageVisibility = 0;
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -186,5 +193,6 @@ public with sharing class PSAWrapper {
         this.comments = psa.Evaluation_Comments__c;
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
         this.totalBudget = psa.Activity_Budget__c;
+        this.percentageVisibility = psa.Percentage_Visibility__c;
     }
 }

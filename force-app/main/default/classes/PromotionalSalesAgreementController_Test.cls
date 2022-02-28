@@ -100,6 +100,7 @@ private class PromotionalSalesAgreementController_Test {
             psa2.Length_of_Agreement__c = 10;
             psa2.Reminder_Date__c = psa2.Begin_Date__c;
             psa2.Next_Email_Date__c = psa2.Begin_Date__c;
+            psa2.Status__c = 'New';
 
             Promotion_Activity__c psa3 = new Promotion_Activity__c();
             psa3.Name = 'Test PSA 3';
@@ -274,7 +275,7 @@ private class PromotionalSalesAgreementController_Test {
             rebates.add(rebate1);
             rebates.add(rebate2);
 
-            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', rebates);
+            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', 6,true,rebates);
             System.assertNotEquals(0, pmiaIds.size());
 
             msg = PromotionalSalesAgreement_Controller.updateActualTotals(psa1.Id);
@@ -295,16 +296,17 @@ private class PromotionalSalesAgreementController_Test {
             PSAWrapper wrapper2 = new PSAWrapper(psa1);
             System.assertNotEquals(null, wrapper2);
             
-            UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
-            contractController.setThePSA(psa1);
+            //UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
+            //contractController.setThePSA(psa1);
             
+            /*
             ApexPages.StandardController stdController = new ApexPages.StandardController(psa1);
             PageReference docuSignPage = new PageReference('/apex/UK_PSA_Generate_DocuSign');
             docuSignPage.getParameters().put('id', psa1.Id);        
             Test.setCurrentPage(docuSignPage);
             
             UK_PSA_Generate_DocuSign_Controller docuSignController = new UK_PSA_Generate_DocuSign_Controller(stdController);
-
+			*/
             /*
             List<Promotion_Activity__c> psaList = new List<Promotion_Activity__c>();
             psaList.add(psa1);
@@ -314,12 +316,12 @@ private class PromotionalSalesAgreementController_Test {
             CalculateNextReminderDate.calcNextReminderDate(psaList);
             CalculateNextActualsReminderDate.calcNextActualsReminderDate(psaList);
             */
-            
-            List<String> psaIds = new List<String>();
-            psaIds.add(psa1.Id);
-            BuildInitialActualsForPSA.buildInitialActuals(psaIds);
-            
-            
+                        
+            PageReference previewRef = Page.PromotionalSalesAgreement_Preview;
+            Test.setCurrentPage(previewRef);
+            ApexPages.currentPage().getParameters().put('id', psa1.Id);
+            PSA_Preview_Controller psaPreviewCtrl = new PSA_Preview_Controller();
+            Promotion_Activity__c previewPSA = psaPreviewCtrl.getPsa();
             Test.stopTest();
         }
     }

@@ -97,6 +97,10 @@
                         <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
                         <span class="slds-text-heading_medium">{wholesalerName}</span>
                     </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.comments.label}</p>
+                        <span class="slds-text-heading_medium">{comments}</span>
+                    </lightning-layout-item>
                 </template>
                 <template if:true={canEdit}>
                     <template if:true={isNew}>
@@ -129,13 +133,27 @@
                                         <template if:true={isPhone}>
                                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                         </template>
-                                        <lightning-input type="number" 
-                                                        label={actualQtyFormattedLabel} 
-                                                        name="i_ActQty" value={rebate.rebateAmount} 
-                                                        placeholder={labels.actualQty.placeholder} 
-                                                        data-rebate-type={rebate.rebateType}
-                                                        step="0.01"
-                                                        onchange={handleRebateAmountChange}></lightning-input>
+                                        <template if:true={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="1"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template if:false={captureVolumeInBottles}>
+                                            <lightning-input type="number" 
+                                                            label={actualQtyFormattedLabel} 
+                                                            name="i_ActQty" value={rebate.rebateAmount} 
+                                                            placeholder={labels.actualQty.placeholder} 
+                                                            data-rebate-type={rebate.rebateType}
+                                                            step="0.01"
+                                                            onchange={handleRebateAmountChange}>
+                                            </lightning-input>
+                                
+                                        </template>
                                         <template if:true={hasActualQtyError}>
                                             <span class="error">{labels.actualQty.error}</span>
                                         </template>
@@ -163,6 +181,15 @@
                                 options={wholesalerOptions}
                                 onchange={handleWholesalerChange}>
                             </lightning-combobox>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-textarea name="i_Comments"
+                                    label={labels.comments.label}
+                                    value={comments}
+                                    maxlength="1024"
+                                    message-when-too-long={labels.comments.toolongMessage}
+                                    onchange={handleCommentsChange}>
+                            </lightning-textarea>
                         </lightning-layout-item>
 
                     </template>
@@ -234,6 +261,15 @@
                                     onchange={handleWholesalerChange}>
                                 </lightning-combobox>
                             </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                            <lightning-textarea name="i_Comments"
+                                    label={labels.comments.label}
+                                    value={comments}
+                                    maxlength="1024"
+                                    message-when-too-long={labels.comments.toolongMessage}
+                                    onchange={handleCommentsChange}>
+                            </lightning-textarea>
                         </lightning-layout-item>
                     </template>
                 </template>                
