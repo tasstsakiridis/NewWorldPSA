@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Training_and_Advocacy__c</fullName>
+    <externalId>false</externalId>
+    <label>Training and Advocacy</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Category Training</fullName>
+                <default>false</default>
+                <label>Category Training</label>
+            </value>
+            <value>
+                <fullName>Product Training</fullName>
+                <default>false</default>
+                <label>Product Training</label>
+            </value>
+            <value>
+                <fullName>Cocktail Training</fullName>
+                <default>false</default>
+                <label>Cocktail Training</label>
+            </value>
+            <value>
+                <fullName>Bespoke Training</fullName>
+                <default>false</default>
+                <label>Bespoke Training</label>
+            </value>
+            <value>
+                <fullName>Bespoke Advocacy Activation</fullName>
+                <default>false</default>
+                <label>Bespoke Advocacy Activation</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

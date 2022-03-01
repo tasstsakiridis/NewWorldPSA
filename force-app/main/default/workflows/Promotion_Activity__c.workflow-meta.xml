@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>UK_PSA_Reminder_Alert</fullName>
+        <description>UK - PSA Reminder Alert</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>Workflow_Email_Templates/UK_PSA_Reminder</template>
+    </alerts>
+    <alerts>
+        <fullName>UK_PSA_Status_Changed</fullName>
+        <description>UK - PSA Status Changed</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>Workflow_Email_Templates/UK_PSA_Status_Update</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>Activity_Approved_Date</fullName>
+        <field>Date_Approved__c</field>
+        <formula>Today()</formula>
+        <name>Activity Approved Date</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Activity_Has_Been_Approved</fullName>
+        <field>Is_Approved__c</field>
+        <literalValue>1</literalValue>
+        <name>Activity Has Been Approved</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Activity_Next_Email_Date</fullName>
+        <field>Next_Email_Date__c</field>
+        <formula>IF(Begin_Date__c + 90 &gt; End_Date__c, End_Date__c, Begin_Date__c + 1)</formula>
+        <name>Activity Next Email Date</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Activity_Pending_Approval</fullName>
+        <field>Status__c</field>
+        <literalValue>Pending Approval</literalValue>
+        <name>Activity Pending Approval</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+    </fieldUpdates>
+</Workflow>

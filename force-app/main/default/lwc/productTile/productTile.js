@@ -3,6 +3,7 @@ import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+import LABEL_SPLIT from '@salesforce/label/c.Split';
 
 export default class ProductTile extends LightningElement {
 
@@ -24,6 +25,34 @@ export default class ProductTile extends LightningElement {
 
     @api
     product;
+
+    @api 
+    quantityFieldName;
+
+    @api 
+    quantityFieldLabel;
+
+    @api 
+    priceFieldName;
+
+    @api 
+    priceFieldLabel;
+
+    @api 
+    captureVolumeInBottles;
+
+    @api 
+    calcSplit;
+
+    @api 
+    showTotalInvestment;
+
+    quantityFieldValue = 0;
+    priceFieldValue = 0;
+
+    get showQtyOrPriceFields() {
+        return this.quantityFieldName != undefined || this.priceFieldName != undefined;
+    }
 
     get productName() {
         return this.product ? this.product.Name : '';
@@ -58,7 +87,9 @@ export default class ProductTile extends LightningElement {
     }
 
     get psaItemSummary() {
-        console.log('[productTile] psaitem', this.psaItem);
+        console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
+        console.log('[productTile] product', this.product == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.product)));
+        console.log('[productTile] captureVolumeInBottles', this.captureVolumeInBottles);
         if (this.psaItem) {            
             let str = '';
             console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
@@ -95,6 +126,12 @@ export default class ProductTile extends LightningElement {
         }
     }
 
+    @api 
+    selectTile(isSelected) {
+        this.isSelected = isSelected;
+        this.setTileClass();
+    }
+
     handleSelectTile(isSelected) {
         this.isSelected = isSelected;
         //this.selectTile();
@@ -123,10 +160,10 @@ export default class ProductTile extends LightningElement {
         try {
         console.log('[productTile.handleClick] product', this.product.Id, this.psaItem);
         this.isSelected = !this.isSelected;
-        this.selectTile();
+        this.setTileClass();
         
         const selectedEvent = new CustomEvent('selected', {
-            detail: { productId: this.product.Id, psaItemId: this.psaItemId }
+            detail: { productId: this.product.Id, productName: this.product.Name, psaItemId: this.psaItemId }
         });
         this.dispatchEvent(selectedEvent);
         }catch(ex) {
@@ -134,7 +171,8 @@ export default class ProductTile extends LightningElement {
         }
     }
 
-    selectTile() {
+    setTileClass() {
+        console.log('[productTile.selectTile] isselected', this.isSelected);
         if (this.keepSelection && this.isSelected) {
             this.tileClass = 'selected';
         } else {
@@ -142,4 +180,16 @@ export default class ProductTile extends LightningElement {
         }
     }
 
+    handleQuantityFieldValueCHange(event) {
+        this.quantityFieldValue = event.detail.value;
+        const updateEvent = new CustomEvent('qtyupdate', {
+            detail: { productId: this.productId, qty: this.quantityFieldValue }
+        });
+    }
+    handlePriceFieldValueCHange(event) {
+        this.priceFieldValue = event.detail.value;
+        const updateEvent = new CustomEvent('priceupdate', {
+            detail: { productId: this.productId, price: this.quantityFieldValue }
+        });
+    }
 }

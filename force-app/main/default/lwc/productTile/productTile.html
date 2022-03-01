@@ -16,10 +16,37 @@
                         </lightning-layout>
                     </lightning-layout-item>
                     <lightning-layout-item size="12">
+                        <template if:true={showQtyOrPriceFields}>
+                            <div class="slds-grid slds-border_top">
+                                <template if:true={quantityFieldName}>
+                                    <div class="slds-col slds-m-right_x-small">
+                                        <lightning-input type="number" 
+                                                        step="1"
+                                                        label={quantityFieldLabel} 
+                                                        value={qtyFieldValue}
+                                                        onchange={handleQtyFieldValueChange}>
+                                        </lightning-input>
+                                    </div>
+                                </template>
+                                <template if:true={priceFieldName}>
+                                    <lightning-input type="number" 
+                                                    formatter="currency"
+                                                    step="0.01"
+                                                    label={priceFieldLabel} 
+                                                    value={priceFieldValue}
+                                                    onchange={handlePriceFieldValueChange}>
+                                    </lightning-input>
+                                </template>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12">
                         <template if:true={psaItem}>
                             <div class="slds-border_top">
                                 <p><lightning-formatted-rich-text value={psaItemSummary}></lightning-formatted-rich-text></p>
-                                <p><b><lightning-formatted-number value={totalInvestment} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b> total investment</p>
+                                <template if:true={showTotalInvestment}>
+                                    <p><b><lightning-formatted-number value={totalInvestment} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b> total investment</p>
+                                </template>
                             </div>
                         </template>
                     </lightning-layout-item>

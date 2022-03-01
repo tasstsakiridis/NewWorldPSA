@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Drink_Strategy__c</fullName>
+    <externalId>false</externalId>
+    <label>Drink Strategy</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Perfect Serve</fullName>
+                <default>false</default>
+                <label>Perfect Serve</label>
+            </value>
+            <value>
+                <fullName>Menu - Outlet Creation</fullName>
+                <default>false</default>
+                <label>Menu - Outlet Creation</label>
+            </value>
+            <value>
+                <fullName>Menu - First drink</fullName>
+                <default>false</default>
+                <label>Menu - First drink</label>
+            </value>
+            <value>
+                <fullName>Menu - First in category</fullName>
+                <default>false</default>
+                <label>Menu - First in category</label>
+            </value>
+            <value>
+                <fullName>Menu -American Whiskey section</fullName>
+                <default>false</default>
+                <label>Menu -American Whiskey section</label>
+            </value>
+            <value>
+                <fullName>Online menu inclusion</fullName>
+                <default>false</default>
+                <label>Online menu inclusion</label>
+            </value>
+            <value>
+                <fullName>Online drink feature</fullName>
+                <default>false</default>
+                <label>Online drink feature</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Christmas serve</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Christmas serve</label>
+            </value>
+            <value>
+                <fullName>Jack &amp; Cola</fullName>
+                <default>false</default>
+                <label>Jack &amp; Cola</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Apple Jack</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Apple Jack</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Godfather No.7</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Godfather No.7</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Lynchburg Lemonade</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Lynchburg Lemonade</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Old Fashioned</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Old Fashioned</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Mr Jack Hard Shake</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Mr Jack Hard Shake</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Red Dog Smash</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Red Dog Smash</label>
+            </value>
+            <value>
+                <fullName>Jack Daniel&#39;s Sour</fullName>
+                <default>false</default>
+                <label>Jack Daniel&#39;s Sour</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>
