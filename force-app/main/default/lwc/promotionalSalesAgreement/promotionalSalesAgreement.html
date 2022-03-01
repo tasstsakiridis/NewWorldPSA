@@ -189,11 +189,6 @@
                                         <lightning-combobox name="i_Status" label={labels.status.label} value={status} options={statusOptions} class="slds-m-horizontal_small" onchange={handleStatusChange}></lightning-combobox>
                                     </lightning-layout-item>
                                 </template>                                
-                                <!--
-                                <lightning-layout-item size="12" padding="around-small">
-                                    <lightning-input type="text" name="i_PurchaseOrder" label={labels.purchaseOrder.label} value={purchaseOrder} class="slds-m-horizontal_small" onchange={handlePurchaseOrderChange}></lightning-input>                                        
-                                </lightning-layout-item>
-                                -->
                             </template>
                             <template if:true={captureTotalBudget}>
                                 <lightning-layout-item size="12" padding="around-small">
@@ -230,11 +225,11 @@
                                     <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                             </template>
-                        </lightning-layout>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
-                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.comments.label}</h3>
-                        <lightning-textarea label={labels.comments.label} value={comments} onchange={handleCommentsChange}></lightning-textarea>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.comments.label}</h3>
+                                <lightning-textarea label={labels.comments.label} value={comments} onchange={handleCommentsChange}></lightning-textarea>
+                            </lightning-layout-item>
+                    </lightning-layout>
                     </lightning-layout-item>
                     <!--
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">

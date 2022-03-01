@@ -237,10 +237,6 @@ private class PromotionalSalesAgreementController_Test {
             //System.assertNotEquals(null, pmi);
 
             Promotion_Material_Item__c pmi = PromotionalSalesAgreement_Controller.getPSAItemDetails(pmiId);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> master
             pmi.Proposed_Plan_Rebate__c = 1.25;
             pmi.Proposed_Plan_Volume__c = 100;
             pmi.Proposed_Listing_Fee__c = 10000;
@@ -252,7 +248,6 @@ private class PromotionalSalesAgreementController_Test {
             psa1.Status__c = 'Approved';
             update psa1;
             
-            System.assertNotEquals(null, pmi);
             Boolean isSOMUser = PromotionalSalesAgreement_Controller.getIsSOMUser();
             System.assertEquals(false, isSOMUser);
 
@@ -280,15 +275,7 @@ private class PromotionalSalesAgreementController_Test {
             rebates.add(rebate1);
             rebates.add(rebate2);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', 6,true,rebates);
-=======
-            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, rebates);
->>>>>>> e1f68c45ffb919604bfd379b695e60822d390ed8
-=======
-            List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', 6,true,rebates);
->>>>>>> master
             System.assertNotEquals(0, pmiaIds.size());
 
             msg = PromotionalSalesAgreement_Controller.updateActualTotals(psa1.Id);
@@ -309,10 +296,6 @@ private class PromotionalSalesAgreementController_Test {
             PSAWrapper wrapper2 = new PSAWrapper(psa1);
             System.assertNotEquals(null, wrapper2);
             
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> master
             //UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
             //contractController.setThePSA(psa1);
             
@@ -339,16 +322,6 @@ private class PromotionalSalesAgreementController_Test {
             ApexPages.currentPage().getParameters().put('id', psa1.Id);
             PSA_Preview_Controller psaPreviewCtrl = new PSA_Preview_Controller();
             Promotion_Activity__c previewPSA = psaPreviewCtrl.getPsa();
-<<<<<<< HEAD
-=======
-            ApexPages.StandardController ctrlr = new ApexPages.StandardController(psa1);
-            PageReference previewRef = Page.PromotionalSalesAgreement_Preview;
-            Test.setCurrentPage(previewRef);
-            PSA_Preview_Controller psaPreviewCtrl = new PSA_Preview_Controller(ctrlr);
-            
->>>>>>> e1f68c45ffb919604bfd379b695e60822d390ed8
-=======
->>>>>>> master
             Test.stopTest();
         }
     }

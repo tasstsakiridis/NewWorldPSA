@@ -6,12 +6,11 @@
 									OCO = 'Tag',
 									LF = '1',
 									CES = 'Electronic agreement - Brown-Forman',
-									CEM = 'Please sign the agreement with your signature',
-									CRL = 'Email~' + Promotion_Activity__c.Contact_Email__c + ';FirstName~' + Promotion_Activity__c.Contact_First_Name__c + ';LastName~' + Promotion_Activity__c.Contact_Last_Name__c + ';RoutingOrder~1;Role~Signer 1, Email~' + User.Email + ';FirstName~' + User.FirstName + ';LastName~' + User.LastName + ';Role~Signer 2;RoutingOrder~2;',
-									CCRM = 'Signer 1~Customer;Signer 2~Sales Executive'
+									CEM = 'Please sign the agreement with your signature'
 								])}"
                         value="Generate DocuSign Document"
-                        id="btn_Generate_DocuSign"/>						
+                        id="btn_Generate_DocuSign"/>
+        
     </apex:form>
         
 </apex:page>

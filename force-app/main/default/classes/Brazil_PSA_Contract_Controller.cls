@@ -78,14 +78,12 @@ public with sharing class Brazil_PSA_Contract_Controller {
                     for(Integer i = 0; i < pi.StepsAndWorkitems.size(); i++) {
                         System.debug('actor: ' + pi.StepsAndWorkItems[i].Actor.Name + ', status: ' + pi.StepsAndWorkItems[i].StepStatus);
 
-                        if (!pi.StepsAndWorkItems[i].IsPending) {
-                            completedDate = pi.StepsAndWorkItems[i].CreatedDate;
-                            //if (pi.StepsAndWorkItems[i].ElapsedTimeInMinutes != null) {
-                            //    completedDate = pi.CreatedDate.addMinutes((Integer)pi.StepsAndWorkItems[i].ElapsedTimeInMinutes);
-                            //}
+                        completedDate = pi.StepsAndWorkItems[i].CreatedDate;
+                        //if (pi.StepsAndWorkItems[i].ElapsedTimeInMinutes != null) {
+                        //    completedDate = pi.CreatedDate.addMinutes((Integer)pi.StepsAndWorkItems[i].ElapsedTimeInMinutes);
+                        //}
 
-                            history.items.add(new ApprovalHistoryItem(pi.StepsAndWorkItems[i].Actor.Name, pi.StepsAndWorkItems[i].StepStatus, pi.StepsAndWorkItems[i].Comments, completedDate, pi.StepsAndWorkItems[i].Actor.Title));
-                        }
+                        history.items.add(new ApprovalHistoryItem(pi.StepsAndWorkItems[i].Actor.Name, pi.StepsAndWorkItems[i].StepStatus, pi.StepsAndWorkItems[i].Comments, completedDate, pi.StepsAndWorkItems[i].Actor.Title));
                     }                    
                 }
             }

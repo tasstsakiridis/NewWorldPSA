@@ -95,17 +95,30 @@ export default class ProductTile extends LightningElement {
             console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
             if (this.psaItem.Plan_Volume__c != undefined) { 
                 if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
-                    str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                    if (this.captureVolumeInBottles) {
+                        str = '<b>'+this.psaItem.Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c)+'</b> bottles';
+                    } else {
+                        str = '<b>'+this.psaItem.Plan_Volume__c + '</b> cases'; 
+                    }
                 } else {
-                    str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                    if (this.captureVolumeInBottles) {
+                        str = '<b>'+this.psaItem.Proposed_Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c)+'</b> bottles';
+                    } else {
+                        str = '<b style="color: red;">'+this.psaItem.Proposed_Plan_Volume__c + '</b> cases';
+                    }
                 }
             }
             console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);
+            console.log('[productTile] calcSplit', this.calcSplit);
             if (this.psaItem.Plan_Rebate__c != undefined) { 
-                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
-                    str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                if (this.calcSplit) {
+                    str += ' @ <b>' + this.psaItem.CurrencyIsoCode + ' ' + parseFloat(this.psaItem.Product_Split__c).toFixed(2) + '</b> ' + LABEL_SPLIT;
                 } else {
-                    str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                    if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                        str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                    } else {
+                        str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                    }    
                 }
             }
             return str;

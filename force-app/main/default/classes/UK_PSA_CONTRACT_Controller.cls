@@ -6,7 +6,6 @@ public with sharing class UK_PSA_CONTRACT_Controller {
                                                     FROM Promotion_Material_Item__c
                                                     WHERE Activity__c =:pa.Id];
 
-/*
         if (items != null) {
             Set<String> setDrinkStrategy = new Set<String>();
             Set<String> setPromotionalActivity = new Set<String>();
@@ -49,7 +48,6 @@ public with sharing class UK_PSA_CONTRACT_Controller {
             outletToProvideValues = outletToProvideValues.removeStart('{');
             outletToProvideValues = outletToProvideValues.removeEnd('}');
         }
-        */
     }
     public Promotion_Activity__c getThePSA() {
         return thePSA;

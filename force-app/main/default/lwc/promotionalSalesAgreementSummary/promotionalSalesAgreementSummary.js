@@ -109,7 +109,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     thePSA;
     showListingFee = true;
     showPromotionalActivity = true;
-    showTrainingAndAdvocacy = false;
+    showTrainingAndAdvocacy = true;
     showPayments = true;
 
     /*
@@ -332,6 +332,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         console.log('[summary.buildTableData] thePSA', this.thePSA);
         if (this.showProductSplit) {
             this.showPromotionalActivity = false;
+            this.showTrainingAndAdvocacy = false;
             this.showListingFee = false;
             let cols = this.columns.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
             cols = cols.filter(c => c.fieldName != 'discount');
