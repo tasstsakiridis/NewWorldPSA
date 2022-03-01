@@ -2,7 +2,7 @@
     padding: 0.25rem;
     background-color: #fff;
     border-radius: 0.25rem;
-    min-height: 100px;
+    min-height: 8em;
     text-align: center;
 }
 
@@ -12,6 +12,7 @@ a {
 
 img.brand {
     height: auto; 
+    max-height: 6em;
     max-width: 90%;
     pointer-events: none;
 }

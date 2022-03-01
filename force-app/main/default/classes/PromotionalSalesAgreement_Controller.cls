@@ -121,7 +121,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
                                                     Product__c, Product_Name__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name, Listing_Fee__c,
                                                     Promotional_Activity__c, Training_and_Advocacy__c, Rebate_Type__c, Rebate_Amount__c, Has_Totals__c,
-                                                    Product_Pack_Qty__c
+                                                    Product_Pack_Qty__c, Comments__c
                                                     FROM PMI_Actuals__r ORDER BY Payment_Date__c),
                                             (SELECT Id, ContentDocumentId, ContentDocument.Title, ContentDocument.FileType, ContentDocument.FileExtension,
                                                     ContentDocument.LatestPublishedVersionId FROM ContentDocumentLinks) 
@@ -332,7 +332,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                        Rebate_Type__c, Rebate_Amount__c, Promotion_Material_Item__r.Total_Listing_Fee_Paid__c, Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c,
                        Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c, Promotion_Material_Item__r.Total_Actual_Volume__c,
                        Product_Pack_Qty__c, Activity__r.Activity_Budget__c, Promotion_Material_Item__r.Total_Payments_Paid__c,
-                       Promotion_Material_Item__r.Product_Split__c
+                       Promotion_Material_Item__r.Product_Split__c, Comments__c
                   FROM PMI_Actual__c 
                  WHERE Id =:pmiaId];
     }
@@ -542,7 +542,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled
-    public static List<String> createActuals(String psaId, String recordTypeId, String promotionId, String pmiId, String wholesalerId, Date paymentDate, String externalKey, String status, Integer productPackQty, Boolean captureVolumeInBottles, List<PSARebate> rebates) {
+    public static List<String> createActuals(String psaId, String recordTypeId, String promotionId, String pmiId, String wholesalerId, Date paymentDate, String externalKey, String status, Integer productPackQty, Boolean captureVolumeInBottles, String comments, List<PSARebate> rebates) {
         System.debug('psaId: ' + psaId);
         System.debug('recordTypeId: ' + recordTypeId);
         System.debug('promotionId: ' + promotionId);
@@ -570,6 +570,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     pmia.Rebate_Type__c = rebate.rebateType;
                     pmia.SAP_GL_Account__c = rebate.glAccount;
                     pmia.Has_Totals__c = rebate.hasTotals;
+                    pmia.Comments__c = comments;
                     if (rebate.rebateType == 'Volume') {
                         pmia.Act_Qty__c = rebate.rebateAmount;
                         if (captureVolumeInBottles) {

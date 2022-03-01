@@ -19,17 +19,18 @@ import OBJECT_PMIA from '@salesforce/schema/PMI_Actual__c';
 
 import FIELD_ID from '@salesforce/schema/PMI_Actual__c.Id';
 import FIELD_ACTIVITY_ID from '@salesforce/schema/PMI_Actual__c.Activity__c';
+import FIELD_ACTUAL_QTY from '@salesforce/schema/PMI_Actual__c.Act_Qty__c';
+import FIELD_ACTUAL_WHOLESALER from '@salesforce/schema/PMI_Actual__c.Actual_Wholesaler__c';
+import FIELD_APPROVAL_STATUS from '@salesforce/schema/PMI_Actual__c.Approval_Status__c';
+import FIELD_COMMENTS from '@salesforce/schema/PMI_Actual__c.Comments__c';
+import FIELD_EXTERNAL_KEY from '@salesforce/schema/PMI_Actual__c.External_Key__c';
+import FIELD_LISTING_FEE from '@salesforce/schema/PMI_Actual__c.Listing_Fee__c';
+import FIELD_PAYMENT_DATE from '@salesforce/schema/PMI_Actual__c.Payment_Date__c';
+import FIELD_PERIOD from '@salesforce/schema/PMI_Actual__c.Period__c';
 import FIELD_PROMOTION_ID from '@salesforce/schema/PMI_Actual__c.Promotion__c';
 import FIELD_PROMOTION_MATERIAL_ITEM_ID from '@salesforce/schema/PMI_Actual__c.Promotion_Material_Item__c';
-import FIELD_APPROVAL_STATUS from '@salesforce/schema/PMI_Actual__c.Approval_Status__c';
-import FIELD_PERIOD from '@salesforce/schema/PMI_Actual__c.Period__c';
-import FIELD_EXTERNAL_KEY from '@salesforce/schema/PMI_Actual__c.External_Key__c';
-import FIELD_ACTUAL_QTY from '@salesforce/schema/PMI_Actual__c.Act_Qty__c';
-import FIELD_PAYMENT_DATE from '@salesforce/schema/PMI_Actual__c.Payment_Date__c';
-import FIELD_ACTUAL_WHOLESALER from '@salesforce/schema/PMI_Actual__c.Actual_Wholesaler__c';
-import FIELD_REBATE_AMOUNT from '@salesforce/schema/PMI_Actual__c.Rebate_Amount__c';
-import FIELD_LISTING_FEE from '@salesforce/schema/PMI_Actual__c.Listing_Fee__c';
 import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/PMI_Actual__c.Promotional_Activity__c';
+import FIELD_REBATE_AMOUNT from '@salesforce/schema/PMI_Actual__c.Rebate_Amount__c';
 import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/PMI_Actual__c.Training_and_Advocacy__c';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account'
@@ -38,6 +39,8 @@ import LABEL_ACTUAL_QTY from '@salesforce/label/c.Actual_Qty';
 import LABEL_ACTUAL_QTY_ERROR from '@salesforce/label/c.Actual_Qty_Error';
 import LABEL_ACTUAL_QTY_PLACEHOLDER from '@salesforce/label/c.Actual_Qty_Placeholder';
 import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_COMMENTS from '@salesforce/label/c.Comments';
+import LABEL_COMMENTS_TOOLONGMSG from '@salesforce/label/c.Too_Many_Characters';
 import LABEL_ERROR from '@salesforce/label/c.Error';
 import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
 import LABEL_HELP from '@salesforce/label/c.Help';
@@ -66,34 +69,35 @@ import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
  
 export default class PromotionalSalesAgreementActualsForm extends NavigationMixin(LightningElement) {
     labels = {
-        nineLitreVolume : { label: LABEL_NINELITREVOLUME },
-        back         : { label: LABEL_BACK },
-        save         : { label: LABEL_SAVE },
-        help         : { label: LABEL_HELP },
-        actuals      : { label: LABEL_ACTUALS },
-        error        : { label: LABEL_ERROR },
-        status       : { label: LABEL_STATUS },
-        account      : { label: LABEL_ACCOUNT },
-        product      : { label: LABEL_PRODUCT },
-        actualQty    : { label: LABEL_ACTUAL_QTY, placeholder: LABEL_ACTUAL_QTY_PLACEHOLDER, error: LABEL_ACTUAL_QTY_ERROR },
-        paymentDate  : { label: LABEL_PAYMENT_DATE, placeholder: LABEL_PAYMENT_DATE_PLACEHOLDER, error: LABEL_PAYMENT_DATE_ERROR },
-        processed    : { label: LABEL_PROCESSED },
-        planned      : { label: LABEL_PLANNED },
-        purchasedFrom : { label: LABEL_PURCHASED_FROM },
-        warning       : { label: LABEL_WARNING },
-        validation    : { error: LABEL_FORM_VALIDATION_ERROR },
-        skip          : { label: LABEL_SKIP.toLowerCase() },
-        prev          : { label: LABEL_PREV.toLowerCase() },
-        next          : { label: LABEL_NEXT.toLowerCase() },
-        listingFeePaid : { label: LABEL_LISTING_FEE_PAID },
-        promotionalActivityPaid: { label: LABEL_PROMOTIONAL_ACTIVITY_PAID },
-        trainingAndAdvocacyPaid: { label: LABEL_TRAINING_ADVOCACY_PAID },
-        rebateAmount  : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
-        rebatePaidAbovePlanned : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
-        remaining     : { label: 'remaining' },
-        amount        : { label: 'Amount' },
-        totalDiscount : { label: LABEL_TOTAL_DISCOUNT },
-        volumeBtl       : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },        
+        account                 : { label: LABEL_ACCOUNT },
+        actualQty               : { label: LABEL_ACTUAL_QTY, placeholder: LABEL_ACTUAL_QTY_PLACEHOLDER, error: LABEL_ACTUAL_QTY_ERROR },
+        actuals                 : { label: LABEL_ACTUALS },
+        amount                  : { label: 'Amount' },
+        back                    : { label: LABEL_BACK },
+        comments                : { label: LABEL_COMMENTS, tooLongMsg: LABEL_COMMENTS_TOOLONGMSG.replace('{0}', '1024') },
+        error                   : { label: LABEL_ERROR },
+        help                    : { label: LABEL_HELP },
+        listingFeePaid          : { label: LABEL_LISTING_FEE_PAID },
+        next                    : { label: LABEL_NEXT.toLowerCase() },
+        nineLitreVolume         : { label: LABEL_NINELITREVOLUME },
+        paymentDate             : { label: LABEL_PAYMENT_DATE, placeholder: LABEL_PAYMENT_DATE_PLACEHOLDER, error: LABEL_PAYMENT_DATE_ERROR },
+        planned                 : { label: LABEL_PLANNED },
+        prev                    : { label: LABEL_PREV.toLowerCase() },
+        processed               : { label: LABEL_PROCESSED },
+        product                 : { label: LABEL_PRODUCT },
+        promotionalActivityPaid : { label: LABEL_PROMOTIONAL_ACTIVITY_PAID },
+        purchasedFrom           : { label: LABEL_PURCHASED_FROM },
+        rebateAmount            : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
+        rebatePaidAbovePlanned  : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
+        remaining               : { label: 'remaining' },
+        save                    : { label: LABEL_SAVE },
+        skip                    : { label: LABEL_SKIP.toLowerCase() },
+        status                  : { label: LABEL_STATUS },
+        totalDiscount           : { label: LABEL_TOTAL_DISCOUNT },
+        trainingAndAdvocacyPaid : { label: LABEL_TRAINING_ADVOCACY_PAID },
+        validation              : { error: LABEL_FORM_VALIDATION_ERROR },
+        volumeBtl               : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },        
+        warning                 : { label: LABEL_WARNING },
     };    
 
     @wire(CurrentPageReference)
@@ -204,6 +208,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     totalActualVolume;
     totalDiscount;
     activityBudget;
+    comments;
 
     rebateType;
     rebateLabel;
@@ -391,6 +396,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.rebateAmount = event.detail.value;
         }
     }
+    handleCommentsChange(event) {
+        this.comments = event.detail.value;
+    }
 
     /**
      * Helper functions
@@ -490,6 +498,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.paymentDate = this.thePMIA.Payment_Date__c;
                 this.approvalStatus = this.thePMIA.Approval_Status__c;
                 this.processed = this.thePMIA.Boomi_Processed__c;
+                this.comments = this.thePMIA.Comments__c;
                 this.processedDate = this.thePMIA.Processed_Date__c;
                 this.plannedVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c);
                 this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
@@ -718,7 +727,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             fields[FIELD_APPROVAL_STATUS.fieldApiName] = this.approvalStatus;
             fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
             fields[FIELD_PAYMENT_DATE.fieldApiName] = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
-
+            fields[FIELD_COMMENTS.fieldApiName] = this.comments;
 
             if (this.pmiaId === undefined) {
                 fields['RecordTypeId'] = this.recordTypeId;
@@ -796,6 +805,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                             status: record.fields[FIELD_APPROVAL_STATUS.fieldApiName],
                             captureVolumeInBottles: this.captureVolumeInBottles,
                             productPackQty: this.productPackQty,
+                            comments: this.comments,
                             rebates: this.rebates })
             .then(result => {
                 console.log('[createnewpmia.createactuals] result', result);
