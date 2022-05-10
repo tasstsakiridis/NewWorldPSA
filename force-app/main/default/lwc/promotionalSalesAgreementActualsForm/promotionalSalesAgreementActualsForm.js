@@ -1,7 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
-import { createRecord, updateRecord } from 'lightning/uiRecordApi';
+import { createRecord, updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
 import { fireEvent, registerListener, unregisterAllListeners } from 'c/pubsub';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -24,6 +24,7 @@ import FIELD_ACTUAL_WHOLESALER from '@salesforce/schema/PMI_Actual__c.Actual_Who
 import FIELD_APPROVAL_STATUS from '@salesforce/schema/PMI_Actual__c.Approval_Status__c';
 import FIELD_COMMENTS from '@salesforce/schema/PMI_Actual__c.Comments__c';
 import FIELD_EXTERNAL_KEY from '@salesforce/schema/PMI_Actual__c.External_Key__c';
+import FIELD_INVOICE_NUMBER from '@salesforce/schema/PMI_Actual__c.Invoice_Number__c';
 import FIELD_LISTING_FEE from '@salesforce/schema/PMI_Actual__c.Listing_Fee__c';
 import FIELD_PAYMENT_DATE from '@salesforce/schema/PMI_Actual__c.Payment_Date__c';
 import FIELD_PERIOD from '@salesforce/schema/PMI_Actual__c.Period__c';
@@ -38,13 +39,16 @@ import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
 import LABEL_ACTUAL_QTY from '@salesforce/label/c.Actual_Qty';
 import LABEL_ACTUAL_QTY_ERROR from '@salesforce/label/c.Actual_Qty_Error';
 import LABEL_ACTUAL_QTY_PLACEHOLDER from '@salesforce/label/c.Actual_Qty_Placeholder';
+import LABEL_AMOUNT from '@salesforce/label/c.Amount';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMMENTS_TOOLONGMSG from '@salesforce/label/c.Too_Many_Characters';
 import LABEL_ERROR from '@salesforce/label/c.Error';
+import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
 import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
 import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
+import LABEL_INVOICE_NUMBER from '@salesforce/label/c.Invoice_Number';
 import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
 import LABEL_NEXT from '@salesforce/label/c.Next';
 import LABEL_NINELITREVOLUME from '@salesforce/label/c.NineLitreVolume';
@@ -59,6 +63,7 @@ import LABEL_PROMOTIONAL_ACTIVITY_PAID from '@salesforce/label/c.Promotional_Act
 import LABEL_PURCHASED_FROM from '@salesforce/label/c.Purchased_From';
 import LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR from '@salesforce/label/c.Rebate_Amount_Above_Planned_Error';
 import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_Placeholder';
+import LABEL_REMAINING from '@salesforce/label/c.Remaining';
 import LABEL_SAVE from '@salesforce/label/c.Save';
 import LABEL_SKIP from '@salesforce/label/c.Skip'
 import LABEL_STATUS from '@salesforce/label/c.Status';
@@ -72,11 +77,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         account                 : { label: LABEL_ACCOUNT },
         actualQty               : { label: LABEL_ACTUAL_QTY, placeholder: LABEL_ACTUAL_QTY_PLACEHOLDER, error: LABEL_ACTUAL_QTY_ERROR },
         actuals                 : { label: LABEL_ACTUALS },
-        amount                  : { label: 'Amount' },
+        amount                  : { label: LABEL_AMOUNT },
         back                    : { label: LABEL_BACK },
         comments                : { label: LABEL_COMMENTS, tooLongMsg: LABEL_COMMENTS_TOOLONGMSG.replace('{0}', '1024') },
         error                   : { label: LABEL_ERROR },
+        freeGoods               : { label: LABEL_FREE_GOODS },
         help                    : { label: LABEL_HELP },
+        invoice                 : { label: LABEL_INVOICE_NUMBER },
         listingFeePaid          : { label: LABEL_LISTING_FEE_PAID },
         next                    : { label: LABEL_NEXT.toLowerCase() },
         nineLitreVolume         : { label: LABEL_NINELITREVOLUME },
@@ -89,7 +96,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         purchasedFrom           : { label: LABEL_PURCHASED_FROM },
         rebateAmount            : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
         rebatePaidAbovePlanned  : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
-        remaining               : { label: 'remaining' },
+        remaining               : { label: LABEL_REMAINING },
         save                    : { label: LABEL_SAVE },
         skip                    : { label: LABEL_SKIP.toLowerCase() },
         status                  : { label: LABEL_STATUS },
@@ -187,6 +194,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     captureVolumeInBottles;
 
+    @api 
+    captureFreeGoods;
+
     error;
     thePMIA;
     thePMI;
@@ -209,6 +219,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     totalDiscount;
     activityBudget;
     comments;
+    invoiceNumber;
 
     rebateType;
     rebateLabel;
@@ -235,6 +246,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
         return lbl;
     }
+
+    freeGoodsQty;
+    totalActualFreeGoodsQty;
 
     listingFeePlanned;
     listingFeePaid;
@@ -302,6 +316,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         } else {
             return 1;
         }
+    }
+
+    get captureInvoice() {
+        return this.psa != undefined && this.psa.Market__r.Name == 'Mexico';
     }
 
    rebates;
@@ -375,6 +393,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.wholesalerName = this.psa.Wholesaler_Alternate_Name__c;
         }
     }
+    handleInvoiceNumberChange(event) {
+        this.invoiceNumber = event.detail.value;
+    }
     handleRebateAmountChange(event) {
         console.log('[handleRebateAmountChange]');
         event.preventDefault();
@@ -412,6 +433,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
             } else if (this.psa.Market__r.Name == 'Brazil') {
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'BRA - PSA');
+            } else if (this.psa.Market__r.Name == 'Mexico') {
+                this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'MX - PSA');
             }
             console.log('[get recordtypeid] rtis', Object.keys(rtis));
             console.log('[get recordtypeid] recordtypeid', this.recordTypeId);
@@ -431,6 +454,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     rebateType: item.value, 
                     label: item.value + ' [' + this.labels.remaining.label + ' : %0]',
                     isVolumeRebate: item.value == 'Volume', 
+                    isFreeGoods:  item.value == 'Free Goods',
                     rebateAmount: 0,
                     remaining: 0                   
                 }));
@@ -487,7 +511,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
    
     loadPMIADetails() {
         getPMIADetails({pmiaId: this.pmiaId})
-        .then(result => {
+        .then(result => { 
             console.log('[pmiaForm.loadPMIADetails] result', result);
             try {
                 this.thePMIA = result;
@@ -504,8 +528,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
                 //this.productPackQty = parseInt(this.thePMIA.Product_Pack_Qty__c);
                 this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
-                this.wholesalerName = this.thePMIA.Actual_Wholesaler__r.Name;
+                this.wholesalerName = this.thePMIA.Actual_Wholesaler__c == undefined ? '' : this.thePMIA.Actual_Wholesaler__r.Name;
                 this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
+                this.isFreeGoodsRebate = this.thePMIA.Rebate_Type__c == 'Free Goods';
                 this.rebateAmount = this.isVolumeRebate ? parseFloat(this.thePMIA.Act_Qty__c) : parseFloat(this.thePMIA.Rebate_Amount__c);
                 this.rebateType = this.thePMIA.Rebate_Type__c;    
                 this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);            
@@ -518,20 +543,39 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.activityBudget = parseFloat(this.thePMIA.Activity__r.Activity_Budget__c);
                 this.totalPaymentsPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Payments_Paid__c).toFixed(2);
                 this.productSplit = parseFloat(this.thePMIA.Promotion_Material_Item__r.Product_Split__c).toFixed(2);
+                this.invoiceNumber = this.thePMIA.Invoice_Number__c;
 
                 console.log('[loadPMIADetails] captureVolumeInBottles', this.captureVolumeInBottles);
                 console.log('[loadPMIADetails] thePMI', this.thePMI);
+                this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c || 0;
+                this.freeGoodsQty = this.thePMIA.Promotion_Material_Item__r.Free_Bottle_Quantity__c || 0;
+                this.listingFeePlanned = this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c || 0;
+                this.promotionalActivityPlanned = this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c || 0;
+                this.trainingAndAdvocacyPlanned = this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c || 0;
+                this.totalActualVolume = this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c || 0;
+                this.totalActualFreeGoodsQty = this.thePMIA.Promotion_Material_Item__r.Total_Actual_Free_Bottle_Qty__c || 0;
+                this.listingFeePaid = this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c || 0;
+                this.promotionalActivityPaid = this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c || 0;
+                this.trainingAndAdvocacyPaid = this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c || 0;
+
                 if (this.captureVolumeInBottles) {
-                    if (this.isVolumeRebate) {
+                    if (this.isVolumeRebate || this.isFreeGoodsRebate) {
                         this.rebateAmount = this.rebateAmount * this.productPackQty;
                     }
                     this.plannedVolume = this.plannedVolume * this.productPackQty;
+                    this.freeGoodsQty = this.freeGoodsQty * this.productPackQty;
                     this.totalActualVolume = this.totalActualVolume * this.productPackQty;
+                    this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
                 }
+
+                console.log('[loadPMIADetails] freeGoodsQty', this.freeGoodsQty);
+                console.log('[loadPMIADetails] totalActualFreeGoodsQty', this.totalActualFreeGoodsQty);
 
                 this.remainingRebate = 0;
                 if (this.rebateType == 'Volume') {
                     this.remainingRebate = this.plannedVolume - this.totalActualVolume;
+                } else if (this.rebateType == 'Free Goods') {
+                    this.remainingRebate = this.freeGoodsQty - this.totalActualFreeGoodsQty;
                 } else if (this.rebateType == 'Listing Fee') {
                     this.remainingRebate = this.listingFeePlanned - this.listingFeePaid;
                 } else if (this.rebateType == 'Promotional Activity') {
@@ -565,8 +609,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('createNewActual.psa', this.psa);
         console.log('createNewActual.wholesalerOptions', this.wholesalerOptions);
         this.wholesaler = this.psa.Wholesaler_Preferred__c;
-        this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c;
-        this.activityBudget = parseFloat(this.psa.Activity_Budget__c);
+        this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c || '';
+        this.activityBudget = parseFloat(this.psa.Activity_Budget__c || 0);
 
         this.theAccount = this.psa.Promotions__r.find(p => p.Id === this.promotionId);
         if (this.theAccount) {
@@ -588,10 +632,14 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.totalTrainingAndAdvocacyPaid = parseFloat(this.thePMI.Total_Training_and_Advocacy_Paid__c || 0);
             this.totalPaymentsPaid = parseFloat(this.thePMI.Total_Payments_Paid__c || 0).toFixed(2);
             this.productSplit = parseFloat(this.thePMI.Product_Split__c || 0).toFixed(2);
+            this.freeGoodsQty = parseFloat(this.thePMI.Free_Bottle_Quantity__c || 0);
+            this.totalActualFreeGoodsQty = parseFloat(this.thePMI.Total_Actual_Free_Bottle_Qty__c || 0);
 
             if (this.captureVolumeInBottles) {
                 this.plannedVolume = this.plannedVolume * this.productPackQty;
                 this.totalActualVolume = this.totalActualVolume * this.productPackQty;
+                this.freeGoodsQty = this.freeGoodsQty * this.productPackQty;
+                this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
             }
         }    
 
@@ -601,6 +649,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.listingFeePaid = 0;
         this.promotionalActivityPaid = 0;
         this.trainingAndAdvocacyPaid = 0;
+        this.invoiceNumber = '';
         
         console.log('[ccreatenewactuals] rebates', this.rebates);
         if (this.rebates) {
@@ -609,6 +658,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     rebate.rebateAmount = 0;
                     if (rebate.rebateType == 'Volume') {
                         rebate.remaining = this.plannedVolume - this.totalActualVolume;
+                    } else if (rebate.rebateType == 'Free Goods') {
+                        rebate.remaining = this.freeGoodsQty - this.totalActualFreeGoodsQty;
                     } else if (rebate.rebateType == 'Listing Fee') {
                         rebate.remaining = this.listingFeePlanned - this.totalListingFeePaid;
                     } else if (rebate.rebateType == 'Promotional Activity') {
@@ -681,6 +732,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 total = this.remainingRebate + this.totalActualVolume;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
                 console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualVolume, total);
+            } else if (this.rebateType == 'Free Goods') {
+                total = this.remainingFreeGoods + this.totalActualFreeGoodsQty;
+                hasRebateError = parseFloat(this.rebateAmount) > total;
+                console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualFreeGoodsQty, total);
             } else if (this.rebateType == 'Listing Fee') {
                 total = this.remainingRebate + this.totalListingFeePaid;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
@@ -728,6 +783,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
             fields[FIELD_PAYMENT_DATE.fieldApiName] = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
+            fields[FIELD_INVOICE_NUMBER.fieldApiName] = this.invoiceNumber;
 
             if (this.pmiaId === undefined) {
                 fields['RecordTypeId'] = this.recordTypeId;
@@ -758,6 +814,12 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     }
                     fields[FIELD_ACTUAL_QTY.fieldApiName] = actQty;
                     fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount * this.plannedDiscount;
+                }
+                if (this.rebateType == 'Free Goods') {
+                    fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount;
+                    if (this.captureVolumeInBottles) {
+                        fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount / this.productPackQty;
+                    }
                 }
                 console.log('[save] rebateAmount', this.rebateAmount);
                 console.log('[save] fields', fields);
@@ -803,6 +865,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                             paymentDate: record.fields[FIELD_PAYMENT_DATE.fieldApiName],
                             externalKey: record.fields[FIELD_EXTERNAL_KEY.fieldApiName],
                             status: record.fields[FIELD_APPROVAL_STATUS.fieldApiName],
+                            invoiceNumber: record.fields[FIELD_INVOICE_NUMBER.fieldApiName],
                             captureVolumeInBottles: this.captureVolumeInBottles,
                             productPackQty: this.productPackQty,
                             comments: this.comments,
@@ -859,9 +922,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 );
             });
     }
-    updatePMIA(record) {
+    async updatePMIA(record) {
         console.log('[pmiaForm.update] record', record);
-        updateRecord(record)
+        await updateRecord(record)
             .then(() => {
                 
                 this.isWorking = false;
@@ -901,6 +964,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     }),
                 );
             });
+
+        getRecordNotifyChange([{ recordId: this.pmiaId }]);
 
     }
 

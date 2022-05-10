@@ -205,17 +205,27 @@
                                     <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
                                     <!--<lightning-combobox name="i_NumberOfPayments" label={labels.numberOfPayments.label} value={numberOfPayments} options={numberOfPaymentOptions} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-combobox>-->
                                 </lightning-layout-item>
-                                <template if:true={isOnePayment}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                <template if:true={configurePayments}>
+                                    <lightning-datatable key-field="payment_number" data={paymentConfigs} 
+                                                        columns={paymentColumns}
+                                                        show-row-number-column="false"
+                                                        hide-checkbox-column
+                                                        suppress-bottom-bar
+                                                        class="payment-configuration-table"></lightning-datatable>
                                 </template>
-                                <template if:true={isTwoPayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
-                                </template>
-                                <template if:true={isThreePayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
-                                </template>
-                                <template if:true={isFourPayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                <template if:false={configurePayments}>
+                                    <template if:true={isOnePayment}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:true={isTwoPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:true={isThreePayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>
+                                    <template if:true={isFourPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>    
                                 </template>
                             </template>                                
 

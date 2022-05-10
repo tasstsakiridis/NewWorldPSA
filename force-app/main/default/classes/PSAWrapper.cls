@@ -15,6 +15,9 @@ public with sharing class PSAWrapper {
         public Decimal discount { get; set; }
 
         @AuraEnabled 
+        public Decimal discountPercent { get; set; }
+
+        @AuraEnabled 
         public String brandStatus { get; set; }
 
         @AuraEnabled 
@@ -37,6 +40,21 @@ public with sharing class PSAWrapper {
 
         @AuraEnabled 
         public String outletToProvide { get; set; }
+
+        @AuraEnabled 
+        public Decimal freeBottleQty { get; set; }
+
+        @AuraEnabled 
+        public Date freeGoodsGivenDate { get; set; }
+
+        @AuraEnabled 
+        public String freeGoodsReason { get; set; }
+
+        @AuraEnabled 
+        public String brandVisibility { get; set; }
+
+        @AuraEnabled 
+        public String productVisibility { get; set; }
     }
 
     public class PSAAccountWrapper {
@@ -116,6 +134,9 @@ public with sharing class PSAWrapper {
     @AuraEnabled 
     public Integer numberOfPayments { get; set; }
 
+    @AuraEnabled
+    public String paymentConfigurations { get; set; }
+
     @AuraEnabled 
     public Decimal totalBudget { get; set; }
 
@@ -158,6 +179,7 @@ public with sharing class PSAWrapper {
         this.comments = '';
         this.mpoPrestige = false;
         this.numberOfPayments = 1;
+        this.paymentConfigurations = '';
         this.totalBudget = 0;
         this.percentageVisibility = 0;
 
