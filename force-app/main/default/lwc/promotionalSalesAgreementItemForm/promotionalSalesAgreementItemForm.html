@@ -74,6 +74,34 @@
                     </template>
                 </lightning-layout>
             </lightning-layout-item>
+            <template if:true={captureFreeGoods}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="number" name="i_FreeGoods"
+                                    label={labels.freeGoods.label}
+                                    value={freeGoodQty}
+                                    step="1"
+                                    readonly={isDisabled}
+                                    onchange={handleFreeGoodsQtyChange}>
+                    </lightning-input>                    
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="date" name="i_FreGoodsGivenDate"
+                                    label={labels.freeGoodsGivenDate.label}
+                                    value={freeGoodGivenDate}
+                                    readonly={isDisabled}
+                                    onchange={handleFreeGoodsGivenDateChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                    <lightning-checkbox-group name="i_FreeGoodsReason"
+                                    label={labels.freeGoodsReason.label}
+                                    options={freeGoodReasonOptions}
+                                    value={freeGoodReasonValues}
+                                    disabled={isDisabled}
+                                    onchange={handleFreeGoodsReasonChange}>
+                    </lightning-checkbox-group>
+                </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Brand Status -->
                 <!--
@@ -88,6 +116,7 @@
                                           label={brandStatusLabel}
                                           options={brandStatusOptions}
                                           value={brandStatusValues}
+                                          disabled={isDisabled}
                                           onchange={handleBrandStatusChange}></lightning-checkbox-group>
             </lightning-layout-item>                        
             <lightning-layout-item size="12" padding="around-small">
@@ -97,6 +126,7 @@
                                     label={labels.volumeForecast.label}
                                     value={volumeForecast}
                                     step="0.01"
+                                    readonly={isDisabled}
                                     onchange={handleVolumeForecastChange}>
                     </lightning-input>
                     <template if:true={hasVolumeForecastError}>
@@ -109,6 +139,7 @@
                                     label={labels.volumeForecastBtl.label}
                                     value={volumeForecast}
                                     step="1"
+                                    readonly={isDisabled}
                                     onchange={handleVolumeForecastChange}>
                     </lightning-input>
                     <template if:true={hasVolumeForecastError}>
@@ -116,13 +147,14 @@
                     </template>
                 </template>
             </lightning-layout-item>
-            <template if:true={isUKMarket}>
+            <template if:true={captureRebate}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
                     <lightning-input type="number" name="i_DiscountPerCase" 
                                     label={labels.discountPerCase.label}                                 
                                     value={discount}
                                     step="0.01"
+                                    readonly={isDisabled}
                                     onchange={handleDiscountChange}
                                     formatter="currency">
                     </lightning-input>
@@ -131,12 +163,29 @@
                     </template>
                 </lightning-layout-item>
             </template>
-            <template if:true={isUKMarket}>
+            <template if:true={captureRebatePercent}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Discounts per Case -->
+                    <lightning-input type="number" name="i_DiscountPercent" 
+                                    label={labels.discountPercent.label}                                 
+                                    value={discountPercent}
+                                    step="0.01"
+                                    readonly={isDisabled}
+                                    onchange={handleDiscountPercentChange}
+                                    formatter="percent-fixed">
+                    </lightning-input>
+                    <template if:true={hasDiscountError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                    </template>
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureListingFee}>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Listing Fee -->
                 <lightning-input type="number" name="i_ListingFee" 
                                  label={listingFeeLabel}
                                  value={listingFee}
+                                 readonly={isDisabled}
                                  onchange={handleListingFeeChange}
                                  formatter="currency">
                 </lightning-input>
@@ -156,6 +205,7 @@
                                         label={drinkStrategyLabel}
                                         options={drinkStrategyOptions}
                                         value={drinkStrategyValues}
+                                        disabled={isDisabled}
                                         onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
 
             </lightning-layout-item>
@@ -173,15 +223,17 @@
                                         label={promotionalActivityLabel}
                                         options={promotionalActivityOptions}
                                         value={promotionalActivityValues}
+                                        disabled={isDisabled}
                                         onchange={handlePromotionalActivityChange}></lightning-checkbox-group>
         
             </lightning-layout-item>
-            <template if:true={isUKMarket}>
+            <template if:true={capturePromotionalActivity}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Promotional Activity Amount -->
                     <lightning-input type="number" name="i_PromotionalActivityAmount" 
                                     label={promotionalActivityLabel}
                                     value={promotionalActivityAmount}
+                                    readonly={isDisabled}
                                     onchange={handlePromotionalActivityValueChange}
                                     formatter="currency">
                     </lightning-input>
@@ -201,6 +253,7 @@
                                         label={trainingAdvocacyLabel}
                                         options={trainingAdvocacyOptions}
                                         value={trainingAdvocacyValues}
+                                        disabled={isDisabled}
                                         onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
             
             </lightning-layout-item>
@@ -229,9 +282,31 @@
                                         label={outletToProvideLabel}
                                         options={outletToProvideOptions}
                                         value={outletToProvideValues}
+                                        disabled={isDisabled}
                                         onchange={handleOutletToProvideChange}></lightning-checkbox-group>
             
             </lightning-layout-item>
+            <template if:true={captureBrandVisibility}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_BrandVisibility" label={brandVisibilityLabel} 
+                                            options={brandVisibilityOptions}
+                                            value={brandVisibilityValues} 
+                                            disabled={isDisabled}
+                                            onchange={handleBrandVisibilityChange}>
+                    </lightning-checkbox-group>                
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureProductVisibility}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_ProductVisibility" label={productVisibilityLabel} 
+                                            options={productVisibilityOptions}
+                                            value={productVisibilityValues} 
+                                            disabled={isDisabled}
+                                            onchange={handleProductVisibilityChange}>
+                    </lightning-checkbox-group>
+                </lightning-layout-item>
+            </template>
+
             <lightning-layout-item size="12" padding="around-small">
                 <lightning-input name="i_Comments" type="text"
                                  max="32768"

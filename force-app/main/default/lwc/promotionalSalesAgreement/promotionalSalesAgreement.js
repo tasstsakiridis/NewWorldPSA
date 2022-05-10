@@ -33,6 +33,7 @@ import LABEL_ACCOUNT_SEARCH_RESULTS from '@salesforce/label/c.Account_Search_Res
 import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
 import LABEL_AGREEMENT_END_DATE from '@salesforce/label/c.Agreement_End_Date';
 import LABEL_AGREEMENT_START_DATE from '@salesforce/label/c.Agreement_Start_Date';
+import LABEL_ALL from '@salesforce/label/c.All';
 import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
 import LABEL_ALTERNATE_RTM_ERROR from '@salesforce/label/c.Alternate_RTM_Error';
 import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
@@ -74,10 +75,12 @@ import LABEL_NONE from '@salesforce/label/c.None';
 import LABEL_NONE_PICKLIST_VALUE from '@salesforce/label/c.None_Picklist_Value';
 import LABEL_NUMBER_OF_PAYMENTS from '@salesforce/label/c.Number_of_Payments';
 import LABEL_OK from '@salesforce/label/c.OK';
+import LABEL_ON_SIGNING from '@salesforce/label/c.On_Signing';
 import LABEL_ONE_PAYMENT_HELPTEXT from '@salesforce/label/c.One_Payment_HelpText';
 import LABEL_PARENT_ACCOUNT from '@salesforce/label/c.Parent_Account';
 import LABEL_PARENT_ACCOUNT_ERROR from '@salesforce/label/c.Parent_Account_Error';
 import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Parent_Account_Search_Results_Message';
+import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
 import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibility';
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
@@ -127,12 +130,17 @@ import FIELD_PROMOTION_ACCOUNT from '@salesforce/schema/Promotion__c';
 const invalidStatusSelections = ['New','Submitted','Pending Approval','Updated'];
 const numberOfPaymentOptions = [{'label':'1','value':'1'},{'label':'2','value':'2'},{'label':'3','value':'3'},{'label':'4','value':'4'}];
 
+const paymentColumns = [
+    { label: '%', fieldName: 'percentage_achieved', editable: true }
+];
+
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
         account                 : { label: LABEL_ACCOUNT },        
         accountSearchResults    : { label: LABEL_ACCOUNT_SEARCH_RESULTS },
         actuals                 : { label: LABEL_ACTUALS },
         agreementEndDate        : { label: LABEL_AGREEMENT_END_DATE },
+        all                     : { label: LABEL_ALL, picklistValue: '--'+LABEL_ALL+'--' },
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
         back                    : { label: LABEL_BACK },
         budget                  : { label: LABEL_BUDGET },
@@ -223,6 +231,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     captureNumberOfPayments = false;
     captureTotalBudget = false;
     captureEndDate = false;
+    agreementRequiresWholesaler = false;
+    configurePayments = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -243,6 +253,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     @track
     attachedFiles;
+
+    paymentColumns = paymentColumns;
+    paymentConfigs = [];
 
     wiredAgreement;
     @wire(getPSA, {psaId: '$recordId'})
@@ -317,6 +330,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.captureNumberOfPayments = this.market.Capture_Number_of_Payments__c == undefined ? false : this.market.Capture_Number_of_Payments__c;
             this.captureTotalBudget = this.market.Capture_PSA_Budget__c == undefined ? false : this.market.Capture_PSA_Budget__c;
             this.captureEndDate = this.market.Capture_End_Date__c == undefined ? false : this.market.Capture_End_Date__c;
+            this.agreementRequiresWholesaler = this.market.Agreement_Requires_Wholesaler__c == undefined ? true : this.market.Agreement_Requires_Wholesaler__c;
+            this.configurePayments = this.market.Agreement_Configure_Payments__c == undefined ? false : this.market.Agreement_Configure_Payments__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -355,6 +370,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                return { label: wholesaler.Name, value: wholesaler.Id }; 
             });
             this.wholesalers.splice(0, 0, { label: this.labels.none.picklistLabel, value: '-none-' });
+            if (!this.agreementRequiresWholesaler) {
+                this.wholesalers.splice(0, 0, { label: this.labels.all.picklistLabel, value: '-all-' });
+            }
         } else if (error) { 
             this.error = error;
             this.wholesalers = undefined;
@@ -858,6 +876,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleNumberOfPaymentsChange(ev) {
         console.log('[handleNumberOfPaymentsChange] value', ev.detail.value);
         this.numberOfPayments = ev.detail.value;
+        if (this.configurePayments) {
+            let payConfigs = [];
+            let percentAchieved = 0;
+            for(let i = 1; i <= this.numberOfPayments; i++) {
+                percentAchieved = 0;
+                if (i == 1) { percentAchieved = LABEL_ON_SIGNING; }
+                payConfigs.push({ payment_number: i, percent_achieved: percentAchieved });
+            }
+            this.paymentConfigs = [...payConfigs];
+        }
     }
 
     handlePreviousPage() {
@@ -1097,8 +1125,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
             }
             if (data.Number_of_Payments__c != undefined) {
-                this.numberOfPayments = data.Number_of_Payments__c.toString();
+                this.numberOfPayments = data.Number_of_Payments__c.toString();                
+                if (data.Payment_Configurations__c != undefined) {
+                    this.paymentConfigs = [];
+                    const pconfigs = data.Payment_Configurations__c.split(',');
+                    for(let i = 0; i < pconfigs.length; i++) {
+                        pconfigs.push({payment_number: (i+1), percentage_achieved: parseFloat(pconfigs[i]) });
+                    }
+                }
             }
+            
             this.percentageVisibility = data.Percentage_Visibility__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
@@ -1279,7 +1315,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
 
         console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
-        if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
+        if (this.agreementRequiresWholesaler && this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             this.hasPreferredRTMError = true;
             isValid = false; 
         }
@@ -1468,9 +1504,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;
         console.log('wholesalerPreferred', this.wholesalerPreferred);
-        const wp = this.wholesalers.find(w => w.value === this.wholesalerPreferred);
-        param.wholesalerPreferredName = wp.label;
-        console.log('wp', wp);
+        if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
+            param.wholesalerPreferredId = null;
+            param.wholesalerPreferredName = '';
+        } else {
+            const wp = this.wholesalers.find(w => w.value === this.wholesalerPreferred);
+            param.wholesalerPreferredName = wp.label;
+            console.log('wp', wp);    
+        }
         if (this.wholesalerAlternate == undefined || this.wholesalerAlternate == '-none-') {
             param.wholesalerAlternateId = null;
             param.wholesalerAlternateName = '';
@@ -1485,6 +1526,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.status = this.status;
         param.totalBudget = this.totalBudget;
         param.percentageVisibility = this.percentageVisibility;
+        param.paymentConfigurations = '';
+        console.log('paymentConfigurations', this.paymentConfigs);
+        if (this.paymentConfigs.length > 0) {
+            for(let i = 0; i < this.paymentConfigs.length; i++) {
+                param.paymentConfigurations += this.paymentConfigs[i].percentage_achieved + ',';
+            }
+            param.paymentConfigurations = param.paymentConfigurations.slice(0, -1);
+        }
 
         param.accounts = [];
         param.promotionsToDelete = [];

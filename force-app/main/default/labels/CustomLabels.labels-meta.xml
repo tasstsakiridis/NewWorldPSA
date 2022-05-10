@@ -32,4 +32,12 @@
         <shortDescription>Wholesaler</shortDescription>
         <value>Wholesaler</value>
     </labels>
+    <labels>
+        <fullName>Too_Many_Characters</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Too Many Characters</shortDescription>
+        <value>Invalid Input.  Maximum length must be less than {0} characters.</value>
+    </labels>
 </CustomLabels>
