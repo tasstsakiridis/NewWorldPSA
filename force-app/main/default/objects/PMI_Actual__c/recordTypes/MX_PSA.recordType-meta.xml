@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MX_PSA</fullName>
+    <active>true</active>
+    <description>Mexico PSA</description>
+    <label>MX - PSA</label>
+    <picklistValues>
+        <picklist>Rebate_Type__c</picklist>
+        <values>
+            <fullName>Free Goods</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Fee</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promotional Activity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Training %26 Advocacy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Volume</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+</RecordType>

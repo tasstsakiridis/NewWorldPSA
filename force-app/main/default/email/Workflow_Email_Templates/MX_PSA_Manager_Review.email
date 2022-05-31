@@ -1,0 +1,252 @@
+<messaging:emailTemplate subject="Promotional Sales Agreement" recipientType="User" relatedToType="Promotion_Activity__c">
+<messaging:htmlEmailBody >
+<html>
+<style type="text/css">
+    body { font-family: 'Arial Unicode MS'; }
+    .label {
+        width: 15%;
+        font-size: smaller;
+        font-weight: bold;
+    }
+    .content {
+        width: 25%;
+    }
+    .smallFont {
+        font-size: smaller;
+    }
+    .items {
+       border-collapse: separate;
+       border-spacing: 10px 0;
+    }
+    .items th {
+       font-size: smaller;
+       font-weight: bold;
+    }
+    .items td {
+       padding: 10px 0;
+    }
+    .tableHeader {
+        font-size: smaller;
+        font-weight: bold;
+        text-align: center;
+    }
+    .tableContent {
+        font-size: small;            
+    }
+    .tableContentRight {
+        font-size: small;
+        text-align: right;
+    }
+    .leftAligned {
+        text-align: left;
+    }
+    .rightAligned {
+        text-align: right;
+    }
+    .wetGoodsList {
+        width: 100%;                
+    }
+    .wetGoodsList th {
+        background: #A9A9A9;
+        font-size: smaller;
+        text-align: center;
+    }
+    .wetGoodsList td {
+        font-size: small;
+        text-align: left;
+    }
+    .odd {
+        background: #fff;
+    }
+    .even {
+        background: #F8F8FF;
+    }
+    .title {
+        background: #A9A9A9;
+    }
+    .sectionHeader {
+        background: #ADD8E6; 
+        border-radius: 5px;
+    }
+    .costBreakdown td {
+        border: 1px solid #000;
+    }
+    dd {
+        display: inline;
+    }
+
+</style>
+    <body>
+        <div>
+        <center>
+            <h1 style="background:#A9A9A9;">
+                {!$Label.PromotionalSalesAgreement}
+            </h1>
+            <h4 style="margin-top: -20px;background: #ADD8E6;border-radius: 5px;">
+                Contrato - <a href="{!relatedTo.Detail_Link__c}"><b>{!relatedTo.Name}</b></a>
+            </h4>
+        </center>            
+        </div>
+
+        <table>
+            <tr>
+                <td style="font-weight: bold;">{!$Label.PreparedBy}</td>
+                <td class="content"><apex:outputText value="{!relatedTo.Created_By_Name__c}" /></td>
+                <td style="font-weight: bold;">{!$Label.DocumentDate}</td>
+                <td class="content">
+                    <apex:outputText id="createdDate" label="{!$Label.DocumentDate}" value="{0, date, dd/MM/yyyy}" >
+                        <apex:param value="{!relatedTo.CreatedDate}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+                    
+          
+            
+            <tr>
+                <td colspan="4" style="text-align: center;"></td>
+            </tr>
+                                    
+            <tr>
+                <td style="font-weight: bold;">{!$ObjectType.Promotion_Activity__c.Fields.Begin_Date__c.Label}</td>
+                <td>
+                    <apex:outputText id="startDate" label="{!$ObjectType.Promotion_Activity__c.Fields.Begin_Date__c.Label}" value="{0, date, dd/MM/yyyy}" >
+                        <apex:param value="{!relatedTo.Begin_Date__c}" />
+                    </apex:outputText>
+                </td>
+                <td style="font-weight: bold;">{!$ObjectType.Promotion_Activity__c.Fields.End_Date__c.Label}</td>
+                <td>
+                    <apex:outputText id="endDate" label="{!$ObjectType.Promotion_Activity__c.Fields.End_Date__c.Label}" value="{0, date, dd/MM/yyyy}" >
+                        <apex:param value="{!relatedTo.End_Date__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">{!$ObjectType.Promotion_Activity__c.Fields.Length_of_Agreement__c.Label}</td>
+                <td>
+                    <apex:outputText value="{0, number, #,##0} {!IF(relatedTo.Is_Length_in_Years__c==true,'Years','Months')}">
+                        <apex:param value="{!relatedTo.Length_of_Agreement__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            
+            <tr><td colspan="4">&nbsp;</td></tr>
+            <tr>
+                <td style="font-weight: bold;">{!$ObjectType.Promotion_Activity__c.Fields.Account__c.Label}</td>
+                <td><apex:outputText value="{!relatedTo.Account__r.Name}" /></td>
+            </tr>
+            
+           <tr><td colspan="4">&nbsp;</td></tr>
+           <tr>
+               <td style="font-weight: bold;">{!$ObjectType.Promotion_Activity__c.Fields.Number_of_Payments__c.Label}</td>
+               <td>
+                   <apex:outputText value="{0, number, #,##0} ({1})" >
+                       <apex:param value="{!relatedTo.Number_of_Payments__c}" />
+                       <apex:param value="{!relatedTo.Payment_Configurations__c}" />
+                   </apex:outputText>
+               </td>
+           </tr>
+        </table>
+        
+        
+
+        <div style="background: #ADD8E6;border-radius: 5px;">
+        <center>
+            <h4>
+                {!$ObjectType.Product__c.LabelPlural}
+            </h4>
+        </center>            
+        </div>     
+        
+        <table id="productGrid" border="1" width="100%" style="border-radius: 5px; margin-top: 10px; margin-bottom: 10px;">
+            <thead style="background-color: #A9A9A9;">
+                <th>{!$ObjectType.Product__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Free_Bottle_Quantity__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Free_Goods_Given_Date__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Free_Goods_Reason__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Brand_Status__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Plan_Volume_Bottles__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Plan_Rebate__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Drink_Strategy__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Listing_Fee__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Promotional_Activity__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Promotional_Activity_Value__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Training_and_Advocacy__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Training_and_Advocacy_Value__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Outlet_to_Provide__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Brand_Visibility__c.Label}</th>
+                <th>{!$ObjectType.Promotion_Material_Item__c.Fields.Product_Visibility__c.Label}</th>
+            </thead>
+            <tfoot>
+            </tfoot>
+            <tbody>
+                <apex:repeat value="{!relatedTo.Promotion_Material_Items__r}" var="a">
+                <tr>
+                    <td>{!a.Product_Custom__r.Name}</td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0}">
+                            <apex:param value="{!a.Free_Bottle_Quantity__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, date, dd-MM-yyyy}">
+                            <apex:param value="{!a.Free_Goods_Given_Date__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Free_Goods_Reason__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Brand_Status__c}" />
+                    </td>
+                    
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0}">
+                            <apex:param value="{!a.Plan_Volume__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0.00}">
+                            <apex:param value="{!a.Plan_Rebate__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Drink_Strategy__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0.00}">
+                            <apex:param value="{!a.Listing_Fee__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Promotional_Activity__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0.00}">
+                            <apex:param value="{!a.Promotional_Activity_Value__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Training_and_Advocacy__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{0, number, #,##0.00}">
+                            <apex:param value="{!a.Training_and_Advocacy_Value__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Outlet_to_Provide__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Brand_Visibility__c}" />
+                    </td>
+                    <td style="text-align:right;">
+                        <apex:outputText value="{!a.Product_Visibility__c}" />
+                    </td>
+                </tr>
+                </apex:repeat>
+            </tbody>
+        </table>       
+    </body>
+</html>
+</messaging:htmlEmailBody>
+</messaging:emailTemplate>

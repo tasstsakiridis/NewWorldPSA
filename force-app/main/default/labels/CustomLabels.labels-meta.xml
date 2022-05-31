@@ -32,4 +32,68 @@
         <shortDescription>Wholesaler</shortDescription>
         <value>Wholesaler</value>
     </labels>
+    <labels>
+        <fullName>Discount_Percent</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Discount Percent</shortDescription>
+        <value>Discount (%)</value>
+    </labels>
+    <labels>
+        <fullName>Free_Goods</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Free Goods</shortDescription>
+        <value>Free Goods</value>
+    </labels>
+    <labels>
+        <fullName>Free_Goods_Given_Date</fullName>
+        <categories>label</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Free Goods Given Date</shortDescription>
+        <value>Free Goods Given Date</value>
+    </labels>
+    <labels>
+        <fullName>Free_Goods_Reason</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Free Goods Reason</shortDescription>
+        <value>Free Goods Reason</value>
+    </labels>
+    <labels>
+        <fullName>Invoice_Number</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Invoice Number</shortDescription>
+        <value>Invoice Number</value>
+    </labels>
+    <labels>
+        <fullName>On_Signing</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>On Signing</shortDescription>
+        <value>On Signing</value>
+    </labels>
+    <labels>
+        <fullName>Amount</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Amount</shortDescription>
+        <value>amount</value>
+    </labels>
+    <labels>
+        <fullName>Remaining</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Remaining</shortDescription>
+        <value>remaining</value>
+    </labels>
 </CustomLabels>

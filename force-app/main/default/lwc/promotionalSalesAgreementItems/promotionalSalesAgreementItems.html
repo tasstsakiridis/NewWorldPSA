@@ -115,12 +115,13 @@
                                             product-id={selectedProductId} 
                                             product-name={selectedProductName} 
                                             promotion-id={promotionId}
-                                            is-locked="false"
+                                            is-locked={isLocked}
                                             is-approved={isApproved}
                                             capture-volume-in-bottles={captureVolumeInBottles}
                                             calc-split={calcProductSplit}
                                             total-budget={totalBudget}
                                             total-planned-spend={totalPlannedSpend}
+                                            capture-free-goods={captureFreeGoods}
                                             psa={thePSA}
                                             onsave={handleSavePSADetails}
                                             onupdated={handlePSAUpdated}

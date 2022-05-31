@@ -23,6 +23,11 @@ import FIELD_ID from '@salesforce/schema/Promotion_Material_Item__c.Id';
 import FIELD_ACTIVITY_ID from '@salesforce/schema/Promotion_Material_Item__c.Activity__c';
 import FIELD_PROMOTION from '@salesforce/schema/Promotion_Material_Item__c.Promotion__c';
 import FIELD_PRODUCT from '@salesforce/schema/Promotion_Material_Item__c.Product_Custom__c';
+import FIELD_BRAND_VISIBILITY from '@salesforce/schema/Promotion_Material_Item__c.Brand_Visibility__c';
+import FIELD_PRODUCT_VISIBILITY from '@salesforce/schema/Promotion_Material_Item__c.Product_Visibility__c';
+import FIELD_FREE_GOODS_QUANTITY from '@salesforce/schema/Promotion_Material_Item__c.Free_Bottle_Quantity__c';
+import FIELD_FREE_GOODS_GIVEN_DATE from '@salesforce/schema/Promotion_Material_Item__c.Free_Goods_Given_Date__c';
+import FIELD_FREE_GOODS_REASON from '@salesforce/schema/Promotion_Material_Item__c.Free_Goods_Reason__c';
 import FIELD_VOLUME_FORECAST from '@salesforce/schema/Promotion_Material_Item__c.Plan_Volume__c';
 import FIELD_ORIGINAL_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Volume__c';
 import FIELD_PREVIOUS_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Volume__c';
@@ -31,6 +36,7 @@ import FIELD_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Pla
 import FIELD_ORIGINAL_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Rebate__c';
 import FIELD_PREVIOUS_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Rebate__c';
 import FIELD_PROPOSED_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Plan_Rebate__c';
+import FIELD_PLAN_REBATE_PERCENTAGE from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate_Percentage__c';
 import FIELD_BRAND_STATUS from '@salesforce/schema/Promotion_Material_Item__c.Brand_Status__c';
 import FIELD_LISTING_FEE from '@salesforce/schema/Promotion_Material_Item__c.Listing_Fee__c';
 import FIELD_ORIGINAL_LISTING_FEE from '@salesforce/schema/Promotion_Material_Item__c.Original_Listing_Fee__c';
@@ -55,43 +61,55 @@ import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Contro
 import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updatePMITotals';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_PERCENTAGE_CHANGE_ERROR from '@salesforce/label/c.Percentage_Change_Error';
-import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
-import LABEL_VOLUME_FORECAST_BTL from '@salesforce/label/c.VolumeBottle';
-import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
-import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
+import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
+import LABEL_DISCOUNT_PERCENT from '@salesforce/label/c.Discount_Percent';
+import LABEL_EMPTYFORM_SAVE_ERROR from '@salesforce/label/c.EmptyForm_Save_Error';
+import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
+import LABEL_FREE_GOODS_GIVEN_DATE from '@salesforce/label/c.Free_Goods_Given_Date';
+import LABEL_FREE_GOOD_REASON from '@salesforce/label/c.Free_Goods_Reason';
+import LABEL_PERCENTAGE_CHANGE_ERROR from '@salesforce/label/c.Percentage_Change_Error';
+import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
+import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
+import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
+import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
+import LABEL_QUANTITY from '@salesforce/label/c.Quantity';
+import LABEL_REASON from '@salesforce/label/c.Reason';
 import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
 import LABEL_SPLIT from '@salesforce/label/c.Split';
-import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
-import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
-import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
-import LABEL_EMPTYFORM_SAVE_ERROR from '@salesforce/label/c.EmptyForm_Save_Error';
-import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.Total_Investment';
+import LABEL_VOLUME_FORECAST_9L from '@salesforce/label/c.Volume9L';
+import LABEL_VOLUME_FORECAST_BTL from '@salesforce/label/c.VolumeBottle';
+import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
 
 export default class PromotionalSalesAgreementItemForm extends NavigationMixin(LightningElement) {
     labels = {
+        available               : { label: 'Available' },
         back                    : { label: LABEL_BACK },
-        volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
-        volumeForecastBtl       : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },
+        comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
         discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
+        discountPercent         : { label: LABEL_DISCOUNT_PERCENT },
         drinkStrategy           : { help: 'Drink Strategy help' },
+        emptyFormError          : { message: LABEL_EMPTYFORM_SAVE_ERROR },
+        error                   : { message: 'Errors found validating/saving item details.  Please review and try saving again.' },
+        freeGoods               : { label: LABEL_FREE_GOODS },
+        freeGoodsGivenDate      : { label: LABEL_FREE_GOODS_GIVEN_DATE },
+        freeGoodsReason         : { label: LABEL_FREE_GOOD_REASON },
+        loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
         promotionalActivity     : { help: 'Promotional Activity help' },
-        trainingAdvocacy        : { help: 'Training & Advocacy help' },
+        quantity                : { label: LABEL_QUANTITY },
+        reason                  : { label: LABEL_REASON },
         outletToProvide         : { help: 'Outlet to Provide help' },
         saving                  : { message: LABEL_SAVING_PLEASE_WAIT },
-        loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
-        available               : { label: 'Available' },
-        error                   : { message: 'Errors found validating/saving item details.  Please review and try saving again.' },
         saveError               : { message: 'Error saving item' },
         saveSuccess             : { message: 'All changes saved successfully'},
-        comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
-        thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR },
-        warning                 : { label: LABEL_WARNING },
-        emptyFormError          : { message: LABEL_EMPTYFORM_SAVE_ERROR },
         split                   : { label: LABEL_SPLIT },
-        totalInvestment         : { label: LABEL_TOTAL_INVESTMENT }
+        thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR },
+        trainingAdvocacy        : { help: 'Training & Advocacy help' },
+        totalInvestment         : { label: LABEL_TOTAL_INVESTMENT },
+        volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
+        volumeForecastBtl       : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },
+        warning                 : { label: LABEL_WARNING },
     };
 
     @api psa;
@@ -106,6 +124,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api captureVolumeInBottles;
     @api calcSplit;
     @api totalBudget;
+    @api captureFreeGoods;
 
     _totalPlannedSpend = 0;
     @api 
@@ -155,11 +174,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             alert('object info finished loading');
         }
 
+        console.log('[getObjectInfo] data', data);
+        console.log('[getObjectInfo] error', error);
         if (data) {
             this.error = undefined;
             this.objectInfo = data;
             this.getRecordTypeId();
             this.setFieldLabels();
+            console.log('finishedLoadingObjectInfo', this.finishedLoadingObjectInfo);
         } else if (error) {
             this.error = error;
             this.objectInfo = undefined;
@@ -187,7 +209,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return this.product == undefined ? '' : this.product.Name;
     }
     get productImageUrl() {
-        return this.product == undefined ? '' : 'https://salesforce-static.b-fonline.com/images/' + this.product.Image_Name__c;
+        return this.product == undefined || this.product.Image_Name__c == undefined || this.product.Image_Name__c == '' ? '' : 'https://salesforce-static.b-fonline.com/images/' + this.product.Image_Name__c;
     }
     get brandName() {
         return this.product == undefined ? '' : this.product.Brand_Name__c;
@@ -245,14 +267,21 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 this.discount = value.data.Proposed_Plan_Rebate__c;
             }
 
+            this.discountPercent = value.data.Plan_Rebate_Percentage__c || 0;
+
+            let freeGoodsVolume = value.data.Free_Bottle_Quantity__c || 0;
+            this.freeGoodGivenDate = value.data.Free_Goods_Given_Date__c || null;
+
             let volume = value.data.Plan_Volume__c || 0;
             if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
                 volume = value.data.Proposed_Plan_Volume__c;
             }
             if (this.captureVolumeInBottles || value.data.Activity__r.Market__r.Capture_Volume_in_Bottles__c) {
                 volume = volume * (value.data.Product_Pack_Qty__c == undefined ? 1 : value.data.Product_Pack_Qty__c);
+                freeGoodsVolume = freeGoodsVolume * (value.data.Product_Pack_Qty__c == undefined ? 1 : value.data.Product_Pack_Qty__c);
             }
             this.volumeForecast = volume;
+            this.freeGoodQty = freeGoodsVolume;
             console.log('[psaItemForm] captureVolumeInBottles', this.captureVolumeInBottles);
             console.log('[psaItemForm] volumeForecast', volume);
             this.listingFee = value.data.Listing_Fee__c || 0;
@@ -293,6 +322,18 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             if (value.data.Outlet_to_Provide__c) {
                 this.outletToProvideValues = value.data.Outlet_to_Provide__c.split(';');
             }
+            this.freeGoodReasonValues = [];
+            if (value.data.Free_Goods_Reason__c) {
+                this.freeGoodReasonValues = value.data.Free_Goods_Reason__c.split(';');
+            }
+            this.brandVisibilityValues = [];
+            if (value.data.Brand_Visibility__c) {
+                this.brandVisibilityValues = value.data.Brand_Visibility__c.split(';');
+            }
+            this.productVisibilityValues = [];
+            if (value.data.Product_Visibility__c) {
+                this.productVisibilityValues = value.data.Product_Visibility__c.split(';');
+            }
 
             this.finishedLoadingDetails = true;
             if (this.finishedLoadingObjectInfo && this.finishedLoadingProduct) { this.isWorking = false; }
@@ -304,10 +345,38 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     get isUKMarket() {
         return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'United Kingdom';
     }
+    get isMexico() {
+        return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'Mexico';
+    }
+    get captureRebate() {
+        return this.isUKMarket;
+    }
+    get captureRebatePercent() {
+        return this.isMexico;
+    }
+    get captureDiscountPerCase() {
+        return this.isUKMarket;
+    }
+    get captureListingFee() {
+        return this.isUKMarket || this.isMexico;
+    }
+    get capturePromotionalActivity() {
+        return this.isUKMarket || this.isMexico;
+    }
+    get captureBrandVisibility() {
+        return this.isMexico;
+    }
+    get captureProductVisibility() {
+        return this.isMexico;
+    }
 
     get canDelete() {
         return (!this.isApproved)
         //return this.psaItem != undefined;
+    }
+    get isDisabled() {
+        console.log('[psaItemForm] isLocked, isMexico, isEditable', this.isLocked, this.isMexico, this.isLocked && this.isMexico);
+        return this.isLocked && this.isMexico;
     }
 
     get psaTotalInvestment() {
@@ -335,6 +404,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     hasVolumeForecastError;
 
     discount = 0;
+    discountPercent = 0;
     discountLabel = 'Discount';
     hasDiscountError;
 
@@ -363,6 +433,20 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     outletToProvideOptions;
     outletToProvideLabel = 'Outlet to Provide';
     outletToProvidePlaceholder;
+
+    freeGoodQty = 0;
+    freeGoodGivenDate;
+    freeGoodReasonValues;
+    freeGoodReasonOptions;
+
+    brandVsibilityLabel = 'Brand Visibility';
+    brandVisibilityValues;
+    brandVisibilityOptions;
+    brandVisibilityPlaceholder;
+    productVisibilityLabel = 'Product Visibility';
+    productVisibilityValues;
+    productVisibilityOptions;
+    productVisibilityPlaceholder;
 
     comments;
 
@@ -425,12 +509,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
      * Helper functions
      */
     getRecordTypeId() {
+        console.log('[psaItemForm.getRecordTypeId] objectInfo', this.objectInfo);
         if (this.objectInfo.recordTypeInfos) {
             //console.log('[psaitemform.getrecordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
             //console.log('[psaitemform.getrecordtypeid] rtis', rtis);
             let rtKey = this.psaRecordTypeName == undefined ? 'UK - PSA' : this.psaRecordTypeName;
+            console.log('[psaItemForm.getRecordTypeId] rtKey', rtKey);
             this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === rtKey);
+            console.log('[psaItemForm.getRecordTypeId] recordTypeId', this.recordTypeId);
             //console.log('[psaitemform.getrecordtypeid] rtis', Object.keys(rtis));
             //console.log('[psaitemform.getrecordtypeid] recordtypeid', this.recordTypeId);
         }    
@@ -466,6 +553,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.outletToProvideLabel = this.objectInfo.fields["Outlet_to_Provide__c"].label;
             this.outletToProvidePlaceholder = this.objectInfo.fields["Outlet_to_Provide__c"].inlineHelpText;
         }
+        if (this.objectInfo.fields["Brand_Visibility__c"]) {
+            this.brandVisibilityLabel = this.objectInfo.fields["Brand_Visibility__c"].label;
+            this.brandVisibilityPlaceholder = this.objectInfo.fields["Brand_Visibility__c"].inlineHelpText;
+        }
+        if (this.objectInfo.fields["Product_Visibility__c"]) {
+            this.productVisibilityLabel = this.objectInfo.fields["Product_Visibility__c"].label;
+            this.productVisibilityPlaceholder = this.objectInfo.fields["Product_Visibility__c"].inlineHelpText;
+        }
 
     }
 
@@ -477,12 +572,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         Object.keys(picklistValues).forEach(picklist => {            
             if (picklist === 'Brand_Status__c') {
                 this.brandStatusOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] brandStatusOptions', this.brandStatusOptions);
                 //if (this.brandStatusValues && this.brandStatusValues.length > 0) {
                 //    const bsoptions = this.selectPicklistValues(this.brandStatusOptions, this.brandStatusValues);
                 //    this.brandStatusOptions = [...bsoptions];
                 //}
             } else if (picklist === 'Drink_Strategy__c') {
                 this.drinkStrategyOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] drinkStrategyOptions', this.drinkStrategyOptions);
                 //if (this.drinkStrategyValues && this.drinkStrategyValues.length > 0) {
                 //    this.selectPicklistValues(this.drinkStrategyOptions, this.drinkStrategyValues);
                 //}
@@ -494,14 +591,25 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 //}
             } else if (picklist === 'Training_and_Advocacy__c') {
                 this.trainingAdvocacyOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] trainingAdvocacyOptions', this.trainingAdvocacyOptions);
                 //if (this.trainingAdvocacyValues && this.trainingAdvocacyValues.length > 0) {
                 //    this.selectPicklistValues(this.trainingAdvocacyOptions, this.trainingAdvocacyValues);
                 //}
             } else if (picklist === 'Outlet_to_Provide__c') {
                 this.outletToProvideOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] outletToProvideOptions', this.outletToProvideOptions);
                 //if (this.outletToProvideValues && this.outletToProvideValues.length > 0) {
                 //    this.selectPicklistValues(this.outletToProvideOptions, this.outletToProvideValues);
                 //}
+            } else if (picklist === 'Free_Goods_Reason__c') {
+                this.freeGoodReasonOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] freeGoodReasonOptions', this.freeGoodReasonOptions);
+            } else if (picklist === 'Brand_Visibility__c') {
+                this.brandVisibilityOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] brandVisibilityOptions', this.brandVisibilityOptions);
+            } else if (picklist === 'Product_Visibility__c') {
+                this.productVisibilityOptions = this.setFieldOptionsForField(picklistValues, picklist);
+                console.log('[psaitemform.setFieldOptions] productVisibilityOptions', this.productVisibilityOptions);
             }
         });
 
@@ -539,7 +647,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     
     initialiseItemForm() {
         console.log('[psaitemform.initialiseitemform]');
+        console.log('[psaitemform.initialiseitemform] captureFreeGoods', this.captureFreeGoods);
         this.discount = 0;
+        this.discountPercent = 0;
         this.volumeForecast = 0;
         this.listingFee = 0;
         this.promotionalActivityAmount = 0;
@@ -552,6 +662,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.promotionalActivityValues = [];
             this.trainingAdvocacyValues = [];
             this.outletToProvideValues = [];    
+            this.freeGoodReasonValues = [];
+            this.brandVisibilityValues = [];
+            this.productVisibilityValues = [];
         }catch(ex) {
             console.log('[clear] exception', ex);
         }
@@ -595,6 +708,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         }
 
     }
+    handleFreeGoodsQtyChange(event) {
+        this.freeGoodQty = event.detail.value;
+    }
+    handleFreeGoodsGivenDateChange(event) {
+        this.freeGoodGivenDate = event.detail.value;
+    }
+    handleFreeGoodsReasonChange(event) {
+        this.freeGoodReasonValues = event.detail.value;
+    }
     handleBrandStatusChange(event) {
         this.brandStatusValues = event.detail.value;
     }
@@ -607,6 +729,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleDiscountChange(event) {
         this.discount = event.detail.value.trim() == '' ? 0 : event.detail.value;
+    }
+    handleDiscountPercentChange(event) {
+        this.discountPercent = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleListingFeeChange(event) {
         this.listingFee = event.detail.value.trim() == '' ? 0 : event.detail.value;
@@ -631,6 +756,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleCommentsChange(event) {
         this.comments = event.detail.value;
+    }
+    handleBrandVisibilityChange(event) {
+        this.brandVisibilityValues = event.detail.value;
+    }
+    handleProductVisibilityChange(event) {
+        this.productVisibilityValues = event.detail.value;
     }
 
     /**
@@ -775,12 +906,18 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityValues.join(';');
             fields[FIELD_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyValues.join(';');
             fields[FIELD_OUTLET_TO_PROVIDE.fieldApiName] = this.outletToProvideValues.join(';');
+            fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
+            fields[FIELD_BRAND_VISIBILITY.fieldApiName] = this.brandVisibilityValues.join(';');
+            fields[FIELD_PRODUCT_VISIBILITY.fieldApiName] = this.productVisibilityValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
 
+            let freeGoodsVolume = this.freeGoodQty;
             let volume = this.volumeForecast;
             if (this.captureVolumeInBottles) {
                 volume = this.volumeForecast / this.product.Pack_Quantity__c;
+                freeGoodsVolume = this.freeGoodQty / this.product.Pack_Quantity__c;
             }
+
             console.log('[psaItemForm.save] captureVolumeInBottles', this.captureVolumeInBottles);
             console.log('[psaItemForm.save] volume', volume);
             fields[FIELD_PROPOSED_PLAN_VOLUME.fieldApiName] = volume;
@@ -788,6 +925,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_PROPOSED_LISTING_FEE.fieldApiName] = this.listingFee;
             fields[FIELD_PROPOSED_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
             fields[FIELD_PROPOSED_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
+
+            var givenDate;
+            if (this.freeGoodGivenDate != undefined) {
+                const pd = new Date(this.freeGoodGivenDate);
+                const paymentDateYear = pd.getFullYear().toString();
+                const paymentDateMonth = ('00' + (pd.getMonth()+1)).slice(-2);
+                const paymentDateDay = ('00' + pd.getDate()).slice(-2);
+                givenDate = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
+            }
 
             if (this.isApproved == false || this.psaItemId == null) {
                 fields[FIELD_ORIGINAL_PLAN_VOLUME.fieldApiName] = volume;
@@ -800,10 +946,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             if (this.psaItemId != null) {
                 if (!this.isChangeAboveThreshold) {
                     fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
+                    fields[FIELD_PLAN_REBATE_PERCENTAGE.fieldApiName] = this.discountPercent;
                     fields[FIELD_VOLUME_FORECAST.fieldApiName] = volume;
                     fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                     fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
-                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;                                                  
+                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;   
+                    fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
+                    fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
+                    fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
                 }
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.psaItem.Plan_Volume__c;
                 fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.psaItem.Plan_Rebate__c;
@@ -812,10 +962,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_PREVIOUS_TRAINING_ADVOCACY.fieldApiName] = this.psaItem.Training_and_Advocacy_Value__c;
             } else {
                 fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
+                fields[FIELD_PLAN_REBATE_PERCENTAGE.fieldApiName] = this.discountPercent;
                 fields[FIELD_VOLUME_FORECAST.fieldApiName] = volume;
                 fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                 fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;    
+                fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
+                fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
+                fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
 
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = volume;
                 fields[FIELD_PREVIOUS_PLAN_REBATE.fieldApiName] = this.discount;

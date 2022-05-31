@@ -14,6 +14,9 @@ public with sharing class BuildInitialActualsForPSA {
         if (rtiList.containsKey('BRA - PSA')) {
             rtBRAPSA = rtiList.get('BRA - PSA').getRecordTypeId();
         }
+        if (rtiList.containsKey('MX - PSA')) {
+            rtBRAPSA = rtiList.get('MX - PSA').getRecordTypeId();
+        }
 
         
         List<PMI_Actual__c> existingActuals = [SELECT Id, External_Key__c FROM PMI_Actual__c WHERE Activity__c =:activityIds AND External_Key__c LIKE '%_0'];
@@ -72,6 +75,13 @@ public with sharing class BuildInitialActualsForPSA {
                     addedActuals = false;
                     //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
                     newActual = createPMIActual(pmi, 'Volume', recordTypeId, configs);
+                    keyExists = externalKeys.contains(newActual.External_Key__c);
+                    System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
+                    if (!keyExists) {
+                        actuals.add(newActual);
+                        addedActuals = true;
+                    }
+                    newActual = createPMIActual(pmi, 'Free Goods', recordTypeId, configs);
                     keyExists = externalKeys.contains(newActual.External_Key__c);
                     System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
                     if (!keyExists) {
