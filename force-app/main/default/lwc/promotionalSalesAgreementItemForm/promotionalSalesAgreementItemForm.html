@@ -61,23 +61,40 @@
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>    
-                        </div>          
+                        </div>     
+                        <!-- Liability -->     
+                        <div if:true={isMexico}>
+                            <p class="slds-text-heading_small">{labels.liability.label}</p>
+                            <lightning-formatted-number label={labels.liability.label} value={rebateLiability} format-style="currency"
+                                currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </div>
                     </lightning-layout-item>
                     <template if:true={calcSplit}>
                         <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
                             <p class="slds-text-heading_small">{labels.split.label}</p>
-                            <lightning-formatted-number label={labels.split.label} value={thisProductSplit}
+                            <lightning-formatted-number label={labels.split.label} value={thisProductGP}
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>
                         </lightning-layout-item>
                     </template>
+                    <template if:true={isMexico}>
+                        <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
+                            <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
+                            <lightning-formatted-number label={labels.grossProfit.label} 
+                                                        value={thisProductGP} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>                    
                 </lightning-layout>
             </lightning-layout-item>
             <template if:true={captureFreeGoods}>
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-input type="number" name="i_FreeGoods"
-                                    label={labels.freeGoods.label}
+                                    label={freeGoodsLabel}
                                     value={freeGoodQty}
                                     step="1"
                                     readonly={isDisabled}
@@ -167,7 +184,7 @@
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
                     <lightning-input type="number" name="i_DiscountPercent" 
-                                    label={labels.discountPercent.label}                                 
+                                    label={discountPercentLabel}                                 
                                     value={discountPercent}
                                     step="0.01"
                                     readonly={isDisabled}

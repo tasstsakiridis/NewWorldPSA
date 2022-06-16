@@ -64,6 +64,7 @@ import LABEL_ITEMS from '@salesforce/label/c.Items';
 import LABEL_LENGTH_OF_AGREEMENT_ERROR from '@salesforce/label/c.Length_of_Agreement_Error';
 import LABEL_LENGTH_OF_AGREEMENT_YEARS from '@salesforce/label/c.Length_of_Agreement_Years';
 import LABEL_LENGTH_OF_AGREEMENT_MONTHS from '@salesforce/label/c.Length_of_Agreement_Months';
+import LABEL_LIMIT_TO_SELECTED_ACCOUNTS from '@salesforce/label/c.Limit_to_Selected_Accounts';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_MONTH from '@salesforce/label/c.Month';
 import LABEL_MONTHS from '@salesforce/label/c.Months';
@@ -99,7 +100,8 @@ import LABEL_SEARCH_BY from '@salesforce/label/c.SearchBy';
 import LABEL_SEARCH_HELP_TEXT from '@salesforce/label/c.Search_Help_Text';
 import LABEL_SELECT_ALL from '@salesforce/label/c.Select_All';
 import LABEL_SIGNING_CUSTOMER from '@salesforce/label/c.Signing_Customer';
-import LABEL_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
+import LABEL_NO_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
+import LABEL_PREDATED_ERROR from '@salesforce/label/c.PreDated_Error';
 import LABEL_STATUS from '@salesforce/label/c.Status';
 import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 import LABEL_SUCCESS from '@salesforce/label/c.Success';
@@ -163,6 +165,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         items                   : { label: LABEL_ITEMS },
         info                    : { label: LABEL_INFO },
         lengthOfPSA             : { yearsLabel: LABEL_LENGTH_OF_AGREEMENT_YEARS, monthsLabel: LABEL_LENGTH_OF_AGREEMENT_MONTHS, error: LABEL_LENGTH_OF_AGREEMENT_ERROR },
+        limitToSelectedAccounts : { label: LABEL_LIMIT_TO_SELECTED_ACCOUNTS },
         loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
         month                   : { label: LABEL_MONTH.toLowerCase(), labelPlural: LABEL_MONTHS.toLowerCase() },
         mpoPrestige             : { label: LABEL_MPO_PRESTIGE },
@@ -190,7 +193,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         searchHelpText          : { label: LABEL_SEARCH_HELP_TEXT },
         selectAll               : { label: LABEL_SELECT_ALL },
         signingCustomerHeader   : { label: LABEL_SIGNING_CUSTOMER },
-        startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_START_DATE_ERROR },
+        startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_NO_START_DATE_ERROR, preDatedPSAError: LABEL_PREDATED_ERROR },
         status                  : { label: LABEL_STATUS },
         submitForApproval       : { label: LABEL_SUBMIT_FOR_APPROVAL, submittedMessage: LABEL_APPROVAL_SUBMITTED.replace('%0', 'PSA') },
         success                 : { label: LABEL_SUCCESS },
@@ -229,6 +232,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isUsingParentAccount = true;
     isSearchingForParent = true;
     isMPOPrestige = false;
+    limitToSelectedAccounts = false;
     hasMultipleAccountPages = true;
     captureNumberOfPayments = false;
     captureTotalBudget = false;
@@ -446,6 +450,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get capturePercentageVisibility() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
+    }
+    get canPreDatePSA() {
+        return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Can_PreDate_PSA__c;
     }
 
     error;
@@ -874,6 +881,21 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleStartDateChange(ev) {
         this.startDate = new Date(ev.detail.value);
         console.log('startdate', this.startDate);
+
+        this.hasStartDateError = false;
+        if (!this.canPreDatePSA) {
+            const today = new Date();
+            today.setHours(0, 0, 0);
+
+            const sdate = this.startDate;
+            console.log('[handleStartDateChange] today', today);
+            console.log('[handleStartDateChange] startDate', this.startDate);
+            console.log('[handleStartDateChange] sdate', sdate);
+            if (sdate < today) {
+                this.hasStartDateError = true;
+                this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
+            }
+        }
     }
     handleEndDateChange(ev) {
         this.i_endDate = new Date(ev.detail.value);
@@ -980,6 +1002,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handlePrestigeTypeToggle(event) {
         this.isMPOPrestige = event.detail.checked;
+    }
+    handleLimitToSelectedAccountsToggle(event) {
+        this.limitToSelectedAccounts = event.detail.checked;
     }
     handleFileUploadFinished(event) {
         try {
@@ -1179,6 +1204,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.percentageVisibility = data.Percentage_Visibility__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
+            this.limitToSelectedAccounts = data.Limit_to_Selected_Accounts__c;
             this.status = data.Status__c;
             this.purchaseOrder = data.Purchase_Order__c;
             this.wholesalerPreferred = data.Wholesaler_Preferred__c;
@@ -1353,6 +1379,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     this.hasLengthOfPSAError = true;
                 }
             }    
+        }
+
+        if (!this.canPreDatePSA) {
+            const today = new Date();
+            today.setHours(0, 0, 0);
+
+            if (this.startDate < today) {
+                this.hasStartDateError = true; isValid = false;
+                this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
+            }
         }
 
         console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
@@ -1544,6 +1580,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.comments = this.comments;
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;
+        param.limitToSelectedAccounts = this.limitToSelectedAccounts;
         console.log('wholesalerPreferred', this.wholesalerPreferred);
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;

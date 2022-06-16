@@ -30,14 +30,79 @@
                                         <td class="col1"><h4>{labels.end.label}</h4></td>
                                         <td class="col2"><lightning-formatted-date-time value={endDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time></td>
                                     </tr>
-                                    <tr>
-                                        <td class="col1"><h4>{labels.numberOfQuarters.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-number value={numberOfQuarters} maximum-fraction-digits="0"></lightning-formatted-number></td>
-                                    </tr>
+                                    <template if:true={showNumberOfQuarters}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.numberOfQuarters.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={numberOfQuarters} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template if:true={showRebateLiability}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.rebateLiability.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalRebateLiability} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template if:true={showTotalInvestment}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.totalInvestment.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalInvestment} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template if:true={showCustomerProfit}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.customerProfit.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={customerProfit} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.roi.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={roi} maximum-fraction-digits="2"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </table>
                             </div>                          
                         </lightning-layout-item>
-
+                        <template if:true={showFreeGoods}>
+                            <lightning-layout-item padding="around-small">
+                                <div class="section">
+                                    <h4 class="slds-text-title_caps">{labels.freeGoods.label}</h4>
+                                    <table class="slds-m-left_x-small slds-m-top_small">
+                                        <tr>
+                                            <td class="col1"><h4>{labels.planned.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalFreeGoodsPlanned} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
+                                            <td class="col3"><h4>(<lightning-formatted-number value={totalFreeGoodsCost} type="currency" maximum-fraction-digits="2"></lightning-formatted-number></h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4 style="text-transform:capitalize;">{labels.actual.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalFreeGoodsActual} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalFreeGoodsBalance} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </lightning-layout-item>   
+                        </template>
                         <lightning-layout-item padding="around-small">
                             <div class="section">
                                 <h4 class="slds-text-title_caps">{labels.volume.label}</h4>
