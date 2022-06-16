@@ -15,6 +15,9 @@ public with sharing class PSAWrapper {
         public Decimal discount { get; set; }
 
         @AuraEnabled 
+        public Decimal discountPercent { get; set; }
+
+        @AuraEnabled 
         public String brandStatus { get; set; }
 
         @AuraEnabled 
@@ -37,6 +40,28 @@ public with sharing class PSAWrapper {
 
         @AuraEnabled 
         public String outletToProvide { get; set; }
+
+        @AuraEnabled 
+        public Decimal freeBottleQty { get; set; }
+
+        @AuraEnabled 
+        public Date freeGoodsGivenDate { get; set; }
+
+        @AuraEnabled 
+        public String freeGoodsReason { get; set; }
+
+        @AuraEnabled 
+        public String brandVisibility { get; set; }
+
+        @AuraEnabled 
+        public String productVisibility { get; set; }
+
+        @AuraEnabled 
+        public Decimal planRebateLiability { get; set; }
+
+        @AuraEnabled 
+        public Decimal planRebateVolume { get; set; }
+
     }
 
     public class PSAAccountWrapper {
@@ -64,6 +89,9 @@ public with sharing class PSAWrapper {
 
     @AuraEnabled 
     public String parentAccountId { get; set; }
+
+    @AuraEnabled 
+    public Boolean allChildAccountsIncluded { get; set; }
 
     @AuraEnabled 
     public String signingCustomerId { get; set; }
@@ -114,7 +142,13 @@ public with sharing class PSAWrapper {
     public Boolean mpoPrestige { get; set; }
 
     @AuraEnabled 
+    public Boolean limitToSelectedAccounts { get; set; }
+
+    @AuraEnabled 
     public Integer numberOfPayments { get; set; }
+
+    @AuraEnabled
+    public String paymentConfigurations { get; set; }
 
     @AuraEnabled 
     public Decimal totalBudget { get; set; }
@@ -141,6 +175,7 @@ public with sharing class PSAWrapper {
         this.marketId = '';
         this.marketName = '';
         this.parentAccountId = '';
+        this.allChildAccountsIncluded = false;
         this.signingCustomerId = '';
         this.signingCustomerName = '';
         this.signingCustomerEmail = '';
@@ -157,7 +192,9 @@ public with sharing class PSAWrapper {
         this.purchaseOrder = '';
         this.comments = '';
         this.mpoPrestige = false;
+        this.limitToSelectedAccounts = true;
         this.numberOfPayments = 1;
+        this.paymentConfigurations = '';
         this.totalBudget = 0;
         this.percentageVisibility = 0;
 
@@ -174,6 +211,7 @@ public with sharing class PSAWrapper {
         this.marketId = psa.Market__c;
         this.marketName = psa.Market__r.Name;
         this.parentAccountId = psa.Account__c;
+        this.allChildAccountsIncluded = psa.All_Child_Accounts_Included__c;
         this.signingCustomerId = psa.Contact__c;
         if (psa.Contact__r != null) {
             this.signingCustomerName = psa.Contact__r.Name;
@@ -194,5 +232,6 @@ public with sharing class PSAWrapper {
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
         this.totalBudget = psa.Activity_Budget__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
+        this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
     }
 }

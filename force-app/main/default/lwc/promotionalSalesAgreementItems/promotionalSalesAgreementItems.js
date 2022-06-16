@@ -69,6 +69,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         if (this.thePSA == null) {
             return false;
         } else {
+            console.log('[psaItems] status, isapproved', this.thePSA.Status__c, this.thePSA.Is_Approved__c);
             return this.thePSA.Status__c === 'Approved' || this.thePSA.Status__c === 'Submitted' || this.thePSA.Status__c == 'Pending Approval' || this.thePSA.Is_Approved__c;
         }
     }
@@ -83,6 +84,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaItems] calcProductSplit', this.thePSA.Market__r.Calculate_PSA_Product_Split__c);
         }
         return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c;
+    }
+    get captureFreeGoods() {
+        if (this.thePSA != undefined) {
+            console.log('[psaItems] captureFreeGoods', this.thePSA.Market__r.Capture_PSA_Free_Goods__c);
+        }
+        return this.thePSA != null && this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
     }
     get showTotalInvestment() {
         return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c == false;

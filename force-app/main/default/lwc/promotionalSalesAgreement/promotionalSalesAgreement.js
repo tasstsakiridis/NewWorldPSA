@@ -33,6 +33,8 @@ import LABEL_ACCOUNT_SEARCH_RESULTS from '@salesforce/label/c.Account_Search_Res
 import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
 import LABEL_AGREEMENT_END_DATE from '@salesforce/label/c.Agreement_End_Date';
 import LABEL_AGREEMENT_START_DATE from '@salesforce/label/c.Agreement_Start_Date';
+import LABEL_ALL from '@salesforce/label/c.All';
+import LABEL_ALL_ACCOUNTS_SELECTED from '@salesforce/label/c.All_Accounts_Selected';
 import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
 import LABEL_ALTERNATE_RTM_ERROR from '@salesforce/label/c.Alternate_RTM_Error';
 import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
@@ -63,21 +65,26 @@ import LABEL_ITEMS from '@salesforce/label/c.Items';
 import LABEL_LENGTH_OF_AGREEMENT_ERROR from '@salesforce/label/c.Length_of_Agreement_Error';
 import LABEL_LENGTH_OF_AGREEMENT_YEARS from '@salesforce/label/c.Length_of_Agreement_Years';
 import LABEL_LENGTH_OF_AGREEMENT_MONTHS from '@salesforce/label/c.Length_of_Agreement_Months';
+import LABEL_LIMIT_TO_SELECTED_ACCOUNTS from '@salesforce/label/c.Limit_to_Selected_Accounts';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_MONTH from '@salesforce/label/c.Month';
 import LABEL_MONTHS from '@salesforce/label/c.Months';
 import LABEL_MPO_PRESTIGE from '@salesforce/label/c.MPO_Prestige';
 import LABEL_NO from '@salesforce/label/c.No';
 import LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT from '@salesforce/label/c.No_Accounts_Found_For_Parent';
+import LABEL_NO_ACCOUNTS_SELECTED from '@salesforce/label/c.No_Accounts_Selected';
 import LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT from '@salesforce/label/c.No_Decision_Makers_found_for_Account';
 import LABEL_NONE from '@salesforce/label/c.None';
 import LABEL_NONE_PICKLIST_VALUE from '@salesforce/label/c.None_Picklist_Value';
 import LABEL_NUMBER_OF_PAYMENTS from '@salesforce/label/c.Number_of_Payments';
 import LABEL_OK from '@salesforce/label/c.OK';
+import LABEL_ON_SIGNING from '@salesforce/label/c.On_Signing';
 import LABEL_ONE_PAYMENT_HELPTEXT from '@salesforce/label/c.One_Payment_HelpText';
 import LABEL_PARENT_ACCOUNT from '@salesforce/label/c.Parent_Account';
 import LABEL_PARENT_ACCOUNT_ERROR from '@salesforce/label/c.Parent_Account_Error';
 import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Parent_Account_Search_Results_Message';
+import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
+//import LABEL_PAYMENT_CONFIGURATIONS from '@salesforce/label/c.Payment_Configurations';
 import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibility';
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
@@ -95,7 +102,8 @@ import LABEL_SEARCH_BY from '@salesforce/label/c.SearchBy';
 import LABEL_SEARCH_HELP_TEXT from '@salesforce/label/c.Search_Help_Text';
 import LABEL_SELECT_ALL from '@salesforce/label/c.Select_All';
 import LABEL_SIGNING_CUSTOMER from '@salesforce/label/c.Signing_Customer';
-import LABEL_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
+import LABEL_NO_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
+import LABEL_PREDATED_ERROR from '@salesforce/label/c.PreDated_Error';
 import LABEL_STATUS from '@salesforce/label/c.Status';
 import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 import LABEL_SUCCESS from '@salesforce/label/c.Success';
@@ -127,12 +135,18 @@ import FIELD_PROMOTION_ACCOUNT from '@salesforce/schema/Promotion__c';
 const invalidStatusSelections = ['New','Submitted','Pending Approval','Updated'];
 const numberOfPaymentOptions = [{'label':'1','value':'1'},{'label':'2','value':'2'},{'label':'3','value':'3'},{'label':'4','value':'4'}];
 
+const paymentColumns = [
+    { label: '%', fieldName: 'percentage_achieved', type: 'number', editable: true }
+];
+
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
         account                 : { label: LABEL_ACCOUNT },        
         accountSearchResults    : { label: LABEL_ACCOUNT_SEARCH_RESULTS },
         actuals                 : { label: LABEL_ACTUALS },
         agreementEndDate        : { label: LABEL_AGREEMENT_END_DATE },
+        all                     : { label: LABEL_ALL, picklistValue: '--'+LABEL_ALL+'--' },
+        allAccountSelected      : { message: LABEL_ALL_ACCOUNTS_SELECTED },
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
         back                    : { label: LABEL_BACK },
         budget                  : { label: LABEL_BUDGET },
@@ -154,11 +168,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         items                   : { label: LABEL_ITEMS },
         info                    : { label: LABEL_INFO },
         lengthOfPSA             : { yearsLabel: LABEL_LENGTH_OF_AGREEMENT_YEARS, monthsLabel: LABEL_LENGTH_OF_AGREEMENT_MONTHS, error: LABEL_LENGTH_OF_AGREEMENT_ERROR },
+        limitToSelectedAccounts : { label: LABEL_LIMIT_TO_SELECTED_ACCOUNTS },
         loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
         month                   : { label: LABEL_MONTH.toLowerCase(), labelPlural: LABEL_MONTHS.toLowerCase() },
         mpoPrestige             : { label: LABEL_MPO_PRESTIGE },
         no                      : { label: LABEL_NO },
         noAccountsFound         : { label: LABEL_NO_ACCOUNTS_FOUND_FOR_PARENT },
+        noAccountsSelected      : { error: LABEL_NO_ACCOUNTS_SELECTED },
         none                    : { label: LABEL_NONE, picklistLabel: LABEL_NONE_PICKLIST_VALUE },
         noSigningCustomers      : { message: LABEL_NO_DECISION_MAKERS_FOUND_FOR_ACCOUNT },
         numberOfPayments        : { label: LABEL_NUMBER_OF_PAYMENTS },
@@ -166,6 +182,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         parentAccount           : { label: LABEL_PARENT_ACCOUNT, error: LABEL_PARENT_ACCOUNT_ERROR },
         parentAccountSearchResults : { label: LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR },
         payments                : { oneHelpText: LABEL_ONE_PAYMENT_HELPTEXT, twoHelpText: LABEL_TWO_PAYMENT_HELPTEXT, threeHelpText: LABEL_THREE_PAYMENT_HELPTEXT, fourHelpText: LABEL_FOUR_PAYMENT_HELPTEXT },
+        paymentConfigurations   : { label: LABEL_PAYMENTS },
         percentageVisibility    : { label: LABEL_PERCENTAGE_VISIBILITY },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         purchaseOrder           : { label: LABEL_PURCHASE_ORDER },
@@ -180,7 +197,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         searchHelpText          : { label: LABEL_SEARCH_HELP_TEXT },
         selectAll               : { label: LABEL_SELECT_ALL },
         signingCustomerHeader   : { label: LABEL_SIGNING_CUSTOMER },
-        startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_START_DATE_ERROR },
+        startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_NO_START_DATE_ERROR, preDatedPSAError: LABEL_PREDATED_ERROR },
         status                  : { label: LABEL_STATUS },
         submitForApproval       : { label: LABEL_SUBMIT_FOR_APPROVAL, submittedMessage: LABEL_APPROVAL_SUBMITTED.replace('%0', 'PSA') },
         success                 : { label: LABEL_SUCCESS },
@@ -218,17 +235,22 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isSearching = false;
     isUsingParentAccount = true;
     isSearchingForParent = true;
+    selectAllChildAccounts = false;
     isMPOPrestige = false;
+    limitToSelectedAccounts = false;
     hasMultipleAccountPages = true;
     captureNumberOfPayments = false;
     captureTotalBudget = false;
     captureEndDate = false;
+    agreementRequiresWholesaler = false;
+    configurePayments = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
     accountQueryString = '';
     accountHasManyDecisionMakers = false;
     accounts;
+    childAccounts;
     selectedAccounts = new Map();
     promotionsToDelete = new Map();
     wiredAccount;
@@ -243,6 +265,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     @track
     attachedFiles;
+
+    paymentColumns = paymentColumns;
+    paymentConfigs = [];
 
     wiredAgreement;
     @wire(getPSA, {psaId: '$recordId'})
@@ -317,6 +342,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.captureNumberOfPayments = this.market.Capture_Number_of_Payments__c == undefined ? false : this.market.Capture_Number_of_Payments__c;
             this.captureTotalBudget = this.market.Capture_PSA_Budget__c == undefined ? false : this.market.Capture_PSA_Budget__c;
             this.captureEndDate = this.market.Capture_End_Date__c == undefined ? false : this.market.Capture_End_Date__c;
+            this.agreementRequiresWholesaler = this.market.Agreement_Requires_Wholesaler__c == undefined ? true : this.market.Agreement_Requires_Wholesaler__c;
+            this.configurePayments = this.market.Agreement_Configure_Payments__c == undefined ? false : this.market.Agreement_Configure_Payments__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -355,6 +382,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                return { label: wholesaler.Name, value: wholesaler.Id }; 
             });
             this.wholesalers.splice(0, 0, { label: this.labels.none.picklistLabel, value: '-none-' });
+            if (!this.agreementRequiresWholesaler) {
+                this.wholesalers.splice(0, 0, { label: this.labels.all.picklistLabel, value: '-all-' });
+            }
         } else if (error) { 
             this.error = error;
             this.wholesalers = undefined;
@@ -388,8 +418,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return true;
         return this.thePSA != null && this.thePSA.Is_Approved__c == false;
     }
+    get hasAccessToActuals() {
+        return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Enable_PSA_Actuals__c;
+    }
     get canEditActuals() {
-        return this.thePSA != null && this.thePSA.Is_Approved__c == true && this.status != 'Updated' && !this.isSubmitted;
+        return this.thePSA != null && this.thePSA.Is_Approved__c == true && this.status != 'Updated' && !this.isSubmitted && this.hasAccessToActuals;
     }
     get canViewSummary() {
         return this.thePSA != null;
@@ -404,6 +437,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             return this.status == 'Approved' || this.status == 'Submitted' || this.status == 'Pending Approval' || this.thePSA.Is_Approved__c == true;
         }
     }
+    get paymentsLocked() {
+        console.log('[canChangePayments] isLocked, isMexico, canchange', this.isLocked, this.isMexico, this.isLocked && this.isMexico);
+        return this.isLocked && this.isMexico;
+    }
+    get isMexico() {
+        return this.thePSA != null && this.thePSA.Market__r != null && this.thePSA.Market__r.Name == 'Mexico';
+    }
     get isApproved() {
         return this.thePSA != null && (this.thePSA.Status__c == 'Approved' || this.thePSA.Is_Approved__c);
     }
@@ -416,6 +456,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get capturePercentageVisibility() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
+    }
+    get canPreDatePSA() {
+        return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Can_PreDate_PSA__c;
     }
 
     error;
@@ -827,6 +870,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.parentAccount = undefined;
         this.accounts = undefined;
         this.isSearchingForParent = true;
+        if (this.thePSA.Promotions__r != undefined && this.thePSA.Promotions__r.length > 0) {
+            this.thePSA.Promotions__r.forEach(p => {
+                this.promotionsToDelete.push(p.Account__c, { id: p.Id, itemItem: p.Account__c });
+            });
+        }
     }
 
     handleAccountTypeToggle(ev) {
@@ -844,6 +892,21 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleStartDateChange(ev) {
         this.startDate = new Date(ev.detail.value);
         console.log('startdate', this.startDate);
+
+        this.hasStartDateError = false;
+        if (!this.canPreDatePSA) {
+            const today = new Date();
+            today.setHours(0, 0, 0);
+
+            const sdate = this.startDate;
+            console.log('[handleStartDateChange] today', today);
+            console.log('[handleStartDateChange] startDate', this.startDate);
+            console.log('[handleStartDateChange] sdate', sdate);
+            if (sdate < today) {
+                this.hasStartDateError = true;
+                this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
+            }
+        }
     }
     handleEndDateChange(ev) {
         this.i_endDate = new Date(ev.detail.value);
@@ -858,15 +921,54 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleNumberOfPaymentsChange(ev) {
         console.log('[handleNumberOfPaymentsChange] value', ev.detail.value);
         this.numberOfPayments = ev.detail.value;
+        if (this.configurePayments) {
+            let payConfigs = [];
+            for(let i = 1; i <= this.numberOfPayments; i++) {
+                payConfigs.push({ payment_number: i, percent_achieved: 0 });
+            }
+            this.paymentConfigs = [...payConfigs];
+        }
+    }
+    handlePaymentConfigChange(ev) {
+        try {
+        console.log('[handlePaymentConfigChange] value', ev.detail.value);
+        console.log('[handlePaymentConfigChange] payment number', ev.target.dataset.paymentnumber);
+            const paymentNumber = ev.target.dataset.paymentnumber - 1;
+            this.paymentConfigs[paymentNumber].percent_achieved = ev.detail.value;
+        }catch(ex) {
+            console.log('[handlePaymentConfigChange] exception', ex);
+        }
+    }
+    handlePaymentConfigurationsSave(ev) {
+        try {
+            this.paymentConfigs = ev.detail.draftValues;
+            console.log('draftValues', this.paymentConfigs);
+        }catch(ex) {
+            console.log('draft values exception', ex);
+        }
     }
 
     handlePreviousPage() {
         this.pageNumber = this.pageNumber - 1;
-        this.getAccounts();
+        if (this.isSearchingForParent) {
+            this.getAccounts();
+        } else {
+            if (this.parentAccount != undefined) {
+                //this.findAccountsForParent(this.parentAccount.Id);
+                this.loadChildAccounts();
+            }
+        }
     }
     handleNextPage() {
         this.pageNumber = this.pageNumber + 1;
-        this.getAccounts();
+        if (this.isSearchingForParent) {
+            this.getAccounts();
+        } else {
+            if (this.parentAccount != undefined) {
+                //this.findAccountsForParent(this.parentAccount.Id);
+                this.loadChildAccounts();
+            }
+        }
     }
     handleSelectAllAccountsClick(event) {
         console.log('select all accounts clicked');
@@ -876,12 +978,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.promotionsToDelete.clear();
         console.log('[selectallaccounts] accounts', this.accounts);
         try {
-            this.accounts.records.forEach(a => {
+            this.selectAllChildAccounts = true;
+            
+            this.childAccounts.forEach(a => {
                 console.log('[selectallaccounts] a', a);
+                a.isSelected = true;
                 if (!this.selectedAccounts.has(a.item.Id)) {
                     this.selectedAccounts.set(a.item.Id, { id: '', itemId: a.item.Id });
                 }
-            });    
+            });
+                
         }catch(ex) {
             console.log('[selectallaccounts] exception', ex);
         }
@@ -891,11 +997,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleUnSelectAllAccountsClick(event) {
         fireEvent(this.pageRef, 'selectTile', false);
         this.promotionsToDelete.clear();
+        this.selectAllChildAccounts = false;
+        this.childAccounts.forEach(a => {
+            a.isSelected = false;
+        });
         this.selectedAccounts.forEach(a => {
             if (a.id != '') {
                 this.promotionsToDelete.set(a.id, a);
             }
         });
+        
     }
 
     handleChangeSigningCustomerClick(event) {
@@ -925,6 +1036,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handlePrestigeTypeToggle(event) {
         this.isMPOPrestige = event.detail.checked;
+    }
+    handleLimitToSelectedAccountsToggle(event) {
+        this.limitToSelectedAccounts = event.detail.checked;
     }
     handleFileUploadFinished(event) {
         try {
@@ -1076,6 +1190,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[getAgreement] psa', this.thePSA);
             this.psaId = data.Id;
             this.recordTypeId = data.RecordTypeId;
+            this.allAccountSelected = data.All_Child_Accounts_Included;
             if (data.Account__c) {
                 this.parentAccount = {
                     Id: data.Account__c,
@@ -1097,11 +1212,34 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
             }
             if (data.Number_of_Payments__c != undefined) {
-                this.numberOfPayments = data.Number_of_Payments__c.toString();
+                this.numberOfPayments = data.Number_of_Payments__c.toString();  
+
+                if (data.Payment_Configurations__c != undefined) {
+                    this.paymentConfigs = [];
+                         
+                    let pconfigs = [];
+                    const pconfigItems = data.Payment_Configurations__c.split(',');
+                    console.log('pconfigs', pconfigItems);
+                    console.log('pconfigs length', pconfigItems.length);
+                    
+                    for(var pcCtr = 0; pcCtr < pconfigItems.length; pcCtr++) {
+                        console.log('pconfigs['+pcCtr+']', pconfigItems[pcCtr]);
+                        pconfigs.push({payment_number: (pcCtr + 1), percent_achieved: pconfigItems[pcCtr]});
+                        
+                    }
+                    this.paymentConfigs = [...pconfigs];
+                    
+                    //for(let i = 0; i < pconfigs.length; i++) {
+                    //    pconfigs.push({payment_number: (i+1), percentage_achieved: parseFloat(pconfigs[i]) });
+                    //}
+                }
+                
             }
+            
             this.percentageVisibility = data.Percentage_Visibility__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
+            this.limitToSelectedAccounts = data.Limit_to_Selected_Accounts__c;
             this.status = data.Status__c;
             this.purchaseOrder = data.Purchase_Order__c;
             this.wholesalerPreferred = data.Wholesaler_Preferred__c;
@@ -1133,7 +1271,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     alert('[psa.loadpsadetails] # of promotions', data.Promotions__r.length);
                 }
                 data.Promotions__r.forEach(p => {
-                    this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
+                    if (p.Account__c != this.parentAccount.Id) {
+                        this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
+                    }
                 });
                 getAccountsForParent({ parentAccountId: this.parentAccount.Id, pageNumber: 1 })
                     .then(result => {
@@ -1148,11 +1288,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
                             return { item: account, isSelected: isSelected };
                         });
+                        this.childAccounts = newList;
                         console.log('[getAccountsForParent] children', newList);
                         this.accounts = {
                             pageSize: result.pageSize,
                             pageNumber: result.pageNumber,
-                            records: newList,
+                            records: newList.slice(0, result.pageSize),
                             totalItemCount: result.totalItemCount
                         };
                         }catch(ex) {
@@ -1278,8 +1419,18 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             }    
         }
 
+        if (!this.canPreDatePSA) {
+            const today = new Date();
+            today.setHours(0, 0, 0);
+
+            if (this.startDate < today) {
+                this.hasStartDateError = true; isValid = false;
+                this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
+            }
+        }
+
         console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
-        if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
+        if (this.agreementRequiresWholesaler && this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             this.hasPreferredRTMError = true;
             isValid = false; 
         }
@@ -1425,14 +1576,24 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         getAccountsForParent({ parentAccountId: accountId, pageNumber: this.pageNumber })
             .then(result => {
                 console.log('[getAccountsForParent] result', result);
+                /*
+                if (this.allChildAccountsIncluded) {
+                    result.records.forEach(item => {
+                        if (!this.selectedAccounts.has(item.Id)) {
+                            this.selectedAccounts.set(item.Id, { id: '', itemId: item.Id });;
+                        }
+                    });
+                }
+                */
                 const newList = result.records.map(item => {
                     return { item: item, isSelected: false };
                 });
                 console.log('[getAccountsForParent] newList', newList);
+                this.childAccounts = newList;
                 this.accounts = {
                     pageSize: result.pageSize,
                     pageNumber: result.pageNumber,
-                    records: newList,
+                    records: newList.slice(0, result.pageSize),
                     totalItemCount: result.totalItemCount
                 };
                 this.error = undefined;
@@ -1443,6 +1604,32 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.accounts = undefined;
             });
     }
+    loadChildAccounts() {
+        try {
+            console.log('[loadChildAccounts] pageeNumber', this.pageNumber);
+            console.log('[loadChildAccounts] pageSize', this.accounts.pageSize);
+            const startIndex = (this.pageNumber - 1) * this.accounts.pageSize;
+            let endIndex = this.accounts.pageSize * this.pageNumber;
+            if (endIndex > this.childAccounts.length) { endIndex = this.childAccounts.length; }
+            console.log('[loadChildAccounts] startIndex, endIndex', startIndex, endIndex);
+            console.log('[loadChildAccounts] # of child accounts', this.childAccounts.length);
+            let newList = this.childAccounts.slice(startIndex, endIndex);
+            
+            console.log('newList', newList);
+            
+            const updatedAccountList = {
+                pageSize: this.accounts.pageSize,
+                pageNumber: this.pageNumber,
+                records: newList,
+                totalItemCount: this.childAccounts.length
+            };
+            this.accounts = {...updatedAccountList};
+        
+        }catch(ex) {
+            console.log('[loadChildAccounts] exception', ex);
+        }
+    }
+
     save() {
         try {
             console.log('psa', this.thePSA);
@@ -1461,16 +1648,23 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.isLengthInYears = this.isLengthInYears;
         param.numberOfPayments = this.numberOfPayments;
         param.parentAccountId = this.parentAccount.Id;
+        param.allChildAccountsIncluded = this.allAccountSelected;
         param.signingCustomerId = this.signingCustomer.Id;
         param.signingCustomerName = this.signingCustomerName;
         param.signingCustomerEmail = this.signingCustomer.Email;
         param.comments = this.comments;
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;
+        param.limitToSelectedAccounts = this.limitToSelectedAccounts;
         console.log('wholesalerPreferred', this.wholesalerPreferred);
-        const wp = this.wholesalers.find(w => w.value === this.wholesalerPreferred);
-        param.wholesalerPreferredName = wp.label;
-        console.log('wp', wp);
+        if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
+            param.wholesalerPreferredId = null;
+            param.wholesalerPreferredName = '';
+        } else {
+            const wp = this.wholesalers.find(w => w.value === this.wholesalerPreferred);
+            param.wholesalerPreferredName = wp.label;
+            console.log('wp', wp);    
+        }
         if (this.wholesalerAlternate == undefined || this.wholesalerAlternate == '-none-') {
             param.wholesalerAlternateId = null;
             param.wholesalerAlternateName = '';
@@ -1485,11 +1679,27 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.status = this.status;
         param.totalBudget = this.totalBudget;
         param.percentageVisibility = this.percentageVisibility;
+        param.paymentConfigurations = '';
+        console.log('paymentConfigurations', this.paymentConfigs);
+        if (this.paymentConfigs.length > 0) {
+            for(let i = 0; i < this.paymentConfigs.length; i++) {
+                var percentage = this.paymentConfigs[i].percent_achieved;
+                console.log('[save] percentage', percentage, this.paymentConfigs[i].percent_achieved);
+                if (i == 0 && isNaN(percentage)) {
+                    percentage = 0;
+                } else {
+                }
+                param.paymentConfigurations += percentage + ',';
+            }
+            param.paymentConfigurations = param.paymentConfigurations.slice(0, -1);
+            console.log('[save] payment configurations', param.paymentConfigurations);
+        }
 
         param.accounts = [];
-        param.promotionsToDelete = [];
+        param.accountsToDelete = [];
         
         if (this.isUsingParentAccount) {
+            console.log('[save] selectedAccounts', this.selectedAccounts);
             if (this.selectedAccounts.size > 0) {
                 this.selectedAccounts.forEach((value, key, map) => {
                     console.log('value', value, key);
@@ -1499,9 +1709,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     param.accounts.push({id: null, itemId: param.parentAccountId});
                 }
             }
+            console.log('[save] promotionsToDelete: ' + this.promotionsToDelete);
             if (this.promotionsToDelete.size > 0) {
                 this.promotionsToDelete.forEach((value, key, map) => {
                     console.log('promoToDelete', value, key);
+                    param.accountsToDelete.push(value.id);
                 });
             }
         } else {

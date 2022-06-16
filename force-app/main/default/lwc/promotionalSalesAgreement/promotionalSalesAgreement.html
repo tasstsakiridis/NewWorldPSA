@@ -90,7 +90,7 @@
     </template>
 
     <template if:true={error}>
-        <c-inline-message message={error} errors={errors} type="error"></c-inline-message>
+        <c-inline-message message={error.body.message} errors={errors} type="error"></c-inline-message>
     </template>
 
     <template if:true={isWorking}>
@@ -200,22 +200,59 @@
                                     <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} onchange={handlePercentageVisibilityChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>
+                            <template if:true={isMexico}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.limitToSelectedAccounts.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_LimitAccounts" checked={limitToSelectedAccounts} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} disabled={isLocked} onchange={handleLimitToSelectedAccountsToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </template>
                             <template if:true={captureNumberOfPayments}>
                                 <lightning-layout-item size="12" padding="around-small">
-                                    <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
+                                    <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" disabled={paymentsLocked} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
                                     <!--<lightning-combobox name="i_NumberOfPayments" label={labels.numberOfPayments.label} value={numberOfPayments} options={numberOfPaymentOptions} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-combobox>-->
                                 </lightning-layout-item>
-                                <template if:true={isOnePayment}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                <template if:true={configurePayments}>
+                                    <div style="margin-left: 2em;">
+                                        <ul class="slds-m-around_small">
+                                            <li>
+                                                <div style="display: inline-block; margin-right: 20px;"><h4>{labels.paymentConfigurations.label}</h4></div>
+                                                <div style="display: inline-block;"><h4>%</h4></div>
+                                            </li>
+                                            <template for:each={paymentConfigs} for:item="paymentConfig">                                                
+                                                <li key={paymentConfig.payment_number}>
+                                                    <div>
+                                                        <div style="display: inline-block; margin-right: 10px;"><span>Payment {paymentConfig.payment_number}</span></div>
+                                                        <div style="display: inline-block;"><lightning-input type="number" data-paymentnumber={paymentConfig.payment_number} 
+                                                                        value={paymentConfig.percent_achieved}
+                                                                        readonly={isLocked} 
+                                                                        onchange={handlePaymentConfigChange}></lightning-input></div>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                    <!--
+                                    <lightning-datatable key-field="payment_number" data={paymentConfigs} 
+                                                        columns={paymentColumns}
+                                                        show-row-number-column="false"
+                                                        hide-checkbox-column
+                                                        class="payment-configuration-table"
+                                                        onsave={handlePaymentConfigurationsSave}></lightning-datatable>
+                                    -->
                                 </template>
-                                <template if:true={isTwoPayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
-                                </template>
-                                <template if:true={isThreePayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
-                                </template>
-                                <template if:true={isFourPayments}>
-                                    <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                <template if:false={configurePayments}>
+                                    <template if:true={isOnePayment}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:true={isTwoPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:true={isThreePayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>
+                                    <template if:true={isFourPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>    
                                 </template>
                             </template>                                
 
@@ -343,9 +380,12 @@
                     </lightning-layout-item>
                     <lightning-layout-item size="12">
                         <template if:true={hasChildAccountsError}>
-                            <span class="slds-m-horizontal_small input-error">Please select atleast one account</span>
+                            <span class="slds-m-horizontal_small input-error">{label.noAccountsSelected.error}</span>
                         </template>
-                        
+                        <template if:true={selectAllChildAccounts}>
+                            <span class="slds-m-around_small warning-info">{labels.allAccountSelected.message}</span>
+                        </template>
+
                         <template if:true={accounts}>
                             <template if:true={accounts.records.length}>
                                 <div class="content">
