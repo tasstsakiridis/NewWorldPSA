@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MX_PSA</fullName>
+    <active>true</active>
+    <label>MX - PSA</label>
+    <picklistValues>
+        <picklist>Brand_Visibility__c</picklist>
+        <values>
+            <fullName>Brand visibility in menus</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fixed materials</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Temporary materials</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Free_Goods_Reason__c</picklist>
+        <values>
+            <fullName>Account Events</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activities to Consumers</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Anniversaries</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Displays</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incentives</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Others</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Training</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Product_Visibility__c</picklist>
+        <values>
+            <fullName>Display Brown-Forman brands in bar and counter bar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other exhibitions</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

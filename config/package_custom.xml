@@ -12,11 +12,7 @@
         <members>promotionalSalesAgreementItems</members>
         <members>promotionalSalesAgreementItemForm</members>
         <members>promotionalSalesAgreementActuals</members>
-        <members>promotionalSalesAgreementActualsForm</members>
-    </types>
-    <types>
-        <name>Flow</name>
-        <members>Promotion_Activity_Mexico</members>
+        <members>promotionalSalesAgreementActualForm</members>
     </types>
     <types>
         <name>CustomField</name>
@@ -32,36 +28,31 @@
         <members>Promotion_Material_Item__c.Total_Actual_Free_Bottle_Qty__c</members>
         <members>Promotion_Material_Item__c.Plan_Rebate_Percentage__c</members>
         <members>PMI_Actual__c.Rebate_Type__c</members>
-        <members>PMI_Actual__c.Invoice_Number__c</members>
-    </types>
-    <types>
-        <name>Layout</name>
-        <members>Promotion_Activity__c-MX - PSA</members>
-        <members>Market__c-Market Layout</members>
-        <members>Market__c-Market Admin Layout</members>
     </types>
     <types>
         <name>RecordType</name>
-        <members>Promotion__c.MX_PSA</members>
         <members>Promotion_Activity__c.MX_PSA</members>
+        <members>Promotion__c.MX_PSA</members>
         <members>Promotion_Material_Item__c.MX_PSA</members>
         <members>PMI_Actual__c.MX_PSA</members>
     </types>
     <types>
-        <name>ApprovalProcess</name>
-        <members>Promotion_Activity__c.Mexico_PSA</members>
+        <name>Layout</name>
+        <members>Market__c.Market_Layout</members>
+        <members>Market__c.Market_Admin_Layout</members>
+        <members>Promotion_Activity__c.MX_PSA</members>        
     </types>
     <types>
         <name>FlexiPage</name>
-        <members>MEXICO_PSA</members>
+        <members>Mexico_PSA</members>
     </types>
     <types>
-        <name>PermissionSet</name>
-        <members>MX_PSA</members>
+        <name>ApprovalProcess</name>
+        <members>Mexico_PSA</members>
     </types>
     <types>
-        <name>EmailTemplate</name>
-        <members>Workflow_Email_Templates/MX_PSA_Manager_Review</members>
+        <name>Flow</name>
+        <members>Promotion_Activity_Mexico</members>
     </types>
     <types>
         <name>CustomLabel</name>
@@ -71,8 +62,6 @@
         <members>Free_Goods_Reason</members>
         <members>Invoice_Number</members>
         <members>Discount_Percent</members>
-        <members>Amount</members>
-        <members>Remaining</members>
     </types>
-    <version>48.0</version>
+    <version>47.0</version>
 </Package>

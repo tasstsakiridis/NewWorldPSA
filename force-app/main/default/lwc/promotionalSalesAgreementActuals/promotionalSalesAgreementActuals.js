@@ -53,6 +53,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     wiredPSA;
     wholesalerOptions;
     captureVolumeInBottles;
+    captureFreeGoods;
 
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
@@ -65,13 +66,16 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.error = undefined;
             this.thePSA = value.data;
             this.marketId = this.thePSA.Market__c;
-            this.wholesalerOptions = [
-                { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true }    
-            ];
+            if (this.thePSA.Wholesaler_Preferred__c != undefined) {
+                this.wholesalerOptions = [
+                    { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true }    
+                ];
+            }
             if (this.thePSA.Wholesaler_Alternate__c != undefined) {
                 this.wholesalerOptions.push({ label: this.thePSA.Wholesaler_Alternate_Name__c, value: this.thePSA.Wholesaler_Alternate__c });
             }
             this.captureVolumeInBottles = this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
+            this.captureFreeGoods = this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
 
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.buildTree();
@@ -298,7 +302,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                         pmiTree.items.push({
                                             paymentDate: actual.Payment_Date__c,
                                             label: pd.toLocaleDateString(userLocale, dateOptions),
-                                            metatext: actual.Actual_Wholesaler__r.Name,
+                                            metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
                                             name: 'pmia_'+actual.Id,
                                             disabled: false,
                                             expanded: true,

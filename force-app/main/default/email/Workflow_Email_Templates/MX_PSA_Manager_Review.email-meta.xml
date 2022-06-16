@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>38.0</apiVersion>
+    <available>true</available>
+    <description>Mexico PSA Manager Review</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>MX - PSA Manager Review</name>
+    <style>none</style>
+    <subject>Promotional Sales Agreement</subject>
+    <type>visualforce</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>
