@@ -503,13 +503,18 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     get thisProductGP() {
-        const v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
+        let v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
         const p = this.product == undefined || this.product.Gross_Profit_per_Bottle__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Bottle__c);
         const packQty = this.product.Pack_Quantity__c == undefined ? 0 : parseInt(this.product.Pack_Quantity__c);
 
-        const productGP = (v + this.planRebateVolume) * p * packQty;
+        if (this.psa.Activity_Type__c != 'Coupon') {
+            v += this.planRebateVolume;
+        }
+        const productGP = v * p * packQty;
         
         console.log('[psaItemForm.thisProductGP] p', p);
+        console.log('[psaItemForm.thisProductGP] activityType', this.psa.Activity_Type__c);
+        console.log('[psaItemForm.thisProductGP] planRebateVolume', this.planRebateVolume);
         console.log('[psaItemForm.thisProductGP] volume', v);
         console.log('[psaItemForm.thisProductGP] packQty', packQty);
         console.log('[psaItemForm.thisProductGP] productSplit', productGP);

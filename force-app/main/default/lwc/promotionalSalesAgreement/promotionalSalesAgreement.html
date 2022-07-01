@@ -200,7 +200,13 @@
                                     <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} onchange={handlePercentageVisibilityChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>
-                            <template if:true={isMexico}>
+                            <template if:true={captureActivityType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.activityType.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_ActivityType" checked={isDirectRebate} message-toggle-active={activityTypeActive.label} message-toggle-inactive={activityTypeInactive.label} disabled={isLocked} onchange={handleActivityTypeToggle}></lightning-input>
+                                </lightning-layout-item>    
+                            </template>
+                            <template if:true={canAddNewAccountsToPSA}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.limitToSelectedAccounts.label}</h2>
                                     <lightning-input type="toggle" class="prestige-type-toggle" name="i_LimitAccounts" checked={limitToSelectedAccounts} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} disabled={isLocked} onchange={handleLimitToSelectedAccountsToggle}></lightning-input>                                        

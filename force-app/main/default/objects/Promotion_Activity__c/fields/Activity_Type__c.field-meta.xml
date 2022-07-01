@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Activity_Type__c</fullName>
+    <externalId>false</externalId>
+    <label>Activity Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>HZ national</fullName>
+                <default>false</default>
+                <label>HZ national</label>
+            </value>
+            <value>
+                <fullName>HZ regional</fullName>
+                <default>false</default>
+                <label>HZ regional</label>
+            </value>
+            <value>
+                <fullName>B2B Werbung</fullName>
+                <default>false</default>
+                <label>B2B Werbung</label>
+            </value>
+            <value>
+                <fullName>Vorverkauf</fullName>
+                <default>false</default>
+                <label>Vorverkauf</label>
+            </value>
+            <value>
+                <fullName>Mengenabfrage</fullName>
+                <default>false</default>
+                <label>Mengenabfrage</label>
+            </value>
+            <value>
+                <fullName>Zuteilung</fullName>
+                <default>false</default>
+                <label>Zuteilung</label>
+            </value>
+            <value>
+                <fullName>Talon</fullName>
+                <default>false</default>
+                <label>Talon</label>
+            </value>
+            <value>
+                <fullName>Messe</fullName>
+                <default>false</default>
+                <label>Messe</label>
+            </value>
+            <value>
+                <fullName>Aktionsgondel</fullName>
+                <default>false</default>
+                <label>Aktionsgondel</label>
+            </value>
+            <value>
+                <fullName>Aktionspreis</fullName>
+                <default>false</default>
+                <label>Aktionspreis</label>
+            </value>
+            <value>
+                <fullName>Pakiet zakupowy LCH 7%</fullName>
+                <default>false</default>
+                <label>Pakiet zakupowy LCH 7%</label>
+            </value>
+            <value>
+                <fullName>Pakiet zakupowy WH</fullName>
+                <default>false</default>
+                <label>Pakiet zakupowy WH</label>
+            </value>
+            <value>
+                <fullName>Gazetka LCH</fullName>
+                <default>false</default>
+                <label>Gazetka LCH</label>
+            </value>
+            <value>
+                <fullName>Gazetka HURT</fullName>
+                <default>false</default>
+                <label>Gazetka HURT</label>
+            </value>
+            <value>
+                <fullName>Gazetka PODHURT</fullName>
+                <default>false</default>
+                <label>Gazetka PODHURT</label>
+            </value>
+            <value>
+                <fullName>Gezetka DETAL</fullName>
+                <default>false</default>
+                <label>Gezetka DETAL</label>
+            </value>
+            <value>
+                <fullName>Stand Detal</fullName>
+                <default>false</default>
+                <label>Stand Detal</label>
+            </value>
+            <value>
+                <fullName>Stand Pernamentny</fullName>
+                <default>false</default>
+                <label>Stand Pernamentny LECLERC</label>
+            </value>
+            <value>
+                <fullName>Ekspozycja Platformowa</fullName>
+                <default>false</default>
+                <label>Ekspozycja Platformowa LECLERC</label>
+            </value>
+            <value>
+                <fullName>Rewitalizacja</fullName>
+                <default>false</default>
+                <label>Rewitalizacja</label>
+            </value>
+            <value>
+                <fullName>Mastershelf</fullName>
+                <default>false</default>
+                <label>Mastershelf</label>
+            </value>
+            <value>
+                <fullName>Pakiet odsprzedażowy</fullName>
+                <default>false</default>
+                <label>Pakiet odsprzedażowy</label>
+            </value>
+            <value>
+                <fullName>Gazetki Sieci Franczyzowe</fullName>
+                <default>false</default>
+                <label>Gazetki Sieci Franczyzowe</label>
+            </value>
+            <value>
+                <fullName>Wsparcie Sprzedaży Sieci Franczyzowe</fullName>
+                <default>false</default>
+                <label>Wsparcie Sprzedaży Sieci Franczyzowe</label>
+            </value>
+            <value>
+                <fullName>Direct Rebate</fullName>
+                <default>false</default>
+                <label>Direct Rebate</label>
+            </value>
+            <value>
+                <fullName>Coupon</fullName>
+                <default>false</default>
+                <label>Coupon</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

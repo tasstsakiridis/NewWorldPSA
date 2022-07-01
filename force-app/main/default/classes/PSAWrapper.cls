@@ -157,6 +157,9 @@ public with sharing class PSAWrapper {
     public Decimal percentageVisibility { get; set; }
 
     @AuraEnabled 
+    public Boolean isDirectRebate { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -197,6 +200,7 @@ public with sharing class PSAWrapper {
         this.paymentConfigurations = '';
         this.totalBudget = 0;
         this.percentageVisibility = 0;
+        this.isDirectRebate = true;
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -233,5 +237,6 @@ public with sharing class PSAWrapper {
         this.totalBudget = psa.Activity_Budget__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
+        this.isDirectRebate = psa.Activity_Type__c == null || psa.Activity_Type__c == 'Direct Rebate';
     }
 }

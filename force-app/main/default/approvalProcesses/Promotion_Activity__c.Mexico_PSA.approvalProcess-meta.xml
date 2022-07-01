@@ -22,7 +22,44 @@
         <label>Manager Approval</label>
         <name>Manager_Approval</name>
     </approvalStep>
-    <emailTemplate>Workflow_Email_Templates/BRA_PSA_Manager_Review</emailTemplate>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>paola_barrios@b-f.com</name>
+                <type>user</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <label>Commercial Finance</label>
+        <name>Commercial_Finance</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>lucerogutierrez@herradura.com.mx</name>
+                <type>user</type>
+            </approver>
+            <whenMultipleApprovers>Unanimous</whenMultipleApprovers>
+        </assignedApprover>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Total_Investment__c</field>
+                <operation>greaterOrEqual</operation>
+                <value>&quot;MXN 200,000&quot;</value>
+            </criteriaItems>
+        </entryCriteria>
+        <label>National Manager</label>
+        <name>National_Manager</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <emailTemplate>Workflow_Email_Templates/MX_PSA_Manager_Review</emailTemplate>
     <enableMobileDeviceAccess>true</enableMobileDeviceAccess>
     <entryCriteria>
         <criteriaItems>
@@ -82,7 +119,7 @@
         <useApproverFieldOfRecordOwner>true</useApproverFieldOfRecordOwner>
         <userHierarchyField>Manager</userHierarchyField>
     </nextAutomatedApprover>
-    <processOrder>10</processOrder>
+    <processOrder>17</processOrder>
     <recallActions>
         <action>
             <name>Activity_Recalled</name>

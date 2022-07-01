@@ -65,7 +65,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
         }
         Market__c market = [SELECT Id, Name, Maximum_Agreement_Length__c, Capture_End_Date__c, Capture_Volume_in_Bottles__c, 
                                     Capture_Number_of_Payments__c, Capture_PSA_Budget__c, Calculate_PSA_Product_Split__c,
-                                    Agreement_Requires_Wholesaler__c, Agreement_Configure_Payments__c, Enable_PSA_Actuals__c 
+                                    Agreement_Requires_Wholesaler__c, Agreement_Configure_Payments__c, Enable_PSA_Actuals__c,
+                                    Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c 
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -105,7 +106,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Market__r.Capture_End_Date__c, Market__r.Agreement_Configure_Payments__c, Market__r.Agreement_Requires_Wholesaler__c, Payment_Configurations__c,
                                             Market__r.Capture_PSA_Free_Goods__c, Market__r.Enable_PSA_Actuals__c, Limit_to_Selected_Accounts__c, Total_Free_Bottle_Quantity__c,
                                             Total_Actual_Free_Bottle_Qty__c, All_Child_Accounts_Included__c, Total_Rebate_Liability__c, Total_Rebate_Volume__c,
-                                            Total_Customer_Profit__c, Total_Return_on_Investment__c,
+                                            Total_Customer_Profit__c, Total_Return_on_Investment__c, Activity_Type__c, Market__r.Capture_Activity_Type__c, Market__r.Add_New_Accounts_to_PSA__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -440,6 +441,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Payment_Configurations__c = psaData.paymentConfigurations;
             psa.Limit_to_Selected_Accounts__c = psaData.limitToSelectedAccounts;
             psa.All_Child_Accounts_Included__c = psaData.allChildAccountsIncluded;
+            psa.Activity_Type__c = psaData.isDirectRebate ? 'Direct Rebate' : 'Coupon';
 
             if (psaData.marketId == null || psaData.marketId == '') {
                 String marketName = psaData.marketName;
@@ -623,9 +625,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                         pmia.Rebate_Amount__c = rebate.rebateAmount * pmi.Plan_Rebate__c; 
                     } else if (rebate.rebateType == 'Free Goods') {
                         pmia.Rebate_Amount__c = rebate.rebateAmount;
-                        if (captureVolumeInBottles) {
-                            pmia.Rebate_Amount__c = rebate.rebateAmount / productPackQty;
-                        }                    
+                        //if (captureVolumeInBottles) {
+                        //    pmia.Rebate_Amount__c = rebate.rebateAmount / productPackQty;
+                        //}                    
                     } else {
                         pmia.Rebate_Amount__c = rebate.rebateAmount;
                     }  
@@ -734,8 +736,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 */
                 pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
 
-                System.debug('[rebateType: ' + pmia.Rebate_Type__c);
-                System.debug('[rebateAmount: ' + pmia.Rebate_Amount__c);
+                System.debug('[updateActuals] pmiaId: ' + pmia.Id);
+                System.debug('[updateActuals] rebateType: ' + pmia.Rebate_Type__c);
+                System.debug('[updateActuals] rebateAmount: ' + pmia.Rebate_Amount__c);
                 if (pmia.Rebate_Type__c == 'Listing Fee') {
                     psa.Total_Listing_Fee_Paid__c += rebateAmount;
                     //p.Total_Listing_Fee_Paid__c += rebateAmount;

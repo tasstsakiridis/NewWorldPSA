@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Limit_to_Selected_Accounts__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Enable this option not auto add any new child accounts that might be created after the Activity (PSA) has been created.</description>
+    <externalId>false</externalId>
+    <label>Limit to Selected Accounts</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

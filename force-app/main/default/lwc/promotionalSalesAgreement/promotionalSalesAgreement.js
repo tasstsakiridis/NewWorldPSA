@@ -30,6 +30,7 @@ import userId from '@salesforce/user/Id';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
 import LABEL_ACCOUNT_SEARCH_RESULTS from '@salesforce/label/c.Account_Search_Results';
+import LABEL_ACTIVITY_TYPE from '@salesforce/label/c.Activity_Type';
 import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
 import LABEL_AGREEMENT_END_DATE from '@salesforce/label/c.Agreement_End_Date';
 import LABEL_AGREEMENT_START_DATE from '@salesforce/label/c.Agreement_Start_Date';
@@ -48,6 +49,7 @@ import LABEL_CLONE_SUCCESS_MESSAGE from '@salesforce/label/c.Clone_Success_Messa
 import LABEL_CLONE_PSA_INSTRUCTION from '@salesforce/label/c.Clone_PSA_Instruction';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMPANY_DETAILS from '@salesforce/label/c.Company_Details';
+import LABEL_COUPON from '@salesforce/label/c.Coupon';
 import LABEL_CUSTOMER_DETAILS from '@salesforce/label/c.Customer_Details';
 import LABEL_DATE_RANGE from '@salesforce/label/c.Date_Range';
 import LABEL_DESELECT_ALL from '@salesforce/label/c.DeSelect_All';
@@ -55,6 +57,7 @@ import LABEL_DETACH_FILE from '@salesforce/label/c.Detach_File';
 import LABEL_DETACH_FILE_CONFIRMATION from '@salesforce/label/c.Detach_File_Confirmation';
 import LABEL_DETACH_FILE_SUCCESS from '@salesforce/label/c.Detach_File_Success';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
+import LABEL_DIRECT_REBATE from '@salesforce/label/c.Direct_Rebate';
 import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
 import LABEL_END_DATE_ERROR from '@salesforce/label/c.End_Date_Error';
 import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
@@ -143,6 +146,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     labels = {
         account                 : { label: LABEL_ACCOUNT },        
         accountSearchResults    : { label: LABEL_ACCOUNT_SEARCH_RESULTS },
+        activityType            : { label: LABEL_ACTIVITY_TYPE, checked: LABEL_DIRECT_REBATE, unchecked: LABEL_COUPON },
         actuals                 : { label: LABEL_ACTUALS },
         agreementEndDate        : { label: LABEL_AGREEMENT_END_DATE },
         all                     : { label: LABEL_ALL, picklistValue: '--'+LABEL_ALL+'--' },
@@ -235,6 +239,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isSearching = false;
     isUsingParentAccount = true;
     isSearchingForParent = true;
+    isDirectRebate = true;
     selectAllChildAccounts = false;
     isMPOPrestige = false;
     limitToSelectedAccounts = false;
@@ -242,6 +247,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     captureNumberOfPayments = false;
     captureTotalBudget = false;
     captureEndDate = false;
+    captureActivityType = false;
     agreementRequiresWholesaler = false;
     configurePayments = false;
     pageNumber = 1;
@@ -259,6 +265,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     numberOfPayments = 1;
     totalBudget = 0;
     percentageVisibility = 0;
+    activityTypeActive = { label: this.labels.activityType.checked, value: this.labels.activityType.checked };
+    activityTypeInactive = { label: this.labels.activityType.unchecked, value: this.labels.activityType.unchecked };    
+    canAddNewAccountsToPSA = false;
+
 
     isWorking = true;
     workingMessage = this.labels.working.message;    
@@ -344,6 +354,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.captureEndDate = this.market.Capture_End_Date__c == undefined ? false : this.market.Capture_End_Date__c;
             this.agreementRequiresWholesaler = this.market.Agreement_Requires_Wholesaler__c == undefined ? true : this.market.Agreement_Requires_Wholesaler__c;
             this.configurePayments = this.market.Agreement_Configure_Payments__c == undefined ? false : this.market.Agreement_Configure_Payments__c;
+            this.captureActivityType = this.market.Capture_Activity_Type__c == undefined ? false : this.market.Capture_Activity_Type__c;
+            this.canAddNewAccountsToPSA = this.market.Add_New_Accounts_to_PSA__c == undefined ? false : this.market.Add_New_Accounts_to_PSA__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -1037,6 +1049,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handlePrestigeTypeToggle(event) {
         this.isMPOPrestige = event.detail.checked;
     }
+    handleActivityTypeToggle(event) {
+        this.isDirectRebate = event.detail.checked;
+    }
     handleLimitToSelectedAccountsToggle(event) {
         this.limitToSelectedAccounts = event.detail.checked;
     }
@@ -1166,6 +1181,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     }
                 });
                 console.log('[psaactualsform.setfieldoptions] approvalstatusoptions', this.statusOptions);
+            } else if (picklist === 'Activity_Type__c') {
+                if (picklistValues[picklist].values.length >= 2) {
+                    this.activityTypeActive = { label: picklistValues[picklist].values[0].label, value: picklistValues[picklist].values[0].value };
+                    this.activityTypeInactive = { label: picklistValues[picklist].values[1].label, value: picklistValues[picklist].values[1].value };    
+                }
             }
         });
 
@@ -1245,6 +1265,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.wholesalerPreferred = data.Wholesaler_Preferred__c;
             this.wholesalerAlternate = data.Wholesaler_Alternate__c;
             this.comments = data.Evaluation_Comments__c
+            this.isDirectRebate = data.Activity_Type__c != 'Coupon';
             if (data.Begin_Date__c) {
                 this.startDate = new Date(data.Begin_Date__c);
             }
@@ -1656,6 +1677,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;
         param.limitToSelectedAccounts = this.limitToSelectedAccounts;
+        param.isDirectRebate = this.isDirectRebate;
         console.log('wholesalerPreferred', this.wholesalerPreferred);
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;
