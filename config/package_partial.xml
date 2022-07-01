@@ -1,78 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <name>ApexClass</name>
-        <members>PromotionalSalesAgreement_Controller</members>
-        <members>PSAWrapper</members>
-        <members>BuildInitialActualsForPSA</members>
-    </types>
-    <types>
-        <name>LightningComponentBundle</name>
-        <members>promotionalSalesAgreement</members>
-        <members>promotionalSalesAgreementItems</members>
-        <members>promotionalSalesAgreementItemForm</members>
-        <members>promotionalSalesAgreementActuals</members>
-        <members>promotionalSalesAgreementActualsForm</members>
-    </types>
-    <types>
-        <name>Flow</name>
-        <members>Promotion_Activity_Mexico</members>
-    </types>
-    <types>
-        <name>CustomField</name>
-        <members>Market__c.Agreement_Requires_Wholesaler__c</members>
-        <members>Market__c.Agreement_Configure_Payments__c</members>
-        <members>Market__c.Capture_PSA_Free_Goods__c</members>
-        <members>Promotion_Activity__c.Payment_Configurations__c</members>
-        <members>Promotion_Activity__c.Total_Actual_Free_Bottle_Qty__c</members>
-        <members>Promotion_Material_Item__c.Free_Goods_Given_Date__c</members>
-        <members>Promotion_Material_Item__c.Free_Goods_Reason__c</members>
-        <members>Promotion_Material_Item__c.Brand_Visibility__c</members>
-        <members>Promotion_Material_Item__c.Product_Visibility__c</members>
-        <members>Promotion_Material_Item__c.Total_Actual_Free_Bottle_Qty__c</members>
-        <members>Promotion_Material_Item__c.Plan_Rebate_Percentage__c</members>
-        <members>PMI_Actual__c.Rebate_Type__c</members>
-        <members>PMI_Actual__c.Invoice_Number__c</members>
-    </types>
-    <types>
-        <name>Layout</name>
-        <members>Promotion_Activity__c-MX - PSA</members>
-        <members>Market__c-Market Layout</members>
-        <members>Market__c-Market Admin Layout</members>
-    </types>
-    <types>
-        <name>RecordType</name>
-        <members>Promotion__c.MX_PSA</members>
-        <members>Promotion_Activity__c.MX_PSA</members>
-        <members>Promotion_Material_Item__c.MX_PSA</members>
-        <members>PMI_Actual__c.MX_PSA</members>
-    </types>
-    <types>
         <name>ApprovalProcess</name>
         <members>Promotion_Activity__c.Mexico_PSA</members>
-    </types>
-    <types>
-        <name>FlexiPage</name>
-        <members>MEXICO_PSA</members>
-    </types>
-    <types>
-        <name>PermissionSet</name>
-        <members>MX_PSA</members>
     </types>
     <types>
         <name>EmailTemplate</name>
         <members>Workflow_Email_Templates/MX_PSA_Manager_Review</members>
     </types>
     <types>
+        <name>CustomField</name>
+        <members>Market__c.Agreement_Requires_Wholesaler__c</members>
+        <members>Market__c.Agreement_Configure_Payments__c</members>
+        <members>Market__c.Capture_PSA_Free_Goods__c</members>
+        <members>Market__c.Can_PreDate_PSA__c</members>
+        <members>Market__c.Capture_Activity_Type__c</members>
+        <members>Market__c.Add_New_Accounts_to_PSA__c</members>
+        <members>Promotion_Activity__c.Activity_Type__c</members>
+        <members>Promotion_Activity__c.All_Child_Accounts_Included__c</members>
+        <members>Promotion_Activity__c.Limit_to_Selected_Accounts__c</members>
+        <members>Promotion_Activity__c.Payment_Configurations__c</members>
+        <members>Promotion_Activity__c.Total_Actual_Free_Bottle_Qty__c</members>
+        <members>Promotion_Activity__c.Total_Rebate_Liability__c</members>
+        <members>Promotion_Activity__c.Total_Rebate_Volume__c</members>
+        <members>Promotion_Activity__c.Total_Actual_Free_Bottle_Cost__c</members>
+        <members>Promotion_Activity__c.Total_Actual_Rebate_Volume__c</members>
+        <members>Promotion_Activity__c.Total_PSA_Gross_Profit__c</members>
+        <members>Promotion_Activity__c.Total_Customer_Profit__c</members>
+        <members>Promotion_Activity__c.Total_Return_on_Investment__c</members>
+        <members>Promotion_Material_Item__c.Free_Goods_Given_Date__c</members>
+        <members>Promotion_Material_Item__c.Free_Goods_Reason__c</members>
+        <members>Promotion_Material_Item__c.Brand_Visibility__c</members>
+        <members>Promotion_Material_Item__c.Product_Visibility__c</members>
+        <members>Promotion_Material_Item__c.Total_Actual_Free_Bottle_Qty__c</members>
+        <members>Promotion_Material_Item__c.Plan_Rebate_Percentage__c</members>
+        <members>Promotion_Material_Item__c.Plan_Rebate_Volume__c</members>
+        <members>Promotion_Material_Item__c.Plan_Rebate_Liability__c</members>
+        <members>Promotion_Material_Item__c.PSA_Free_Bottle_Cost__c</members>
+        <members>Promotion_Material_Item__c.Plan_PSA_Gross_Profit__c</members>
+        <members>PMI_Actual__c.Rebate_Type__c</members>
+        <members>PMI_Actual__c.Invoice_Number__c</members>
+        <members>PMI_Actual__c.Sample_Order__c</members>
+        <members>SAP_Interfaced_Data__c.Activity__c</members>
+        <members>SAP_Interfaced_Data_Item__c.Unit_of_Measure__c</members>
+        <members>SAP_Interfaced_Data_Item__c.Units__c</members>
+        <members>SAP_Interfaced_Data_Item__c.PMI_Actual__c<members>
+        <members>Product__c.Used_For__c</members>
+        <members>Product__c.Gross_Profit_per_Case__c</members>
+        <members>Product__c.Gross_Profit_per_Bottle__c</members>
+        <members>Product__c.Gross_Profit_per_Flat_Case__c</members>
+    </types>
+    <types>
+        <name>RecordType</name>
+        <members>Promotion_Activity__c.MX_PSA</members>
+        <members>Promotion__c.MX_PSA</members>
+        <members>Promotion_Material_Item__c.MX_PSA</members>
+        <members>PMI_Actual__c.MX_PSA</members>
+        <members>SAP_Interfaced_Data__c.Sample_Order_MEX</members>
+    </types>
+    <types>
+        <name>Layout</name>
+        <members>Market__c.Market_Layout</members>
+        <members>Market__c.Market_Admin_Layout</members>
+        <members>Promotion_Activity__c.MX_PSA</members>   
+        <members>SAP_Interfaced_Data__c.Sample_Order_MEX</members>
+        <members>Product__c.Product_Layout</members>
+        <members>Product__c.Mexico_Dry_Goods_Page_Layout</members>  
+        <members>Product__c>Mexico_Wet_Goods_Page_Layout</members>   
+    </types>
+    <types>
+        <name>FlexiPage</name>
+        <members>Mexico_PSA</members>
+    </types>
+    <types>
+        <name>ApprovalProcess</name>
+        <members>Mexico_PSA</members>
+    </types>
+    <types>
+        <name>Flow</name>
+        <members>Promotion_Activity_Mexico</members>
+        <members>Account_Mexico</members>
+    </types>
+    <types>
+        <name>PermissionSet</name>
+        <members>MX_PSA</members>
+        <members>BRA_PSA</members>
+        <members>UK_PSA</members>
+    </types>
+    <types>
+        <name>ValidationRule</name>
+        <members>PMI_Actual__c.Payment_Made</members>
+    </types>
+    <types>
         <name>CustomLabel</name>
-        <members>On_Signing</members>
+        <members>All_Accounts_Selected</members>
+        <members>Amount</members>
+        <members>Cost</members>
+        <members>Customer_Profit</members>
+        <members>Discount_Percent</members>        
         <members>Free_Goods</members>
+        <members>Free_Goods_Given</members>
         <members>Free_Goods_Given_Date</members>
         <members>Free_Goods_Reason</members>
+        <members>Gross_Profit</members>
         <members>Invoice_Number</members>
-        <members>Discount_Percent</members>
-        <members>Amount</members>
+        <members>Liability</members>
+        <members>Limit_to_Selected_Accounts</members>
+        <members>No_Accounts_Selected</members>
+        <members>On_Signing</members>
+        <members>PreDate_Error</members>
+        <members>Rebate_Liability</members>
+        <members>Rebate_Volume</members>
         <members>Remaining</members>
-    </types>
+        <members>ROI</members>
+        <members>Activity_Type</members>
+        <members>Direct_Rebate</members>
+        <members>Coupon</members>
+    </types>    
     <version>48.0</version>
 </Package>
