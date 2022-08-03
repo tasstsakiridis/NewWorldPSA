@@ -10,10 +10,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Fixed materials</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Temporary materials</fullName>
             <default>false</default>
         </values>
@@ -37,10 +33,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Incentives</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Others</fullName>
             <default>false</default>
         </values>
@@ -53,10 +45,6 @@
         <picklist>Product_Visibility__c</picklist>
         <values>
             <fullName>Display Brown-Forman brands in bar and counter bar</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Other exhibitions</fullName>
             <default>false</default>
         </values>
     </picklistValues>

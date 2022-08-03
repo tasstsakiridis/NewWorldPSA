@@ -5,6 +5,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
 import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 
+import LOCALE from '@salesforce/i18n/locale';
 import { refreshApex } from '@salesforce/apex';
 
 import { fireEvent } from 'c/pubsub';
@@ -234,8 +235,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     hasParentAccountError = false;
     hasChildAccountsError = false;
     thePSA;
-    startDate = new Date();
-    i_endDate = new Date();
+    startDate = '';
+    endDate = '';
     isSearching = false;
     isUsingParentAccount = true;
     isSearchingForParent = true;
@@ -505,17 +506,37 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         ];
     }
     
-
+    formatDate(theDate) {
+        const year = theDate.getFullYear();
+        const month = ('00' + (theDate.getMonth() + 1)).slice(-2);
+        const day = ('00' + theDate.getDate()).slice(-2);
+        console.log('[formatDate] theDate, year, month, day', theDate, year, month, day);
+        return year + '-' + month + '-' + day + 'T00:00:00Z';
+    }
+    /*
     get formattedStartDate() {
-        var theDate = this.startDate == null ? new Date() : this.startDate;
-        return theDate.toISOString();
+        var theDate = this.startDate == null ? new Date() : this.startDate;;
+        try {
+            console.log('[formattedStartDate] theDate', theDate);
+            theDate = this.formatDate(theDate);
+        } catch(ex) {
+            console.log('[formattedStartDate] exception', ex);
+        }
+        return theDate;
     }
     get formattedEndDate() {
         var theDate = this.i_endDate == null ? new Date() : this.i_endDate;
-        return theDate.toISOString();
+        try {
+            console.log('[formattedEndDate] theDate', theDate);
+            theDate = this.formatDate(theDate);
+        } catch(ex) {
+            console.log('[formattedEndDate] exception', ex);
+        }
+        return theDate;
     }
+    
     get endDate() {
-        var theDate = this.startDate == null ? new Date() : this.startDate;
+        var theDate = this.startDate == null ? new Date() : new Date(this.startDate);
         var year = theDate.getFullYear();
         var month = theDate.getMonth();
         var day = theDate.getDate();
@@ -531,7 +552,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         console.log('[endDate] theDate', theDate, year, month, day, newDate);
         return newDate;
-    }    
+    }  
+    */  
 
     get acceptedFileUploadFormats() {
         return ['.pdf', '.png'];
@@ -902,15 +924,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }    
 
     handleStartDateChange(ev) {
-        this.startDate = new Date(ev.detail.value);
-        console.log('startdate', this.startDate);
+        this.startDate = ev.detail.value;
+        console.log('[handleStartDateChange] startdate', this.startDate);
+        console.log('[handleStartDateChange] event.date', ev.detail.value);
 
         this.hasStartDateError = false;
         if (!this.canPreDatePSA) {
             const today = new Date();
             today.setHours(0, 0, 0);
 
-            const sdate = this.startDate;
+            const sdate = new Date(ev.detail.value);
             console.log('[handleStartDateChange] today', today);
             console.log('[handleStartDateChange] startDate', this.startDate);
             console.log('[handleStartDateChange] sdate', sdate);
@@ -921,11 +944,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
     }
     handleEndDateChange(ev) {
-        this.i_endDate = new Date(ev.detail.value);
+        this.endDate = ev.detail.value;
     }
     handleLengthOfPSAChange(ev) {
         console.log('[handleLengthOfPSAChange] value', ev.detail.value);
         this.lengthOfPSA = ev.detail.value;
+        this.calcEndDate();
+
         if (this.thePSA.Is_Approved__c) { 
             this.status = 'Updated';
         }
@@ -1018,6 +1043,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.promotionsToDelete.set(a.id, a);
             }
         });
+        this.selectedAccounts.clear();
         
     }
 
@@ -1162,6 +1188,25 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     /**
      * Helper functions
      */
+    calcEndDate() {
+        var theDate = this.startDate == null ? new Date() : new Date(this.startDate);
+        var year = theDate.getFullYear();
+        var month = theDate.getMonth();
+        var day = theDate.getDate();
+        let newDate = new Date(year, month, day);
+        console.log('[enddate] islengthinyears', this.isLengthInYears, this.lengthOfPSA, newDate);
+        if (this.isLengthInYears) {
+            newDate.setFullYear(newDate.getFullYear() + parseInt(this.lengthOfPSA));
+            if (newDate > theDate) {
+                newDate.setDate(newDate.getDate() - 1);
+            }
+        } else {
+            newDate.setMonth(newDate.getMonth() + parseInt(this.lengthOfPSA));
+        }
+        console.log('[endDate] theDate', theDate, year, month, day, newDate);
+        
+        this.endDate = newDate;
+    }
     getUpdatedPageReference(stateChanges) {
         console.log('[psa.getupdatedpagereference] statechanges', stateChanges);
         return Object.assign({}, this.currentPageReference, {
@@ -1220,10 +1265,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     ShippingCountry: data.Account__r.ShippingCountry,
                     ShippingState: data.Account__r.ShippingState,
                     ShippingCountry: data.Account__r.ShippingCountry,
-                    Contacts: [data.Contact__r]
+                    Contacts: [data.Contact__r],
+                    PromotionId: ''
                 };
                 this.isSearchingForParent = false;
-                this.isUsingParentAccount = data.Account__r.RecordType.Name === 'Parent';
+                this.isUsingParentAccount = data.Account__r.RecordType.Name.indexOf('Parent') > -1;
                 const el = this.template.querySelector("lightning-input.account-type-toggle");
                 console.log('[getPSA] account-type-toggle', el);
                 if (el) {
@@ -1267,10 +1313,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.comments = data.Evaluation_Comments__c
             this.isDirectRebate = data.Activity_Type__c != 'Coupon';
             if (data.Begin_Date__c) {
-                this.startDate = new Date(data.Begin_Date__c);
+                this.startDate = data.Begin_Date__c;
             }
             if (data.End_Date__c) {
-                this.i_endDate = new Date(data.End_Date__c);
+                this.endDate = data.End_Date__c;
             }
             if (data.Is_Length_in_Years__c != undefined) {
                 this.isLengthInYears = data.Is_Length_in_Years__c;
@@ -1292,12 +1338,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     alert('[psa.loadpsadetails] # of promotions', data.Promotions__r.length);
                 }
                 data.Promotions__r.forEach(p => {
-                    if (p.Account__c != this.parentAccount.Id) {
+                    if (p.Account__c == this.parentAccount.Id) {
+                        this.parentAccount.PromotionId = p.Id;
+                    } else {
                         this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
                     }
                 });
-                getAccountsForParent({ parentAccountId: this.parentAccount.Id, pageNumber: 1 })
-                    .then(result => {
+                getAccountsForParent({ 
+                    parentAccountId: this.parentAccount.Id, 
+                    pageNumber: 1,
+                    market: this.market.Name
+                }).then(result => {
                         try {
                         console.log('[getAccountsForParent] result', result);
                         if (this.isPhone && this.isThisTass) {
@@ -1425,7 +1476,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.hasChildAccountsError = false;
 
         if (this.captureEndDate) {
-            if (this.i_endDate.getTime() < this.startDate.getTime()) {
+            const edate = new Date(this.endDate);
+            const sdate = new Date(this.startDate);
+            if (edate.getTime() < sdate.getTime()) {
                 this.hasEndDateError = true;    
                 isValid = false;            
             }
@@ -1444,7 +1497,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             const today = new Date();
             today.setHours(0, 0, 0);
 
-            if (this.startDate < today) {
+            if (new Date(this.startDate) < today) {
                 this.hasStartDateError = true; isValid = false;
                 this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
             }
@@ -1569,8 +1622,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[handleaccountsearchbuttonclick] querystring', this.accountQueryString);
         console.log('[handleaccountsearchbuttonclick] usingparent', this.isUsingParentAccount);
         console.log('[handleaccountsearchbuttonclick] market', this.market);
-        getAccountsByName({accountName: this.accountQueryString, isSearchingForParent: this.isUsingParentAccount, market: this.marketId, pageNumber: this.pageNumber})
-            .then(result => {
+        getAccountsByName({
+            accountName: this.accountQueryString, 
+            isSearchingForParent: this.isUsingParentAccount, 
+            market: this.marketId, 
+            marketName: this.market.Name,
+            pageNumber: this.pageNumber
+        }).then(result => {
                 console.log('[getAccountsByName] result', result);
                 const newList = result.records.map(item => {
                     return { item: item, isSelected: false };
@@ -1594,7 +1652,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     }
     findAccountsForParent(accountId) {
-        getAccountsForParent({ parentAccountId: accountId, pageNumber: this.pageNumber })
+        getAccountsForParent({ parentAccountId: accountId, pageNumber: this.pageNumber, market: this.market.Name })
             .then(result => {
                 console.log('[getAccountsForParent] result', result);
                 /*
@@ -1664,7 +1722,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         
         param.beginDate = this.startDate;
-        param.endDate = this.captureEndDate ? this.i_endDate : this.endDate;
+        param.endDate = this.endDate;
         param.lengthOfPSA = this.lengthOfPSA;
         param.isLengthInYears = this.isLengthInYears;
         param.numberOfPayments = this.numberOfPayments;
@@ -1728,7 +1786,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     param.accounts.push({id:value.id, itemId:value.itemId});
                 });
                 if (!this.selectedAccounts.has(param.parentAccountId)) {
-                    param.accounts.push({id: null, itemId: param.parentAccountId});
+                    param.accounts.push({id: this.parentAccount.PromotionId, itemId: param.parentAccountId});
                 }
             }
             console.log('[save] promotionsToDelete: ' + this.promotionsToDelete);
@@ -1756,14 +1814,23 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             .then(result => {
                 this.isWorking = false;
                 console.log('[savePSA] success. result', result);
-                this.psaId = result.Id;
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: this.labels.success.label,
-                        message: this.labels.saveSuccess.message,
-                        variant: 'success'
-                    }),
-                );
+                if (result === 'SUCCESS') {
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: this.labels.success.label,
+                            message: this.labels.saveSuccess.message,
+                            variant: 'success'
+                        }),
+                    );
+                } else {
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: this.labels.error.label,
+                            message: result,
+                            variant: 'warning'
+                        }),
+                    );
+                } 
 
                 this.wiredAgreement = refreshApex(this.wiredAgreement);
             })

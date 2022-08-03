@@ -261,7 +261,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.psaItemId = undefined;
         } else if (value.data) {
             this.error = undefined;
-            this.psaItem = value.data;
+            this.psaItem = {...value.data};
 
             //this.psaItemId = value.data.Id;
             this.productId = value.data.Product_Custom__c;
@@ -271,7 +271,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 Image_Name__c: value.data.Product_Custom__r.Image_Name__c
             };
             
-            this.totalPlannedSpend = value.data.Activity__r.Total_Planned_Spend__c;
+            this.productSplit = parseFloat(value.data.Product_Split__c);
+            this.totalPlannedSpend = parseFloat(value.data.Activity__r.Total_Planned_Spend__c);
             this.discount = value.data.Plan_Rebate__c || 0;
             if (value.data.Proposed_Plan_Rebate__c && value.data.Proposed_Plan_Rebate__c != value.data.Plan_Rebate__c) {
                 this.discount = value.data.Proposed_Plan_Rebate__c;
@@ -381,7 +382,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     get canDelete() {
-        return (!this.isApproved)
+        return (!this.isApproved && this.psaItem != undefined);
         //return this.psaItem != undefined;
     }
     get isDisabled() {
@@ -470,16 +471,19 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return ti;
     }
     
-    get thisProductSplit() {
-        console.log('[psaItemForm.thisProductSplit] psaItem', this.pasItem);
-        console.log('[psaItemForm.thisProductSplit] psaItemId', this.pasItemId);
-        console.log('[psaItemForm.thisProductSplit] packQty', this.product.Pack_Quantity__c);
-        console.log('[psaItemForm.thisProductSplit] gp', this.product.Gross_Profit_per_Case__c);
+    productSplit = 0;
+    get calcProductSplit() {
+        console.log('[psaItemForm.calcProductSplit] psaItem', this.pasItem);
+        console.log('[psaItemForm.calcProductSplit] psaItemId', this.pasItemId);
+        console.log('[psaItemForm.calcProductSplit] product', this.product);
+        console.log('[psaItemForm.calcProductSplit] packQty', this.product.Pack_Quantity__c);
+        console.log('[psaItemForm.calcProductSplit] gp', this.product.Gross_Profit_per_Case__c);
 
         const pq = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
+        const us = this.product.Unit_Size__c == undefined ? 1 : parseInt(this.product.Unit_Size__c);
         const gp = this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
         const v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
-        const case9lt = (v / pq) / 9;
+        const case9lt = (v * us) / 9000;
         const goalPrice = case9lt * gp;
         let tps = 0;
         if (this.totalPlannedSpend == 0) {
@@ -492,27 +496,35 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         } 
         let productSplit = (goalPrice / tps) * this.totalBudget;
 
-        console.log('[psaItemForm.thisProductSplit] totalPlannedSpend', this.totalPlannedSpend);
-        console.log('[psaItemForm.thisProductSplit] volume', v);
-        console.log('[psaItemForm.thisProductSplit] 9lt cases', case9lt);
-        console.log('[psaItemForm.thisProductSplit] goalPrice', goalPrice);
-        console.log('[psaItemForm.thisProductSplit] tps', tps);
-        console.log('[psaItemForm.thisProductSplit] productSplit', productSplit);
+        console.log('[psaItemForm.calcProductSplit] product', this.product);
+        console.log('[psaItemForm.calcProductSplit] psaItem', this.pasItem);
+        console.log('[psaItemForm.calcProductSplit] psaItemId', this.pasItemId);
+        console.log('[psaItemForm.calcProductSplit] totalPlannedSpend', this.totalPlannedSpend);
+        console.log('[psaItemForm.calcProductSplit] packQty', pq);
+        console.log('[psaItemForm.calcProductSplit] unit size', us);
+        console.log('[psaItemForm.calcProductSplit] gp', gp);
+        console.log('[psaItemForm.calcProductSplit] totalBudget', this.totalBudget);
+        console.log('[psaItemForm.calcProductSplit] volume', v);
+        console.log('[psaItemForm.calcProductSplit] 9lt cases', case9lt);
+        console.log('[psaItemForm.calcProductSplit] goalPrice', goalPrice);
+        console.log('[psaItemForm.calcProductSplit] tps', tps);
+        console.log('[psaItemForm.calcProductSplit] productSplit', this.productSplit);
         
         return productSplit;
     }
 
     get thisProductGP() {
-        let v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : parseFloat(this.volumeForecast);
-        const p = this.product == undefined || this.product.Gross_Profit_per_Bottle__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Bottle__c);
-        const packQty = this.product.Pack_Quantity__c == undefined ? 0 : parseInt(this.product.Pack_Quantity__c);
+        let v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : Math.round(parseFloat(this.volumeForecast));
+        const gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
+        const packQty = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
 
         if (this.psa.Activity_Type__c != 'Coupon') {
             v += this.planRebateVolume;
         }
-        const productGP = v * p * packQty;
+
+        const productGP = (v / packQty) * gpPerCase;
         
-        console.log('[psaItemForm.thisProductGP] p', p);
+        console.log('[psaItemForm.thisProductGP] gpPerBottle', gpPerCase);
         console.log('[psaItemForm.thisProductGP] activityType', this.psa.Activity_Type__c);
         console.log('[psaItemForm.thisProductGP] planRebateVolume', this.planRebateVolume);
         console.log('[psaItemForm.thisProductGP] volume', v);
@@ -531,18 +543,26 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return this.freeGoodQty * unitCost;
     }
     get planRebateVolume() {
-        return this.volumeForecast * (this.discountPercent / 100);
+        console.log('[psaItemForm.planRebateVolume] volumeForcast', this.volumeForecast);
+        console.log('[psaItemForm.planRebateVolume] discountPercent', this.discountPercent);
+        let v1 = this.volumeForecast * (this.discountPercent / 100);
+        let v2 = parseInt(v1);
+        let v3 = v1 - v2;
+        let v = v3 <= 0.5 ? v2 : v1;
+        console.log('[psaItemForm.planRebateVolume] v, v1, v2, v3', v, v1, v2, v3);
+        return v;
     }
     get discountPercentLabel() {
         return `${this.labels.discountPercent.label} (${this.labels.liability.label}: ${this.planRebateVolume.toFixed(0)})`;
     }
     get rebateLiability() {
-        const price = this.product.Price__c == undefined ? 0 : parseFloat(this.product.Price__c);    
-        const packQty = this.product.Pack_Quantity__c == undefined ? 0 : parseInt(this.product.Pack_Quantity__c);
+        const price = this.product.Price_per_Case__c == undefined ? 0 : parseFloat(this.product.Price_per_Case__c);    
+        const packQty = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
+        console.log('[psaItemForm.rebateLiability] product', this.product);
         console.log('[psaItemForm.rebateLiability] price', price);
         console.log('[psaItemForm.rebateLiability] packQty', packQty);
         console.log('[psaItemForm.rebateLiability] rebateVolume', this.planRebateVolume);    
-        return (this.planRebateVolume * (price * packQty) * 1.05).toFixed(2);
+        return ((this.planRebateVolume / packQty) * price * 1.05).toFixed(2);
     }
 
     /**
@@ -779,6 +799,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     handleVolumeForecastChange(event) {
         try {      
             this.volumeForecast = event.detail.value.trim() == '' ? 0 : event.detail.value;
+            if (this.calcSplit) {
+                this.calcProductSplit();
+            }
         }catch(ex) {
             console.log('exception', ex);
         }
@@ -1069,11 +1092,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             alert('creating new pmi record');
         }
         createRecord(record)
-            .then(psaItem => {
-                console.log('[psaitemForm.createrecord] psaItem', psaItem);
+            .then(result => {
+                console.log('[psaitemForm.createrecord] psaItem', result);
                 this.isWorking = false;
-                this.psaItem = psaItem;
-                this.psaItemId = psaItem.id;
+                this.psaItem = {...result};
+                this.psaItemId = result.id;
                 if (this.isPhone && this.isThisTass) {
                     alert('created pmi successfully');
                 }
@@ -1089,7 +1112,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     this.updatePSAStatus("Updated");
                 }
                 this.updateTotals('save');
-
+                refreshApex(this.wiredPSAItem);
                 /*
                 if (!this.isPhone) {
                     const saveEvent = new CustomEvent('save', {
@@ -1133,7 +1156,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     this.updatePSAStatus("Updated");
                 }
                 this.updateTotals('update');
-
+                refreshApex(this.wiredPSAItem);
                 /*
                 try {
                 if (!this.isPhone) {
@@ -1217,6 +1240,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                         }
                     });
                     this.dispatchEvent(saveEvent);
+                    refreshApex(this.wiredPSAItem);
                 }
             })
             .catch((error) => {

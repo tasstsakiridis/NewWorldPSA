@@ -3,4 +3,15 @@
     <fullName>MX_PSA</fullName>
     <active>true</active>
     <label>MX - PSA</label>
+    <picklistValues>
+        <picklist>Activity_Type__c</picklist>
+        <values>
+            <fullName>Coupon</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Direct Rebate</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
 </RecordType>

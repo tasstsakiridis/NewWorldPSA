@@ -96,4 +96,124 @@
         <shortDescription>Remaining</shortDescription>
         <value>remaining</value>
     </labels>
+    <labels>
+        <fullName>Activity_Type</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Activity Type</shortDescription>
+        <value>Activity Type</value>
+    </labels>
+    <labels>
+        <fullName>All_Accounts_Selected</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>All Accounts Selected</shortDescription>
+        <value>All Accounts Selected</value>
+    </labels>
+    <labels>
+        <fullName>Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cost</shortDescription>
+        <value>Cost</value>
+    </labels>
+    <labels>
+        <fullName>Coupon</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Coupon</shortDescription>
+        <value>Coupon</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Profit</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Customer Profit</shortDescription>
+        <value>Customer Profit</value>
+    </labels>
+    <labels>
+        <fullName>Direct_Rebate</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Direct Rebate</shortDescription>
+        <value>Direct Rebate</value>
+    </labels>
+    <labels>
+        <fullName>Free_Goods_Given</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Free Goods Given</shortDescription>
+        <value>Free Goods Given</value>
+    </labels>
+    <labels>
+        <fullName>Gross_Profit</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gross Profit</shortDescription>
+        <value>Gross Profit</value>
+    </labels>
+    <labels>
+        <fullName>Liability</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Liability</shortDescription>
+        <value>Liability</value>
+    </labels>
+    <labels>
+        <fullName>Limit_to_Selected_Accounts</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Limit to Selected Accounts</shortDescription>
+        <value>Limit to Selected Accounts</value>
+    </labels>
+    <labels>
+        <fullName>No_Accounts_Selected</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No Accounts Selected</shortDescription>
+        <value>Please select atleast one account</value>
+    </labels>
+    <labels>
+        <fullName>ROI</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>ROI</shortDescription>
+        <value>ROI</value>
+    </labels>
+    <labels>
+        <fullName>Rebate_Liability</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rebate Liability</shortDescription>
+        <value>Rebate Liability</value>
+    </labels>
+    <labels>
+        <fullName>Rebate_Volume</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rebate Volume</shortDescription>
+        <value>Rebate Volume</value>
+    </labels>
+    <labels>
+        <fullName>PreDated_Error</fullName>
+        <categories>label</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PreDated Error</shortDescription>
+        <value>You cannot select a date that has passed.</value>
+    </labels>
 </CustomLabels>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payment_Made</fullName>
+    <active>true</active>
+    <description>Should not be able to change  Act Qty if Payment has already been made</description>
+    <errorConditionFormula>AND(ISCHANGED( Act_Qty__c ),TEXT(Approval_Status__c)=&apos;Paid&apos;, Market_Name__c = &apos;Brazil&apos; )</errorConditionFormula>
+    <errorDisplayField>Activity__c</errorDisplayField>
+    <errorMessage>You cannot change the Actual Quantity after the payment has been made</errorMessage>
+</ValidationRule>

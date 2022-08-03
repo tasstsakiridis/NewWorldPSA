@@ -1,0 +1,610 @@
+<apex:component layout="none" access="global" controller="Mexico_PSA_Contract_Controller" >
+    <apex:attribute name="psa" description="the activity record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
+    
+<html>
+
+    <head>
+        <style>
+            body {
+                overflow: hidden;
+            }
+
+            @page {
+                margin: 1cm;
+            }
+            
+            .title {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 2em;
+                font-weight: bold;
+                color: #603000;
+            }
+            .important-text {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 14pt;
+                font-weight: bold;
+            }
+            
+            @media screen {
+                .highlight-text {
+                    background-color: yellow;
+                }
+            }
+            
+            @media print {
+                .no_print {
+                    display: none;
+                }
+            }
+
+            .table-bordered {
+                width: 100%;
+            }
+            .table-bordered {
+                border: 1px solid #999;
+                border-collapse: collapse;                
+            }
+            thead {
+                display: table-header-group;
+            }
+            .table-bordered-th {
+                font-size: 9pt;
+            }
+            .table-bordered-td {
+                font-size: 10pt;
+            }
+
+            tfoot {
+                display: table-footer-group;
+            }
+
+            .cabecalh {
+                left: 0px;
+                position: relative;
+                top: 0px;
+            }
+
+            .rodap {
+                background-color: white;
+                bottom: 0px;
+                left: 0px;
+                page-break-after: always;
+                position: relative;
+                width: 19cm;
+            }
+
+            .content {
+                margin-bottom: 100px;
+                margin-top: 100px;
+            }
+
+            .rodape {
+                background-color: #323849;
+                padding: 5px;
+                width: 100%;
+            }
+
+            .rodape button span {
+                float: left;
+                white-space: nowrap;
+            }
+
+            #header h1 {
+                border: 0px none;
+                margin: 0px;
+            }
+
+            .ui-menu {
+                width: 250px;
+            }
+
+            .ui-widget {
+                font-size: 0.9em;
+                z-index: 2;
+            }
+
+            .linha {
+                border: 1px solid #AAAAAA;
+            }
+
+            .linha label {
+                display: inline-block;
+                padding: 4px;
+                text-align: left;
+            }
+
+            .linha input {
+                margin: 0px;
+            }
+
+            #menu {
+                z-index: 1;
+            }
+
+            #header {
+                background: none repeat scroll 0px 0px #323849;
+                color: #E6E6FA;
+                font-size: small;
+                width: 100%;
+                z-index: 10;
+            }
+
+            #header h2 {
+                margin: 0px;
+                text-align: center;
+            }
+
+            a[href="#menu"] {
+                border: 0px none !important;
+                right: 6px !important;
+                top: 6px !important;
+                z-index: 11;
+            }
+
+            footer {
+                color: #E6E6FA;
+                font-size: small;
+                text-align: center;
+            }
+
+            #campo_filtro {
+                margin-left: 10%;
+                width: 80%;
+            }
+
+            div.page-break {
+                background-color: white;
+                background-image: none;
+                height: 26cm;
+                overflow: hidden;
+                padding: 0px;
+                width: 19cm;
+            }
+                        
+            img {
+                max-width: 99%;
+            }
+
+            p {
+                margin-bottom: 0.25cm;
+                direction: ltr;
+                line-height: 120%;
+                text-align: left;
+            }
+
+            p.western {
+                font-family: "Arial",serif;
+                font-size: 9pt;
+            }
+
+            p.cjk {
+                font-size: 9pt;
+            }
+
+            a:link {
+                color: rgb(5, 99, 193);
+            }
+
+            a.no_print {
+                /*
+                    border: 3px outset blue;
+                    background-color: green;
+                    padding: 4px 10px;
+                    color: black;
+                */
+                text-decoration: none;
+                align: center;
+                font-size: 1.3em;
+                padding: 3px 15px;
+                vertical-align: text-bottom;
+                font-weight: bold;
+                border: 2px solid #000000;
+                background-color: #8A7E6E;
+                color: #FFFFFF;
+                margin-bottom: 3px;
+                border-radius: 5px 5px 5px 5px;
+            }
+
+            p.bf {
+                margin-bottom: 0cm;
+                line-height: 115%;
+                font-size: 10pt;
+                text-align: justify;
+            }
+
+            p.ni1 {
+                font-weight: bold;
+            }
+
+            ol {
+                list-style-type: none;
+                counter-reset: item;
+                margin: 0;
+                padding: 0;
+            }
+            ol > li {
+                display: table;
+                counter-increment: item;
+                margin-bottom: 0.6em;
+            }
+            ol > li:before {
+                content: counters(item, ".") ". ";
+                display: table-cell; 
+                padding-right: 0.6em;  
+                width: 30px;           
+            }
+            li ol > li {
+                margin: 0;
+            }
+            li ol > li:before {
+                content: counters(item, ".") " ";  
+            }
+            
+            ul.circle {
+                list-style-type: circle;
+                font-size: 12pt;
+            }
+            .segment-header {
+                background-color: #ad6339;
+                margin-top: 10px;
+                padding: 2px;
+                border-radius: 3px;
+            }
+            .segment-header span {
+                margin-left: 10px;
+            }
+            .segment-sub-header {
+                background-color: #cf9372;
+                border-radius: 3px;
+                margin-top: 5px;
+                padding: 2px;
+            }
+            .segment-sub-header span {
+                margin-left: 10px;
+                font-size: 10pt;
+            }
+            .small-font {
+                font-size: 8pt;
+            }
+            .segment-detail-item-header {
+                font-size: 9pt;
+            }
+            .segment-detail-item-text {
+                font-size: 10pt;
+            }
+            .no-bullet {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div><img class="pageHeader" style="float: right;" src="{!$Resource.Mexico_PSA_Logo}"/></div>
+        <div style="clear: both;" ></div>
+        <div style="float: right; border: 1px solid #999; padding: 5px 10px;">
+            <apex:outputText value="FOLIO: {0}">
+                <apex:param value="{!thePSA.Sales_Proposal_Id__c}" />
+            </apex:outputText>
+        </div>
+        <table border="0" align="center" width="100%" style="margin-top: 20px;">
+            <tbody>
+                <tr>
+                    <td>
+                        <div>
+                            <p align="justify" class="bf segment-detail-item-header">
+                                <apex:outputText value="Cliente: {0}" styleClass="highlight-text segment-detail-item-text">
+                                    <apex:param value="{!thePSA.Account__r.Name}" />
+                                </apex:outputText>
+                            </p>
+                        </div>
+                    </td>
+                    <td>
+                        <p align="justify" class="bf segment-detail-item-header">
+                            <apex:outputText value="Fecha de inicio: {0} - {1}" styleClass="highlight-text segment-detail-item-text">
+                                <apex:param value="{!thePSA.Begin_Date__c}" />
+                                <apex:param value="{!thePSA.End_Date__c}" />
+                            </apex:outputText>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p align="justify" class="bf">&nbsp;</p>
+                    </td>
+                    <td>
+                        <p align="justify" class="bf segment-detail-item-header">
+                            <apex:outputText value="Ejecutivo: {0}" styleClass="highlight-text segment-detail-item-text">
+                                <apex:param value="{!ownerName}" />
+                            </apex:outputText>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p align="justify" class="bf segment-detail-item-header">
+                            <apex:outputText value="Representante legal: {0}" styleClass="highlight-text segment-detail-item-text">
+                                <apex:param value="{!thePSA.Contact__r.Name}" />
+                            </apex:outputText>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p align="justify" class="bf segment-detail-item-header">
+                            <apex:outputText value="Razón: {0}" styleClass="highlight-text segment-detail-item-text">
+                                <apex:param value="{!thePSA.Account__r.English_Name__c}" />
+                            </apex:outputText>
+                        </p>
+                        <p class="segment-detail-item-header">
+                            <apex:outputText value="RFC: {0}" styleClass="highlight-text segment-detail-item-text">
+                                <apex:param value="{!thePSA.Account__r.RFC__c}" />
+                            </apex:outputText>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="segment-detail-item-header">Domicilio:</p>
+                        <ul class="no-bullet">
+                            <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingStreet}</li>
+                            <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingCity}</li>
+                            <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingPostalCode}</li>
+                            <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingState}</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="segment-header">
+            <span style="color: white; font-size: 10pt;">COMPROMISOS BROWN-FORMAN MÉXICO</span>            
+        </div>
+        <div class="segment-sub-header">
+            <span>Bonificaciones ({!numberOfProducts} productos)</span>
+        </div>
+        <table style="border: 1px solid #999; border-collapse: collapse;">
+            <thead>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 10%;">#</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 30%;">Producto</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 10%;">%</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">Compra esperada</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">A bonificar</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 20%;">Importe</th>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!promotionMaterialItems}" var="pmi" id="promotionMaterialItems">
+                    <tr>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt;">{!pmi.index}</td>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt">{!pmi.productName}</td>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                            <apex:outputText value="{0, number, 0}%">
+                                <apex:param value="{!pmi.rebatePercentage}" />
+                            </apex:outputText>
+                        </td>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                            <apex:outputText value="{0, number, #,##0}" >
+                                <apex:param value="{!pmi.planVolumeBottles}" />
+                            </apex:outputText>
+                        </td>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                            <apex:outputText value="{0, number, #,##0}">
+                                <apex:param value="{!pmi.planVolumeLiability}" />
+                            </apex:outputText>
+                        </td>
+                        <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                            <apex:outputText value="{0, number, #,##0.00}">
+                                <apex:param value="{!pmi.rebateLiability}" />
+                            </apex:outputText>
+                        </td>                    
+                    </tr>
+                </apex:repeat>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                    <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                        <apex:outputText value="{0, number, 0}">
+                            <apex:param value="{!thePSA.Total_Volume_Bottles__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                        <apex:outputText value="{0, number, #,##0}">
+                            <apex:param value="{!totalVolumeLiability}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt; text-align: right;">
+                        <apex:outputText value="{0, number, #,##0.00}">
+                            <apex:param value="{!totalRebateLiability}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="small-font">
+            <ul class="no-bullet">
+            <li>* Compra esperada durante la vigencia del convenio.</li>
+            <li>* Los chequebonos por bonificación serán dirigidos para canje exclusivamentes
+                con el mayorista autorizado con quien se realice la compra.</li>
+            <li>* Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente a compras que previamente no hayan obtenido un beneficio
+                que impacte en precio como descuentos, precio especial, expos, combos, ofertas armadas, paquetes promocionales etc.</li>
+            <li>* Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y una vez pasado este tiempo perderá su validez.</li>
+            </ul>
+        </div>
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Patrocinio en efectivo</span>
+        </div>
+        <div>
+            <apex:outputText value="+ Valor total en patrocinio: $ {0, number, #,##0.00}">
+                <apex:param value="{!thePSA.Total_Listing_Fee__c}" />
+            </apex:outputText>
+        </div>     
+        <div>
+            <apex:outputText value="Parcialidades ({0})">
+                <apex:param value="{!thePSA.Number_of_Payments__c}" />
+            </apex:outputText>
+            <table style="width: 200px; font-size: 10pt;">
+                <apex:repeat value="{!payments}" var="p">
+                    <tr>
+                        <td style="width: 75px;">{!p.paymentNumber}</td>
+                        <td style="text-align: right; width: 125px;">
+                            <apex:outputText value="{0, number, 0}%">
+                                <apex:param value="{!p.paymentPercentage}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </div> 
+
+        <div class="segment-header" style="color: white; margin-top: 10px;">
+            <span>Apoyo en producto</span>
+        </div>  
+        <div class="segment-sub-header">
+            <span>
+            <apex:outputText value="Apoyos ({0})">
+                <apex:param value="{!numberOfProducts}" />
+            </apex:outputText>
+            </span>
+        </div>
+        <table style="width: 100%; font-size: 10pt;">
+            <apex:repeat value="{!promotionMaterialItems}" var="pmi">
+                <tr>
+                    <td style="width: 25%;">
+                        <apex:outputText value="{0, date, dd MMM yyyy}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.freeGoodsGivenDate}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 25%;">
+                        <apex:outputText value="$ {0, number, #,##0.00}">
+                            <apex:param value="{!pmi.freeBottleCost}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.freeGoodsReason}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>COMPROMISOS CENTRO DE CONSUMO</span>
+        </div>
+        <div class="segment-sub-header">
+            <span>
+                <apex:outputText value="Disponibilidad ({0} productos)">
+                    <apex:param value="{!numberOfMustStockProducts}" />
+                </apex:outputText>
+            </span>
+        </div>
+        <apex:repeat value="{!mustStockProducts}" var="msp">
+            <p style="font-size: 10pt;">{!msp.Product_Name__c}</p>
+        </apex:repeat>
+
+        <p class="small-font">* Los productos señalados deberán estar catalogados, disponibles a la venta y listado en los menús del establecimiento.</p>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Precios</span>
+        </div>
+        <p class="small-font">+ Alineación de precios de marcas Brown-Forman contra set competitivo</p>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Visibilidad de marca</span>
+        </div>
+        <p class="small-font">+ Material temporal</p>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Visibilidad de producto</span>
+        </div>
+        <ul class="no-bullet small-font">
+            <li>+ Exhibiciones barra / contrabarra</li>
+            <li>+ Otras exhibiciones</li>
+        </ul>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Drinking Strategy</span>
+        </div>
+        <ul class="no-bullet small-font">
+            <li>+ Ad-Hoc</li>
+            <li>+ Seasonal</li>
+        </ul>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Actividades de marca</span>
+        </div>
+        <ul class="no-bullet small-font">
+            <li>+ Activaciones</li>
+            <li>+ Degustaciones</li>
+            <li>+ Promociones a consumidor</li>
+        </ul>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Capacitaciones de marca</span>
+        </div>
+        <p class="small-font">+ Permitir capacitaciones a tripulaciones /staff</p>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Actividades de marca</span>
+        </div>
+        <p class="small-font">+ Permitir incentivar a tripulaciones / staff</p>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span>Compromisos adicionales del Centro de Consumo</span>
+        </div>
+
+        <table>
+            <tbody>
+                <td width="60%" style="border-right: 1px solid #999;">
+                    <p class="small-font">En los casos que por remodelación, clausura o cierre temporal del centro de consumo al que corresponde
+este acuerdo comercial, y que como consecuencia los términos del presente acuerdo no pudieran ser
+aplicables a dicho centro de consumo, el centro de consumo se obliga a notificar inmediatamente al
+ejecutivo. El ejecutivo decidirá discrecionalmente la reasignación de recursos en una de las siguientes
+alternativas: (i) reasignar los recursos pactados en la parte proporcional que aún no se haya aplicado, en
+el presente acuerdo a un centro de consumo perteneciente al mismo grupo; o (ii) la devolución de los
+recursos pactados en la parte proporcional que aún no se haya aplicado a la fecha que
+corresponda.
+En caso de que el centro de consumo sea vendido o traspasado a un tercero, el ejecutivo tendrá facultad
+de decidir sobre la continuidad de la relación comercial con el nuevo dueño. En caso de que se decida la
+contraídas continuidad de la relación comercial con el nuevo dueño, el nuevo dueño asume las
+obligaciones en el presente acuerdo. En caso de que el ejecutivo decida no continuar con la relación
+comercial en dicho centro de consumo con el nuevo dueño, el centro de consumo se obliga a devolver los
+recursos pactados en la parte proporcional que aún no se haya aplicado a la fecha que corresponda;
+esta devolución deberá surtir efectos previo a que entre la nueva administración del centro de consumo.
+En caso de que se imposibilitara la ejecución parcial o total del presente acuerdo, o en caso de
+incumplimiento del mismo por parte del centro de consumo, BFTM podrá terminar el acuerdo mediante
+aviso por escrito dirigido al centro de consumo en el momento que se de dicha situación, en tal caso el
+centro de consumo devolverá de inmediato las cantidades que falten por amortizar por el apoyo brindado
+en efectivo así como devolverá todos aquellos materiales y productos que se encuentren en buen estado,
+no teniendo BFTM la obligación de cubrir ninguna cantidad o entrega de producto o material que falte
+por realizarse.
+El centro de consumo colaborará con BFTM proporcionando información y permitiendo visitas para
+confirmar el cumplimiento del presente acuerdo.
+Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente
+compras que previamente no hayan obtenido un beneficio que impacte en precio como descuentos,
+precio especial, expos, combos, ofertas armadas,paquetes promocionales etc.
+Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y
+una vez pasado este tiempo perderá su validez.
+Brown-Forman México se reserva el derecho de modificar cualquier campo del convenio con previo aviso.
+Brown-Forman México se reserva el derecho de modificar la forma de pago en bonificaciones con previo
+aviso.
+La empresa no se hace responsable por el mal uso de este documento
+Comentarios: 01-800-36-87-000 centrodeconsumo@b-f.com</p>
+                </td>
+                <td width="40%;">
+                    <div style="margin-left: 15px; vertical-align: bottom;">
+                        <div>
+                            <p>___________________________________</p>
+                            <p>{!ownerName}</p>
+                        </div>
+                        <div style="margin-top: 50px;">
+                            <p>___________________________________</p>
+                            <p>{!ownerManagerName}</p>
+                        </div>
+                        <div style="margin-top: 50px;">
+                            <p>___________________________________</p>
+                            <p>{!thePSA.Contact__r.Name}</p>
+                        </div>
+                    </div>
+                </td>
+            </tbody>
+        </table>
+    </body>
+</html>
+
+</apex:component>

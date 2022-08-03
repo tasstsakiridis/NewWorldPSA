@@ -122,14 +122,14 @@
                 <h2 class="slds-text-title_caps slds-m-around_small">{labels.dateRange.label}</h2>
                 <lightning-layout multiple-rows="true" class="slds-m-vertical_small">
                     <lightning-layout-item size="12" padding="around-small">
-                        <lightning-input type="date" name="i_StartDate" label={labels.startDate.label} value={formattedStartDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleStartDateChange}></lightning-input>
+                        <lightning-input type="date" name="i_StartDate" label={labels.startDate.label} value={startDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleStartDateChange}></lightning-input>
                         <template if:true={hasStartDateError}>
                             <span class="slds-m-horizontal_small input-error">{labels.startDate.error}</span>
                         </template>
                     </lightning-layout-item>
                     <template if:true={captureEndDate}>
                         <lightning-layout-item size="12" padding="around-small">
-                            <lightning-input type="date" name="i_EndDate" label={labels.endDate.label} value={formattedEndDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleEndDateChange}></lightning-input>
+                            <lightning-input type="date" name="i_EndDate" label={labels.endDate.label} value={endDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleEndDateChange}></lightning-input>
                             <template if:true={hasEndDateError}>
                                 <span class="slds-m-horizontal_small input-error">{labels.endDate.error}</span>
                             </template>    

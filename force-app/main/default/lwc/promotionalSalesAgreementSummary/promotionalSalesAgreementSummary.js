@@ -27,6 +27,7 @@ import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PROMOTIONAL_ACTIVITY from '@salesforce/label/c.Promotional_Activity';
 import LABEL_PSASUMMARY from '@salesforce/label/c.PSA_Summary';
 import LABEL_REBATE_LIABILITY from '@salesforce/label/c.Rebate_Liability';
+import LABEL_REBATE_PERCENT from '@salesforce/label/c.Rebate_Percent';
 import LABEL_REBATE_VOLUME from '@salesforce/label/c.Rebate_Volume';
 import LABEL_ROI from '@salesforce/label/c.ROI';
 import LABEL_QUARTERS_CAPTURED from '@salesforce/label/c.QuartersCaptured';
@@ -58,6 +59,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         promotionalActivity:    { label: LABEL_PROMOTIONAL_ACTIVITY },
         psaSummary:             { label: LABEL_PSASUMMARY },
         rebateLiability:        { label: LABEL_REBATE_LIABILITY },
+        rebatePercent:          { label: LABEL_REBATE_PERCENT },
         roi:                    { label: LABEL_ROI },
         split:                  { label: LABEL_SPLIT },
         start:                  { label: LABEL_START_DATE },
@@ -77,30 +79,31 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
 
     @track 
     columns = [
-        { label: LABEL_ACCOUNT, fieldName: 'account', type: 'text', wrapText: true, cellAttributes: { alignment: 'left' }},
-        { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }},
-        { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'freeGoodsGiven', type: 'number', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }},
-        { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}},
-        { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }},
+        { label: LABEL_ACCOUNT, fieldName: 'account', type: 'text', wrapText: true, cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'freeGoodsGiven', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','United Kingdom']},
+        { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
+        { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil','United Kingdom']},
+        { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
+        { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
         //{ label: this.listingFeeBalanceLabel, fieldName: 'listingFeeBalance', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_PROMOTIONAL_ACTIVITY, fieldName: 'promotionalActivity', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }},
+        { label: LABEL_PROMOTIONAL_ACTIVITY, fieldName: 'promotionalActivity', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
+        { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
         //{ label: LABEL_TRAINING_ADVOCACY, fieldName: 'trainingAdvocacy', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.trainingAdvocacyPaidLabel, fieldName: 'trainingAdvocacyPaid', type: 'currency', cellAttributes: { alignment: 'right' }},    
-        { label: LABEL_REBATE_VOLUME, fieldName: 'rebateVolume', type: 'number', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_REBATE_LIABILITY, fieldName: 'rebateLiability', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_GROSS_PROFIT, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: LABEL_TOTAL_INVESTMENT, fieldName: 'totalInvestment', type: 'currency', cellAttributes: { alignment: 'right' } },
-        { label: this.totalInvestment9lLabel, fieldName: 'totalInvestment9L', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: this.totalInvestmentActualLabel, fieldName: 'totalInvestmentActual', type: 'currency', cellAttributes: { alignment: 'right' }},
-        { label: this.totalInvestmentActual9lLabel, fieldName: 'totalInvestmentActual9L', type: 'currency', cellAttributes: { alignment: 'right' }},
+        { label: LABEL_REBATE_VOLUME, fieldName: 'rebateVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_REBATE_PERCENT, fieldName: 'rebatePercent', type: 'percent', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_REBATE_LIABILITY, fieldName: 'rebateLiability', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_GROSS_PROFIT, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil']},
+        { label: LABEL_TOTAL_INVESTMENT, fieldName: 'totalInvestment', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom'] },
+        { label: this.totalInvestment9lLabel, fieldName: 'totalInvestment9L', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
+        { label: this.totalInvestmentActualLabel, fieldName: 'totalInvestmentActual', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
+        { label: this.totalInvestmentActual9lLabel, fieldName: 'totalInvestmentActual9L', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
     ];
     
     @wire(CurrentPageReference)
@@ -390,44 +393,45 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.showRebateLiability = false;
         this.showTotalInvestment = false;
         this.showCustomerProfit = false;
-        var cols = [...this.columns];
+        console.log('[summary.buildTableData] columns', this.columns);
+        console.log('[summary.buildTableData] market name', this.thePSA.Market__r.Name);
+        var cols = [...this.columns.filter(c => c.markets.includes(this.thePSA.Market__r.Name))];
         console.log('[summary.buildTableData] showFreeGoods', this.showFreeGoods);
         if (!this.showFreeGoods) {
-            cols = cols.filter(c => c.fieldName.indexOf('freeGoods') < 0);
+            //cols = cols.filter(c => c.fieldName.indexOf('freeGoods') < 0);
         }
         if (this.marketName == 'Brazil') {
             this.showPromotionalActivity = false;
             this.showTrainingAndAdvocacy = false;
             this.showListingFee = false;
             this.showPayments = true
-            cols = cols.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
-            cols = cols.filter(c => c.fieldName != 'discount');
+            //cols = cols.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
+            //cols = cols.filter(c => c.fieldName != 'discount');
         }
         if (this.marketName == 'Mexico') {
             this.showRebateLiability = true;
             this.showTotalInvestment = true;
             this.showCustomerProfit = true;
-            cols = cols.filter(c => c.fieldName != 'discount');
-            cols = cols.filter(c => c.fieldName.indexOf('totalInvestment') < 0);
+            //cols = cols.filter(c => c.fieldName != 'discount');
+            //cols = cols.filter(c => c.fieldName.indexOf('totalInvestment') < 0);
         } else {
-            cols = cols.filter(c => c.fieldName != 'rebateLiability');
-            cols = cols.filter(c => c.fieldName != 'rebateVolume');
-            cols = cols.filter(c => c.fieldName != 'totalRebateGP');
+            //cols = cols.filter(c => c.fieldName != 'rebatePercent');
+            //cols = cols.filter(c => c.fieldName != 'rebateLiability');
+            //cols = cols.filter(c => c.fieldName != 'rebateVolume');
+            //cols = cols.filter(c => c.fieldName != 'totalRebateGP');
         }
         if (this.marketName == 'United Kingdom') {
             this.showNumberOfQuarters = true;            
         } else {
             this.showTrainingAndAdvocacy = false;
-            cols = cols.filter(c => c.fieldName != 'quartersCaptured');
-            console.log('[summary.buildTableData] remove quarters captured', cols);
+            //cols = cols.filter(c => c.fieldName != 'quartersCaptured');
         }
         
         if (!this.showProductSplit) {
-            cols = cols.filter(c => c.fieldName != 'productSplit' && c.fieldName != 'payment');
+            //cols = cols.filter(c => c.fieldName != 'productSplit' && c.fieldName != 'payment');
         }
        
         console.log('[summary.buildTableData] cols', cols);
-        console.log('[summary.buildTableData] showTrainingAndAdvocacy', this.showTrainingAndAdvocacy);
         this.columns = [...cols];
         this.isWorking = true;
         const account = { id: this.thePSA.Account__c, 
@@ -483,11 +487,13 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
                     totalInvestment: parseFloat(pmi.Total_Investment__c),
                     packQuantity: parseInt(pmi.Product_Pack_Qty__c),
-                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c),
+                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c==undefined ? 0 : pmi.Product_Custom__r.Gross_Profit_per_Case__c),
                     rebateVolume: parseFloat(pmi.Plan_Rebate_Volume__c),
                     rebateLiability: parseFloat(pmi.Plan_Rebate_Liability__c),
+                    rebatePercent: (parseFloat(pmi.Plan_Rebate_Percentage__c)/100),
                     totalPSAGP: parseFloat(pmi.Plan_PSA_Gross_Profit__c),
-                    payment: parseFloat(pmi.Total_Payments_Paid__c)
+                    payment: parseFloat(pmi.Total_Payments_Paid__c),
+                    productSplit: parseFloat(pmi.Product_Split__c)
                 });
             });
         }
@@ -557,8 +563,10 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 row.totalInvestment = pmi.totalInvestment;
                 row.rebateLiability = pmi.rebateLiability;
                 row.rebateVolume = pmi.rebateVolume;
+                row.rebatePercent = pmi.rebatePercent;
                 row.totalPSAGP = pmi.totalPSAGP;
                 row.payment = pmi.payment;
+                row.productSplit = pmi.productSplit;
 
                 row.quartersCaptured = 0;  // Need to calculate or capture how many quarters are captured
                 row.listingFeeBalance = row.listingFee - row.listingFeePaid;
@@ -569,11 +577,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     row.totalInvestmentActual9L = row.actualVolume > 0 ? row.totalInvestmentActual / row.actualVolume : 0;    
                 }
         
-                const nineLtrCases = pmi.plannedVolume / 9;
-                const plannedPrice = nineLtrCases * pmi.grossProfit;
-                row.productSplit = (plannedPrice / this.totalPlannedSpend) * this.totalBudget;
-                console.log('9ltr cases: ' + nineLtrCases);
-                console.log('plannedPrice: ' + plannedPrice);
+                //const nineLtrCases = pmi.plannedVolume / 9;
+                //const plannedPrice = nineLtrCases * pmi.grossProfit;
+                //row.productSplit = (plannedPrice / this.totalPlannedSpend) * this.totalBudget;
+                //console.log('9ltr cases: ' + nineLtrCases);
+                //console.log('plannedPrice: ' + plannedPrice);
                 console.log('grossProfit: ' + pmi.grossProfit);
                 console.log('totalBudget: ' + this.totalBudget);
                 console.log('totalPlannedSpend: ' + this.totalPlannedSpend);

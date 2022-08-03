@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Used_For__c</fullName>
+    <description>What this product can be used for</description>
+    <externalId>false</externalId>
+    <inlineHelpText>What this product can be used for</inlineHelpText>
+    <label>Used For</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Account Survey</fullName>
+                <default>false</default>
+                <label>Account Survey</label>
+            </value>
+            <value>
+                <fullName>Order</fullName>
+                <default>false</default>
+                <label>Order</label>
+            </value>
+            <value>
+                <fullName>CPT</fullName>
+                <default>false</default>
+                <label>CPT</label>
+            </value>
+            <value>
+                <fullName>Fee</fullName>
+                <default>false</default>
+                <label>Fee</label>
+            </value>
+            <value>
+                <fullName>Incentive</fullName>
+                <default>false</default>
+                <label>Incentive</label>
+            </value>
+            <value>
+                <fullName>Promotion</fullName>
+                <default>false</default>
+                <label>Promotion</label>
+            </value>
+            <value>
+                <fullName>Sample Order</fullName>
+                <default>false</default>
+                <label>Sample Order</label>
+            </value>
+            <value>
+                <fullName>Sample Order - E-Premise</fullName>
+                <default>false</default>
+                <label>Sample Order - E-Premise</label>
+            </value>
+            <value>
+                <fullName>High Value</fullName>
+                <default>false</default>
+                <label>High Value</label>
+            </value>
+            <value>
+                <fullName>Sample Order - UK</fullName>
+                <default>false</default>
+                <label>Sample Order - UK</label>
+            </value>
+            <value>
+                <fullName>Employee Request</fullName>
+                <default>false</default>
+                <label>Employee Request</label>
+            </value>
+            <value>
+                <fullName>Price</fullName>
+                <default>false</default>
+                <label>Price</label>
+            </value>
+            <value>
+                <fullName>Sample Order - TWN</fullName>
+                <default>false</default>
+                <label>Sample Order - TWN</label>
+            </value>
+            <value>
+                <fullName>Sample Order - Storeroom Request</fullName>
+                <default>false</default>
+                <label>Sample Order - Storeroom Request</label>
+            </value>
+            <value>
+                <fullName>Sample Order - MEX</fullName>
+                <default>false</default>
+                <label>Sample Order - MEX</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>
