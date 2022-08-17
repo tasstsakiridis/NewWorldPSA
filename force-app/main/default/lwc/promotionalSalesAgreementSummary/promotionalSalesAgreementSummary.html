@@ -24,11 +24,15 @@
                                 <table class="slds-m-left_x-small slds-m-top_small">
                                     <tr>
                                         <td class="col1"><h4>{labels.start.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-date-time value={startDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time></td>
+                                        <td class="col2"><!--<lightning-formatted-date-time value={startDate} year="numeric" day="2-digit" month="long" weekday="long" time-zone={timeZone}></lightning-formatted-date-time>-->
+                                            {formattedStartDate}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td class="col1"><h4>{labels.end.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-date-time value={endDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time></td>
+                                        <td class="col2"><!--<lightning-formatted-date-time value={endDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time>-->
+                                            {formattedEndDate}
+                                        </td>
                                     </tr>
                                     <template if:true={showNumberOfQuarters}>
                                         <tr>
@@ -89,7 +93,7 @@
                                         <tr>
                                             <td class="col1"><h4>{labels.planned.label}</h4></td>
                                             <td class="col2"><lightning-formatted-number value={totalFreeGoodsPlanned} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
-                                            <td class="col3"><h4>(<lightning-formatted-number value={totalFreeGoodsCost} type="currency" maximum-fraction-digits="2"></lightning-formatted-number></h4></td>
+                                            <td class="col3"><h4><lightning-formatted-number value={totalFreeGoodsCost} type="currency" maximum-fraction-digits="2"></lightning-formatted-number></h4></td>
                                         </tr>
                                         <tr>
                                             <td class="col1"><h4 style="text-transform:capitalize;">{labels.actual.label}</h4></td>

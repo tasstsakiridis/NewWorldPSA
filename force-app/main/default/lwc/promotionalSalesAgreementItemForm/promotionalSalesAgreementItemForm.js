@@ -281,7 +281,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             this.discountPercent = value.data.Plan_Rebate_Percentage__c || 0;
 
             let freeGoodsVolume = value.data.Free_Bottle_Quantity__c || 0;
-            this.freeGoodGivenDate = value.data.Free_Goods_Given_Date__c || null;
+            //this.freeGoodGivenDate = value.data.Free_Goods_Given_Date__c || null;
 
             let volume = value.data.Plan_Volume__c || 0;
             if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
@@ -382,7 +382,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
 
     get canDelete() {
-        return (!this.isApproved && this.psaItem != undefined);
+        console.log('[psaItemForm.canDelete] isApproved, psaItemId', this.isApproved, this.psaItemId);
+        return (!this.isApproved && this.psaItemId != undefined);
         //return this.psaItem != undefined;
     }
     get isDisabled() {
@@ -548,7 +549,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         let v1 = this.volumeForecast * (this.discountPercent / 100);
         let v2 = parseInt(v1);
         let v3 = v1 - v2;
-        let v = v3 <= 0.5 ? v2 : v1;
+        let v = v3 <= 0.5 ? v2 : Math.round(v1);
         console.log('[psaItemForm.planRebateVolume] v, v1, v2, v3', v, v1, v2, v3);
         return v;
     }
@@ -1035,7 +1036,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                     fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;   
                     fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
-                    fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
+                    //fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
                     fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
                 }
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = this.psaItem.Plan_Volume__c;
@@ -1051,7 +1052,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                 fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;    
                 fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
-                fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
+                //fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
                 fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
 
                 fields[FIELD_PREVIOUS_PLAN_VOLUME.fieldApiName] = volume;

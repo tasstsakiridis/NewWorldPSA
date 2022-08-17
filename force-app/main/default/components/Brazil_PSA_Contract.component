@@ -1,4 +1,4 @@
-<apex:component layout="none" access="global" controller="Brazil_PSA_Contract_Controller" >
+<apex:component layout="none" access="global" controller="Brazil_PSA_Contract_Controller" language="pt_BR">
     <apex:attribute name="psa" description="the activity record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
     
 <html>
@@ -951,14 +951,33 @@
                 <ul style="font-size: 10pt;">
                     <apex:repeat value="{!psaApprovalHistory.items}" var="h" id="approvalHistory">
                         <li>
-                        <apex:outputText value="Criado por: {0} em {1, date, dd/MM/yyyy}" rendered="{!h.Status=='Started'}">
+                        <apex:outputText value="Criado por: {0} em {1}" rendered="{!h.Status=='Started'}">
                             <apex:param value="{!h.Actor}" />
-                            <apex:param value="{!h.RawCompletedDate}" />
+                            <apex:param value="{!h.CompletedDate}" />
                         </apex:outputText>
-                        <apex:outputText value="Aprovado por {0} por {1} em {2, date, dd/MM/yyyy}" rendered="{!h.Status!='Started'}">
+                        <apex:outputText value="{3} por {0} por {1} em {2}" rendered="{!h.Status=='Submitted'}">
                             <apex:param value="{!h.ActorRole}" />
                             <apex:param value="{!h.Actor}" />
-                            <apex:param value="{!h.RawCompletedDate}" />
+                            <apex:param value="{!h.CompletedDate}" />
+                            <apex:param value="{!$Label.Submitted}" />
+                        </apex:outputText>
+                        <apex:outputText value="{3} por {0} por {1} em {2}" rendered="{!h.Status=='Approved'}">
+                            <apex:param value="{!h.ActorRole}" />
+                            <apex:param value="{!h.Actor}" />
+                            <apex:param value="{!h.CompletedDate}" />
+                            <apex:param value="{!$Label.Approved}" />
+                        </apex:outputText>
+                        <apex:outputText value="{3} por {0} por {1} em {2}" rendered="{!h.Status=='Rejected'}">
+                            <apex:param value="{!h.ActorRole}" />
+                            <apex:param value="{!h.Actor}" />
+                            <apex:param value="{!h.CompletedDate}" />
+                            <apex:param value="{!$Label.Rejected}" />
+                        </apex:outputText>
+                        <apex:outputText value="{3} por {0} por {1} em {2}" rendered="{!h.Status=='Pending'}">
+                            <apex:param value="{!h.ActorRole}" />
+                            <apex:param value="{!h.Actor}" />
+                            <apex:param value="{!h.CompletedDate}" />
+                            <apex:param value="{!$Label.Pending_Approval}" />
                         </apex:outputText>
                         </li>
                     </apex:repeat>

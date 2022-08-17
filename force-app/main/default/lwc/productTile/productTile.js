@@ -87,12 +87,10 @@ export default class ProductTile extends LightningElement {
     }
 
     get psaItemSummary() {
-        console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
-        console.log('[productTile] product', this.product == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.product)));
-        console.log('[productTile] captureVolumeInBottles', this.captureVolumeInBottles);
+        //console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
+        //console.log('[productTile] product', this.product == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.product)));
         if (this.psaItem) {            
             let str = '';
-            console.log('[productTile] planVolume, proposed volume', this.psaItem.Plan_Volume__c, this.psaItem.Proposed_Plan_Volume__c);
             if (this.psaItem.Plan_Volume__c != undefined) { 
                 if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
                     if (this.captureVolumeInBottles) {
@@ -108,8 +106,7 @@ export default class ProductTile extends LightningElement {
                     }
                 }
             }
-            console.log('[productTile] planRebate, proposed rebate', this.psaItem.Plan_Rebate__c, this.psaItem.Proposed_Plan_Rebate__c);
-            console.log('[productTile] calcSplit', this.calcSplit);
+
             if (this.psaItem.Plan_Rebate__c != undefined) { 
                 if (this.calcSplit) {
                     str += ' @ <b>' + this.psaItem.CurrencyIsoCode + ' ' + parseFloat(this.psaItem.Product_Split__c).toFixed(2) + '</b> ' + LABEL_SPLIT;
@@ -151,17 +148,15 @@ export default class ProductTile extends LightningElement {
     }
     handlePSAUpdate(detail) {
         try {
-        if (detail.psaItemId === this.psaItem.Id) {   
-            console.log('[producttile.handlepsaupdated] detail', detail, this.psaItem);
-            const newItem = Object.assign({}, this.psaItem);                     
-            newItem.Plan_Rebate__c = detail.discount;
-            newItem.Plan_Volume__c = detail.volume;
-            newItem.Total_Investment__c = detail.totalInvestment;
-            newItem.Proposed_Plan_Volume__c = detail.proposedVolume;
-            newItem.Proposed_Plan_Rebate__c = detail.proposedRebate;
-            this.psaItem = Object.assign({}, newItem);
-            console.log('[producttile.handlepsaupdated] psaitem', this.psaItem);
-        }
+            if (detail.psaItemId === this.psaItem.Id) {   
+                const newItem = Object.assign({}, this.psaItem);                     
+                newItem.Plan_Rebate__c = detail.discount;
+                newItem.Plan_Volume__c = detail.volume;
+                newItem.Total_Investment__c = detail.totalInvestment;
+                newItem.Proposed_Plan_Volume__c = detail.proposedVolume;
+                newItem.Proposed_Plan_Rebate__c = detail.proposedRebate;
+                this.psaItem = Object.assign({}, newItem);
+            }
         }catch(ex) {
             console.log('[producttile.handlepsaupdated] exception', ex);
         }
@@ -171,21 +166,19 @@ export default class ProductTile extends LightningElement {
         event.preventDefault();
 
         try {
-        console.log('[productTile.handleClick] product', this.product.Id, this.psaItem);
-        this.isSelected = !this.isSelected;
-        this.setTileClass();
-        
-        const selectedEvent = new CustomEvent('selected', {
-            detail: { productId: this.product.Id, productName: this.product.Name, psaItemId: this.psaItemId }
-        });
-        this.dispatchEvent(selectedEvent);
+            this.isSelected = !this.isSelected;
+            this.setTileClass();
+            
+            const selectedEvent = new CustomEvent('selected', {
+                detail: { productId: this.product.Id, productName: this.product.Name, psaItemId: this.psaItemId }
+            });
+            this.dispatchEvent(selectedEvent);
         }catch(ex) {
             console.log('[producttile.handleclick] exception', ex);
         }
     }
 
     setTileClass() {
-        console.log('[productTile.selectTile] isselected', this.isSelected);
         if (this.keepSelection && this.isSelected) {
             this.tileClass = 'selected';
         } else {

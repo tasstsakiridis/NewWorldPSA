@@ -59,6 +59,7 @@ public with sharing class Brazil_PSA_Contract_Controller {
 
         ApprovalHistory history = new ApprovalHistory();
         DateTime completedDate;
+        String formattedCompletedDate;
 
         List<ProcessInstance> piList = [SELECT Id, CreatedDate, TargetObjectid, Status, ElapsedTimeInDays, ElapsedTimeInHours, ElapsedTimeInMinutes, 
                                             (SELECT Id, CreatedDate, StepStatus, Comments, Actor.Name, Actor.UserRole.Name, Actor.Title, ElapsedTimeInDays, ElapsedTimeInHours, 
@@ -79,11 +80,15 @@ public with sharing class Brazil_PSA_Contract_Controller {
                         System.debug('actor: ' + pi.StepsAndWorkItems[i].Actor.Name + ', status: ' + pi.StepsAndWorkItems[i].StepStatus);
 
                         completedDate = pi.StepsAndWorkItems[i].CreatedDate;
+                        formattedCompletedDate = getFormattedDate(pi.StepsAndWorkItems[i].CreatedDate.date());
                         //if (pi.StepsAndWorkItems[i].ElapsedTimeInMinutes != null) {
                         //    completedDate = pi.CreatedDate.addMinutes((Integer)pi.StepsAndWorkItems[i].ElapsedTimeInMinutes);
                         //}
 
-                        history.items.add(new ApprovalHistoryItem(pi.StepsAndWorkItems[i].Actor.Name, pi.StepsAndWorkItems[i].StepStatus, pi.StepsAndWorkItems[i].Comments, completedDate, pi.StepsAndWorkItems[i].Actor.Title));
+                        System.debug('[PSA_Contract_Controller] status: ' + pi.StepsAndWorkItems[i].StepStatus);
+                        ApprovalHistoryItem ahi = new ApprovalHistoryItem(pi.StepsAndWorkItems[i].Actor.Name, pi.StepsAndWorkItems[i].StepStatus, pi.StepsAndWorkItems[i].Comments, pi.StepsAndWorkItems[i].CreatedDate, formattedCompletedDate, pi.StepsAndWorkItems[i].Actor.Title, '');
+                        System.debug('[PSA_Contract_Controller] history item: ' + ahi);
+                        history.items.add(ahi);
                     }                    
                 }
             }

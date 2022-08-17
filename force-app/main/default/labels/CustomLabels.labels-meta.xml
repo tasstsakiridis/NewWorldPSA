@@ -216,4 +216,36 @@
         <shortDescription>PreDated Error</shortDescription>
         <value>You cannot select a date that has passed.</value>
     </labels>
+    <labels>
+        <fullName>Approved</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Approved</shortDescription>
+        <value>Approved</value>
+    </labels>
+    <labels>
+        <fullName>Pending_Approval</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Pending Approval</shortDescription>
+        <value>Pending Approval</value>
+    </labels>
+    <labels>
+        <fullName>Rejected</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rejected</shortDescription>
+        <value>Rejected</value>
+    </labels>
+    <labels>
+        <fullName>Submitted</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Submitted</shortDescription>
+        <value>Submitted</value>
+    </labels>
 </CustomLabels>

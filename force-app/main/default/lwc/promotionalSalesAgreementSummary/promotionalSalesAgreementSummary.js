@@ -2,6 +2,9 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 
+import LOCALE from '@salesforce/i18n/locale';
+import TIMEZONE from '@salesforce/i18n/timeZone';
+
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
@@ -70,6 +73,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         volume:                 { label: LABEL_VOLUME },
         working:                { message: LABEL_WORKING }
     };
+    
+    locale = LOCALE;
+    timeZone = TIMEZONE;
     
     @api 
     psaId;
@@ -194,10 +200,42 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         return this.thePSA == undefined ? '' : this.thePSA.Name;
     }
     get startDate() {
+        console.log('[summary.startDate] timezone', this.timeZone);
         return this.thePSA == undefined ? null : this.thePSA.Begin_Date__c;
+    }
+    get formattedStartDate() {
+        console.log('[summary.formattedStartDate] startdate', this.startDate);
+        let sdate = new Date();
+        if (this.startDate) {
+            const dateParts = this.startDate.split('-');
+            const year = dateParts[0];
+            const month = dateParts[1] - 1;
+            const day = dateParts[2];
+            console.log('[summary.formattedStartDate] dateParts, year, month, day', dateParts, year, month, day);
+
+            sdate = new Date(year, month, day);
+        }
+        console.log('[summary.formattedStartDate] sdate', sdate);
+        //return day + '-' + month + '-' + year;
+        return sdate.toLocaleDateString(LOCALE, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
     }
     get endDate() {
         return this.thePSA == undefined ? null : this.thePSA.End_Date__c;
+    }
+    get formattedEndDate() {
+        console.log('[summary.formattedEndDate] enddate', this.endDate);
+        let sdate = new Date();
+        if (this.endDate) {
+            const dateParts = this.endDate.split('-');
+            const year = dateParts[0];
+            const month = dateParts[1] - 1;
+            const day = dateParts[2];
+            console.log('[summary.formattedEndDate] dateParts, year, month, day', dateParts, year, month, day);
+
+            sdate = new Date(year, month, day);
+        }
+        console.log('[summary.formattedStartDate] sdate', sdate);
+        return sdate.toLocaleDateString(LOCALE, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
     }
     get totalFreeGoodsPlanned() {
         return parseInt(this.thePSA.Total_Free_Bottle_Quantity__c);
