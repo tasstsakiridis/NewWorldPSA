@@ -1,3 +1,6 @@
+/*
+ * Test Class:  PromotionalSalesAgreementController_Test
+ */
 public class SelectableItem {
     @AuraEnabled
     public Object item { get; set; }

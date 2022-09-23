@@ -251,6 +251,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     captureActivityType = false;
     agreementRequiresWholesaler = false;
     configurePayments = false;
+    allAccountsSelected = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -441,7 +442,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.thePSA != null;
     }
     get hasPreview() {
-        return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
+        return this.market == undefined || (this.market != undefined && this.market.Enable_PSA_Preview__c == true);
     }
     get isLocked() {
         if (this.thePSA == undefined) {
@@ -611,6 +612,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         console.log('[signingCustomerName] name',name);
         return name;
+    }
+    get signingCustomerEmail() {
+        let email = '';
+        if (this.signingCustomer) {
+            email = this.signingCustomer.Email == undefined ? '' : this.signingCustomer.Email;
+        }
+
+        return email;
     }
     get hasMultipleSigningContacts() {
         var hasMultiple = false;
@@ -928,6 +937,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[handleStartDateChange] startdate', this.startDate);
         console.log('[handleStartDateChange] event.date', ev.detail.value);
 
+        this.calcEndDate();
         this.hasStartDateError = false;
         if (!this.canPreDatePSA) {
             const today = new Date();
@@ -1255,7 +1265,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[getAgreement] psa', this.thePSA);
             this.psaId = data.Id;
             this.recordTypeId = data.RecordTypeId;
-            this.allAccountSelected = data.All_Child_Accounts_Included;
+            this.allAccountsSelected = data.All_Child_Accounts_Included;
             if (data.Account__c) {
                 this.parentAccount = {
                     Id: data.Account__c,
@@ -1317,6 +1327,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             }
             if (data.End_Date__c) {
                 this.endDate = data.End_Date__c;
+            } else {
+                this.calcEndDate();
             }
             if (data.Is_Length_in_Years__c != undefined) {
                 this.isLengthInYears = data.Is_Length_in_Years__c;
@@ -1332,7 +1344,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
             this.selectedAccounts.clear();
             this.promotionsToDelete.clear();
-                        
+                      
             if (data.Promotions__r != undefined && data.Promotions__r.length > 0) {
                 if (this.isPhone && this.isThisTass) {
                     alert('[psa.loadpsadetails] # of promotions', data.Promotions__r.length);
@@ -1383,6 +1395,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     alert('[psa.loadpsadetails] no promotions for this psa');
                 }    
             }
+            
         }catch(ex) {
             console.log('[getPSA] exception', ex);
         }
@@ -1723,15 +1736,15 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         
         param.beginDate = this.startDate;
         param.endDate = this.endDate;
-        param.lengthOfPSA = this.lengthOfPSA;
+        param.lengthOfPSA = parseInt(this.lengthOfPSA);
         param.isLengthInYears = this.isLengthInYears;
-        param.numberOfPayments = this.numberOfPayments;
+        param.numberOfPayments = parseInt(this.numberOfPayments);
         param.parentAccountId = this.parentAccount.Id;
-        param.allChildAccountsIncluded = this.allAccountSelected;
+        param.allChildAccountsIncluded = this.allAccountsSelected;
         param.signingCustomerId = this.signingCustomer.Id;
         param.signingCustomerName = this.signingCustomerName;
-        param.signingCustomerEmail = this.signingCustomer.Email;
-        param.comments = this.comments;
+        param.signingCustomerEmail = this.signingCustomerEmail;
+        param.comments = this.comments == undefined ? '' : this.comments;
         param.wholesalerPreferredId = this.wholesalerPreferred;
         param.mpoPrestige = this.isMPOPrestige;
         param.limitToSelectedAccounts = this.limitToSelectedAccounts;
@@ -1755,10 +1768,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('wa', wa);
             param.wholesalerAlternateName = wa.label;    
         }
-        param.purchaseOrder = this.purchaseOrder;
+        param.purchaseOrder = this.purchaseOrder == undefined ? '' : this.purchaseOrder;
         param.status = this.status;
-        param.totalBudget = this.totalBudget;
-        param.percentageVisibility = this.percentageVisibility;
+        param.totalBudget = this.totalBudget == undefined ? 0 : this.totalBudget;
+        param.percentageVisibility = this.percentageVisibility == undefined ? 0 : this.percentageVisibility;
         param.paymentConfigurations = '';
         console.log('paymentConfigurations', this.paymentConfigs);
         if (this.paymentConfigs.length > 0) {
@@ -1774,7 +1787,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             param.paymentConfigurations = param.paymentConfigurations.slice(0, -1);
             console.log('[save] payment configurations', param.paymentConfigurations);
         }
-
+        
         param.accounts = [];
         param.accountsToDelete = [];
         

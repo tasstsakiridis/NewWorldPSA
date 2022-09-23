@@ -17,6 +17,7 @@ import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_END_DATE from '@salesforce/label/c.End_Date';
 import LABEL_DISCOUNTPERCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
+import LABEL_FREE_GOODS_COST from '@salesforce/label/c.Free_Goods_Cost';
 import LABEL_FREE_GOODS_GIVEN from '@salesforce/label/c.Free_Goods_Given';
 import LABEL_GROSS_PROFIT from '@salesforce/label/c.Gross_Profit';
 import LABEL_LISTING_FEE from '@salesforce/label/c.Listing_Fee';
@@ -89,6 +90,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
         { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'freeGoodsGiven', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_FREE_GOODS_COST, fieldName: 'freeGoodsCost', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','United Kingdom']},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
@@ -531,7 +533,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     rebatePercent: (parseFloat(pmi.Plan_Rebate_Percentage__c)/100),
                     totalPSAGP: parseFloat(pmi.Plan_PSA_Gross_Profit__c),
                     payment: parseFloat(pmi.Total_Payments_Paid__c),
-                    productSplit: parseFloat(pmi.Product_Split__c)
+                    productSplit: parseFloat(pmi.Product_Split__c),
+                    freeGoodsCost: parseFloat(pmi.PSA_Free_Bottle_Cost__c == undefined ? 0 : pmi.PSA_Free_Bottle_Cost__c).toFixed(2)
                 });
             });
         }
@@ -605,6 +608,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 row.totalPSAGP = pmi.totalPSAGP;
                 row.payment = pmi.payment;
                 row.productSplit = pmi.productSplit;
+                row.freeGoodsCost = pmi.freeGoodsCost;
 
                 row.quartersCaptured = 0;  // Need to calculate or capture how many quarters are captured
                 row.listingFeeBalance = row.listingFee - row.listingFeePaid;

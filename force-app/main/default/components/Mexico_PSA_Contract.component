@@ -24,18 +24,6 @@
                 font-size: 14pt;
                 font-weight: bold;
             }
-            
-            @media screen {
-                .highlight-text {
-                    background-color: yellow;
-                }
-            }
-            
-            @media print {
-                .no_print {
-                    display: none;
-                }
-            }
 
             .table-bordered {
                 width: 100%;
@@ -253,6 +241,10 @@
             .segment-header span {
                 margin-left: 10px;
             }
+            .segment-header-title {
+                color: white; 
+                font-size: 10pt;
+            }
             .segment-sub-header {
                 background-color: #cf9372;
                 border-radius: 3px;
@@ -277,6 +269,56 @@
                 padding: 0;
                 margin: 0;
             }
+            .payments-table {
+                width: 200px; 
+                font-size: 10pt;
+            }
+            .must-stock-products {
+                font-size: 10pt;
+            }
+            
+            @media screen {
+                .highlight-text {
+                    background-color: yellow;
+                }
+                .segment-header-title {
+                    font-size: 12pt;
+                }
+                .segment-sub-header-title {
+                    font-size: 11pt;
+                }
+                .segment-detail-item-header {
+                    font-size: 11pt;
+                }
+                .segment-detail-item-text {
+                    font-size: 12pt;
+                }
+                .table-bordered-th {
+                    font-size: 11pt;
+                }
+                .table-bordered-td {
+                    font-size: 12pt;
+                }
+                .bf-table {
+                    font-size: 12pt;
+                }
+                .small-font {
+                    font-size: 10pt;
+                }
+                .payments-table {
+                    font-size: 12pt;
+                }
+                .must-stock-products {
+                    font-size: 12pt;
+                }
+            }
+            
+            @media print {
+                .no_print {
+                    display: none;
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -301,7 +343,7 @@
                     </td>
                     <td>
                         <p align="justify" class="bf segment-detail-item-header">
-                            <apex:outputText value="Fecha de inicio: {0} - {1}" styleClass="highlight-text segment-detail-item-text">
+                            <apex:outputText value="Fecha de inicio: {0, date, dd MMM yyyy} - {1, date, dd MMM yyyy}" styleClass="highlight-text segment-detail-item-text">
                                 <apex:param value="{!thePSA.Begin_Date__c}" />
                                 <apex:param value="{!thePSA.End_Date__c}" />
                             </apex:outputText>
@@ -343,8 +385,8 @@
                         </p>
                     </td>
                     <td>
-                        <p class="segment-detail-item-header">Domicilio:</p>
-                        <ul class="no-bullet">
+                        <p class="highlight-text segment-detail-item-header">Domicilio:</p>
+                        <ul class="highlight-text no-bullet">
                             <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingStreet}</li>
                             <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingCity}</li>
                             <li class="segment-detail-item-text">{!thePSA.Account__r.ShippingPostalCode}</li>
@@ -356,12 +398,12 @@
         </table>
 
         <div class="segment-header">
-            <span style="color: white; font-size: 10pt;">COMPROMISOS BROWN-FORMAN MÉXICO</span>            
+            <span class="segment-header-title">COMPROMISOS BROWN-FORMAN MÉXICO</span>            
         </div>
         <div class="segment-sub-header">
-            <span>Bonificaciones ({!numberOfProducts} productos)</span>
+            <span class="segment-sub-header-title">Bonificaciones ({!numberOfProducts} productos)</span>
         </div>
-        <table style="border: 1px solid #999; border-collapse: collapse;">
+        <table class="bf-table" style="border: 1px solid #999; border-collapse: collapse;">
             <thead>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 10%;">#</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 30%;">Producto</th>
@@ -370,7 +412,7 @@
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">A bonificar</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 20%;">Importe</th>
             </thead>
-            <tbody>
+            <tbody class="hightlight-text">
                 <apex:repeat value="{!promotionMaterialItems}" var="pmi" id="promotionMaterialItems">
                     <tr>
                         <td style="border: 1px solid #999; border-collapse: collapse; font-size: 10pt;">{!pmi.index}</td>
@@ -418,28 +460,39 @@
             </tbody>
         </table>
         <div class="small-font">
-            <ul class="no-bullet">
-            <li>* Compra esperada durante la vigencia del convenio.</li>
-            <li>* Los chequebonos por bonificación serán dirigidos para canje exclusivamentes
-                con el mayorista autorizado con quien se realice la compra.</li>
-            <li>* Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente a compras que previamente no hayan obtenido un beneficio
-                que impacte en precio como descuentos, precio especial, expos, combos, ofertas armadas, paquetes promocionales etc.</li>
-            <li>* Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y una vez pasado este tiempo perderá su validez.</li>
+            <apex:outputPanel rendered="{!thePSA.Activity_Type__c == 'Coupon'}">
+            <ul class="no-bullet">            
+                <li>* Compra esperada durante la vigencia del convenio.</li>
+                <li>* Los chequebonos por bonificación serán dirigidos para canje exclusivamentes
+                    con el mayorista autorizado con quien se realice la compra.</li>
+                <li>* Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente a compras que previamente no hayan obtenido un beneficio
+                    que impacte en precio como descuentos, precio especial, expos, combos, ofertas armadas, paquetes promocionales etc.</li>
+                <li>* Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y una vez pasado este tiempo perderá su validez.</li>
+                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estará vigente durante la vigencia del convenio, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del convenio vigente  y/o creación de uno nuevo</li>
             </ul>
+            </apex:outputPanel>
+
+            <apex:outputPanel rendered="{!thePSA.Activity_Type__c == 'Direct Rebate'}">
+            <ul class="no-bullet">            
+                <li>* Compra esperada durante la vigencia del convenio</li>
+                <li>* El % de bonificación es equivalente al porcentaje de descuento y este descuento será proporcionado directamente por el mayorista autorizado</li>
+                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estará vigente durante la vigencia del convenio, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del convenio vigente  y/o creación de uno nuevo</li>
+            </ul>
+            </apex:outputPanel>
         </div>
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Patrocinio en efectivo</span>
+            <span class="segment-header-title">Patrocinio en efectivo</span>
         </div>
         <div>
-            <apex:outputText value="+ Valor total en patrocinio: $ {0, number, #,##0.00}">
-                <apex:param value="{!thePSA.Total_Listing_Fee__c}" />
+            <apex:outputText value="+ Valor total en patrocinio: $ {0, number, #,##0.00}" styleClass="highlight-text">
+                <apex:param value="{!totalListingFee}" />
             </apex:outputText>
         </div>     
         <div>
-            <apex:outputText value="Parcialidades ({0})">
+            <apex:outputText value="Parcialidades ({0})" styleClass="highlight-text">
                 <apex:param value="{!thePSA.Number_of_Payments__c}" />
             </apex:outputText>
-            <table style="width: 200px; font-size: 10pt;">
+            <table class="payments-table highlight-text">
                 <apex:repeat value="{!payments}" var="p">
                     <tr>
                         <td style="width: 75px;">{!p.paymentNumber}</td>
@@ -453,22 +506,52 @@
             </table>
         </div> 
 
+        <apex:outputPanel rendered="{!totalPromotionalActivity > 0}">
+            <div class="segment-header" style="margin-top: 10px;">
+                <span class="segment-header-title">ACTIVIDADES PROMOCIONALES</span>
+            </div>
+            <apex:outputText value="Parcialidades ($ {0, number, #,##0.00})" styleClass="highlight-text">
+                <apex:param value="{!totalPromotionalActivity}" />
+            </apex:outputText>
+
+            <table class="payments-table highlight-text" style="width: 100%;">
+                <apex:repeat value="{!promotionalActivityItems}" var="pmi">
+                    <tr>
+                        <td style="width: 35%;">
+                            <apex:outputText value="{0}" styleClass="highlight-text">
+                                <apex:param value="{!pmi.productName}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td style="width: 25%;">
+                            <apex:outputText value="$ {0, number, #,##0.00}" styleClass="highlight-text">
+                                <apex:param value="{!pmi.value}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td style="width: 40%;">
+                            <apex:outputText value="{!pmi.selectedValues}" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+
+        </apex:outputPanel>
+
         <div class="segment-header" style="color: white; margin-top: 10px;">
-            <span>Apoyo en producto</span>
+            <span class="segment-header-title">Apoyo en producto</span>
         </div>  
         <div class="segment-sub-header">
-            <span>
-            <apex:outputText value="Apoyos ({0})">
-                <apex:param value="{!numberOfProducts}" />
-            </apex:outputText>
+            <span class="segment-sub-header-title highlight-text">
+                <apex:outputText value="Apoyos ({0})">
+                    <apex:param value="{!numberOfProducts}" />
+                </apex:outputText>
             </span>
         </div>
-        <table style="width: 100%; font-size: 10pt;">
+        <table class="payments-table highlight-text" style="width: 100%;">
             <apex:repeat value="{!promotionMaterialItems}" var="pmi">
                 <tr>
-                    <td style="width: 25%;">
-                        <apex:outputText value="{0, date, dd MMM yyyy}" styleClass="highlight-text">
-                            <apex:param value="{!pmi.freeGoodsGivenDate}" /> 
+                    <td style="width: 35%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
                         </apex:outputText>
                     </td>
                     <td style="width: 25%;">
@@ -476,7 +559,7 @@
                             <apex:param value="{!pmi.freeBottleCost}" />
                         </apex:outputText>
                     </td>
-                    <td style="width: 50%;">
+                    <td style="width: 40%;">
                         <apex:outputText value="{!pmi.freeGoodsReason}" />
                     </td>
                 </tr>
@@ -484,117 +567,170 @@
         </table>
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>COMPROMISOS CENTRO DE CONSUMO</span>
+            <span class="segment-header-title">COMPROMISOS CENTRO DE CONSUMO</span>
         </div>
         <div class="segment-sub-header">
-            <span>
+            <span class="segment-sub-header-title">
                 <apex:outputText value="Disponibilidad ({0} productos)">
                     <apex:param value="{!numberOfMustStockProducts}" />
                 </apex:outputText>
             </span>
         </div>
         <apex:repeat value="{!mustStockProducts}" var="msp">
-            <p style="font-size: 10pt;">{!msp.Product_Name__c}</p>
+            <p class="must-stock-products highlight-text">{!msp.Product_Name__c}</p>
         </apex:repeat>
 
         <p class="small-font">* Los productos señalados deberán estar catalogados, disponibles a la venta y listado en los menús del establecimiento.</p>
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Precios</span>
+            <span class="segment-header-title">Precios</span>
         </div>
         <p class="small-font">+ Alineación de precios de marcas Brown-Forman contra set competitivo</p>
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Visibilidad de marca</span>
+            <span class="segment-header-title">Drink Strategy</span>
         </div>
-        <p class="small-font">+ Material temporal</p>
+        <table class="payments-table highlight-text" style="width: 100%;">
+            <apex:repeat value="{!drinkStrategyItems}" var="pmi">
+                <tr>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.selectedValues}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
+
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Visibilidad de producto</span>
+            <span class="segment-header-title">Visibilidad de marca</span>
         </div>
-        <ul class="no-bullet small-font">
-            <li>+ Exhibiciones barra / contrabarra</li>
-            <li>+ Otras exhibiciones</li>
-        </ul>
+        <table class="payments-table highlight-text" style="width: 100%;">
+            <apex:repeat value="{!brandVisibilityItems}" var="pmi">
+                <tr>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.selectedValues}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Drinking Strategy</span>
+            <span class="segment-header-title">Visibilidad de producto</span>
         </div>
-        <ul class="no-bullet small-font">
-            <li>+ Ad-Hoc</li>
-            <li>+ Seasonal</li>
-        </ul>
+        <table class="payments-table highlight-text" style="width: 100%;">
+            <apex:repeat value="{!productVisibilityItems}" var="pmi">
+                <tr>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.selectedValues}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
 
+        <!--
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Actividades de marca</span>
+            <span class="segment-header-title">Actividades de marca</span>
         </div>
         <ul class="no-bullet small-font">
             <li>+ Activaciones</li>
             <li>+ Degustaciones</li>
             <li>+ Promociones a consumidor</li>
         </ul>
-
+        -->
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Capacitaciones de marca</span>
+            <span class="segment-header-title">Capacitaciones de marca</span>            
         </div>
-        <p class="small-font">+ Permitir capacitaciones a tripulaciones /staff</p>
+        <table class="payments-table highlight-text" style="width: 100%;">
+            <apex:repeat value="{!trainingAndAdvocacyItems}" var="pmi">
+                <tr>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.selectedValues}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
 
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Actividades de marca</span>
+            <span class="segment-header-title">Actividades de marca</span>
         </div>
         <p class="small-font">+ Permitir incentivar a tripulaciones / staff</p>
 
+        <p class="small-font">Los incentivos se administrarán a través de la plataforma “Gana Más” y son temporales, BF informará al cliente cuando sean realizados</p>
+
         <div class="segment-header" style="margin-top: 10px;">
-            <span>Compromisos adicionales del Centro de Consumo</span>
+            <span class="segment-header-title">Información del centro del consumo</span>
+        </div>
+        <table class="payments-table highlight-text" style="width: 100%;">
+            <apex:repeat value="{!outletToProvideItems}" var="pmi">
+                <tr>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{0}" styleClass="highlight-text">
+                            <apex:param value="{!pmi.productName}" /> 
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 50%;">
+                        <apex:outputText value="{!pmi.selectedValues}" />
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span class="segment-header-title">Notas adicionales al acuerdo comercial</span>
+        </div>
+        <p>{!comments}</p>        
+
+        <div class="segment-header" style="margin-top: 10px;">
+            <span class="segment-header-title">Compromisos adicionales del Centro de Consumo</span>
         </div>
 
         <table>
             <tbody>
                 <td width="60%" style="border-right: 1px solid #999;">
-                    <p class="small-font">En los casos que por remodelación, clausura o cierre temporal del centro de consumo al que corresponde
-este acuerdo comercial, y que como consecuencia los términos del presente acuerdo no pudieran ser
-aplicables a dicho centro de consumo, el centro de consumo se obliga a notificar inmediatamente al
-ejecutivo. El ejecutivo decidirá discrecionalmente la reasignación de recursos en una de las siguientes
-alternativas: (i) reasignar los recursos pactados en la parte proporcional que aún no se haya aplicado, en
-el presente acuerdo a un centro de consumo perteneciente al mismo grupo; o (ii) la devolución de los
-recursos pactados en la parte proporcional que aún no se haya aplicado a la fecha que
-corresponda.
-En caso de que el centro de consumo sea vendido o traspasado a un tercero, el ejecutivo tendrá facultad
-de decidir sobre la continuidad de la relación comercial con el nuevo dueño. En caso de que se decida la
-contraídas continuidad de la relación comercial con el nuevo dueño, el nuevo dueño asume las
-obligaciones en el presente acuerdo. En caso de que el ejecutivo decida no continuar con la relación
-comercial en dicho centro de consumo con el nuevo dueño, el centro de consumo se obliga a devolver los
-recursos pactados en la parte proporcional que aún no se haya aplicado a la fecha que corresponda;
-esta devolución deberá surtir efectos previo a que entre la nueva administración del centro de consumo.
-En caso de que se imposibilitara la ejecución parcial o total del presente acuerdo, o en caso de
-incumplimiento del mismo por parte del centro de consumo, BFTM podrá terminar el acuerdo mediante
-aviso por escrito dirigido al centro de consumo en el momento que se de dicha situación, en tal caso el
-centro de consumo devolverá de inmediato las cantidades que falten por amortizar por el apoyo brindado
-en efectivo así como devolverá todos aquellos materiales y productos que se encuentren en buen estado,
-no teniendo BFTM la obligación de cubrir ninguna cantidad o entrega de producto o material que falte
-por realizarse.
-El centro de consumo colaborará con BFTM proporcionando información y permitiendo visitas para
-confirmar el cumplimiento del presente acuerdo.
-Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente
-compras que previamente no hayan obtenido un beneficio que impacte en precio como descuentos,
-precio especial, expos, combos, ofertas armadas,paquetes promocionales etc.
-Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y
-una vez pasado este tiempo perderá su validez.
-Brown-Forman México se reserva el derecho de modificar cualquier campo del convenio con previo aviso.
-Brown-Forman México se reserva el derecho de modificar la forma de pago en bonificaciones con previo
-aviso.
-La empresa no se hace responsable por el mal uso de este documento
-Comentarios: 01-800-36-87-000 centrodeconsumo@b-f.com</p>
+                    <p class="small-font">En los casos que por remodelación, clausura o cierre temporal del centro de consumo al que corresponde este acuerdo 
+                    comercial, y que como consecuencia los términos del presente acuerdo no pudieran ser aplicables a dicho centro de consumo, el centro de 
+                    consumo se obliga a notificar inmediatamente al ejecutivo. BFTM decidirá discrecionalmente la reasignación de recursos en una de las 
+                    siguientes alternativas: (i) reasignar los recursos pactados en la parte proporcional que aún no se haya aplicado, en el presente acuerdo a 
+                    un centro de consumo perteneciente al mismo grupo; o (ii) la devolución de los recursos pactados en la parte proporcional que aún no se haya 
+                    aplicado a la fecha que corresponda. En caso de que el centro de consumo sea vendido o traspasado a un tercero, BFTM tendrá facultad de 
+                    decidir sobre la continuidad de la relación comercial con el nuevo dueño. En caso de que se decida la contraídas continuidad de la relación 
+                    comercial con el nuevo dueño, el nuevo dueño asume las obligaciones en el presente acuerdo. En caso de que BFTM decida no continuar con la 
+                    relación comercial en dicho centro de consumo con el nuevo dueño, el centro de consumo se obliga a devolver los recursos pactados en la parte 
+                    proporcional que aún no se haya aplicado a la fecha que corresponda; esta devolución deberá surtir efectos previo a que entre la nueva 
+                    administración del centro de consumo. En caso de que se imposibilitara la ejecución parcial o total del presente acuerdo, o en caso de 
+                    incumplimiento del mismo por parte del centro de consumo, BFTM podrá terminar el acuerdo mediante aviso por escrito dirigido al centro de 
+                    consumo en el momento que se de dicha situación, en tal caso el centro de consumo devolverá de inmediato las cantidades que falten por 
+                    amortizar por el apoyo brindado en efectivo así como devolverá todos aquellos materiales y productos que se encuentren en buen estado, no 
+                    teniendo BFTM la obligación de cubrir ninguna cantidad o entrega de producto o material que falte por realizarse. El centro de consumo 
+                    colaborará con BFTM proporcionando información y permitiendo visitas para confirmar el cumplimiento del presente acuerdo. Brown-Forman México 
+                    se reserva el derecho de modificar cualquier campo del convenio con previo aviso. Brown-Forman México se reserva el derecho de modificar la 
+                    forma de pago en bonificaciones con previo aviso. La empresa no se hace responsable por el mal uso de este documento.</p>
                 </td>
                 <td width="40%;">
                     <div style="margin-left: 15px; vertical-align: bottom;">
                         <div>
                             <p>___________________________________</p>
                             <p>{!ownerName}</p>
-                        </div>
-                        <div style="margin-top: 50px;">
-                            <p>___________________________________</p>
-                            <p>{!ownerManagerName}</p>
                         </div>
                         <div style="margin-top: 50px;">
                             <p>___________________________________</p>

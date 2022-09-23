@@ -19,7 +19,7 @@ public class PSA_Preview_Controller {
                                             Market__r.Promotion_Discount_Threshold__c, Reminder_Date__c, Next_Email_Date__c, Market__r.Capture_Volume_in_Bottles__c,
                                             Number_of_Payments__c, Activity_Budget__c, Market__r.Capture_PSA_Budget__c, Market__r.Calculate_PSA_Product_Split__c,
                                             Total_Planned_Spend__c, Total_Payments_Paid__c, Percentage_Visibility__c, Total_Volume_Bottles__c, Total_Actual_Volume_Bottles__c,
-                                            Market__r.Capture_End_Date__c,
+                                            Market__r.Capture_End_Date__c, Activity_Type__c, Payment_Configurations__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -49,5 +49,16 @@ public class PSA_Preview_Controller {
     
     public Promotion_Activity__c getPsa() {
         return psa;
+    }
+
+    public ApexPages.Component getPreviewComponent() {
+        if (psa != null) {
+           if (psa.Market__r.Name == 'Brazil') {
+                return new Component.c.Brazil_PSA_Contract(psa=this.psa);
+           } else if (psa.Market__r.Name == 'Mexico') {
+                return new Component.c.Mexico_PSA_Contract(psa=this.psa);
+           }
+        }
+        return null;
     }
 }

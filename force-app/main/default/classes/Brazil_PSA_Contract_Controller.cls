@@ -103,29 +103,29 @@ public with sharing class Brazil_PSA_Contract_Controller {
             Integer month = theDate.month();
             String monthName = '';
             if (month == 1) {
-                monthName = Label.January;
+                monthName = 'Janeiro';
             } else if (month == 2) {
-                monthName = Label.February;
+                monthName = 'Fevereiro';
             } else if (month == 3) {
-                monthName = Label.March;
+                monthName = 'Março';
             } else if (month == 4) {
-                monthName = Label.April;
+                monthName = 'Abril';
             } else if (month == 5) {
-                monthName = Label.May;
+                monthName = 'Maio';
             } else if (month == 6) {
-                monthName = Label.June;
+                monthName = 'Junho';
             } else if (month == 7) {
-                monthName = Label.July;
+                monthName = 'Julho';
             } else if (month == 8) {
-                monthName = Label.August;
+                monthName = 'Agosto';
             } else if (month == 9) {
-                monthName = Label.September;
+                monthName = 'Setembro';
             } else if (month == 10) {
-                monthName = Label.October;
+                monthName = 'Outubro';
             } else if (month == 11) {
-                monthName = Label.November;
+                monthName = 'Novembro';
             } else if (month == 12) {
-                monthname = Label.December;
+                monthname = 'Dezembro';
             }
             formattedDate = theDate.day() + ' de ' + monthName + ' de ' + theDate.year();
         }

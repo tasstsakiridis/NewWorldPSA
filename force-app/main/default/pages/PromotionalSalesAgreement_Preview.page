@@ -1,3 +1,4 @@
 <apex:page controller="PSA_Preview_Controller">
-    <c:Brazil_PSA_Contract psa="{!psa}"></c:Brazil_PSA_Contract>
+    <!--<c:Brazil_PSA_Contract psa="{!psa}"></c:Brazil_PSA_Contract>-->
+    <apex:dynamicComponent componentValue="{!previewComponent}" />
 </apex:page>

@@ -66,7 +66,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Market__c market = [SELECT Id, Name, Maximum_Agreement_Length__c, Capture_End_Date__c, Capture_Volume_in_Bottles__c, 
                                     Capture_Number_of_Payments__c, Capture_PSA_Budget__c, Calculate_PSA_Product_Split__c,
                                     Agreement_Requires_Wholesaler__c, Agreement_Configure_Payments__c, Enable_PSA_Actuals__c,
-                                    Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c 
+                                    Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c, Enable_PSA_Preview__c 
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -95,7 +95,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
                                             Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
                                             Contact__c, Contact__r.Name, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
-                                            Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
+                                            Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c, Market__r.Enable_PSA_Preview__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Volume__c, Total_Discount__c, Total_Investment__c, 
                                             Total_Listing_Fee__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy__c, Evaluation_Comments__c, Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, 
@@ -122,7 +122,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                     Proposed_Training_Advocacy_Value__c, Product_Pack_Qty__c, Product_Custom__r.Gross_Profit_per_Case__c, Product_Custom__r.Price_per_Case__c,
                                                     CurrencyISOCode, Product_Split__c, Total_Payments_Paid__c, Free_Bottle_Quantity__c, Free_Goods_Given_Date__c, Free_Goods_Reason__c, 
                                                     Brand_Visibility__c, Product_Visibility__c, Plan_Rebate_Percentage__c, Plan_Rebate_Liability__c, Plan_Rebate_Volume__c,
-                                                    Plan_PSA_Gross_Profit__c, Product_Custom__r.Gross_Profit_Flat_Case__c
+                                                    Plan_PSA_Gross_Profit__c, Product_Custom__r.Gross_Profit_Flat_Case__c, PSA_Free_Bottle_Cost__c
                                                     FROM Promotion_Material_Items__r), 
                                             (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Account__c, Account_Name__c, Act_Qty__c,
                                                     Approval_Status__c, Brand_Name__c, External_Key__c, Payment_Date__c, Period__c, RecordTypeId, 
@@ -414,9 +414,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static String savePSA(PSAWrapper psaData) {
         String msg = 'OK';
 
-        System.debug('[savePSA] psaData: ' + psaData);
         
         try {            
+            System.debug('[savePSA] psaData: ' + psaData);
             System.debug('[savePSA] psa Id: ' + psaData.id);
             System.debug('[savePSA] marketId: ' + psaData.marketId);
             System.debug('[savePSA] marketName: ' + psaData.marketName);
@@ -516,6 +516,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
             msg = 'SUCCESS';
         }catch(Exception ex) {
+            System.debug('[Save] exception: ' + ex.getMessage());
             msg = ex.getMessage();
         }
         
