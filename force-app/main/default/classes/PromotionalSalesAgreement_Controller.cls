@@ -305,7 +305,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             brandsSelected = brandsSelected.replaceAll(',', '\',\'');    
             soql += ' AND Brand__c IN (' + brandsSelected + ')';
         }
-        soql += ' WITH SECURITY_ENFORCED ORDER BY Name LIMIT :pageSize OFFSET :offset';
+        soql += ' ORDER BY Name LIMIT :pageSize OFFSET :offset';
         PagedResult result = new PagedResult();
         result.pageSize = pageSize;
         result.records = Database.query(soql);
