@@ -5,18 +5,18 @@
         </h3>
         <template if:false={isPhone}>
             <lightning-button-group slot="actions">
-                <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" disabled={isLocked} onclick={handleCancelButtonClick} ></lightning-button>
                 <template if:true={canEdit}>
-                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
+                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" disabled={isLocked} onclick={handleSaveButtonClick} ></lightning-button>
                 </template>
                 <template if:true={pmiRecords}>
                     <lightning-formatted-text value={multipleRecordsMessage} ></lightning-formatted-text>
-                    <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" onclick={handleSkipButtonClick}></lightning-button>
+                    <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" disabled={isLocked} onclick={handleSkipButtonClick}></lightning-button>
                     <template if:false={isFirstRecord}>
-                        <lightning-button label={labels.prev.label} icon-name="utility:left" title="Previous" class="" onclick={handlePreviousRecordButtonClick}></lightning-button>                        
+                        <lightning-button label={labels.prev.label} icon-name="utility:left" title="Previous" class="" disabled={isLocked} onclick={handlePreviousRecordButtonClick}></lightning-button>                        
                     </template>                    
                     <template if:false={isLastRecord}>
-                        <lightning-button label={labels.next.label} icon-name="utility:right" title="Next" class="" onclick={handleNextRecordButtonClick}></lightning-button>                        
+                        <lightning-button label={labels.next.label} icon-name="utility:right" title="Next" class="" disabled={isLocked} onclick={handleNextRecordButtonClick}></lightning-button>                        
                     </template>                    
                 </template>
                 <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
@@ -28,11 +28,11 @@
                     <lightning-layout-item size="12">
                         <lightning-layout>
                             <lightning-layout-item size="2">
-                                <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" disabled={isLocked} onclick={handleCancelButtonClick}></lightning-button-icon>
                             </lightning-layout-item>
                             <lightning-layout-item size="7" class="slds-text-align_center">
                                 <template if:true={canEdit}>
-                                    <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                                    <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" disabled={isLocked} onclick={handleSaveButtonClick}></lightning-button-icon>
                                 </template>
                             </lightning-layout-item>
                             <lightning-layout-item size="3">

@@ -77,6 +77,7 @@ import LABEL_GROSS_PROFIT from '@salesforce/label/c.Gross_Profit';
 import LABEL_PERCENTAGE_CHANGE_ERROR from '@salesforce/label/c.Percentage_Change_Error';
 import LABEL_INPUT_TEXT_PLACEHOLDER from '@salesforce/label/c.Input_Text_Placeholder';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
+import LABEL_INVALID_INTEGER from '@salesforce/label/c.Invalid_Integer';
 import LABEL_LIABILITY from '@salesforce/label/c.Liability';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
@@ -104,6 +105,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         freeGoodsGivenDate      : { label: LABEL_FREE_GOODS_GIVEN_DATE },
         freeGoodsReason         : { label: LABEL_FREE_GOOD_REASON },
         grossProfit             : { label: LABEL_GROSS_PROFIT },
+        invalidNumber           : { message: LABEL_INVALID_INTEGER },
         liability               : { label: LABEL_LIABILITY },
         loading                 : { message: LABEL_LOADING_PLEASE_WAIT },
         promotionalActivity     : { help: 'Promotional Activity help' },
@@ -970,6 +972,14 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 }
             }
     
+        } else {
+            console.log('[psaitems.validate] isMexico', this.isMexico);
+            console.log('[psaitems.validate] isInteger', Number.isInteger(this.discountPercent));
+            console.log('[psaitems.validate] discountPercent', this.discountPercent);
+            if (this.isMexico && !Number.isInteger(parseFloat(this.discountPercent))) {
+                isValid = false;
+                this.showToast('error', this.labels.error.label, this.labels.invalidNumber.message.replace('{0}', this.labels.discountPercent.label));
+            }
         }
         console.log('[psaitems.validate] isvalie, volume, discount', isValid, this.hasVolumeForecastError, this.hasDiscountError);
         return isValid;

@@ -27,6 +27,10 @@
                             <div class="slds-page-header__control">
                                 <lightning-button-group>
                                     <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <template if:true={canSubmitForApproval}>
+                                        <lightning-button label={labels.submit.label} icon-name="utility:approval" title="Submit for Approval"
+                                                        class="slds-m-left_medium" onclick={handleSubmitButtonClick}></lightning-button>
+                                    </template>                                    
                                     <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_medium" onclick={handleHelpButtonClick}></lightning-button-icon>
                                 </lightning-button-group>
                             </div>
@@ -70,6 +74,7 @@
                                         wholesaler-options={wholesalerOptions}
                                         capture-volume-in-bottles={captureVolumeInBottles}
                                         capture-free-goods={captureFreeGoods}
+                                        is-locked={isLocked}
                                         onclose={handleCloseForm}
                                         onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>
                         </template>

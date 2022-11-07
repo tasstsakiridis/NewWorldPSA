@@ -61,7 +61,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
                   		 Activity_Budget__c, Account__r.Owner.Name, Account__r.Owner.Manager.Name, Account__r.ShippingPostalCode, Date_Approved__c,
                            Percentage_Visibility__c, Account__r.Payment_Account__c, Account__r.Payment_Account_Bank__c, Account__r.Payment_Account_Agency__c,
                            Sales_Proposal_Id__c, Account__r.RFC__c, Account__r.ShippingCity, Account__r.ShippingState, Total_Volume_Bottles__c, Total_Rebate_Volume__c,
-                           Payment_Configurations__c, Activity_Type__c, Evaluation_Comments__c, Total_Promotional_Activity__c,
+                           Payment_Configurations__c, Activity_Type__c, Evaluation_Comments__c, Total_Promotional_Activity__c, Total_Free_Bottle_Quantity__c,
                   	(SELECT Id, Name, Product__c, Product_Name__c, Plan_Volume__c, Plan_Volume_Bottles__c, Plan_Rebate_Liability__c, Free_Goods_Reason__c, 
                             Free_Goods_Given_Date__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c, Product_Custom__r.Price__c, Plan_Rebate_Percentage__c,
                             Brand_Status__c, Listing_Fee__c, Promotional_Activity__c, Promotional_Activity_Value__c, Drink_Strategy__c, Brand_Visibility__c, 
@@ -80,6 +80,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
         totalRebateLiability = 0;
         promotionMaterialItems = new List<pmiItem>();
         mustStockProducts = new List<Promotion_Material_Item__c>();
+        mustStockBrands = new List<String>();
         drinkStrategyItems = new List<listItem>();
         promotionalActivityItems = new List<listItem>();
         trainingAndAdvocacyItems = new List<listItem>();
@@ -91,8 +92,18 @@ public with sharing class Mexico_PSA_Contract_Controller {
 
         totalListingFee = thePSA.Total_Listing_Fee__c == null ? 0 : thePSA.Total_Listing_Fee__c;
         totalPromotionalActivity = thePSA.Total_Promotional_Activity__c == null ? 0 : thePSA.Total_Promotional_Activity__c;
+        totalFreeGoods = thePSA.Total_Free_Bottle_Quantity__c == null ? 0 : thePSA.Total_Free_Bottle_Quantity__c;
 
-        if (String.isNotEmpty(thePSA.Payment_Configurations__c) && numberOfPayments > 1 && totalListingFee > 0) {
+        showPaymentDetails = totalListingFee + totalPromotionalActivity + totalFreeGoods > 0;
+
+        if (numberOfPayments == 1 && totalListingFee > 0) {
+            payment p = new payment();
+            p.paymentNumber = 1;
+            p.paymentPercentage = 100;
+            p.paymentAmount = totalListingFee;
+            payments.add(p);
+            
+        } else if (String.isNotEmpty(thePSA.Payment_Configurations__c) && numberOfPayments > 1 && totalListingFee > 0) {
             String[] configurations = thePSA.Payment_Configurations__c.split(',');
             for(String config : configurations) {
                 payment p = new payment();
@@ -103,7 +114,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
                 payments.add(p);
                 ctr++;
             }
-        }
+        } 
 
         totalVolumeLiability = 0;
         totalRebateLiability = 0;
@@ -142,6 +153,9 @@ public with sharing class Mexico_PSA_Contract_Controller {
             ctr++;
 
             if (String.isNotEmpty(pmi.Brand_Status__c) && pmi.Brand_Status__c.indexOf('Must Stock') >= 0) {
+                if (!mustStockBrands.contains(pmi.Brand__c)) {
+                    mustStockBrands.add(pmi.Brand__c);
+                }
                 mustStockProducts.add(pmi);
             }
 
@@ -197,7 +211,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
         }
 
         
-        numberOfMustStockProducts = mustStockProducts.size();
+        numberOfMustStockBrands = mustStockBrands.size();
         percentageVisibility = thePSA.Percentage_Visibility__c == null ? 0 : thePSA.Percentage_Visibility__c;
         
         for(String s : drinkStrategiesByBrand.keySet()) {
@@ -285,14 +299,15 @@ public with sharing class Mexico_PSA_Contract_Controller {
 
     public List<pmiItem> promotionMaterialItems                 { get; set; }
     public List<Promotion_Material_Item__c> mustStockProducts   { get; set; }
-    public List<listItem> drinkStrategyItems                     { get; set; }
-    public List<listItem> promotionalActivityItems               { get; set; }
-    public List<listItem> trainingAndAdvocacyItems               { get; set; }
-    public List<listItem> brandVisibilityItems                   { get; set; }
-    public List<listItem> productVisibilityItems                 { get; set; }
-    public List<listItem> outletToProvideItems                   { get; set; }
+    public List<String> mustStockBrands                         { get; set; }
+    public List<listItem> drinkStrategyItems                    { get; set; }
+    public List<listItem> promotionalActivityItems              { get; set; }
+    public List<listItem> trainingAndAdvocacyItems              { get; set; }
+    public List<listItem> brandVisibilityItems                  { get; set; }
+    public List<listItem> productVisibilityItems                { get; set; }
+    public List<listItem> outletToProvideItems                  { get; set; }
     public List<payment> payments                               { get; set; }
-    public Integer numberOfMustStockProducts                    { get; set; }
+    public Integer numberOfMustStockBrands                      { get; set; }
     public String ownerName                                     { get; set; }
     public String ownerManagerName                              { get; set; }
     public String contactName                                   { get; set; }
@@ -303,6 +318,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
     public Decimal totalListingFee                              { get; set; }
     public Decimal totalPromotionalActivity                     { get; set; }
     public Decimal totalPlanVolume                              { get; set; }
+    public Decimal totalFreeGoods                               { get; set; }
     public Integer numberOfPayments                             { get; set; }
     public Decimal firstPaymentAmount                           { get; set; }
     public String formattedFirstPaymentAmount                   { get; set; }
@@ -324,6 +340,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
     public String dateApproved                                  { get; set; }
     public String dateCreated                                   { get; set; }
     public String comments                                      { get; set; }
+    public Boolean showPaymentDetails                           { get; set; }
 
     public Integer numberOfProducts { get; set; }
     

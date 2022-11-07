@@ -19,6 +19,7 @@ import OBJECT_PMIA from '@salesforce/schema/PMI_Actual__c';
 
 import FIELD_ID from '@salesforce/schema/PMI_Actual__c.Id';
 import FIELD_ACTIVITY_ID from '@salesforce/schema/PMI_Actual__c.Activity__c';
+import FIELD_ACTIVITY_NAME from '@salesforce/schema/PMI_Actual__c.Activity_Name__c';
 import FIELD_ACTUAL_QTY from '@salesforce/schema/PMI_Actual__c.Act_Qty__c';
 import FIELD_ACTUAL_WHOLESALER from '@salesforce/schema/PMI_Actual__c.Actual_Wholesaler__c';
 import FIELD_APPROVAL_STATUS from '@salesforce/schema/PMI_Actual__c.Approval_Status__c';
@@ -197,6 +198,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     captureFreeGoods;
 
+    @api 
+    isLocked;
+
     error;
     thePMIA;
     thePMI;
@@ -286,9 +290,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     approvalStatus;
     approvalStatusOptions;
     get canEdit() {
-        console.log('[canEdit]');
+
+        console.log('[actualsForm.canEdit] isLocked', this.isLocked);
         //return this.approvalStatus !== 'Paid' && this.approvalStatus !== 'Approved';
-        return true;
+        return !this.isLocked;
     }
 
     get isNew() {
@@ -638,12 +643,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             if (this.captureVolumeInBottles) {
                 this.plannedVolume = this.plannedVolume * this.productPackQty;
                 this.totalActualVolume = this.totalActualVolume * this.productPackQty;
-                this.freeGoodsQty = this.freeGoodsQty * this.productPackQty;
-                this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
             }
         }    
 
-        this.approvalStatus = 'Paid';
+        this.approvalStatus = this.psa.Market__r.Name == 'Mexico' ? 'New' : 'Paid';
         this.paymentDate = new Date();
         this.actualQty = 0;
         this.listingFeePaid = 0;
@@ -858,6 +861,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[pmiaForm.createNewPMIA] rebates', this.rebates);
         console.log(']pmiaForm.createNewPMIA] record', record);
         createActuals({psaId: this.psaId, 
+                        psaName: this.psa.Name,
                             recordTypeId: this.recordTypeId, 
                             promotionId: record.fields[FIELD_PROMOTION_ID.fieldApiName],
                             pmiId: record.fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName],

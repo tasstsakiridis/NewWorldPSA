@@ -270,6 +270,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     activityTypeActive = { label: this.labels.activityType.checked, value: this.labels.activityType.checked };
     activityTypeInactive = { label: this.labels.activityType.unchecked, value: this.labels.activityType.unchecked };    
     canAddNewAccountsToPSA = false;
+    canPreDatePSA = false;
 
 
     isWorking = true;
@@ -320,8 +321,18 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     */
 
+    isSOMUser = false;
     @wire(getIsSOMUser)
-    isSOMUser;
+    wiredSOMUser(value) {
+        if (value.data) {
+            this.isSOMUser = value.data;
+            this.error = null;
+        } else {
+            this.isSOMUser = false;
+            this.error = value.error;
+        }
+    }
+    
 
     numberOfPaymentOptions = numberOfPaymentOptions;
     statusOptions;
@@ -358,6 +369,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.configurePayments = this.market.Agreement_Configure_Payments__c == undefined ? false : this.market.Agreement_Configure_Payments__c;
             this.captureActivityType = this.market.Capture_Activity_Type__c == undefined ? false : this.market.Capture_Activity_Type__c;
             this.canAddNewAccountsToPSA = this.market.Add_New_Accounts_to_PSA__c == undefined ? false : this.market.Add_New_Accounts_to_PSA__c;
+            this.canPreDatePSA = this.market.Can_PreDate_PSA__c == undefined ? false : this.market.Can_PreDate_PSA__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -471,9 +483,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get capturePercentageVisibility() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
     }
-    get canPreDatePSA() {
-        return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Can_PreDate_PSA__c;
-    }
+    //get canPreDatePSA() {
+    //    return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Can_PreDate_PSA__c;
+    //}
 
     error;
     get psaName() {
@@ -936,6 +948,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.startDate = ev.detail.value;
         console.log('[handleStartDateChange] startdate', this.startDate);
         console.log('[handleStartDateChange] event.date', ev.detail.value);
+        console.log('[handleStartDateChange] canPreDatePSA', this.canPreDatePSA);
 
         this.calcEndDate();
         this.hasStartDateError = false;
@@ -1290,10 +1303,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             if (data.Number_of_Payments__c != undefined) {
                 this.numberOfPayments = data.Number_of_Payments__c.toString();  
 
+                let pconfigs = [];
                 if (data.Payment_Configurations__c != undefined) {
-                    this.paymentConfigs = [];
                          
-                    let pconfigs = [];
                     const pconfigItems = data.Payment_Configurations__c.split(',');
                     console.log('pconfigs', pconfigItems);
                     console.log('pconfigs length', pconfigItems.length);
@@ -1303,12 +1315,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                         pconfigs.push({payment_number: (pcCtr + 1), percent_achieved: pconfigItems[pcCtr]});
                         
                     }
-                    this.paymentConfigs = [...pconfigs];
                     
                     //for(let i = 0; i < pconfigs.length; i++) {
                     //    pconfigs.push({payment_number: (i+1), percentage_achieved: parseFloat(pconfigs[i]) });
                     //}
                 }
+                this.paymentConfigs = [...pconfigs];
                 
             }
             
@@ -1467,6 +1479,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 if (result.selected) {
                     this.showToast('success', 'Success', this.labels.clone.clonedMessage.replace('%0', 'PSA'));    
                     this.recordId = result.id;
+                    refreshApex(this.wiredAgreement);
                 } else {
                     this.showToast('error', 'Warning', result.description);
                 }

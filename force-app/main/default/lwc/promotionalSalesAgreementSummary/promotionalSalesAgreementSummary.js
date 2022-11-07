@@ -89,7 +89,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_ACCOUNT, fieldName: 'account', type: 'text', wrapText: true, cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
         { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
         { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
-        { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'freeGoodsGiven', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'actualFreeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_COST, fieldName: 'freeGoodsCost', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','United Kingdom']},
@@ -585,7 +585,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 row.product = pmi.product;
 
                 row.freeGoods = pmi.plannedFreeGoods;
-                row.freeGoodsGiven = pmi.actualFreeGoods;
+                row.actualFreeGoods = pmi.actualFreeGoods;
                 volume = pmi.plannedVolume;
                 actualVolume = pmi.actualVolume;
                 if (this.captureVolumeInBottles) {

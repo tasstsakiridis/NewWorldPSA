@@ -244,6 +244,7 @@
             .segment-header-title {
                 color: white; 
                 font-size: 10pt;
+                text-transform: uppercase;
             }
             .segment-sub-header {
                 background-color: #cf9372;
@@ -254,6 +255,9 @@
             .segment-sub-header span {
                 margin-left: 10px;
                 font-size: 10pt;
+            }
+            .large-font {
+                font-size: 12pt;
             }
             .small-font {
                 font-size: 8pt;
@@ -480,37 +484,39 @@
             </ul>
             </apex:outputPanel>
         </div>
-        <div class="segment-header" style="margin-top: 10px;">
-            <span class="segment-header-title">Patrocinio en efectivo</span>
-        </div>
-        <div>
-            <apex:outputText value="+ Valor total en patrocinio: $ {0, number, #,##0.00}" styleClass="highlight-text">
-                <apex:param value="{!totalListingFee}" />
-            </apex:outputText>
-        </div>     
-        <div>
-            <apex:outputText value="Parcialidades ({0})" styleClass="highlight-text">
-                <apex:param value="{!thePSA.Number_of_Payments__c}" />
-            </apex:outputText>
-            <table class="payments-table highlight-text">
-                <apex:repeat value="{!payments}" var="p">
-                    <tr>
-                        <td style="width: 75px;">{!p.paymentNumber}</td>
-                        <td style="text-align: right; width: 125px;">
-                            <apex:outputText value="{0, number, 0}%">
-                                <apex:param value="{!p.paymentPercentage}" />
-                            </apex:outputText>
-                        </td>
-                    </tr>
-                </apex:repeat>
-            </table>
-        </div> 
+        <apex:outputPanel rendered="{!showPaymentDetails}">
+            <div class="segment-header" style="margin-top: 10px;">
+                <span class="segment-header-title">Patrocinio en efectivo</span>
+            </div>
+            <div>
+                <apex:outputText value="+ Valor total en patrocinio: $ {0, number, #,##0.00}" styleClass="highlight-text large-font">
+                    <apex:param value="{!totalListingFee}" />
+                </apex:outputText>
+            </div>     
+            <div>
+                <apex:outputText value="Parcialidades ({0})" styleClass="highlight-text large-font">
+                    <apex:param value="{!thePSA.Number_of_Payments__c}" />
+                </apex:outputText>
+                <table class="payments-table highlight-text">
+                    <apex:repeat value="{!payments}" var="p">
+                        <tr>
+                            <td style="width: 75px;">{!p.paymentNumber}</td>
+                            <td style="text-align: right; width: 125px;">
+                                <apex:outputText value="{0, number, 0}%">
+                                    <apex:param value="{!p.paymentPercentage}" />
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </div> 
+        </apex:outputPanel>
 
         <apex:outputPanel rendered="{!totalPromotionalActivity > 0}">
             <div class="segment-header" style="margin-top: 10px;">
                 <span class="segment-header-title">ACTIVIDADES PROMOCIONALES</span>
             </div>
-            <apex:outputText value="Parcialidades ($ {0, number, #,##0.00})" styleClass="highlight-text">
+            <apex:outputText value="Parcialidades ($ {0, number, #,##0.00})" styleClass="highlight-text large-font">
                 <apex:param value="{!totalPromotionalActivity}" />
             </apex:outputText>
 
@@ -549,35 +555,41 @@
         <table class="payments-table highlight-text" style="width: 100%;">
             <apex:repeat value="{!promotionMaterialItems}" var="pmi">
                 <tr>
-                    <td style="width: 35%;">
+                    <td style="width: 30%;">
                         <apex:outputText value="{0}" styleClass="highlight-text">
                             <apex:param value="{!pmi.productName}" /> 
                         </apex:outputText>
                     </td>
-                    <td style="width: 25%;">
+                    <td style="width: 20%;">
                         <apex:outputText value="$ {0, number, #,##0.00}">
                             <apex:param value="{!pmi.freeBottleCost}" />
                         </apex:outputText>
                     </td>
-                    <td style="width: 40%;">
+                    <td style="width: 20%;">
+                        <apex:outputText value="{0, number, #,##0}">
+                            <apex:param value="{!pmi.freeBottleVolume}" />
+                        </apex:outputText>
+                    </td>
+                    <td style="width: 30%;">
                         <apex:outputText value="{!pmi.freeGoodsReason}" />
                     </td>
                 </tr>
             </apex:repeat>
         </table>
+        <p class="">{!$Label.Mexico_Free_Goods_Note}</p>
 
         <div class="segment-header" style="margin-top: 10px;">
             <span class="segment-header-title">COMPROMISOS CENTRO DE CONSUMO</span>
         </div>
         <div class="segment-sub-header">
             <span class="segment-sub-header-title">
-                <apex:outputText value="Disponibilidad ({0} productos)">
-                    <apex:param value="{!numberOfMustStockProducts}" />
+                <apex:outputText value="Disponibilidad ({0} marcas)">
+                    <apex:param value="{!numberOfMustStockBrands}" />
                 </apex:outputText>
             </span>
         </div>
-        <apex:repeat value="{!mustStockProducts}" var="msp">
-            <p class="must-stock-products highlight-text">{!msp.Product_Name__c}</p>
+        <apex:repeat value="{!mustStockBrands}" var="msp">
+            <p class="must-stock-products highlight-text">{!msp}</p>
         </apex:repeat>
 
         <p class="small-font">* Los productos señalados deberán estar catalogados, disponibles a la venta y listado en los menús del establecimiento.</p>

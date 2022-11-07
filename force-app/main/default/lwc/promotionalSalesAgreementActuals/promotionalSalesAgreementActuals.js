@@ -1,5 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
@@ -7,13 +8,16 @@ import { refreshApex } from '@salesforce/apex';
 
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getGLMappings from '@salesforce/apex/PromotionalSalesAgreement_Controller.getGLMappings';
+import submitForApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.submitActualsForApproval';
 
 import userLocale from '@salesforce/i18n/locale';
 
+import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_CREATE_NEW from '@salesforce/label/c.CreateNew';
 import LABEL_PSA_UPDATED_ACTUALS_MESSAGE from '@salesforce/label/c.PSA_Updated_Actuals_Message';
+import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 
 export default class PromotionalSalesAgreementActuals extends NavigationMixin(LightningElement) {
     labels = {
@@ -21,7 +25,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         help         : { label: LABEL_HELP },
         createNew    : { label: LABEL_CREATE_NEW },
         createNewForAllProducts : { label: 'Create new for all products...' },
-        psaUpdated   : { message: LABEL_PSA_UPDATED_ACTUALS_MESSAGE }
+        psaUpdated   : { message: LABEL_PSA_UPDATED_ACTUALS_MESSAGE },
+        submit       : { label: LABEL_SUBMIT_FOR_APPROVAL, submittedMessage: LABEL_APPROVAL_SUBMITTED.replace('%0', 'PSA') }
     };    
     
     @wire(CurrentPageReference)
@@ -54,7 +59,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     wholesalerOptions;
     captureVolumeInBottles;
     captureFreeGoods;
-
+    
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
         this.wiredPSA = value;
@@ -82,6 +87,9 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         }
     }
 
+    get market() {
+        return this.thePSA == undefined || this.thePSA.Market__r == undefined ? '' : this.thePSA.Market__r.Name;
+    }
     get psaName() {
         return this.thePSA == undefined ? '' : this.thePSA.Name;
     }
@@ -94,6 +102,14 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     get canEdit() {
         console.log('[canEdit] status, isapproved', this.psaStatus, this.isApproved);
         return this.psaStatus != 'Updated' && this.psaStatus != 'Submit' && this.psaStatus != 'Pending Approval' && this.isApproved;
+    }
+
+    get isLocked() {
+        return this.thePSA != undefined && this.thePSA.PMI_Actual_Status__c != undefined && (this.thePSA.PMI_Actual_Status__c == 'Submit' || this.thePSA.PMI_Actual_Status__c == 'Pending');
+    }
+    get canSubmitForApproval() {
+        console.log('[actuals.canSubmitForApproval] canEdit, market, isLocked', this.canEdit, this.market, this.isLocked);
+        return this.canEdit && this.market == 'Mexico' && !this.isLocked;
     }
 
     glMappings;
@@ -174,8 +190,33 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             }, true);
         }catch(ex) {
             console.log('[handelCancelButtonClick] exception', ex);
-        }
-    
+        }        
+    }
+    handleSubmitButtonClick() {
+        this.isWorking = true;
+        console.log('[psaActuals.handleSubmitButton]');
+        submitForApproval({ psaId: this.psaId })
+            .then(result => {
+                this.isWorking = false;
+                console.log('[psaActuals.handleSubmitButton] result', result);
+                if (result == 'OK') {
+                    this.showToast('success','Success', this.labels.submit.submittedMessage);
+                    refreshApex(this.wiredPSA)
+                        .then(() => {
+                            this.thePSA = this.wiredPSA.data;
+                            this.buildTree();
+                            this.handleCloseForm();
+                            
+                        })
+                } else {
+                    this.showToast('error', 'Warning', result);
+                }
+            })
+            .catch(error => {
+                this.isWorking = false;
+                this.error = error;
+                this.showToast('error', 'Warning', error);
+            });
     }
 
     handleOnSelect(event) {
@@ -336,4 +377,27 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             console.log('[actuals.buildtree] exception', ex);
         }
     }
+
+    showToast(type, title, msg) {
+        console.log('[showToast] type', type, title, msg);
+        try {
+        var toastMessage = msg;
+        if (Array.isArray(msg)) {
+            toastMessage = '';
+            msg.forEach(m => {
+                toastMessage += m + '\n';
+            });
+        }
+        const event = new ShowToastEvent({
+            title: title,
+            message: toastMessage,
+            variant: type
+        });
+
+        this.dispatchEvent(event);
+        }catch(ex) {
+            console.log('[showToast] exception', ex);
+        }   
+    }
+
 }
