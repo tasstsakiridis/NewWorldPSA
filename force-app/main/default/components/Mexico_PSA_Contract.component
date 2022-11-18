@@ -1,6 +1,6 @@
 <apex:component layout="none" access="global" controller="Mexico_PSA_Contract_Controller" >
     <apex:attribute name="psa" description="the activity record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
-    
+     
 <html>
 
     <head>
@@ -274,7 +274,7 @@
                 margin: 0;
             }
             .payments-table {
-                width: 200px; 
+                width: 300px; 
                 font-size: 10pt;
             }
             .must-stock-products {
@@ -472,7 +472,7 @@
                 <li>* Se aplican restricciones para el apoyo de bonificaciones, estás estarán limitadas exclusivamente a compras que previamente no hayan obtenido un beneficio
                     que impacte en precio como descuentos, precio especial, expos, combos, ofertas armadas, paquetes promocionales etc.</li>
                 <li>* Los folios de bonificación generados en la plataforma recompensas B-F tendrán una vigencia de 30 días y una vez pasado este tiempo perderá su validez.</li>
-                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estará vigente durante la vigencia del convenio, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del convenio vigente  y/o creación de uno nuevo</li>
+                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estarán vigentes durante su duración, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del mismo  y/o creación de uno nuevo</li>
             </ul>
             </apex:outputPanel>
 
@@ -480,7 +480,7 @@
             <ul class="no-bullet">            
                 <li>* Compra esperada durante la vigencia del convenio</li>
                 <li>* El % de bonificación es equivalente al porcentaje de descuento y este descuento será proporcionado directamente por el mayorista autorizado</li>
-                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estará vigente durante la vigencia del convenio, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del convenio vigente  y/o creación de uno nuevo</li>
+                <li>* El cliente confirma que la información del RFC y Razón Social que aparecen en el presente convenio estarán vigentes durante su duración, no puede existir cambio de RFC durante la vigencia y en caso de que el cliente cambie su estructura legal impactando en la negociación del convenio, se evaluará la cancelación del mismo  y/o creación de uno nuevo</li>
             </ul>
             </apex:outputPanel>
         </div>
@@ -500,11 +500,11 @@
                 <table class="payments-table highlight-text">
                     <apex:repeat value="{!payments}" var="p">
                         <tr>
-                            <td style="width: 75px;">{!p.paymentNumber}</td>
-                            <td style="text-align: right; width: 125px;">
-                                <apex:outputText value="{0, number, 0}%">
-                                    <apex:param value="{!p.paymentPercentage}" />
-                                </apex:outputText>
+                            <td style="width: 75px;">pago {!p.paymentNumber}</td> 
+                            <td style="text-align: right; width: 300px;">
+                                <apex:outputText value="{0, number, 0}% de la compra esperada"> 
+                                    <apex:param value="{!p.paymentPercentage}"  /> 
+                                </apex:outputText> 
                             </td>
                         </tr>
                     </apex:repeat>
@@ -514,13 +514,17 @@
 
         <apex:outputPanel rendered="{!totalPromotionalActivity > 0}">
             <div class="segment-header" style="margin-top: 10px;">
-                <span class="segment-header-title">ACTIVIDADES PROMOCIONALES</span>
+                <span class="segment-header-title">APOYO PARA MATERIALES</span>
             </div>
-            <apex:outputText value="Parcialidades ($ {0, number, #,##0.00})" styleClass="highlight-text large-font">
+            <apex:outputText value="+ Valor total del apoyo:  $ {0, number, #,##0.00}" styleClass="highlight-text large-font">
                 <apex:param value="{!totalPromotionalActivity}" />
             </apex:outputText>
+            <div>
+                
+            </div>
+               
 
-            <table class="payments-table highlight-text" style="width: 100%;">
+            <!--<table class="payments-table highlight-text" style="width: 100%;">
                 <apex:repeat value="{!promotionalActivityItems}" var="pmi">
                     <tr>
                         <td style="width: 35%;">
@@ -538,20 +542,21 @@
                         </td>
                     </tr>
                 </apex:repeat>
-            </table>
+            </table>-->
 
         </apex:outputPanel>
 
         <div class="segment-header" style="color: white; margin-top: 10px;">
             <span class="segment-header-title">Apoyo en producto</span>
-        </div>  
-        <div class="segment-sub-header">
+        </div> 
+        
+       <!-- <div class="segment-sub-header">
             <span class="segment-sub-header-title highlight-text">
                 <apex:outputText value="Apoyos ({0})">
                     <apex:param value="{!numberOfProducts}" />
                 </apex:outputText>
             </span>
-        </div>
+        </div>-->
         <table class="payments-table highlight-text" style="width: 100%;">
             <apex:repeat value="{!promotionMaterialItems}" var="pmi">
                 <tr>
@@ -566,7 +571,7 @@
                         </apex:outputText>
                     </td>
                     <td style="width: 20%;">
-                        <apex:outputText value="{0, number, #,##0}">
+                        <apex:outputText value="{0, number, #,##0} botellas">
                             <apex:param value="{!pmi.freeBottleVolume}" />
                         </apex:outputText>
                     </td>
