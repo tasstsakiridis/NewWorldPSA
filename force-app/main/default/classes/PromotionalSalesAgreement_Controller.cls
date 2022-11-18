@@ -79,6 +79,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
         try {
             List<GroupMember> groups = [SELECT Id, Group.Name FROM GroupMember WHERE UserOrGroupId =:UserInfo.getUserId() AND Group.DeveloperName ='UK_SOM'];
             isSOMUser = groups == null ? false : groups.size() > 0;
+            if (!isSOMUSer) {
+                Profile profile = [SELECT Id, Name FROM Profile WHERE Id =:UserInfo.getProfileId() LIMIT 1];
+                System.debug('profile: ' + profile);
+                isSOMUser = profile != null && profile.Name == 'System Administrator';
+            }
             System.debug('# of groups: ' + groups == null ? 0 : groups.size());
             System.debug('isSOMUSer: ' + isSOMUser);
         } catch(Exception ex) {
@@ -683,11 +688,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled 
-    public static String updateActualTotals(String psaId) {
+    public static String updateActualTotals(List<String> psaIds) {
         String msg = 'OK';
 
         try {
-            Promotion_Activity__c psa = [SELECT Id, Total_Actual_Volume__c, Total_Actual_Discount__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
+            List<Promotion_Activity__c> activities = [SELECT Id, Total_Actual_Volume__c, Total_Actual_Discount__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy_Paid__c, Market__r.Capture_Volume_in_Bottles__c, Activity_Budget__c, Total_Payments_Paid__c,
                                             Total_Actual_Volume_Bottles__c, Total_Actual_Free_Bottle_Qty__c, 
                                                 (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
@@ -701,117 +706,116 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                         Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Plan_Rebate__c,
                                                         Promotion_Material_Item__r.Listing_Fee__c, Promotion_Material_Item__r.Promotional_Activity_Value__c,
                                                         Promotion_Material_Item__r.Training_and_Advocacy_Value__c, Proposed_Discount__c, Rebate_Type__c, Rebate_Amount__c
-                                                        FROM PMI_Actuals__r WHERE Approval_Status__c = 'Paid' OR Approval_Status__c = 'Rebate Complete')
+                                                        FROM PMI_Actuals__r WHERE Approval_Status__c = 'Approved' OR Approval_Status__c = 'Paid' OR Approval_Status__c = 'Rebate Complete')
                                         FROM Promotion_Activity__c 
-                                        WHERE Id =:psaId];
+                                        WHERE Id =:psaIds];
             
-            psa.Total_Actual_Volume__c = 0;
-            psa.Total_Actual_Volume_Bottles__c = 0;
-            psa.Total_Actual_Discount__c = 0;
-            psa.Total_Actual_Free_Bottle_Qty__c = 0;
-            psa.Total_Listing_Fee_Paid__c = 0;
-            psa.Total_Promotional_Activity_Paid__c = 0;
-            psa.Total_Training_and_Advocacy_Paid__c = 0;
-            psa.Total_Actual_Investment__c = 0;
-            psa.Total_Payments_Paid__c = 0;
-
-            /*
-            Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
-            for(Promotion__c p : psa.Promotions__r) {
-                m_Promotions.put(p.Id, p);
-            }
-            */
             Map<Id, Promotion_Material_Item__c> m_PMIs = new Map<Id, Promotion_Material_Item__c>();
-            for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
-                pmi.Total_Actual_Volume__c = 0;
-                pmi.Total_Actual_Free_Bottle_Qty__c = 0;
-                pmi.Total_Listing_Fee_Paid__c = 0;
-                pmi.Total_Promotional_Activity_Paid__c = 0;
-                pmi.Total_Training_and_Advocacy_Paid__c = 0;
-                pmi.Total_Payments_Paid__c = 0;
-                
-                m_PMIs.put(pmi.Id, pmi);
-            }
 
-            Decimal rebateAmount = 0;
-            Decimal actualQty = 0;
-            Decimal listingFee = 0;
-            Decimal freeGoodQty = 0;
-            Decimal promotionalActivity = 0;
-            Decimal trainingAndAdvocacy = 0;
-            Decimal actualInvestment = 0;
-            Decimal totalDiscount = 0;
-            Decimal packQty = 0;
+            for(Promotion_Activity__c psa : activities) {
+                psa.Total_Actual_Volume__c = 0;
+                psa.Total_Actual_Volume_Bottles__c = 0;
+                psa.Total_Actual_Discount__c = 0;
+                psa.Total_Actual_Free_Bottle_Qty__c = 0;
+                psa.Total_Listing_Fee_Paid__c = 0;
+                psa.Total_Promotional_Activity_Paid__c = 0;
+                psa.Total_Training_and_Advocacy_Paid__c = 0;
+                psa.Total_Actual_Investment__c = 0;
+                psa.Total_Payments_Paid__c = 0;
 
-            Promotion__c p;
-            Promotion_Material_Item__c pmi;
-            for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
-                rebateAmount = pmia.Rebate_Amount__c == null ? 0 : pmia.Rebate_Amount__c;
-                
                 /*
-                p = m_Promotions.get(pmia.Promotion__c);
-                if (p.Total_Actual_Discount__c == null) { p.Total_Actual_Discount__c = 0; }
-                if (p.Total_Listing_Fee_Paid__c == null) { p.Total_Listing_Fee_Paid__c = 0; }
-                if (p.Total_Promotional_Activity_Paid__c == null) { p.Total_Promotional_Activity_Paid__c = 0; }
-                if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
+                Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
+                for(Promotion__c p : psa.Promotions__r) {
+                    m_Promotions.put(p.Id, p);
+                }
                 */
-                pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
-
-                System.debug('[updateActuals] pmiaId: ' + pmia.Id);
-                System.debug('[updateActuals] rebateType: ' + pmia.Rebate_Type__c);
-                System.debug('[updateActuals] rebateAmount: ' + pmia.Rebate_Amount__c);
-                if (pmia.Rebate_Type__c == 'Listing Fee') {
-                    psa.Total_Listing_Fee_Paid__c += rebateAmount;
-                    //p.Total_Listing_Fee_Paid__c += rebateAmount;
-                    pmi.Total_Listing_Fee_Paid__c += rebateAmount;
-                } else if (pmia.Rebate_Type__c == 'Promotional Activity') {
-                    psa.Total_Promotional_Activity_Paid__c += rebateAmount;
-                    //p.Total_Promotional_Activity_Paid__c += rebateAmount;
-                    pmi.Total_Promotional_Activity_Paid__c += rebateAmount;
-                } else if (pmia.Rebate_Type__c == 'Training & Advocacy') {
-                    psa.Total_Training_and_Advocacy_Paid__c += rebateAmount;
-                    //p.Total_Training_and_Advocacy_Paid__c += rebateAmount;
-                    pmi.Total_Training_and_Advocacy_Paid__c += rebateAmount;
-                } else if (pmia.Rebate_Type__c == 'Payment') {
-                    psa.Total_Payments_Paid__c += rebateAmount;
-                    pmi.Total_Payments_Paid__c += rebateAmount;
-                } else if (pmia.Rebate_Type__c == 'Free Goods') {
-                    psa.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
-                    pmi.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
-                } else if (pmia.Rebate_Type__c == 'Volume') {
-                    actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
-                    packQty = pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
-                    //if (psa.Market__r.Capture_Volume_in_Bottles__c) {
-                    //    actualQty = actualQty * packQty;
-                    //}
+                for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
+                    pmi.Total_Actual_Volume__c = 0;
+                    pmi.Total_Actual_Free_Bottle_Qty__c = 0;
+                    pmi.Total_Listing_Fee_Paid__c = 0;
+                    pmi.Total_Promotional_Activity_Paid__c = 0;
+                    pmi.Total_Training_and_Advocacy_Paid__c = 0;
+                    pmi.Total_Payments_Paid__c = 0;
                     
-                    System.debug('[actualQty: ' + actualQty);
-                    totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
-
-                    psa.Total_Actual_Volume__c += actualQty;        
-                    psa.Total_Actual_Volume_Bottles__c += actualQty * packQty;            
-                    psa.Total_Actual_Discount__c += totalDiscount;
-                    //p.Total_Actual_Discount__c += totalDiscount;
-                    pmi.Total_Actual_Volume__c += actualQty;
+                    m_PMIs.put(pmi.Id, pmi);
                 }
 
-                //m_Promotions.put(p.Id, p);
-                m_PMIs.put(pmi.Id, pmi);
+                Decimal rebateAmount = 0;
+                Decimal actualQty = 0;
+                Decimal listingFee = 0;
+                Decimal freeGoodQty = 0;
+                Decimal promotionalActivity = 0;
+                Decimal trainingAndAdvocacy = 0;
+                Decimal actualInvestment = 0;
+                Decimal totalDiscount = 0;
+                Decimal packQty = 0;
+
+                Promotion__c p;
+                Promotion_Material_Item__c pmi;
+                for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
+                    rebateAmount = pmia.Rebate_Amount__c == null ? 0 : pmia.Rebate_Amount__c;
+                    
+                    /*
+                    p = m_Promotions.get(pmia.Promotion__c);
+                    if (p.Total_Actual_Discount__c == null) { p.Total_Actual_Discount__c = 0; }
+                    if (p.Total_Listing_Fee_Paid__c == null) { p.Total_Listing_Fee_Paid__c = 0; }
+                    if (p.Total_Promotional_Activity_Paid__c == null) { p.Total_Promotional_Activity_Paid__c = 0; }
+                    if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
+                    */
+                    pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
+
+                    System.debug('[updateActuals] pmiaId: ' + pmia.Id);
+                    System.debug('[updateActuals] rebateType: ' + pmia.Rebate_Type__c);
+                    System.debug('[updateActuals] rebateAmount: ' + pmia.Rebate_Amount__c);
+                    if (pmia.Rebate_Type__c == 'Listing Fee') {
+                        psa.Total_Listing_Fee_Paid__c += rebateAmount;
+                        //p.Total_Listing_Fee_Paid__c += rebateAmount;
+                        pmi.Total_Listing_Fee_Paid__c += rebateAmount;
+                    } else if (pmia.Rebate_Type__c == 'Promotional Activity') {
+                        psa.Total_Promotional_Activity_Paid__c += rebateAmount;
+                        //p.Total_Promotional_Activity_Paid__c += rebateAmount;
+                        pmi.Total_Promotional_Activity_Paid__c += rebateAmount;
+                    } else if (pmia.Rebate_Type__c == 'Training & Advocacy') {
+                        psa.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                        //p.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                        pmi.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                    } else if (pmia.Rebate_Type__c == 'Payment') {
+                        psa.Total_Payments_Paid__c += rebateAmount;
+                        pmi.Total_Payments_Paid__c += rebateAmount;
+                    } else if (pmia.Rebate_Type__c == 'Free Goods') {
+                        psa.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
+                        pmi.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
+                    } else if (pmia.Rebate_Type__c == 'Volume') {
+                        actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
+                        packQty = pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
+                        //if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                        //    actualQty = actualQty * packQty;
+                        //}
+                        
+                        System.debug('[actualQty: ' + actualQty);
+                        totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
+
+                        psa.Total_Actual_Volume__c += actualQty;        
+                        psa.Total_Actual_Volume_Bottles__c += actualQty * packQty;            
+                        psa.Total_Actual_Discount__c += totalDiscount;
+                        //p.Total_Actual_Discount__c += totalDiscount;
+                        pmi.Total_Actual_Volume__c += actualQty;
+                    }
+
+                    //m_Promotions.put(p.Id, p);
+                    m_PMIs.put(pmi.Id, pmi);
+
+                }
+
+                psa.Total_Actual_Investment__c = psa.Total_Actual_Discount__c + psa.Total_Listing_Fee_Paid__c + psa.Total_Promotional_Activity_Paid__c + psa.Total_Training_and_Advocacy_Paid__c;
 
             }
 
-            psa.Total_Actual_Investment__c = psa.Total_Actual_Discount__c + psa.Total_Listing_Fee_Paid__c + psa.Total_Promotional_Activity_Paid__c + psa.Total_Training_and_Advocacy_Paid__c;
-
-            /*
-            if (m_Promotions.size() > 0) {
-                update m_Promotions.values();
-            }
-            */
             if (m_PMIs.size() > 0) {
                 update m_PMIs.values();
             }
 
-            update psa;
+            update activities;
         }catch(Exception ex) {
             msg = ex.getMessage();   
             System.debug('update totals exception ' + ex.getMessage());         
@@ -1004,8 +1008,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 }
                 update psa.PMI_Actuals__r;
 
-                psa.SalesProposal_Actuals_Updated__c = true;
                 psa.PMI_Actual_Status__c = 'Submit';
+                psa.SalesProposal_Actuals_Updated__c = true;
                 update psa;
             }
         } catch (Exception ex) {
@@ -1070,11 +1074,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                 Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
                                                 Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, Reminder_Date__c,
                                                 Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, Total_Volume__c, Total_Actual_Volume__c, Purchase_Order__c,
-                                                Number_of_Payments__c, Payment_Configurations__c, Activity_Type__c, Limit_to_Selected_Accounts__c,
+                                                Total_Investment__c, Number_of_Payments__c, Payment_Configurations__c, Activity_Type__c, Limit_to_Selected_Accounts__c,
                                                 (SELECT Id, Account__c, AccountName__c, Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, 
                                                         Account__r.ShippingCountry, Account__r.ShippingPostalCode, Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, 
                                                         Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
-                                                (SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
+                                                (SELECT Id, RecordTypeId, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
                                                         Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
                                                         Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
                                                         Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,

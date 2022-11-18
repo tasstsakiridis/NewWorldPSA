@@ -564,13 +564,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.trainingAndAdvocacyPaid = this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c || 0;
 
                 if (this.captureVolumeInBottles) {
-                    if (this.isVolumeRebate || this.isFreeGoodsRebate) {
+                    if (this.isVolumeRebate) {
                         this.rebateAmount = this.rebateAmount * this.productPackQty;
                     }
                     this.plannedVolume = this.plannedVolume * this.productPackQty;
-                    this.freeGoodsQty = this.freeGoodsQty * this.productPackQty;
+                    //this.freeGoodsQty = this.freeGoodsQty * this.productPackQty;
                     this.totalActualVolume = this.totalActualVolume * this.productPackQty;
-                    this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
+                    //this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
                 }
 
                 console.log('[loadPMIADetails] freeGoodsQty', this.freeGoodsQty);
@@ -581,6 +581,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     this.remainingRebate = this.plannedVolume - this.totalActualVolume;
                 } else if (this.rebateType == 'Free Goods') {
                     this.remainingRebate = this.freeGoodsQty - this.totalActualFreeGoodsQty;
+                    if (this.remainingRebate < 0) { this.remainingRebate = 0; }
                 } else if (this.rebateType == 'Listing Fee') {
                     this.remainingRebate = this.listingFeePlanned - this.listingFeePaid;
                 } else if (this.rebateType == 'Promotional Activity') {
@@ -974,7 +975,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
 
     updateTotals() {
-        updateActualTotals({psaId: this.psaId})
+
+        updateActualTotals({psaIds: [this.psaId]})
             .then((status) => {
                 console.log('[updateTotals] status', status);
             })

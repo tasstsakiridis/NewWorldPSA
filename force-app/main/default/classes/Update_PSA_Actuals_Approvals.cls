@@ -6,6 +6,7 @@ public with sharing class Update_PSA_Actuals_Approvals {
                                                     FROM Promotion_Activity__c
                                                     WHERE Id =:activityIds];
 
+        List<String> activityIdsToUpdate = new List<String>();
         List<PMI_Actual__c> actualsToUpdate = new List<PMI_Actual__c>();
         for(Promotion_Activity__c theActivity : activities) {
             if (theActivity.PMI_Actuals__r != null && theActivity.PMI_Actuals__r.size() > 0) {
@@ -20,12 +21,16 @@ public with sharing class Update_PSA_Actuals_Approvals {
                 }
 
                 theActivity.SalesProposal_Actuals_Updated__c = false;                
+
+                activityIdsToUpdate.add(theActivity.Id);
             }            
         }
 
         if (actualsToUpdate.size() > 0) {
             update actualsToUpdate;
             update activities;
+
+            PromotionalSalesAgreement_Controller.updateActualTotals(activityIdsToUpdate);
         }
     }
 }

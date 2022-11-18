@@ -448,7 +448,16 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.thePSA != null && this.thePSA.Market__r != undefined && this.thePSA.Market__r.Enable_PSA_Actuals__c;
     }
     get canEditActuals() {
-        return this.thePSA != null && this.thePSA.Is_Approved__c == true && this.status != 'Updated' && !this.isSubmitted && this.hasAccessToActuals;
+        let canEdit = false;
+        if (this.thePSA != null && this.thePSA.Is_Approved__c == true && !this.isSubmitted && this.hasAccessToActuals) {
+            if (this.isMexico) {
+                canEdit = this.status == 'Signed';
+            } else {
+                canEdit = this.status != 'Updated';
+            }
+        }
+        //return this.thePSA != null && this.thePSA.Is_Approved__c == true && this.status != 'Updated' && !this.isSubmitted && this.hasAccessToActuals;
+        return canEdit;
     }
     get canViewSummary() {
         return this.thePSA != null;
@@ -1519,7 +1528,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             }    
         }
 
-        if (!this.canPreDatePSA) {
+        if (!this.isApproved && !this.canPreDatePSA) {
             const today = new Date();
             today.setHours(0, 0, 0);
 
@@ -1527,6 +1536,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.hasStartDateError = true; isValid = false;
                 this.labels.startDate.error = this.labels.startDate.preDatedPSAError;
             }
+            console.log('[validatepsa] isValid', isValid);
+            console.log('[validatepsa] startDateError', this.hasStartDateError);
         }
 
         console.log('[validatepsa] wholesalerpreferred', this.wholesalerPreferred);
@@ -1541,7 +1552,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.hasParentAccountError = true;
             isValid = false; 
         } else if (this.isUsingParentAccount && (this.selectedAccounts == undefined || this.selectedAccounts.size == 0)) {
-            this.hasChildAccountsError = true;
+            this.hasChildAccountsError = true;            
             isValid =  false; 
         }
         return isValid;

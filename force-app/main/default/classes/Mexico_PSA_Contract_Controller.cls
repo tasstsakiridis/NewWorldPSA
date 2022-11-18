@@ -65,7 +65,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
                   	(SELECT Id, Name, Product__c, Product_Name__c, Plan_Volume__c, Plan_Volume_Bottles__c, Plan_Rebate_Liability__c, Free_Goods_Reason__c, 
                             Free_Goods_Given_Date__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c, Product_Custom__r.Price__c, Plan_Rebate_Percentage__c,
                             Brand_Status__c, Listing_Fee__c, Promotional_Activity__c, Promotional_Activity_Value__c, Drink_Strategy__c, Brand_Visibility__c, 
-                            Product_Visibility__c, Training_and_Advocacy__c, Outlet_to_Provide__c, Comments__c, Plan_Rebate_Volume__c, Brand__c 
+                            Product_Visibility__c, Training_and_Advocacy__c, Outlet_to_Provide__c, Comments__c, Plan_Rebate_Volume__c, Brand__c
                        FROM Promotion_Material_Items__r)
            		    FROM Promotion_Activity__c 
 		            WHERE Id =:pa.Id];
@@ -138,7 +138,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
             //item.rebateLiability = item.planVolumeBottles * (pmi.Product_Custom__r.Price__c == null ? 0 : pmi.Product_Custom__r.Price__c);
             item.rebateLiability = pmi.Plan_Rebate_Liability__c == null ? 0 : pmi.Plan_Rebate_Liability__c;
             item.freeBottleVolume = pmi.Free_Bottle_Quantity__c == null ? 0 : pmi.Free_Bottle_Quantity__c;
-            item.freeBottleCost = pmi.PSA_Free_Bottle_Cost__c == null ? 0 : pmi.PSA_Free_Bottle_Cost__c;
+            item.freeBottleCost = pmi.Product_Custom__r == null ||  pmi.Product_Custom__r.Price__c == null ? 0 : pmi.Product_Custom__r.Price__c * item.freeBottleVolume;
             item.freeGoodsReason = pmi.Free_Goods_Reason__c == null ? '' : pmi.Free_Goods_Reason__c;            
             item.promotionalActivity = pmi.Promotional_Activity__c == null ? '' : pmi.Promotional_Activity__c;
             item.promotionalActivityAmount = pmi.Promotional_Activity_Value__c == null ? 0 : pmi.Promotional_Activity_Value__c;            
@@ -342,6 +342,6 @@ public with sharing class Mexico_PSA_Contract_Controller {
     public String comments                                      { get; set; }
     public Boolean showPaymentDetails                           { get; set; }
 
-    public Integer numberOfProducts { get; set; }
+    public Integer numberOfProducts                             { get; set; }
     
 }
