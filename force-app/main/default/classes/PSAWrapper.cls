@@ -127,6 +127,18 @@ public with sharing class PSAWrapper {
     public String wholesalerAlternateName { get; set; }
 
     @AuraEnabled 
+    public String accountWholesalerPreferred { get; set; }
+
+    @AuraEnabled 
+    public String accountWholesalerPreferredName { get; set; }
+
+    @AuraEnabled 
+    public String accountWholesalerAlternate { get; set; }
+
+    @AuraEnabled 
+    public String accountWholesalerAlternateName { get; set; }
+
+    @AuraEnabled 
     public String status { get; set; }
 
     @AuraEnabled 
@@ -186,6 +198,10 @@ public with sharing class PSAWrapper {
         this.isLengthInYears = true;
         this.beginDate = null;
         this.endDate = null;
+        this.accountWholesalerPreferred = '';
+        this.accountWholesalerPreferredName = '';
+        this.accountWholesalerAlternate = '';
+        this.accountWholesalerAlternateName = '';
         this.wholesalerAlternateId = '';
         this.wholesalerAlternateName = '';
         this.wholesalerPreferredId = '';
@@ -238,5 +254,9 @@ public with sharing class PSAWrapper {
         this.percentageVisibility = psa.Percentage_Visibility__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
         this.isDirectRebate = psa.Activity_Type__c == null || psa.Activity_Type__c == 'Direct Rebate';
+        this.accountWholesalerPreferred = psa.Account_Wholesaler_Preferred__c;
+        this.accountWholesalerPreferredName = psa.Account_Wholesaler_Preferred_Name__c;
+        this.accountWholesalerAlternate = psa.Account_Wholesaler_Alternate__c;
+        this.accountWholesalerAlternateName = psa.Account_Wholesaler_Alternate_Name__c;
     }
 }

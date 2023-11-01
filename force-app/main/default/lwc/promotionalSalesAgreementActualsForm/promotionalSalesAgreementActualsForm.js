@@ -434,13 +434,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             console.log('[get recordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
             console.log('[get recordtypeid] rtis', rtis);
+            /*
             if (this.psa.Market__r.Name == 'United Kingdom') {
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
             } else if (this.psa.Market__r.Name == 'Brazil') {
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'BRA - PSA');
             } else if (this.psa.Market__r.Name == 'Mexico') {
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'MX - PSA');
-            }
+            }*/
+            this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === this.psa.RecordType.Name);
             console.log('[get recordtypeid] rtis', Object.keys(rtis));
             console.log('[get recordtypeid] recordtypeid', this.recordTypeId);
         }    

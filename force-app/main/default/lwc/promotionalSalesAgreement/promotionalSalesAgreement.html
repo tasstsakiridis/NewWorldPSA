@@ -44,7 +44,7 @@
                                         <lightning-button label={labels.summary.label} icon-name="utility:matrix" title="Summary" class="slds-m-horizontal_x-small" onclick={handleSummaryButtonClick}></lightning-button>
                                     </template>
                                     <template if:true={hasPreview}>
-                                        <lightning-button icon-name="utility:list" label="Preview" title="Preview" class="slds-m-horizontal_x-small" onclick={handlePreviewButtonClick}></lightning-button>
+                                        <lightning-button icon-name="utility:list" label={labels.preview.label} title="Preview" class="slds-m-horizontal_x-small" onclick={handlePreviewButtonClick}></lightning-button>
                                     </template>                    
                                     <lightning-button label={labels.items.label} icon-name="utility:snippet" title="Items" class="slds-m-horizontal_x-small" onclick={handleItemsButtonClick} ></lightning-button>
                                     <template if:true={canEditActuals}>
@@ -354,11 +354,16 @@
                                         </template>
                                     </template>
                                 </template>
+                                <template if:true={hasSigningCustomerError}>
+                                    <div class="slds-m-horizontal_small">
+                                        <span class="input-error error-large">{labels.signingCustomer.error}</span>
+                                    </div>
+                                </template>
                                 <template if:false={signingCustomer}>
                                     <div class="slds-m-horizontal_medium">
                                         <span class="slds-text-title_caps">{labels.noSigningCustomers.message}</span>
                                     </div>
-                                </template>
+                                </template>                                
                             </div>
                             <template if:false={isLocked}>
                                 <div>

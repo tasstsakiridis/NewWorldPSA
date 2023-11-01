@@ -2,10 +2,19 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { registerListener, unregisterAllListeners } from 'c/pubsub';
 import { CurrentPageReference } from 'lightning/navigation';
 
+import LABEL_BOTTLE from '@salesforce/label/c.Bottle';
+import LABEL_BOTTLES from '@salesforce/label/c.Bottles';
+import LABEL_CASE from '@salesforce/label/c.Case';
+import LABEL_CASES from '@salesforce/label/c.Cases';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
 import LABEL_SPLIT from '@salesforce/label/c.Split';
 
 export default class ProductTile extends LightningElement {
+    labels = {
+        bottle: { label: LABEL_BOTTLE, labelPlural: LABEL_BOTTLES, labelLowercase: LABEL_BOTTLE.toLowerCase() },
+        case: { label: LABEL_CASE, labelPlural: LABEL_CASES, labelLowercase: LABEL_CASE.toLowerCase() },
+        split: { label: LABEL_SPLIT }
+    };
 
     tileClass = 'tile';
 
@@ -40,6 +49,9 @@ export default class ProductTile extends LightningElement {
 
     @api 
     captureVolumeInBottles;
+
+    @api 
+    captureRebatePerBottle;
 
     @api 
     calcSplit;
@@ -79,6 +91,46 @@ export default class ProductTile extends LightningElement {
         return pictureUrl;
     }
 
+    get formattedVolume() {
+        let v = 0;
+
+        if (this.psaItem && this.psaItem.Plan_Volume__c != undefined) {
+            if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
+                if (this.captureVolumeInBottles) {
+                    v = '<b>' + this.psaItem.Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c) + '</b> ' + LABEL_BOTTLES.toLowerCase();
+                } else {
+                    v = '<b>' + this.psaItem.Plan_Volume__c + '</b> ' + LABEL_CASES.toLowerCase(); 
+                }
+            } else {
+                if (this.captureVolumeInBottles) {
+                    v = '<b>' + this.psaItem.Proposed_Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c) + '</b> ' + LABEL_BOTTLES.toLowerCase();
+                } else {
+                    v = '<b>' + this.psaItem.Proposed_Plan_Volume__c + '</b> ' + LABEL_CASES.toLowerCase();
+                }
+            }
+        }
+
+        return v;
+
+    }
+    get planRebate() {
+        let r = 0;
+
+        if (this.psaItem.Plan_Rebate__c != undefined) { 
+            if (this.calcSplit) {
+                r = this.psaItem.Product_Split__c;
+            } else {
+                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                    r = this.psaItem.Plan_Rebate__c 
+                } else {
+                    r = this.psaItem.Proposed_Plan_Rebate__c;                         
+                }    
+            }
+        }
+
+        return parseFloat(r).toFixed(2);
+    }
+
     @api 
     psaItem;
 
@@ -112,9 +164,17 @@ export default class ProductTile extends LightningElement {
                     str += ' @ <b>' + this.psaItem.CurrencyIsoCode + ' ' + parseFloat(this.psaItem.Product_Split__c).toFixed(2) + '</b> ' + LABEL_SPLIT;
                 } else {
                     if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
-                        str += ' @ $<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                        if (this.captureRebatePerBottle) {
+                            str += ' @ ' + this.psaItem.CurrencyIsoCode + '<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/bottle'; 
+                        } else {
+                            str += ' @ <b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/case'; 
+                        }
                     } else {
-                        str += ' @ $<b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case'; 
+                        if (this.captureRebatePerBottle) {
+                            str += ' @ <b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/bottle';                         
+                        } else {
+                            str += ' @ <b style="color: red;">' + parseFloat(this.psaItem.Proposed_Plan_Rebate__c) + '</b>/case';                         
+                        }
                     }    
                 }
             }
@@ -132,7 +192,7 @@ export default class ProductTile extends LightningElement {
     }
     get totalInvestmentSummary() {
         if (this.psaItem && this.psaItem.Total_Investment__c) {
-            return '$' + parseFloat(this.psaItem.Total_Investment__c) + ' ' + LABEL_TOTAL_INVESTMENT.toLowerCase();
+            return parseFloat(this.psaItem.Total_Investment__c) + ' ' + LABEL_TOTAL_INVESTMENT.toLowerCase();
         }
     }
 

@@ -54,6 +54,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     treeItems;
     error;
     marketId;
+    recordTypeName;
     thePSA;
     wiredPSA;
     wholesalerOptions;
@@ -71,6 +72,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.error = undefined;
             this.thePSA = value.data;
             this.marketId = this.thePSA.Market__c;
+            this.recordTypeName = this.thePSA.RecordType.Name;
             if (this.thePSA.Wholesaler_Preferred__c != undefined) {
                 this.wholesalerOptions = [
                     { label: this.thePSA.Wholesaler_Preferred_Name__c, value: this.thePSA.Wholesaler_Preferred__c, selected: true }    
@@ -81,8 +83,9 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             }
             this.captureVolumeInBottles = this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
             this.captureFreeGoods = this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
-
+            
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
+            this.getGLMappingsForPSA();
             this.buildTree();
         }
     }
@@ -113,16 +116,20 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     }
 
     glMappings;
-    @wire(getGLMappings, { marketId: '$marketId' })
-    getGLMappings(value) {
-        console.log('[getGLMappings] value', value);
-        if (value.error) {
-            this.error = value.error;
-            this.glMappings = undefined;
-        } else if (value.data) { 
+    getGLMappingsForPSA() {
+        console.log('[getGLMappings] marketId', this.marketId);
+        console.log('[getGLMappings] recordType', this.recordTypeName);
+        getGLMappings({             
+            marketId: this.marketId, 
+            recordTypeName: this.recordTypeName 
+        }).then(result => {
+            console.log('[getGLMappings] glMappsing', result);
+            this.glMappings = result;
             this.error = undefined;
-            this.glMappings = value.data;
-        }
+        }).catch(error => {
+            this.error = error;
+            this.glMappings = undefined;
+        });
     }
 
     /**

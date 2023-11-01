@@ -1,6 +1,6 @@
 <apex:component layout="none" access="global" controller="Mexico_PSA_Contract_Controller" >
     <apex:attribute name="psa" description="the activity record" type="Promotion_Activity__c" assignTo="{!thePSA}" />
-     
+    
 <html>
 
     <head>
@@ -347,7 +347,7 @@
                     </td>
                     <td>
                         <p align="justify" class="bf segment-detail-item-header">
-                            <apex:outputText value="Fecha de inicio: {0, date, dd MMM yyyy} - {1, date, dd MMM yyyy}" styleClass="highlight-text segment-detail-item-text">
+                            <apex:outputText value="Vigencia: {0, date, dd MMM yyyy} - {1, date, dd MMM yyyy}" styleClass="highlight-text segment-detail-item-text">
                                 <apex:param value="{!thePSA.Begin_Date__c}" />
                                 <apex:param value="{!thePSA.End_Date__c}" />
                             </apex:outputText>
@@ -398,8 +398,29 @@
                         </ul>
                     </td>
                 </tr>
+                <tr>
+                	<td colspan="2">
+                        <apex:outputPanel rendered="{!thePSA.Limit_to_Selected_Accounts__c == TRUE}">
+                        	<p>
+                               * El presente convenio grupal únicamente es válido para las sucursales y RFC que se especifican a continuación: {!selectedAccounts}
+                            </p>
+                        </apex:outputPanel>                    
+                        <apex:outputPanel rendered="{!thePSA.Limit_to_Selected_Accounts__c == FALSE && thePSA.Account__r.RecordType.Name == 'MX - Parents On'}">
+                             <p class="small-font">
+                               * El presente convenio grupal es valido para todas las sucursales existentes y nuevas aperturas que se realicen durante la vigencia del mismo.
+                            </p>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!thePSA.Account__r.RecordType.Name == 'MX - Outlet On'}">
+                             <p class="small-font">
+                               * El presente convenio únicamente es válido para la unidad actual con la que se firma el convenio, el RFC incluido es válido para generación de certificados
+                            </p>
+                        </apex:outputPanel>
+                    </td>
+                </tr>
             </tbody>
         </table>
+        
+        
 
         <div class="segment-header">
             <span class="segment-header-title">COMPROMISOS BROWN-FORMAN MÉXICO</span>            
@@ -412,7 +433,7 @@
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 10%;">#</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 30%;">Producto</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 10%;">%</th>
-                <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">Compra esperada</th>
+                <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">Compra esperada en botellas</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 15%;">A bonificar</th>
                 <th style="border: 1px solid #999; border-collapse: collapse; width: 20%;">Importe</th>
             </thead>
@@ -519,6 +540,9 @@
             <apex:outputText value="+ Valor total del apoyo:  $ {0, number, #,##0.00}" styleClass="highlight-text large-font">
                 <apex:param value="{!totalPromotionalActivity}" />
             </apex:outputText>
+            <p class="small-font">
+             * El monto especificado en esta sección es exclusivamente para realización de materiales, activaciones, etc mediante proveedores internos de Brown-Forman, realizados en común acuerdo. 
+            </p>
             <div>
                 
             </div>
@@ -546,9 +570,6 @@
 
         </apex:outputPanel>
 
-        <div class="segment-header" style="color: white; margin-top: 10px;">
-            <span class="segment-header-title">Apoyo en producto</span>
-        </div> 
         
        <!-- <div class="segment-sub-header">
             <span class="segment-sub-header-title highlight-text">
@@ -557,31 +578,36 @@
                 </apex:outputText>
             </span>
         </div>-->
-        <table class="payments-table highlight-text" style="width: 100%;">
-            <apex:repeat value="{!promotionMaterialItems}" var="pmi">
-                <tr>
-                    <td style="width: 30%;">
-                        <apex:outputText value="{0}" styleClass="highlight-text">
-                            <apex:param value="{!pmi.productName}" /> 
-                        </apex:outputText>
-                    </td>
-                    <td style="width: 20%;">
-                        <apex:outputText value="$ {0, number, #,##0.00}">
-                            <apex:param value="{!pmi.freeBottleCost}" />
-                        </apex:outputText>
-                    </td>
-                    <td style="width: 20%;">
-                        <apex:outputText value="{0, number, #,##0} botellas">
-                            <apex:param value="{!pmi.freeBottleVolume}" />
-                        </apex:outputText>
-                    </td>
-                    <td style="width: 30%;">
-                        <apex:outputText value="{!pmi.freeGoodsReason}" />
-                    </td>
-                </tr>
-            </apex:repeat>
-        </table>
-        <p class="">{!$Label.Mexico_Free_Goods_Note}</p>
+        <apex:outputPanel rendered="{!totalFreeGoods > 0}">
+            <div class="segment-header" style="color: white; margin-top: 10px;">
+                <span class="segment-header-title">Apoyo en producto</span>
+            </div> 
+            <table class="payments-table highlight-text" style="width: 100%;">
+                <apex:repeat value="{!freeGoodsToGive}" var="pmi" >
+                    <tr>
+                        <td style="width: 30%;">
+                            <apex:outputText value="{0}" styleClass="highlight-text">
+                                <apex:param value="{!pmi.productName}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td style="width: 20%;">
+                            <apex:outputText value="$ {0, number, #,##0.00}">
+                                <apex:param value="{!pmi.freeBottleCost}" />
+                            </apex:outputText>
+                        </td>
+                        <td style="width: 20%;">
+                            <apex:outputText value="{0, number, #,##0} botellas">
+                                <apex:param value="{!pmi.freeBottleVolume}" />
+                            </apex:outputText>
+                        </td>
+                        <td style="width: 30%;">
+                            <apex:outputText value="{!pmi.freeGoodsReason}" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+            <p class="">{!$Label.Mexico_Free_Goods_Note}</p>
+        </apex:outputPanel>
 
         <div class="segment-header" style="margin-top: 10px;">
             <span class="segment-header-title">COMPROMISOS CENTRO DE CONSUMO</span>

@@ -28,10 +28,6 @@ public with sharing class Mexico_PSA_Contract_Controller {
         public Decimal planVolumeBottles                { get; set; }
         public Decimal planVolumeLiability              { get; set; }
         public Decimal rebateLiability                  { get; set; }
-        public Decimal freeBottleVolume                 { get; set; }
-        public Decimal freeBottleCost                   { get; set; }
-        public Date freeGoodsGivenDate                  { get; set; }
-        public String freeGoodsReason                   { get; set; }
         public Decimal promotionalActivityAmount        { get; set; }
         public String promotionalActivity               { get; set; }
         public String drinkStrategy                     { get; set; }
@@ -46,6 +42,16 @@ public with sharing class Mexico_PSA_Contract_Controller {
         public Boolean hasPromotionalActivity           { get; set; }
         public Boolean hasTrainingAndAdvocacy           { get; set; }
     }
+    
+    public class pmiFreeGoods {
+        public Integer index							{ get; set; }
+        public String productName                       { get; set; }
+        public Decimal freeBottleVolume                 { get; set; }
+        public Decimal freeBottleCost                   { get; set; }
+        public Date freeGoodsGivenDate                  { get; set; }
+        public String freeGoodsReason                   { get; set; }  
+    }
+    
     public class payment {
         public Integer paymentNumber                    { get; set; }
         public Decimal paymentPercentage                { get; set; }
@@ -62,6 +68,8 @@ public with sharing class Mexico_PSA_Contract_Controller {
                            Percentage_Visibility__c, Account__r.Payment_Account__c, Account__r.Payment_Account_Bank__c, Account__r.Payment_Account_Agency__c,
                            Sales_Proposal_Id__c, Account__r.RFC__c, Account__r.ShippingCity, Account__r.ShippingState, Total_Volume_Bottles__c, Total_Rebate_Volume__c,
                            Payment_Configurations__c, Activity_Type__c, Evaluation_Comments__c, Total_Promotional_Activity__c, Total_Free_Bottle_Quantity__c,
+                  		   Limit_to_Selected_Accounts__c, Account__r.RecordType.Name,  
+                    (SELECT Id, Name, AccountName__c, Account__r.RFC__c,Account__r.RecordType.Name FROM Promotions__r), 
                   	(SELECT Id, Name, Product__c, Product_Name__c, Plan_Volume__c, Plan_Volume_Bottles__c, Plan_Rebate_Liability__c, Free_Goods_Reason__c, 
                             Free_Goods_Given_Date__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c, Product_Custom__r.Price__c, Plan_Rebate_Percentage__c,
                             Brand_Status__c, Listing_Fee__c, Promotional_Activity__c, Promotional_Activity_Value__c, Drink_Strategy__c, Brand_Visibility__c, 
@@ -70,6 +78,15 @@ public with sharing class Mexico_PSA_Contract_Controller {
            		    FROM Promotion_Activity__c 
 		            WHERE Id =:pa.Id];
 
+        List<Schema.PicklistEntry> brandStatusValues = Promotion_Material_Item__c.Brand_Status__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> drinkStategyValues = Promotion_Material_Item__c.Drink_Strategy__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> promotionalActivityValues = Promotion_Material_Item__c.Promotional_Activity__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> trainingAndAdvocacyValues = Promotion_Material_Item__c.Training_and_Advocacy__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> brandVisibilityValues = Promotion_Material_Item__c.Brand_Visibility__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> productVisibilityValues = Promotion_Material_Item__c.Product_Visibility__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> freeGoodsReasonValues = Promotion_Material_Item__c.Free_Goods_Reason__c.getDescribe().getPicklistValues();
+        List<Schema.PicklistEntry> outletToProvideValues = Promotion_Material_Item__c.Outlet_to_Provide__c.getDescribe().getPicklistValues();
+
         numberOfProducts = thePSA.Promotion_Material_Items__r.size();
         ownerName = thePSA.Account__r.Owner.Name;
         ownerManagerName = thePSA.Account__r.Owner.Manager.Name;
@@ -77,8 +94,10 @@ public with sharing class Mexico_PSA_Contract_Controller {
         comments = thePSA.Evaluation_Comments__c == null ? '' : thePSA.Evaluation_Comments__c;
         
         Integer ctr = 1;
+        Integer ctrFreeGoods = 1;
         totalRebateLiability = 0;
         promotionMaterialItems = new List<pmiItem>();
+        accountsInContract = new List<Promotion__c>();
         mustStockProducts = new List<Promotion_Material_Item__c>();
         mustStockBrands = new List<String>();
         drinkStrategyItems = new List<listItem>();
@@ -87,6 +106,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
         brandVisibilityItems = new List<listItem>();
         productVisibilityItems = new List<listItem>();
         outletToProvideItems = new List<listItem>();
+        selectedAccounts = '';
 
         payments = new List<payment>();        
 
@@ -95,11 +115,22 @@ public with sharing class Mexico_PSA_Contract_Controller {
         totalFreeGoods = thePSA.Total_Free_Bottle_Quantity__c == null ? 0 : thePSA.Total_Free_Bottle_Quantity__c;
 
         showPaymentDetails = totalListingFee + totalPromotionalActivity + totalFreeGoods > 0;
+        
+         if (thePSA.Account__r.RecordType.Name == 'MX - Parents On' && thePSA.Limit_to_Selected_Accounts__c == TRUE){
+            
+            for (Promotion__c promotion : thePSA.Promotions__r ) {
+                if(promotion.Account__r.RecordType.Name == 'MX - Outlet On' ){
+                	selectedAccounts += promotion.AccountName__c + ' (' + promotion.Account__r.RFC__c + '),';    
+                }
+            }
+            selectedAccounts = selectedAccounts.removeEnd(',');
+        }
+
 
         if (numberOfPayments == 1 && totalListingFee > 0) {
             payment p = new payment();
             p.paymentNumber = 1;
-            p.paymentPercentage = 100;
+            p.paymentPercentage = 0;
             p.paymentAmount = totalListingFee;
             payments.add(p);
             
@@ -119,6 +150,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
         totalVolumeLiability = 0;
         totalRebateLiability = 0;
         ctr = 1;
+        
         Map<String, List<String>> drinkStrategiesByBrand = new Map<String, List<String>>();
         Map<String, List<String>> promotionalActivitiesByBrand = new Map<String, List<String>>();
         Map<String, List<String>> trainingAdvocaciesByBrand = new Map<String, List<String>>();
@@ -126,6 +158,7 @@ public with sharing class Mexico_PSA_Contract_Controller {
         Map<String, List<String>> productVisibilityByBrand = new Map<String, List<String>>();
         Map<String, List<String>> outletToProvideByBrand = new Map<String, List<String>>();
         List<String> itemSelections;
+        freeGoodsToGive = new List<pmiFreeGoods>();
 
         for(Promotion_Material_Item__c pmi : thePSA.Promotion_Material_Items__r) {            
             pmiItem item = new pmiItem();
@@ -137,20 +170,32 @@ public with sharing class Mexico_PSA_Contract_Controller {
             item.planVolumeLiability = pmi.Plan_Rebate_Volume__c == null ? 0 : pmi.Plan_Rebate_Volume__c;
             //item.rebateLiability = item.planVolumeBottles * (pmi.Product_Custom__r.Price__c == null ? 0 : pmi.Product_Custom__r.Price__c);
             item.rebateLiability = pmi.Plan_Rebate_Liability__c == null ? 0 : pmi.Plan_Rebate_Liability__c;
-            item.freeBottleVolume = pmi.Free_Bottle_Quantity__c == null ? 0 : pmi.Free_Bottle_Quantity__c;
-            item.freeBottleCost = pmi.Product_Custom__r == null ||  pmi.Product_Custom__r.Price__c == null ? 0 : pmi.Product_Custom__r.Price__c * item.freeBottleVolume;
-            item.freeGoodsReason = pmi.Free_Goods_Reason__c == null ? '' : pmi.Free_Goods_Reason__c;            
-            item.promotionalActivity = pmi.Promotional_Activity__c == null ? '' : pmi.Promotional_Activity__c;
+            if(pmi.Free_Bottle_Quantity__c != null && pmi.Free_Bottle_Quantity__c > 0){
+                pmiFreeGoods freeGoods = new pmiFreeGoods();
+                freeGoods.index = ctrFreeGoods;
+                freeGoods.productName = pmi.Product_Name__c;
+            	freeGoods.freeBottleVolume = pmi.Free_Bottle_Quantity__c == null ? 0 : pmi.Free_Bottle_Quantity__c;
+            	freeGoods.freeBottleCost = pmi.Product_Custom__r == null ||  pmi.Product_Custom__r.Price__c == null ? 0 : pmi.Product_Custom__r.Price__c * freeGoods.freeBottleVolume;
+            	freeGoods.freeGoodsReason = getTranslation(pmi.Free_Goods_Reason__c, freeGoodsReasonValues);   
+
+                freeGoodsToGive.add(freeGoods);
+                ctrFreeGoods++;
+            }
+            
+            item.promotionalActivity = getTranslation(pmi.Promotional_Activity__c, promotionalActivityValues);
+
             item.promotionalActivityAmount = pmi.Promotional_Activity_Value__c == null ? 0 : pmi.Promotional_Activity_Value__c;            
-            item.drinkStrategy = pmi.Drink_Strategy__c == null ? '' : pmi.Drink_Strategy__c;
-            item.brandVisibility = pmi.Brand_Visibility__c == null ? '' : pmi.Brand_Visibility__c;
-            item.productVisibility = pmi.Product_Visibility__c == null ? '' : pmi.Product_Visibility__c;
-            item.trainingAndAdvocacy = pmi.Training_and_Advocacy__c == null ? '' : pmi.Training_and_Advocacy__c;
-            item.outletToProvide = pmi.Outlet_to_Provide__c == null ? '' : pmi.Outlet_to_Provide__c;
+            item.drinkStrategy = getTranslation(pmi.Drink_Strategy__c, drinkStategyValues);
+            
+            item.brandVisibility = getTranslation(pmi.Brand_Visibility__c, brandVisibilityValues);
+            item.productVisibility = getTranslation(pmi.Product_Visibility__c, productVisibilityValues);
+            item.trainingAndAdvocacy = getTranslation(pmi.Training_and_Advocacy__c, trainingAndAdvocacyValues);
+            item.outletToProvide = getTranslation(pmi.Outlet_to_Provide__c, outletToProvideValues);
 
             totalRebateLiability += item.rebateLiability;
             totalVolumeLiability += item.planVolumeLiability;
             ctr++;
+            
 
             if (String.isNotEmpty(pmi.Brand_Status__c) && pmi.Brand_Status__c.indexOf('Must Stock') >= 0) {
                 if (!mustStockBrands.contains(pmi.Brand__c)) {
@@ -234,6 +279,21 @@ public with sharing class Mexico_PSA_Contract_Controller {
         }
 
     }
+
+    private String getTranslation(String value, List<Schema.PicklistEntry> picklistValues) {
+        String v = value == null ? '' : value;
+        List<String> values = v.split(';');
+        String result = '';
+        for(String s : values) {
+            for(Schema.PicklistEntry pe : picklistValues) {
+                if (pe.getValue() == s) {
+                    result += pe.getLabel() + ',';
+                }
+            }
+        }
+
+        return result.removeEnd(',');
+    }
     private List<String> groupSelection(String picklistValues, String key, Map<String, List<String>> itemMap) {
         List<String> picklistSelections = picklistValues.split(';');
         List<String> selections;
@@ -249,56 +309,14 @@ public with sharing class Mexico_PSA_Contract_Controller {
         }
         return selections;
     }
-    private String getFormattedDate(Date theDate) {
-        String formattedDate = '';
-
-        if (theDate != null) {
-            Integer month = theDate.month();
-            String monthName = '';
-            if (month == 1) {
-                monthName = Label.January;
-            } else if (month == 2) {
-                monthName = Label.February;
-            } else if (month == 3) {
-                monthName = Label.March;
-            } else if (month == 4) {
-                monthName = Label.April;
-            } else if (month == 5) {
-                monthName = Label.May;
-            } else if (month == 6) {
-                monthName = Label.June;
-            } else if (month == 7) {
-                monthName = Label.July;
-            } else if (month == 8) {
-                monthName = Label.August;
-            } else if (month == 9) {
-                monthName = Label.September;
-            } else if (month == 10) {
-                monthName = Label.October;
-            } else if (month == 11) {
-                monthName = Label.November;
-            } else if (month == 12) {
-                monthname = Label.December;
-            }
-            formattedDate = theDate.day() + ' de ' + monthName + ' de ' + theDate.year();
-        }
-
-        return formattedDate;
-    }
-    private String formatCurrencyValue(Decimal value) {
-        Long divisor = 10;
-        String returnValue = value.format();
-        if (Math.mod(value.longValue(), divisor) == 0) {
-            returnValue += ',00';
-        }
-        return returnValue;
-    }
     public Promotion_Activity__c getThePSA() {
         return thePSA;
     }
 
     public List<pmiItem> promotionMaterialItems                 { get; set; }
+    public List<pmiFreeGoods> freeGoodsToGive		            { get; set; }
     public List<Promotion_Material_Item__c> mustStockProducts   { get; set; }
+    public List <Promotion__c> accountsInContract               { get; set; }
     public List<String> mustStockBrands                         { get; set; }
     public List<listItem> drinkStrategyItems                    { get; set; }
     public List<listItem> promotionalActivityItems              { get; set; }
@@ -319,27 +337,10 @@ public with sharing class Mexico_PSA_Contract_Controller {
     public Decimal totalPromotionalActivity                     { get; set; }
     public Decimal totalPlanVolume                              { get; set; }
     public Decimal totalFreeGoods                               { get; set; }
-    public Integer numberOfPayments                             { get; set; }
-    public Decimal firstPaymentAmount                           { get; set; }
-    public String formattedFirstPaymentAmount                   { get; set; }
-    public String translatedFirstPaymentAmount                  { get; set; }
-    public Decimal secondPaymentAmount                          { get; set; }
-    public String formattedSecondPaymentAmount                  { get; set; }
-    public String translatedSecondPaymentAmount                 { get; set; }
-    public Decimal thirdPaymentAmount                           { get; set; }
-    public String formattedThirdPaymentAmount                   { get; set; }
-    public String translatedThirdPaymentAmount                  { get; set; }
-    public Decimal fourthPaymentAmount                          { get; set; }
-    public String formattedFourthPaymentAmount                  { get; set; }
-    public String translatedFourthPaymentAmount                 { get; set; }
-    public String formattedLengthOfAgreement                    { get; set; }
     public Decimal percentageVisibility                         { get; set; }
-    public String formattedPercentageVisibility                 { get; set; }
-    public String currencyFormatString                          { get; set; }
-    public ApprovalHistory psaApprovalHistory                   { get; set; }
-    public String dateApproved                                  { get; set; }
-    public String dateCreated                                   { get; set; }
+    public Integer numberOfPayments                             { get; set; }
     public String comments                                      { get; set; }
+    public String selectedAccounts                              { get; set; }
     public Boolean showPaymentDetails                           { get; set; }
 
     public Integer numberOfProducts                             { get; set; }

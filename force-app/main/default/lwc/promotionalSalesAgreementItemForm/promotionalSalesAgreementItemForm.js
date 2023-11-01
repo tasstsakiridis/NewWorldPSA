@@ -67,6 +67,7 @@ import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controll
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COST from '@salesforce/label/c.Cost';
+import LABEL_DISCOUNT_PER_BOTTLE from '@salesforce/label/c.Discount_per_Bottle';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_DISCOUNT_PERCENT from '@salesforce/label/c.Discount_Percent';
 import LABEL_EMPTYFORM_SAVE_ERROR from '@salesforce/label/c.EmptyForm_Save_Error';
@@ -96,6 +97,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         back                    : { label: LABEL_BACK },
         comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
         cost                    : { label: LABEL_COST },
+        discountPerBottle       : { label: LABEL_DISCOUNT_PER_BOTTLE },
         discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
         discountPercent         : { label: LABEL_DISCOUNT_PERCENT },
         drinkStrategy           : { help: 'Drink Strategy help' },
@@ -133,10 +135,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api promotionId;
     @api isLocked;
     @api isApproved;
-    @api captureVolumeInBottles;
     @api calcSplit;
     @api totalBudget;
     @api captureFreeGoods;
+    @api captureVolumeInBottles;
+    @api captureRebatePerBottle;
+    @api fieldSet;
 
     _totalPlannedSpend = 0;
     @api 
@@ -362,25 +366,45 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'Mexico';
     }
     get captureRebate() {
-        return this.isUKMarket;
+        //return this.isUKMarket;
+        return this.fieldSet != null && this.fieldSet.Plan_Rebate__c != null;
     }
     get captureRebatePercent() {
-        return this.isMexico;
-    }
-    get captureDiscountPerCase() {
-        return this.isUKMarket;
+        //return this.isMexico;
+        return this.fieldSet != null && this.fieldSet.Plan_Rebate_Percentage__c != null;
     }
     get captureListingFee() {
-        return this.isUKMarket || this.isMexico;
+        //return this.isUKMarket || this.isMexico;
+        return this.fieldSet != null && this.fieldSet.Listing_Fee__c != null;
+    }
+    get capturePromotionalActivityAmount() {
+        return this.fieldSet != null && this.fieldSet.Promotional_Activity_Value__c != null;
     }
     get capturePromotionalActivity() {
-        return this.isUKMarket || this.isMexico;
+        //return this.isUKMarket || this.isMexico;
+        return this.fieldSet != null && this.fieldSet.Promotional_Activity__c != null;
+    }
+    get captureTrainingAndAdvocacy() {
+        return this.fieldSet != null && this.fieldSet.Training_and_Advocacy__c != null;
     }
     get captureBrandVisibility() {
-        return this.isMexico;
+        //return this.isMexico;
+        console.log('captureBrandVisibility', this.fieldSet != null && this.fieldSet.Brand_Visibility__c != null);
+        return this.fieldSet != null && this.fieldSet.Brand_Visibility__c != null;
     }
     get captureProductVisibility() {
-        return this.isMexico;
+        //return this.isMexico;
+        console.log('captureProductVisibility', this.fieldSet != null && this.fieldSet.Product_Visibility__c != null);
+        return this.fieldSet != null && this.fieldSet.Product_Visibility__c != null;
+    }
+    get captureBrandStatus() {
+        return this.fieldSet != null && this.fieldSet.Brand_Status__c != null;
+    }
+    get captureDrinkStrategy() {
+        return this.fieldSet != null && this.fieldSet.Drink_Strategy__c != null;
+    }
+    get captureOutletToProvide() {
+        return this.fieldSet != null && this.fieldSet.Outlet_to_Provide__c != null;
     }
 
     get canDelete() {
@@ -805,6 +829,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             if (this.calcSplit) {
                 this.calcProductSplit();
             }
+            console.log('[handleVolumeForecastChange] volumeForecast', this.volumeForecast);
         }catch(ex) {
             console.log('exception', ex);
         }
@@ -976,9 +1001,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             console.log('[psaitems.validate] isMexico', this.isMexico);
             console.log('[psaitems.validate] isInteger', Number.isInteger(this.discountPercent));
             console.log('[psaitems.validate] discountPercent', this.discountPercent);
-            if (this.isMexico && !Number.isInteger(parseFloat(this.discountPercent))) {
-                isValid = false;
-                this.showToast('error', this.labels.error.label, this.labels.invalidNumber.message.replace('{0}', this.labels.discountPercent.label));
+            if (this.isMexico) {
+                if (!Number.isInteger(parseFloat(this.discountPercent))) {
+                    isValid = false;
+                    this.showToast('error', this.labels.error.label, this.labels.invalidNumber.message.replace('{0}', this.labels.discountPercent.label));
+                }
+                if (this.volumeForecast <= 0) {
+                    isValid = false;
+                    this.showToast('error', this.labels.error.label, this.labels.volumeForecast.error);
+                }
             }
         }
         console.log('[psaitems.validate] isvalie, volume, discount', isValid, this.hasVolumeForecastError, this.hasDiscountError);
@@ -1008,7 +1039,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             let freeGoodsVolume = this.freeGoodQty;
             let volume = this.volumeForecast;
             if (this.captureVolumeInBottles) {
-                volume = this.volumeForecast / this.product.Pack_Quantity__c;
+                volume = this.volumeForecast / (this.product.Pack_Quantity__c == undefined || this.product.Pack_Quantity__c == 0 ? 1 : this.product.Pack_Quantity__c);
                 //freeGoodsVolume = this.freeGoodQty / this.product.Pack_Quantity__c;
             }
 

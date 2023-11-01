@@ -1,3 +1,6 @@
+/**
+ * Test Class:  Update_PSA_Actuals_Approvals_Test
+ */
 public with sharing class Update_PSA_Actuals_Approvals {
     @InvocableMethod
     public static void Update_PSA_Actuals_Approvals(List<String> activityIds) {
@@ -30,7 +33,7 @@ public with sharing class Update_PSA_Actuals_Approvals {
             update actualsToUpdate;
             update activities;
 
-            PromotionalSalesAgreement_Controller.updateActualTotals(activityIdsToUpdate);
+            String result = PromotionalSalesAgreement_Controller.updateActualTotals(activityIdsToUpdate);
         }
     }
 }

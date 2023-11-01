@@ -1,15 +1,27 @@
 <apex:page standardController="Promotion_Activity__c" extensions="UK_PSA_Generate_DocuSign_Controller" lightningStylesheets="true">
     <apex:form >
-	<apex:commandButton action="{!URLFOR('/apex/dsfs__DocuSign_CreateEnvelope', null, [
-									SourceID = Promotion_Activity__c.Id,
-									DSEID = '0',
-									OCO = 'Tag',
-									LF = '1',
-									CES = 'Electronic agreement - Brown-Forman',
-									CEM = 'Please sign the agreement with your signature'
-								])}"
-                        value="Generate DocuSign Document"
-                        id="btn_Generate_DocuSign"/>
+        <apex:outputPanel rendered="{!psa.Market_Name__c == 'Brazil'}">
+            <apex:commandButton action="{!URLFOR('/apex/dsfs__DocuSign_CreateEnvelope', null, [ SourceID = psa.Id, DSEID = '0', CRL = 'Email~'
+            + currentUser.Email + ';FirstName~' + currentUser.FirstName + ';LastName~' + currentUser.LastName + ';RoutingOrder~1;Role~Signer 1, Email~' +
+             currentUser.Manager_Email__c + ';FirstName~' + currentUser.Manager_FirstName__c + ';LastName~' + currentUser.Manager_LastName__c + ';Role~Signer 2;RoutingOrder~2,
+             Email~' + psa.Contact_Email__c + ';FirstName~' + psa.Contact_First_Name__c
+            + ';LastName~' + psa.Contact_Last_Name__c + ';Role~Signer 3;RoutingOrder~3,Email~' + psa.Finance_Manager_Email__c
+            + ';FirstName~' + psa.Finance_Manager_FirstName__c + ';LastName~' +psa.Finance_Manager_LastName__c
+            + ';RoutingOrder~4;Role~Signer 4;', CCRM = 'Signer 1~Executive;Signer 2~Manager;Signer 3~Subscriber Customer;Signer 4~Legal Representative BF',
+            OCO = 'Tag', LF = '1' ])}" value="Generate DocuSign Document" id="btn_Generate_DocuSign_BRA" />
+
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!psa.Market_Name__c != 'Brazil'}">
+            <apex:commandButton action="{!URLFOR('/apex/dsfs__DocuSign_CreateEnvelope', null, [
+                                                SourceID = Promotion_Activity__c.Id,
+                                                DSEID = '0',
+                                                OCO = 'Tag',
+                                                LF = '1',
+                                                CES = '{!$Label.DocuSign_Title}',
+                                                CEM = '{!$Label.DocuSign_Message}'
+                                            ])}" value="Generate DocuSign Document" id="btn_Generate_DocuSign" />
+        
+        </apex:outputPanel>
         
     </apex:form>
         

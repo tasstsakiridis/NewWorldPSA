@@ -119,9 +119,9 @@ public with sharing class Mexico_PSA_Contract_Controller_Test {
             psaItem1.Brand_Status__c = 'Must Stock';
             psaItem1.Drink_Strategy__c = 'Perfect Serve';
             psaItem1.Listing_Fee__c = 100000;
-            psaItem1.Promotional_Activity__c = 'Point of Sale';
+            psaItem1.Promotional_Activity__c = 'Sampling Activity';
             psaItem1.Training_and_Advocacy__c = 'Category Training';
-            psaItem1.Outlet_to_Provide__c = 'Social Media Posting';
+            psaItem1.Outlet_to_Provide__c = 'Activity Sales Data';
             psaItem1.Free_Bottle_Quantity__c = 10;
             psaItem1.Free_Goods_Given_Date__c = Date.today();
             psaItem1.Free_Goods_Reason__c = 'Training';      

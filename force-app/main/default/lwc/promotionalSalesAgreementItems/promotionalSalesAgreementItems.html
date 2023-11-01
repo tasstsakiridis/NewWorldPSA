@@ -92,6 +92,7 @@
                                                 product={product.product}
                                                 psa-item={product.psaItem} 
                                                 capture-volume-in-bottles={captureVolumeInBottles}
+                                                capture-rebate-per-bottle={captureRebatePerBottle}
                                                 show-total-investment={showTotalInvestment}
                                                 calc-split={calcProductSplit}
                                                 onselected={handleProductSelected} ></c-product-tile>
@@ -118,11 +119,13 @@
                                             is-locked={isLocked}
                                             is-approved={isApproved}
                                             capture-volume-in-bottles={captureVolumeInBottles}
+                                            capture-rebate-per-bottle={captureRebatePerBottle}
                                             calc-split={calcProductSplit}
                                             total-budget={totalBudget}
                                             total-planned-spend={totalPlannedSpend}
                                             capture-free-goods={captureFreeGoods}
                                             psa={thePSA}
+                                            field-set={fieldSet}
                                             onsave={handleSavePSADetails}
                                             onupdated={handlePSAUpdated}
                                             onclose={handleClosePSADetailForm}></c-promotional-sales-agreement-item-form>

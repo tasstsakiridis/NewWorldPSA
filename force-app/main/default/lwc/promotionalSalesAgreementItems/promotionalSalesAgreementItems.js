@@ -1,4 +1,4 @@
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { fireEvent, registerListener, unregisterAllListeners } from 'c/pubsub';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -6,8 +6,11 @@ import { refreshApex } from '@salesforce/apex';
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 
+import OBJECT_PMI from '@salesforce/schema/Promotion_Material_Item__c';
+
 import userId from '@salesforce/user/Id';
 
+import getFieldSet from '@salesforce/apex/PromotionalSalesAgreement_Controller.getFieldSet';
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProducts';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
@@ -29,6 +32,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     
     @api psaId;
     @api recordTypeName;
+
+    @track recordTypeAPIName;
+    @track marketName;
 
     thePSA; 
     promotionId;
@@ -79,6 +85,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get captureVolumeInBottles() {
         return this.thePSA != null && this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
     }
+    get captureRebatePerBottle() {
+        return this.thePSA != null && this.thePSA.Market__r.Capture_Rebate_per_Bottle__c;
+    }
     get calcProductSplit() {
         if (this.thePSA != undefined) {
             console.log('[psaItems] calcProductSplit', this.thePSA.Market__r.Calculate_PSA_Product_Split__c);
@@ -125,6 +134,20 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
         }
     }
 
+    fieldSet;
+    @wire(getFieldSet, { objectName: OBJECT_PMI.objectApiName, recordTypeName: '$recordTypeAPIName', marketName: '$marketName' })
+    wiredGetFieldSet({ error, data }) {
+        if (data) {
+            this.error = undefined;
+            this.fieldSet = data;
+            console.log('[getFieldset] fieldSet', this.fieldSet);
+        } else if (error) {
+            console.log('[getFieldset] error', error);
+            this.fieldSet = undefined;
+            this.error = error;            
+        }
+    }
+
     wiredAgreement;
     @wire(getPSA, {psaId: '$psaId'})
     wiredGetAgreement(value) {
@@ -138,6 +161,12 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             this.error = undefined;
             this.thePSA = value.data;
             this.recordTypeName = this.thePSA.RecordType.Name;
+            this.recordTypeAPIName = this.thePSA.RecordType.DeveloperName;
+            this.marketName = this.thePSA.Market__r.Name;
+
+            console.log('[psaItems.getPSA] recordTypeAPIName', this.recordTypeAPIName);
+            console.log('[psaItems.getPSA] marketName', this.marketName);
+
             if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
                 this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__r.RecordType.Name == 'Parent').Id;
             } else {

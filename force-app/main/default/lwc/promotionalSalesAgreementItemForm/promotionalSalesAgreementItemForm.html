@@ -121,23 +121,16 @@
                     </lightning-checkbox-group>
                 </lightning-layout-item>
             </template>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Brand Status -->
-                <!--
-                <p class="label">{brandStatusLabel}</p>                
-                <select class="brandStatus" multiple>
-                    <template for:each={brandStatusOptions} for:item="bs">
-                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
-                    </template>
-                </select>
-            -->
-                <lightning-checkbox-group name="i_BrandStatus"
-                                          label={brandStatusLabel}
-                                          options={brandStatusOptions}
-                                          value={brandStatusValues}
-                                          disabled={isDisabled}
-                                          onchange={handleBrandStatusChange}></lightning-checkbox-group>
-            </lightning-layout-item>                        
+            <template if:true={captureBrandStatus}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_BrandStatus"
+                                            label={brandStatusLabel}
+                                            options={brandStatusOptions}
+                                            value={brandStatusValues}
+                                            disabled={isDisabled}
+                                            onchange={handleBrandStatusChange}></lightning-checkbox-group>
+                </lightning-layout-item>              
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
                 <template if:false={captureVolumeInBottles}>
@@ -169,14 +162,16 @@
             <template if:true={captureRebate}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
-                    <lightning-input type="number" name="i_DiscountPerCase" 
-                                    label={labels.discountPerCase.label}                                 
-                                    value={discount}
-                                    step="0.01"
-                                    readonly={isDisabled}
-                                    onchange={handleDiscountChange}
-                                    formatter="currency">
-                    </lightning-input>
+                    <template if:true={captureRebatePerBottle}>
+                        <lightning-input type="number" name="i_DiscountPerBottle" label={labels.discountPerBottle.label} value={discount} step="0.01"
+                            readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
+                        </lightning-input>
+                    </template>
+                    <template if:false={captureRebatePerBottle}>
+                        <lightning-input type="number" name="i_DiscountPerCase" label={labels.discountPerCase.label} value={discount} step="0.01"
+                            readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
+                        </lightning-input>                    
+                    </template>
                     <template if:true={hasDiscountError}>
                         <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
                     </template>
@@ -199,54 +194,39 @@
                 </lightning-layout-item>
             </template>
             <template if:true={captureListingFee}>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Listing Fee -->
-                <lightning-input type="number" name="i_ListingFee" 
-                                 label={listingFeeLabel}
-                                 value={listingFee}
-                                 readonly={isDisabled}
-                                 onchange={handleListingFeeChange}
-                                 formatter="currency">
-                </lightning-input>
-            </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Listing Fee -->
+                    <lightning-input type="number" name="i_ListingFee" 
+                                    label={listingFeeLabel}
+                                    value={listingFee}
+                                    readonly={isDisabled}
+                                    onchange={handleListingFeeChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
             </template>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Drink Strategy -->
-                <!--
-                <p class="label">{drinkStrategyLabel}</p>
-                <select class="drinkStrategy" multiple >
-                    <template for:each={drinkStrategyOptions} for:item="bs">
-                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
-                    </template>
-                </select>
-            -->
-                <lightning-checkbox-group name="i_DrinkStrategy"
-                                        label={drinkStrategyLabel}
-                                        options={drinkStrategyOptions}
-                                        value={drinkStrategyValues}
-                                        disabled={isDisabled}
-                                        onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
+            <template if:true={captureDrinkStrategy}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_DrinkStrategy"
+                                            label={drinkStrategyLabel}
+                                            options={drinkStrategyOptions}
+                                            value={drinkStrategyValues}
+                                            disabled={isDisabled}
+                                            onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
 
-            </lightning-layout-item>
+                </lightning-layout-item>
+            </template>
+            <template if:true={capturePromotionalActivity}>
             <lightning-layout-item size="12" padding="around-small">
-                <!-- Promotional Activity -->
-                <!--
-                <p class="label">{promotionalActivityLabel}</p>
-                <select class="promotionalActivity" multiple >
-                    <template for:each={promotionalActivityOptions} for:item="bs">
-                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
-                    </template>
-                </select>
-            -->
                 <lightning-checkbox-group name="i_PromotionalActivity"
                                         label={promotionalActivityLabel}
                                         options={promotionalActivityOptions}
                                         value={promotionalActivityValues}
                                         disabled={isDisabled}
-                                        onchange={handlePromotionalActivityChange}></lightning-checkbox-group>
-        
-            </lightning-layout-item>
-            <template if:true={capturePromotionalActivity}>
+                                        onchange={handlePromotionalActivityChange}></lightning-checkbox-group>            
+                </lightning-layout-item>
+            </template>
+            <template if:true={capturePromotionalActivityAmount}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Promotional Activity Amount -->
                     <lightning-input type="number" name="i_PromotionalActivityAmount" 
@@ -258,53 +238,28 @@
                     </lightning-input>
                 </lightning-layout-item>
             </template>
-            <lightning-layout-item size="12" padding="around-small">
-                <!-- Training & Advocacy -->
-                <!--
-                <p class="label">{trainingAdvocacyLabel}</p>
-                <select class="trainingAdvocacy" multiple>
-                    <template for:each={trainingAdvocacyOptions} for:item="bs">
-                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
-                    </template>
-                </select>
-            -->
-                <lightning-checkbox-group name="i_TrainingAndAdvocacy"
-                                        label={trainingAdvocacyLabel}
-                                        options={trainingAdvocacyOptions}
-                                        value={trainingAdvocacyValues}
-                                        disabled={isDisabled}
-                                        onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
-            
-            </lightning-layout-item>
-            <!-- Training & Advocacy Amount -->
-            <!--
-            <lightning-layout-item size="12" padding="around-small">
-                <lightning-input type="number" name="i_TrainingAdvocacyAmount" 
-                                 label={trainingAdvocacyLabel}
-                                 value={trainingAdvocacyAmount}
-                                 onchange={handleTrainingAdvocacyValueChange}
-                                 formatter="currency">
-                </lightning-input>
-            </lightning-layout-item>
-            -->
+            <template if:true={captureTrainingAndAdvocacy}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Training & Advocacy -->
+                    <lightning-checkbox-group name="i_TrainingAndAdvocacy"
+                                            label={trainingAdvocacyLabel}
+                                            options={trainingAdvocacyOptions}
+                                            value={trainingAdvocacyValues}
+                                            disabled={isDisabled}
+                                            onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>                
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureOutletToProvide}>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Outlet to Provide -->
-                <!--
-                <p class="label">{outletToProvideLabel}</p>
-                <select class="outletToProvide" multiple>
-                    <template for:each={outletToProvideOptions} for:item="bs">
-                        <option key={bs.value} value={bs.value} selected={bs.selected}>{bs.label}</option>
-                    </template>
-                </select>
-            -->
                 <lightning-checkbox-group name="i_OutletToProvide"
                                         label={outletToProvideLabel}
                                         options={outletToProvideOptions}
                                         value={outletToProvideValues}
                                         disabled={isDisabled}
-                                        onchange={handleOutletToProvideChange}></lightning-checkbox-group>
-            
-            </lightning-layout-item>
+                                        onchange={handleOutletToProvideChange}></lightning-checkbox-group>            
+                </lightning-layout-item>
+            </template>
             <template if:true={captureBrandVisibility}>
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-checkbox-group name="i_BrandVisibility" label={brandVisibilityLabel} 

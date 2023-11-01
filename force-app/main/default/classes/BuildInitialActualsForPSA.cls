@@ -6,6 +6,7 @@ public with sharing class BuildInitialActualsForPSA {
     public static void buildInitialActuals(List<String> activityIds) {
         String rtUKPSA = '';
         String rtBRAPSA = '';
+        String rtMXPSA = '';
         
         Map<String, Schema.RecordTypeInfo> rtiList = PMI_Actual__c.SObjectType.getDescribe().getRecordTypeInfosByName();
         if (rtiList.containsKey('UK - PSA')) {
@@ -15,7 +16,7 @@ public with sharing class BuildInitialActualsForPSA {
             rtBRAPSA = rtiList.get('BRA - PSA').getRecordTypeId();
         }
         if (rtiList.containsKey('MX - PSA')) {
-            rtBRAPSA = rtiList.get('MX - PSA').getRecordTypeId();
+            rtMXPSA = rtiList.get('MX - PSA').getRecordTypeId();
         }
 
         
@@ -63,6 +64,9 @@ public with sharing class BuildInitialActualsForPSA {
                     switch on pmi.Activity__r.Market_Name__c {
                         when 'Brazil' {
                             recordTypeId = rtBRAPSA;
+                        }
+                        when 'Mexico' {
+                            recordTypeId = rtMXPSA;
                         }
                         when 'United Kingdom' {
                             recordTypeId = rtUKPSA;

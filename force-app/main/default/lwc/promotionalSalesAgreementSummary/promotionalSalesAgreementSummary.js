@@ -448,6 +448,13 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             //cols = cols.filter(c => c.fieldName.indexOf('listingFee') < 0 && c.fieldName.indexOf('promotionalActivity') < 0 && c.fieldName.indexOf('totalInvestment') < 0);
             //cols = cols.filter(c => c.fieldName != 'discount');
         }
+        if (this.marketName == 'France') {
+            this.showPromotionalActivity = false;
+            this.showTrainingAndAdvocacy = false;
+            this.showListingFee = false;
+            this.showPayments = false;
+        }
+        
         if (this.marketName == 'Mexico') {
             this.showRebateLiability = true;
             this.showTotalInvestment = true;

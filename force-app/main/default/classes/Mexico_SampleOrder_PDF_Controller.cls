@@ -8,7 +8,8 @@ public with sharing class Mexico_SampleOrder_PDF_Controller {
         theSampleOrder = [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Approval_Status__c, Business_Name__c,
                                 Business_Address__c, Business_Address2__c, Business_City__c, Business_State__c, Business_Postcode__c, Business_Country__c,
                                 Classification__c, Contact_Name__c, Contact_Phone__c, Order_Number__c, Requested_By__c, CreatedBy.Name, 
-                                Requested_Delivery_Date__c, Shipping_Instructions__c, Storage_Locker__c, Storage_Locker__r.Name,
+                                Requested_Delivery_Date__c, Shipping_Instructions__c, Storage_Locker__c, Storage_Locker__r.Name, Reason__c,
+                                CreatedBy.Manager.Name,
                                 (SELECT Id, Name, Product__c, Product_Code__c, Product__r.Name, Quantity__c, Product__r.Price__c, Line_Item_Total__c 
                                    FROM SAP_Interfaced_Data_Items__r)
                             FROM SAP_Interfaced_Data__c 
@@ -27,6 +28,7 @@ public with sharing class Mexico_SampleOrder_PDF_Controller {
             totalOrderQuantity += item.Quantity__c;
         }
 
+        managerName = theSampleOrder.CreatedBy.ManagerId == null ? '' : theSampleOrder.CreatedBy.Manager.Name;
     }
     public SAP_Interfaced_Data__c getTheSampleOrder() {
         return theSampleOrder;
@@ -34,6 +36,7 @@ public with sharing class Mexico_SampleOrder_PDF_Controller {
 
     public Date requestedDate               { get; set; }
 
+    public String managerName               { get; set; }
     public String requestedBy               { get; set; }
     public String requestedDay              { get; set; }
     public String requestedMonth            { get; set; }

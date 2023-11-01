@@ -66,7 +66,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Market__c market = [SELECT Id, Name, Maximum_Agreement_Length__c, Capture_End_Date__c, Capture_Volume_in_Bottles__c, 
                                     Capture_Number_of_Payments__c, Capture_PSA_Budget__c, Calculate_PSA_Product_Split__c,
                                     Agreement_Requires_Wholesaler__c, Agreement_Configure_Payments__c, Enable_PSA_Actuals__c,
-                                    Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c, Enable_PSA_Preview__c, Can_PreDate_PSA__c 
+                                    Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c, Enable_PSA_Preview__c, Can_PreDate_PSA__c,
+                                    Capture_Rebate_per_Bottle__c, Load_only_Account_Wholesalers__c 
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -77,13 +78,35 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static Boolean getIsSOMUser() {
         Boolean isSOMUser = false;
         try {
-            List<GroupMember> groups = [SELECT Id, Group.Name FROM GroupMember WHERE UserOrGroupId =:UserInfo.getUserId() AND Group.DeveloperName ='UK_SOM'];
-            isSOMUser = groups == null ? false : groups.size() > 0;
-            if (!isSOMUSer) {
-                Profile profile = [SELECT Id, Name FROM Profile WHERE Id =:UserInfo.getProfileId() LIMIT 1];
-                System.debug('profile: ' + profile);
-                isSOMUser = profile != null && profile.Name == 'System Administrator';
+            /*
+            List<Group> groups = [SELECT Id FROM Group WHERE RelatedId IN (SELECT UserRoleId FROM User WHERE Id=:UserInfo.getUserId()) AND Type = 'Role'];
+            isSOMUser = groups != null && groups.size() > 0;
+
+            if (!isSOMUser) {
+                List<GroupMember> groupMembers = [SELECT Id, UserOrGroupId FROM GroupMember WHERE Group.DeveloperName ='UK_SOM' AND UserOrGroupId =:UserInfo.getUserId()];
+                isSOMUser = groupMembers == null ? false : groupMembers.size() > 0;
+
             }
+            */
+            
+            List<GroupMember> groups = [SELECT Id, UserOrGroupId FROM GroupMember WHERE Group.DeveloperName ='UK_SOM'];
+            //isSOMUser = groups == null ? false : groups.size() > 0;
+            if (groups != null && groups.size() > 0) {
+                String userId = UserInfo.getUserId();
+                String roleId = UserInfo.getUserRoleId();
+                for(GroupMember gm : groups) {
+                    if (gm.UserOrGroupId == userId || gm.UserOrGroupId == roleId) {
+                        isSOMUser = true; break;
+                    }
+                }
+
+                if (!isSOMUSer) {
+                    Profile profile = [SELECT Id, Name FROM Profile WHERE Id =:UserInfo.getProfileId() LIMIT 1];
+                    System.debug('profile: ' + profile);
+                    isSOMUser = profile != null && profile.Name == 'System Administrator';
+                }
+            }
+            
             System.debug('# of groups: ' + groups == null ? 0 : groups.size());
             System.debug('isSOMUSer: ' + isSOMUser);
         } catch(Exception ex) {
@@ -102,7 +125,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
     @AuraEnabled(cacheable=true)
     public static Promotion_Activity__c getPSA(String psaId){
-        return [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
+        return [SELECT Id, Name, RecordTypeId, RecordType.Name, RecordType.DeveloperName, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
                                             Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
                                             Contact__c, Contact__r.Name, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c, Market__r.Enable_PSA_Preview__c,
@@ -117,7 +140,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Market__r.Capture_PSA_Free_Goods__c, Market__r.Enable_PSA_Actuals__c, Limit_to_Selected_Accounts__c, Total_Free_Bottle_Quantity__c,
                                             Total_Actual_Free_Bottle_Qty__c, All_Child_Accounts_Included__c, Total_Rebate_Liability__c, Total_Rebate_Volume__c,
                                             Total_Customer_Profit__c, Total_Return_on_Investment__c, Activity_Type__c, Market__r.Capture_Activity_Type__c, Market__r.Add_New_Accounts_to_PSA__c,
-                                            PMI_Actual_Status__c, Market__r.Can_PreDate_PSA__c,
+                                            PMI_Actual_Status__c, Market__r.Can_PreDate_PSA__c, Market__r.Capture_Rebate_per_Bottle__c, Market__r.Load_only_Account_Wholesalers__c,
+                                            Account_Wholesaler_Preferred__c, Account_Wholesaler_Preferred_Name__c, Account_Wholesaler_Alternate__c, Account_Wholesaler_Alternate_Name__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -200,7 +224,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled
     public static Account getAccountById(String accountId) {
         return [SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,
-                    (SELECT Id, Name, Email FROM Contacts WHERE Decision_Maker__c = true)
+                    (SELECT Id, Name, Email FROM Contacts WHERE Decision_Maker__c = true),
+                    (SELECT Id, Wholesaler_Account_Name__c, Wholesaler_Name__c, Wholesaler__c FROM Wholesalers__r WHERE Is_Active__c = true)
                   FROM Account 
                  WHERE Id =:accountId];
     }
@@ -311,6 +336,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
         String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c, Pack_Quantity__c, Unit_Size__c, Gross_Profit_per_Case__c, Gross_Profit_Flat_Case__c, Gross_Profit_per_Bottle__c, Unit_Cost__c, Price__c, Price_per_Case__c, Wholesale_Price__c FROM Product__c';
         soql += ' WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\' AND Used_For__c INCLUDES (\'Promotion\')';
+        if (marketName == 'France') {
+            soql += ' AND (Channel__c = \'On\' OR Channel__c = \'Both\') ';
+        }
         if (brandsSelected.length() > 0) {
             brandsSelected = '\'' + brandsSelected + '\'';
             brandsSelected = brandsSelected.replaceAll(',', '\',\'');    
@@ -358,12 +386,17 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<Wholesaler__c> getWholesalers(String market) {
-        return [SELECT Id, Name 
-                  FROM Wholesaler__c 
-                 WHERE Is_Active__c = true
-                   AND Market__c =:market  
-                  WITH SECURITY_ENFORCED];
+    public static List<Map<String, String>> getWholesalers(String market) {
+        List<Map<String, String>> wholesalers = new List<Map<String, String>>();
+
+        for(Wholesaler__c w : [SELECT Id, Name FROM Wholesaler__c WHERE Is_Active__c = true AND Market__c =:market WITH SECURITY_ENFORCED]) {
+            wholesalers.add(new Map<String, String>{
+                'Id' => w.Id,
+                'Name' => w.Name
+            });
+        }
+
+        return wholesalers;
     }
 
     @AuraEnabled
@@ -387,7 +420,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
 
     @AuraEnabled(cacheable=true) 
-    public static List<SAP_Interfaced_Data_Configuration__c> getGLMappings(String marketId) {
+    public static List<SAP_Interfaced_Data_Configuration__c> getGLMappings(String marketId, String recordTypeName) {
         if (marketId == null) {
             User u = [SELECT Id, Market__c FROM User WHERE Id =:UserInfo.getUserId()];
             String marketName = 'Australia';
@@ -399,7 +432,10 @@ public with sharing class PromotionalSalesAgreement_Controller {
             marketId = m.Id;
         }
         Map<String, Schema.RecordTypeInfo> rtList = SAP_Interfaced_Data_Configuration__c.SObjectType.getDescribe().getRecordTypeInfosByName();
-        String rtId = rtList.get('UK - PSA').getRecordTypeId();
+        String rtId = '';
+        if (rtList.containsKey(recordTypeName)) {
+            rtId = rtList.get(recordTypeName).getRecordTypeId();
+        }
 
         return [SELECT Id, Classification__c, SoldTo_Code__c
                   FROM SAP_Interfaced_Data_Configuration__c
@@ -408,6 +444,33 @@ public with sharing class PromotionalSalesAgreement_Controller {
                    AND Is_Active__c = true];
     }
 
+    @AuraEnabled(cacheable=true) 
+    public static Map<String, SimpleListItem> getFieldSet(String objectName, String recordTypeName, String marketName) {
+        if (String.isEmpty(objectName)) {
+            objectName = 'Promotion_Activity__c';
+        }
+
+        String fieldSetName = marketName + '_' + recordTypeName;
+        fieldSetName = fieldSetName.replaceAll(' ', '_');
+
+        System.debug('objectName: ' + objectName);
+        System.debug('marketName: ' + marketName);
+        System.debug('recordTypeName: ' + recordTypeName);
+
+        Map<String, SimpleListItem> fieldSetFields = new Map<String, SimpleListItem>();
+
+        Schema.FieldSet fieldSet = null;
+        Schema.SObjectType objectDetails = Schema.getGlobalDescribe().get(objectName);
+        Map<String, Schema.FieldSet> fsMap = objectDetails.getDescribe().fieldSets.getMap();
+        if (fsMap.containsKey(fieldSetName)) {
+            fieldSet = fsMap.get(fieldSetName);
+            for(Schema.FieldSetMember fsm : fieldSet.getFields()) {
+                fieldSetFields.put(fsm.getFieldPath(), new SimpleListItem(fsm.getFieldPath(), fsm.getFieldPath(), false, fsm.getLabel(), false, fsm.getRequired()));
+            }
+        }
+
+        return fieldSetFields;
+    }
     /*
     @AuraEnabled
     public static Promotion_Material_Item__c getPMIDetails(String pmiId) {
@@ -461,6 +524,10 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Limit_to_Selected_Accounts__c = psaData.limitToSelectedAccounts;
             psa.All_Child_Accounts_Included__c = psaData.allChildAccountsIncluded;
             psa.Activity_Type__c = psaData.isDirectRebate ? 'Direct Rebate' : 'Coupon';
+            psa.Account_Wholesaler_Preferred__c = psaData.accountWholesalerPreferred;
+            psa.Account_Wholesaler_Preferred_Name__c = psaData.accountWholesalerPreferredName;
+            psa.Account_Wholesaler_Alternate__c = psaData.accountWholesalerAlternate;
+            psa.Account_Wholesaler_Alternate_Name__c = psaData.accountWholesalerAlternateName;
 
             if (psaData.marketId == null || psaData.marketId == '') {
                 String marketName = psaData.marketName;
@@ -694,7 +761,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         try {
             List<Promotion_Activity__c> activities = [SELECT Id, Total_Actual_Volume__c, Total_Actual_Discount__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy_Paid__c, Market__r.Capture_Volume_in_Bottles__c, Activity_Budget__c, Total_Payments_Paid__c,
-                                            Total_Actual_Volume_Bottles__c, Total_Actual_Free_Bottle_Qty__c, 
+                                            Total_Actual_Volume_Bottles__c, Total_Actual_Free_Bottle_Qty__c, SalesProposal_Actuals_Updated__c,
                                                 (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                                         Total_Training_and_Advocacy_Paid__c, Total_Planned_Discount__c, Total_Actual_Discount__c, Total_Planned_Qty__c 
                                                         FROM Promotions__r),
@@ -808,6 +875,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 }
 
                 psa.Total_Actual_Investment__c = psa.Total_Actual_Discount__c + psa.Total_Listing_Fee_Paid__c + psa.Total_Promotional_Activity_Paid__c + psa.Total_Training_and_Advocacy_Paid__c;
+                psa.SalesProposal_Actuals_Updated__c = false;
 
             }
 
@@ -1022,9 +1090,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static String submitForApproval(String psaId) {
         String msg = 'OK';
         try {
-            Promotion_Activity__c psa = [SELECT Id, Status__c FROM Promotion_Activity__c WHERE Id =:psaId];
+            Promotion_Activity__c psa = [SELECT Id, Status__c, Market__r.Name FROM Promotion_Activity__c WHERE Id =:psaId];
             if (psa != null) {
                 psa.Status__c = 'Submitted';
+                if (psa.Market__r.Name == 'France') {
+                    psa.Status__c = 'Approved';
+                    psa.Is_Approved__c = true;
+                }
                 update psa;
 
                 /*
