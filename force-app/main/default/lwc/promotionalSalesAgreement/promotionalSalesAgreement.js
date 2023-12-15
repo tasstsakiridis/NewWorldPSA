@@ -493,6 +493,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get isApproved() {
         return this.thePSA != null && (this.thePSA.Status__c == 'Approved' || this.thePSA.Is_Approved__c);
     }
+    get canSendContract() {
+        if (this.thePSA == null || this.thePSA.Market__r == null || this.thePSA.Market__r.Name == 'France') {
+            return false;
+        } else {
+            return this.isApproved;
+        }
+    }
     get canChangeStatus() {
         console.log('[canChangestatus] status, isSOMUser', this.status, this.isSOMUser);
         return this.status != 'New' && this.status != 'Submitted' && this.status != 'Updated' && this.isSOMUser;
@@ -1826,6 +1833,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.parentAccountId = this.parentAccount.Id;
         param.allChildAccountsIncluded = this.allAccountsSelected;
         param.signingCustomerId = this.signingCustomer.Id;
+        param.signingCustomerFirstName = this.signingCustomer.FirstName;
+        param.signingCustomerLastName = this.signingCustomer.LastName;
         param.signingCustomerName = this.signingCustomerName;
         param.signingCustomerEmail = this.signingCustomerEmail;
         param.comments = this.comments == undefined ? '' : this.comments;

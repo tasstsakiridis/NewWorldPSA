@@ -37,7 +37,7 @@
                                     <template if:true={canClone}>
                                         <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
                                     </template>
-                                    <template if:true={isApproved}>
+                                    <template if:true={canSendContract}>
                                         <lightning-button label={labels.docusign.label} icon-name="utility:edit_form" title="Docusign" class="slds-m-horizontal_x-small" onclick={handleDocusignButtonClick}></lightning-button>
                                     </template>
                                     <template if:true={canViewSummary}>

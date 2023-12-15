@@ -60,6 +60,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     wholesalerOptions;
     captureVolumeInBottles;
     captureFreeGoods;
+    validateActualVolume = false;
     
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
@@ -83,6 +84,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             }
             this.captureVolumeInBottles = this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
             this.captureFreeGoods = this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
+            this.validateActualVolume = this.thePSA.Market__r.Validate_Actual_Volume__c;
             
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.getGLMappingsForPSA();

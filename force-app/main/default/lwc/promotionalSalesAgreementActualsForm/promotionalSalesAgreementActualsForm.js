@@ -199,6 +199,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     captureFreeGoods;
 
     @api 
+    validateActualVolume;
+
+    @api 
     isLocked;
 
     error;
@@ -734,7 +737,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         } else {
             console.log('[validateForm] rebateType, rebateAmount, remainingRebate', this.rebateType, this.rebateAmount, this.remainingRebate);
             let total = 0;
-            if (this.rebateType == 'Volume') {
+            if (this.rebateType == 'Volume' && this.validateActualVolume == true) {
                 total = this.remainingRebate + this.totalActualVolume;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
                 console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualVolume, total);

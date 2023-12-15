@@ -67,7 +67,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                     Capture_Number_of_Payments__c, Capture_PSA_Budget__c, Calculate_PSA_Product_Split__c,
                                     Agreement_Requires_Wholesaler__c, Agreement_Configure_Payments__c, Enable_PSA_Actuals__c,
                                     Capture_Activity_Type__c, Add_New_Accounts_to_PSA__c, Enable_PSA_Preview__c, Can_PreDate_PSA__c,
-                                    Capture_Rebate_per_Bottle__c, Load_only_Account_Wholesalers__c 
+                                    Capture_Rebate_per_Bottle__c, Load_only_Account_Wholesalers__c, Validate_Actual_Volume__c 
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -127,7 +127,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static Promotion_Activity__c getPSA(String psaId){
         return [SELECT Id, Name, RecordTypeId, RecordType.Name, RecordType.DeveloperName, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
                                             Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
-                                            Contact__c, Contact__r.Name, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
+                                            Contact__c, Contact__r.Name, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c, Market__r.Enable_PSA_Preview__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Volume__c, Total_Discount__c, Total_Investment__c, 
                                             Total_Listing_Fee__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, 
@@ -142,6 +142,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Total_Customer_Profit__c, Total_Return_on_Investment__c, Activity_Type__c, Market__r.Capture_Activity_Type__c, Market__r.Add_New_Accounts_to_PSA__c,
                                             PMI_Actual_Status__c, Market__r.Can_PreDate_PSA__c, Market__r.Capture_Rebate_per_Bottle__c, Market__r.Load_only_Account_Wholesalers__c,
                                             Account_Wholesaler_Preferred__c, Account_Wholesaler_Preferred_Name__c, Account_Wholesaler_Alternate__c, Account_Wholesaler_Alternate_Name__c,
+                                            Market__r.Validate_Actual_Volume__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c 
@@ -224,7 +225,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled
     public static Account getAccountById(String accountId) {
         return [SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,
-                    (SELECT Id, Name, Email FROM Contacts WHERE Decision_Maker__c = true),
+                    (SELECT Id, Name, FirstName, LastName, Email FROM Contacts WHERE Decision_Maker__c = true),
                     (SELECT Id, Wholesaler_Account_Name__c, Wholesaler_Name__c, Wholesaler__c FROM Wholesalers__r WHERE Is_Active__c = true)
                   FROM Account 
                  WHERE Id =:accountId];
@@ -232,7 +233,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled(Cacheable=true)
     public static PagedResult getAccountsByName(String accountName, Boolean isSearchingForParent, String market, String marketName, Integer pageNumber) {        
         String soql = 'SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,';
-        soql += '(SELECT Id, Name FROM Contacts WHERE Decision_Maker__c = true)';
+        soql += '(SELECT Id, Name, FirstName, LastName FROM Contacts WHERE Decision_Maker__c = true)';
         soql += ' FROM Account ';
         
         String whereClause = ' WHERE Name LIKE \'%' + String.escapeSingleQuotes(accountName) + '%\'';
@@ -510,6 +511,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Number_of_Payments__c = Integer.valueOf(psaData.numberOfPayments);
             psa.Account__c = psaData.parentAccountId;
             psa.Contact__c = psaData.signingCustomerId;
+            psa.Contact_First_Name__c = psaData.signingCustomerFirstName;
+            psa.Contact_Last_Name__c = psaData.signingCustomerLastName;
             psa.Wholesaler_Preferred__c = psaData.wholesalerPreferredId;
             psa.Wholesaler_Preferred_Name__c = psaData.wholesalerPreferredName;
             psa.Wholesaler_Alternate__c = psaData.wholesalerAlternateId;
@@ -1141,7 +1144,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         try {
             Promotion_Activity__c psa = [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
                                                 Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
-                                                Contact__c, Contact__r.Name, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
+                                                Contact__c, Contact__r.Name,Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                                 Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
                                                 Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
                                                 Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, Reminder_Date__c,

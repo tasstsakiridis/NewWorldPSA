@@ -11,7 +11,13 @@
             OCO = 'Tag', LF = '1' ])}" value="Generate DocuSign Document" id="btn_Generate_DocuSign_BRA" />
 
         </apex:outputPanel>
-        <apex:outputPanel rendered="{!psa.Market_Name__c != 'Brazil'}">
+        <apex:outputPanel rendered="{!psa.Market_Name__c == 'France'}">
+            <apex:commandButton action="{!URLFOR('/apex/dsfs__DocuSign_CreateEnvelope', null, [ SourceID = psa.Id, DSEID = '0', DST='04f148d0-e0b0-46a9-9da7-49c1d068964b',
+            CRL = 'Email~' + psa.Contact_Email__c + ';FirstName~' + psa.Contact_First_Name__c + ';LastName~' + psa.Contact_Last_Name__c + ';RoutingOrder~1;Role~Signer
+            1, Email~' + currentUser.Manager_Email__c + ';FirstName~' + currentUser.Manager_FirstName__c + ';LastName~' + currentUser.Manager_LastName__c + ';Role~Signer 2;RoutingOrder~2;',
+            OCO = 'Tag', LF = '0', CCRM = 'Signer 1~Customer;Signer 2~Manager' ] )}" value="Generate DocuSign Document" id="btn_Generate_DocuSign_FRA" />
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!AND(psa.Market_Name__c != 'Brazil',psa.Market_Name__c != 'France')}">
             <apex:commandButton action="{!URLFOR('/apex/dsfs__DocuSign_CreateEnvelope', null, [
                                                 SourceID = Promotion_Activity__c.Id,
                                                 DSEID = '0',

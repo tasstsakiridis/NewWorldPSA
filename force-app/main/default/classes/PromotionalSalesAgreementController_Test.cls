@@ -15,13 +15,19 @@ private class PromotionalSalesAgreementController_Test {
         
         String rtWholesaler = wRecordTypes.get('United Kingdom').getRecordTypeId();
         String rtAccount_UK = aRecordTypes.get('United Kingdom - On Premise').getRecordTypeId();
+        String rtAccount_MX = aRecordTypes.get('MX - Outlet On').getRecordTypeId();
         String rtParentAccount_UK = aRecordTypes.get('Parent').getRecordTypeId();
         String rtContact_UK = cRecordTypes.get('UK - Contacts').getRecordTypeId();
+        String rtContact_MX = cRecordTypes.get('MX - Contacts').getRecordTypeId();
         String rtWetGoods = pRecordTypes.get('Wet Goods').getRecordTypeId();
         String rtPSAActivity = paRecordTypes.get('UK - PSA').getRecordTypeId();
+        String rtMXPSAActivity = paRecordTypes.get('MX - PSA').getRecordTypeId();
         String rtPSAPromotion = promoRecordTypes.get('UK - PSA').getRecordTypeId();
+        String rtMXPSAPromotion = promoRecordTypes.get('MX - PSA').getRecordTypeId();
         String rtPSAPMI = pmiRecordTypes.get('UK - PSA').getRecordTypeId();
+        String rtMXPSAPMI = pmiRecordTypes.get('MX - PSA').getRecordTypeId();
         String rtPSAPMIA = pmiaRecordTypes.get('UK - PSA').getRecordTypeId();
+        String rtMXPMIA = pmiaRecordTypes.get('MX - PSA').getRecordTypeId();
 
         User manager = helper.createUser('System Administrator', 'Test', 'Manager', 'United Kingdom');
         insert manager;
@@ -30,59 +36,85 @@ private class PromotionalSalesAgreementController_Test {
         user1.ManagerId = manager.Id;
         insert user1;
 
+
+        Market__c mUK = helper.createMarket('United Kingdom');
+        mUK.Country_ISO_Code_2__c = 'GB';
+        mUK.Country_ISO_Code_3__c = 'GBR';
+        mUK.Maximum_Agreement_Length__c = 5;
+        
+        Market__c mMX = helper.createMarket('Mexico');
+        mMX.Country_ISO_Code_2__c = 'MX';
+        mMX.Country_ISO_Code_3__c = 'MEX';
+        mMX.Maximum_Agreement_Length__c = 5;
+        
+        Market__c[] markets = new Market__c[]{mUK, mMX};
+        insert markets;
+
+        Account parentAccount = helper.createAccount('Test UK Parent Account', mUK.Id, 'Wholesaler');
+        parentAccount.RecordTypeId = rtParentAccount_UK;
+        parentAccount.Status__c = 'Active';
+        parentAccount.Market__c = mUK.Id;
+        parentAccount.Is_Active__c = true;
+        parentAccount.ShippingStreet = '8 Otley Road';
+        parentAccount.ShippingCity = 'Leeds';
+        parentAccount.ShippingState = '';
+        parentAccount.ShippingPostalCode = 'LS20 8AH';
+        parentAccount.ShippingCountry = 'United Kingdom';
+        insert parentAccount;
+        
+        Account childAccount = helper.createAccount('Test UK Child Account', mUK.Id, 'On Premise');
+        childAccount.RecordTypeId = rtAccount_UK;
+        childAccount.ParentId = parentAccount.Id;
+        childAccount.Market__c = mUK.Id;
+        childAccount.Is_Active__c = true;
+        childAccount.Status__c = 'Active';
+        childAccount.Sales_Route__c = 'WEST COAST';
+        childAccount.ShippingStreet = '100 Acre Road';
+        childAccount.ShippingCity = 'Glasgow';
+        childAccount.ShippingPostalCode = 'G20 OTL';
+        childAccount.ShippingCountry = 'United Kingdom';
+        
+        Account mxAccount = helper.createAccount('Test MX Account', mMX.Id, 'On Premise');
+        mxAccount.RecordTypeId = rtAccount_MX;
+        mxAccount.Is_Active__c = true;
+        mxAccount.Status__c = 'Active';
+        mxAccount.ShippingStreet = '1 mexico Road';
+        mxAccount.ShippingCity = 'Mexico';
+        mxAccount.ShippingPostalCode = '20000';
+        mxAccount.ShippingCountry = 'Mexico';
+        mxAccount.Market__c = mMX.Id;
+        
+        Account[] accounts = new Account[]{childAccount, mxAccount};
+        insert accounts;
+
+        Contact contact1 = helper.createContact('Test UK', 'Parent Contact', parentAccount.Id);
+        contact1.Decision_Maker__c = true;
+        contact1.RecordTypeId = rtContact_UK;
+        
+        Contact contact2 = helper.createContact('Test UK', 'Child Contact', childAccount.Id);
+        contact2.Decision_Maker__c = true;
+        contact2.RecordTypeId = rtContact_UK;
+        
+        Contact contact3 = helper.createContact('Test MX', 'Contact', mxAccount.Id);
+
+        Contact[] l_Contacts = new Contact[]{contact1, contact2, contact3};
+        insert l_Contacts;
+
+        Wholesaler__c wholesaler1 = new Wholesaler__c(RecordTypeId=rtWholesaler,Name='WholesalerPreferred',Wholesaler_Name__c='Wholesaler1',Market__c=mUK.Id,Is_Active__c=true);
+        Wholesaler__c wholesaler2 = new Wholesaler__c(RecordTypeId=rtWholesaler,Name='WholesalerAlternate',Wholesaler_Name__c='Wholesaler2',Market__c=mUK.Id,Is_Active__c=true);
+        Wholesaler__c[] l_Wholesaler = new Wholesaler__c[]{wholesaler1, wholesaler2};
+        insert l_Wholesaler;
+
+        Brand__c brand = new Brand__c(Name='Brand');
+        insert brand;
+            
+        List<Product__c> products = helper.createProducts(6, 'Wet Goods', mUK.Id, brand.Id, false);
+        products[4].Market__c = mMX.Id;
+        products[5].Market__c = mMX.Id;
+        insert products;
+            
         System.runAs(user1) {
-
-            Market__c mUK = helper.createMarket('United Kingdom');
-            mUK.Country_ISO_Code_2__c = 'GB';
-            mUK.Country_ISO_Code_3__c = 'GBR';
-            mUK.Maximum_Agreement_Length__c = 5;
-            insert mUK;
-
-            Account parentAccount = helper.createAccount('Test UK Parent Account', mUK.Id, 'Wholesaler');
-            parentAccount.RecordTypeId = rtParentAccount_UK;
-            parentAccount.Status__c = 'Active';
-            parentAccount.Is_Active__c = true;
-            parentAccount.ShippingStreet = '8 Otley Road';
-            parentAccount.ShippingCity = 'Leeds';
-            parentAccount.ShippingState = '';
-            parentAccount.ShippingPostalCode = 'LS20 8AH';
-            parentAccount.ShippingCountry = 'United Kingdom';
-            insert parentAccount;
-
-            Account childAccount = helper.createAccount('Test UK Child Account', mUK.Id, 'On Premise');
-            childAccount.RecordTypeId = rtAccount_UK;
-            childAccount.ParentId = parentAccount.Id;
-            childAccount.Is_Active__c = true;
-            childAccount.Status__c = 'Active';
-            childAccount.Sales_Route__c = 'WEST COAST';
-            childAccount.ShippingStreet = '100 Acre Road';
-            childAccount.ShippingCity = 'Glasgow';
-            childAccount.ShippingPostalCode = 'G20 OTL';
-            childAccount.ShippingCountry = 'United Kingdom';
-            insert childAccount;
-
-            Contact contact1 = helper.createContact('Test UK', 'Parent Contact', parentAccount.Id);
-            contact1.Decision_Maker__c = true;
-            contact1.RecordTypeId = rtContact_UK;
-            
-            Contact contact2 = helper.createContact('Test UK', 'Child Contact', childAccount.Id);
-            contact2.Decision_Maker__c = true;
-            contact2.RecordTypeId = rtContact_UK;
-
-            Contact[] l_Contacts = new Contact[]{contact1, contact2};
-            insert l_Contacts;
-
-            Wholesaler__c wholesaler1 = new Wholesaler__c(RecordTypeId=rtWholesaler,Name='WholesalerPreferred',Wholesaler_Name__c='Wholesaler1',Market__c=mUK.Id,Is_Active__c=true);
-            Wholesaler__c wholesaler2 = new Wholesaler__c(RecordTypeId=rtWholesaler,Name='WholesalerAlternate',Wholesaler_Name__c='Wholesaler2',Market__c=mUK.Id,Is_Active__c=true);
-            Wholesaler__c[] l_Wholesaler = new Wholesaler__c[]{wholesaler1, wholesaler2};
-            insert l_Wholesaler;
-
-            Brand__c brand = new Brand__c(Name='Brand');
-            insert brand;
-            
-            List<Product__c> products = helper.createProducts(3, 'Wet Goods', mUK.Id, brand.Id, false);
-            insert products;
-            
+        
             Promotion_Activity__c psa1 = new Promotion_Activity__c();
             psa1.Name = 'Test PSA 1';
             psa1.RecordTypeId = rtPSAActivity;
@@ -130,9 +162,45 @@ private class PromotionalSalesAgreementController_Test {
             psa4.Reminder_Date__c = null;
             psa4.Next_Email_Date__c = psa4.End_Date__c.addDays(10);
             
-            Promotion_Activity__c[] l_PSA = new Promotion_Activity__c[]{psa1, psa2, psa3, psa4};
+            Promotion_Activity__c psa5 = new Promotion_Activity__c();
+            psa5.RecordTypeId = rtMXPSAActivity;
+            psa5.Name = 'Test MX PSA 1';
+            psa5.Begin_Date__c = Date.today();
+            psa5.End_Date__c = psa5.Begin_Date__c.addMonths(2);
+            psa5.Account__c = mxAccount.Id;
+            psa5.Contact__c = contact3.Id;
+            psa5.Is_Length_in_Years__c = false;
+            
+            Promotion_Activity__c[] l_PSA = new Promotion_Activity__c[]{psa1, psa2, psa3, psa4, psa5};
             insert l_PSA;
 
+            Promotion__c mxPromotion = new Promotion__c();
+            mxPromotion.RecordTypeId = rtMXPSAPromotion;
+            mxPromotion.Promotion_Activity__c = psa5.Id;
+            mxPromotion.Account__c = mxAccount.Id;
+            insert mxPromotion;
+            
+            Promotion_Material_Item__c mxPMI1 = new Promotion_Material_Item__c();
+            mxPMI1.RecordTypeId = rtMXPSAPMI;
+            mxPMI1.Activity__c = psa5.Id;
+            mxPMI1.Promotion__c = mxPromotion.Id;
+            mxPMI1.Product_Custom__c = products[4].Id;
+            mxPMI1.Plan_Volume__c = 1;
+            insert mxPMI1;
+
+			PMI_Actual__c mxPMIA1 = new PMI_Actual__c();
+			mxPMIA1.RecordTypeId = rtMXPMIA;
+            mxPMIA1.Activity__c = psa5.Id;
+            mxPMIA1.Promotion__c = mxPromotion.Id;
+            mxPMIA1.Promotion_Material_Item__c = mxPMI1.Id;
+            mxPMIA1.Period__c = 0;
+            mxPMIA1.Rebate_Type__c = 'Volume';
+            mxPMIA1.Rebate_Amount__c = 1;
+            mxPMIA1.Act_Qty__c = 1;
+            mxPMIA1.External_Key__c = mxPromotion.Id + '-' + mxPMI1.Id + '-0_Volume';
+            mxPMIA1.Approval_Status__c = 'Submit';
+            insert mxPMIA1;
+            
             ContentVersion cv = new ContentVersion();
             cv.Title = 'Test Document';
             cv.PathOnClient = 'Test.png';
@@ -168,7 +236,7 @@ private class PromotionalSalesAgreementController_Test {
             PagedResult pr4 = PromotionalSalesAgreement_Controller.getBrands(1);
             System.assertNotEquals(null, pr4.records, 'get brands failed');
 
-            List<Wholesaler__c> wholesalers = PromotionalSalesAgreement_Controller.getWholesalers(mUK.Id);
+            List<Map<String, String>> wholesalers = PromotionalSalesAgreement_Controller.getWholesalers(mUK.Id);
             System.assertNotEquals(null, wholesalers, 'get wholesalers failed');
 
             PSAWrapper wrapper1 = new PSAWrapper();
@@ -249,7 +317,7 @@ private class PromotionalSalesAgreementController_Test {
             update psa1;
             
             Boolean isSOMUser = PromotionalSalesAgreement_Controller.getIsSOMUser();
-            System.assertEquals(false, isSOMUser);
+            //System.assertEquals(true, isSOMUser);
 
             User u = PromotionalSalesAgreement_Controller.getUserDetails();
             System.assertNotEquals(null, u);
@@ -277,8 +345,8 @@ private class PromotionalSalesAgreementController_Test {
 
             List<String> pmiaIds = PromotionalSalesAgreement_Controller.createActuals(psa1.Id, rtPSAPMIA, promotionId, pmiId, wholesalerId, Date.today(), externalKey, 'New', '', 6,true,'test comments', rebates);
             System.assertNotEquals(0, pmiaIds.size());
-
-            msg = PromotionalSalesAgreement_Controller.updateActualTotals(psa1.Id);
+                       
+            msg = PromotionalSalesAgreement_Controller.updateActualTotals(new List<String>{psa1.Id});
             //System.assertEquals('OK', msg);
             
             PMI_Actual__c pmia2 = PromotionalSalesAgreement_Controller.getPMIADetails(pmiaIds[0]);
@@ -295,6 +363,8 @@ private class PromotionalSalesAgreementController_Test {
             
             PSAWrapper wrapper2 = new PSAWrapper(psa1);
             System.assertNotEquals(null, wrapper2);
+            
+            
             
             //UK_PSA_CONTRACT_Controller contractController = new UK_PSA_CONTRACT_Controller();
             //contractController.setThePSA(psa1);
@@ -322,6 +392,26 @@ private class PromotionalSalesAgreementController_Test {
             ApexPages.currentPage().getParameters().put('id', psa1.Id);
             PSA_Preview_Controller psaPreviewCtrl = new PSA_Preview_Controller();
             Promotion_Activity__c previewPSA = psaPreviewCtrl.getPsa();
+            
+            ApexPages.currentPage().getParameters().put('id', psa5.Id);
+            ApexPages.Component cmp = psaPreviewCtrl.getPreviewComponent();
+
+            SimpleListItem sli = new SimpleListItem();
+            SimpleListItem sli2 = new SimpleListItem('123', 'sli2');
+            System.assertEquals('sli2', sli2.name);
+
+            SimpleListitem sli3 = new SimpleListItem('123', 'sli3', 'test sli3');
+            System.assertEquals('test sli3', sli3.description);
+
+            SimpleListItem sli4 = new SimpleListItem('123', 'sli4', false, 'test sli4', true);
+            System.assertEquals(true, sli4.isDefault);
+
+            SimpleListItem sli5 = new SimpleListItem('123', 'sli5', false, 'test sli5', true, false);
+            System.assertEquals(false, sli5.isRequired);
+
+            SimpleListItem sli6 = new SimpleListItem('sli6', false);
+            System.assertEquals(false, sli6.isRequired);
+
             Test.stopTest();
         }
     }

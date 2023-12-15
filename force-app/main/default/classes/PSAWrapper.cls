@@ -99,6 +99,12 @@ public with sharing class PSAWrapper {
     @AuraEnabled 
     public String signingCustomerName { get; set; }
 
+    @AuraEnabled 
+    public String signingCustomerFirstName { get; set; }
+
+    @AuraEnabled 
+    public String signingCustomerLastName { get; set; }
+
     @AuraEnabled
     public String signingCustomerEmail { get; set; }
 
@@ -193,6 +199,8 @@ public with sharing class PSAWrapper {
         this.allChildAccountsIncluded = false;
         this.signingCustomerId = '';
         this.signingCustomerName = '';
+        this.signingCustomerFirstName = '';
+        this.signingCustomerLastName = '';
         this.signingCustomerEmail = '';
         this.lengthOfPSA = 0;
         this.isLengthInYears = true;
@@ -234,6 +242,8 @@ public with sharing class PSAWrapper {
         this.allChildAccountsIncluded = psa.All_Child_Accounts_Included__c;
         this.signingCustomerId = psa.Contact__c;
         if (psa.Contact__r != null) {
+            this.signingCustomerFirstName = psa.Contact__r.FirstName;
+            this.signingCustomerLastName = psa.Contact__r.LastName;
             this.signingCustomerName = psa.Contact__r.Name;
             this.signingCustomerEmail = psa.Contact__r.Email;    
         }
