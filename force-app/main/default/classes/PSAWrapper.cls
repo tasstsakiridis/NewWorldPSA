@@ -39,6 +39,9 @@ public with sharing class PSAWrapper {
         public Decimal trainingAndAdvocacyAmount { get; set; }
 
         @AuraEnabled 
+        public Decimal brandSupport { get; set; }
+
+        @AuraEnabled 
         public String outletToProvide { get; set; }
 
         @AuraEnabled 
@@ -148,6 +151,9 @@ public with sharing class PSAWrapper {
     public String status { get; set; }
 
     @AuraEnabled 
+    public String promotionType { get; set; }
+
+    @AuraEnabled 
     public String comments { get; set; }
 
     @AuraEnabled 
@@ -215,6 +221,7 @@ public with sharing class PSAWrapper {
         this.wholesalerPreferredId = '';
         this.wholesalerAlternateName = '';
         this.status = 'OK';
+        this.promotionType = '';
         this.message = '';
         this.purchaseOrder = '';
         this.comments = '';
@@ -257,6 +264,7 @@ public with sharing class PSAWrapper {
         this.wholesalerPreferredId = psa.Wholesaler_Preferred__c;
         this.wholesalerPreferredName = psa.Wholesaler_Preferred_Name__c;
         this.status = psa.Status__c;
+        this.promotionType = psa.Promotion_Type__c;
         this.purchaseOrder = psa.Purchase_Order__c;
         this.comments = psa.Evaluation_Comments__c;
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);

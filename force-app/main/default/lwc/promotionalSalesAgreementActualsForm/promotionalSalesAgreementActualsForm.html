@@ -154,13 +154,13 @@
                                                 <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                             </template>
                                             <template if:true={captureVolumeInBottles}>
-                                                <lightning-input type="number" label={actualQtyFormattedLabel} name="i_ActQty" value={rebate.rebateAmount}
+                                                <lightning-input type="number" label={rebate.label} name="i_ActQty" value={rebate.rebateAmount}
                                                     placeholder={labels.actualQty.placeholder} data-rebate-type={rebate.rebateType} step="1"
                                                     onchange={handleRebateAmountChange}>
                                                 </lightning-input>
                                             </template>
                                             <template if:false={captureVolumeInBottles}>
-                                                <lightning-input type="number" label={actualQtyFormattedLabel} name="i_ActQty" value={rebate.rebateAmount}
+                                                <lightning-input type="number" label={rebate.label} name="i_ActQty" value={rebate.rebateAmount}
                                                     placeholder={labels.actualQty.placeholder} data-rebate-type={rebate.rebateType} step="0.01"
                                                     onchange={handleRebateAmountChange}>
                                                 </lightning-input>
@@ -248,11 +248,11 @@
                                     <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number>
                                 </div>
 
-                                <template if:true={isPhone}>
+                                <template lwc:if={isNotPhone}>
                                     <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                 </template>
                                 <lightning-input type="number" 
-                                                label={actualQtyFormattedLabel} 
+                                                label={rebateLabel} 
                                                 name="i_ActQty" value={rebateAmount} 
                                                 placeholder={labels.actualQty.placeholder} 
                                                 step="0.01"

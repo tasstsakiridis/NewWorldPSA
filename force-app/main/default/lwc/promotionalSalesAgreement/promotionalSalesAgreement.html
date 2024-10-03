@@ -192,12 +192,17 @@
                             </template>
                             <template if:true={captureTotalBudget}>
                                 <lightning-layout-item size="12" padding="around-small">
-                                    <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} onchange={handleTotalBudgetChange}></lightning-input>
+                                    <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} class="slds-m-horizontal_small" disabled={isLocked} onchange={handleTotalBudgetChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>
                             <template if:true={capturePercentageVisibility}>
                                 <lightning-layout-item size="12" padding="around-small">
-                                    <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} onchange={handlePercentageVisibilityChange}></lightning-input>
+                                    <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} disabled={isLocked} onchange={handlePercentageVisibilityChange}></lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                            <template if:true={capturePromotionType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_PromotionType" label={labels.promotionType.label} value={promotionType} options={promotionTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} onchange={handlePromotionTypeChange}></lightning-combobox>
                                 </lightning-layout-item>
                             </template>
                             <template if:true={captureActivityType}>

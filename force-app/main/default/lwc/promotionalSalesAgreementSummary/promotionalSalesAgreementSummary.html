@@ -211,6 +211,39 @@
                                 </div>
                             </lightning-layout-item>    
                         </template>
+                        <template if:true={showBrandSupport}>
+                            <lightning-layout-item padding="around-small">
+                                <div class="section">
+                                    <h4 class="slds-text-title_caps">{labels.brandSupport.label}</h4>
+                                    <table class="slds-m-left_x-small slds-m-top_small">
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.total.label}</h4>
+                                            </td>
+                                            <td class="col2"><lightning-formatted-number value={brandSupport} format-style="currency"
+                                                    minimum-fraction-digits="2" maximum-fraction-digits="2"
+                                                    currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.paid.label}</h4>
+                                            </td>
+                                            <td class="col2"><lightning-formatted-number value={brandSupportPaid} format-style="currency"
+                                                    minimum-fraction-digits="2" maximum-fraction-digits="2"
+                                                    currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.balance.label}</h4>
+                                            </td>
+                                            <td class="col2"><lightning-formatted-number value={brandSupportBalance} format-style="currency"
+                                                    minimum-fraction-digits="2" maximum-fraction-digits="2"
+                                                    currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
                     </lightning-layout>
                 </lightning-layout-item>
                 <lightning-layout-item size="12" padding="around-small">

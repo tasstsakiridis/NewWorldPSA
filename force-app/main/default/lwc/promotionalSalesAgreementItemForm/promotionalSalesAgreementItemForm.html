@@ -238,15 +238,21 @@
                     </lightning-input>
                 </lightning-layout-item>
             </template>
+            <template if:true={captureBrandSupport}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Brand Support -->
+                    <lightning-input type="number" name="i_BrandSupport" label={brandSupportLabel}
+                        value={brandSupport} readonly={isDisabled} onchange={handleBrandSupportChange}
+                        formatter="currency">
+                    </lightning-input>                        
+                </lightning-layout-item>
+            </template>
             <template if:true={captureTrainingAndAdvocacy}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Training & Advocacy -->
-                    <lightning-checkbox-group name="i_TrainingAndAdvocacy"
-                                            label={trainingAdvocacyLabel}
-                                            options={trainingAdvocacyOptions}
-                                            value={trainingAdvocacyValues}
-                                            disabled={isDisabled}
-                                            onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>                
+                    <lightning-checkbox-group name="i_TrainingAndAdvocacy" label={trainingAdvocacyLabel}
+                        options={trainingAdvocacyOptions} value={trainingAdvocacyValues} disabled={isDisabled}
+                        onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
                 </lightning-layout-item>
             </template>
             <template if:true={captureOutletToProvide}>
@@ -281,15 +287,17 @@
                 </lightning-layout-item>
             </template>
 
-            <lightning-layout-item size="12" padding="around-small">
-                <lightning-input name="i_Comments" type="text"
-                                 max="32768"
-                                 value={comments}
-                                 label={labels.comments.label}
-                                 placeholder={labels.comments.placeholder}
-                                 onchange={handleCommentsChange}>
-                </lightning-input>
-            </lightning-layout-item>
+            <template if:true={captureComments}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input name="i_Comments" type="text"
+                                    max="32768"
+                                    value={comments}
+                                    label={labels.comments.label}
+                                    placeholder={labels.comments.placeholder}
+                                    onchange={handleCommentsChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
         </lightning-layout>
     </div>
     </template>    

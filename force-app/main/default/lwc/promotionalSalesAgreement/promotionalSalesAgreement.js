@@ -18,7 +18,7 @@ import getWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controlle
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getUserDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getUserDetails';
 import savePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.savePSA';
-import detachDocument from '@salesforce/apex/PromotionalSalesAgreement_Controller.detachDocument';
+//import detachDocument from '@salesforce/apex/PromotionalSalesAgreement_Controller.detachDocument';
 import getIsSOMUser from '@salesforce/apex/PromotionalSalesAgreement_Controller.getIsSOMUser';
 import submitForApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.submitForApproval';
 import recallApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.recallApproval';
@@ -93,6 +93,7 @@ import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibili
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
 import LABEL_PREVIEW from '@salesforce/label/c.Preview';
+import LABEL_PROMOTION_TYPE from '@salesforce/label/c.Promotion_Type';
 import LABEL_PSA_RETAIL_ACCOUNTS_HEADING from '@salesforce/label/c.PSA_Retail_Accounts_Heading';
 import LABEL_PURCHASE_ORDER from '@salesforce/label/c.Purchase_Order';
 import LABEL_RECALL from '@salesforce/label/c.Recall';
@@ -193,6 +194,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         percentageVisibility    : { label: LABEL_PERCENTAGE_VISIBILITY },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         preview                 : { label: LABEL_PREVIEW },
+        promotionType           : { label: LABEL_PROMOTION_TYPE },
         purchaseOrder           : { label: LABEL_PURCHASE_ORDER },
         recall                  : { label: LABEL_RECALL, recalledMessage: LABEL_RECALL_SUCCESS.replace('%0', 'PSA') },
         retailAccountsHeading   : { label: LABEL_PSA_RETAIL_ACCOUNTS_HEADING },
@@ -229,6 +231,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
 
     @api recordId;
+    
     error;
     errors;
     hasLengthOfPSAError = false;
@@ -254,6 +257,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     captureTotalBudget = false;
     captureEndDate = false;
     captureActivityType = false;
+    capturePromotionType = false;
     agreementRequiresWholesaler = false;
     configurePayments = false;
     allAccountsSelected = false;
@@ -269,6 +273,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     promotionsToDelete = new Map();
     wiredAccount;
     purchaseOrder;
+    promotionType;
     comments;
     numberOfPayments = 1;
     totalBudget = 0;
@@ -304,7 +309,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.thePSA = undefined;
             } else if (value.data) {
                 this.error = undefined;
-                this.loadPSADetails(value.data);
+                this.loadPSADetails(value.data.psa);
                 //this.loadAttachedFiles();
                 this.isWorking = false;
             }
@@ -343,6 +348,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     numberOfPaymentOptions = numberOfPaymentOptions;
     statusOptions;
+    promotionTypeOptions;
+
     recordTypeId;
     picklistValuesMap;
     @wire(getPicklistValuesByRecordType, { objectApiName: OBJECT_ACTIVITY, recordTypeId: '$recordTypeId' })
@@ -378,6 +385,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.canAddNewAccountsToPSA = this.market.Add_New_Accounts_to_PSA__c == undefined ? false : this.market.Add_New_Accounts_to_PSA__c;
             this.canPreDatePSA = this.market.Can_PreDate_PSA__c == undefined ? false : this.market.Can_PreDate_PSA__c;
             this.loadOnlyAccountWholesalers = this.market.Load_only_Account_Wholesalers__c == undefined ? false : this.market.Load_only_Account_Wholesalers__c;
+            this.capturePromotionType = this.market.Capture_Promotion_Type__c == undefined ? false : this.market.Capture_Promotion_Type__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -494,11 +502,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return this.thePSA != null && (this.thePSA.Status__c == 'Approved' || this.thePSA.Is_Approved__c);
     }
     get canSendContract() {
+        return this.thePSA != null && this.isApproved && this.thePSA.Market__r != null && this.thePSA.Market__r.DocuSign__c != null && this.thePSA.Market__r.DocuSign__c.indexOf('PSA') > -1;
+        /*
         if (this.thePSA == null || this.thePSA.Market__r == null || this.thePSA.Market__r.Name == 'France') {
             return false;
         } else {
             return this.isApproved;
         }
+        */
     }
     get canChangeStatus() {
         console.log('[canChangestatus] status, isSOMUser', this.status, this.isSOMUser);
@@ -1180,12 +1191,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[promotionalSalesAgreement.handleFileUploadFinished] exception', ex);
         }
     }
+    /*
     handleRemoveAttachedFile(event) {
         const response = confirm(this.labels.detachFile.confirmation.replace('{0}', event.detail.item.label));
         if (response == true) {            
             this.detachFile(event.detail.item.name, event.detail.item.label, event.detail.index);
         } 
     }
+        */
     handlePurchaseOrderChange(event) {
         this.purchaseOrder = event.detail.value;
     }
@@ -1203,6 +1216,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.showToast('error', 'Invalid selection', 'You cannot select this status');
         }
     }
+    handlePromotionTypeChange(event) {
+        this.promotionType = event.detail.value;
+    }
+
     handleCommentsChange(event) {
         this.comments = event.detail.value;
     }
@@ -1293,6 +1310,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     this.activityTypeActive = { label: picklistValues[picklist].values[0].label, value: picklistValues[picklist].values[0].value };
                     this.activityTypeInactive = { label: picklistValues[picklist].values[1].label, value: picklistValues[picklist].values[1].value };    
                 }
+            } else if (picklist === 'Promotion_Type__c') {
+                this.promotionTypeOptions = [];
+                picklistValues[picklist].values.forEach(pv => {
+                    this.promotionTypeOptions.push({ label: pv.label, value: pv.value });
+                });
             }
         });
 
@@ -1364,6 +1386,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 
             }
             
+            this.promotionType = data.Promotion_Type__c;
             this.percentageVisibility = data.Percentage_Visibility__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
@@ -1415,6 +1438,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                         this.selectedAccounts.set(p.Account__c, { id: p.Id, itemId: p.Account__c });
                     }
                 });
+                /*
                 if (this.isUsingParentAccount) {
                     getAccountsForParent({ 
                         parentAccountId: this.parentAccount.Id, 
@@ -1453,6 +1477,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 } else {
                     this.getAccount(data.Account__c);
                 }
+                */
+               this.getAccount(data.Account__c);
 
             } else {
                 if (this.isPhone && this.isThisTass) {
@@ -1632,6 +1658,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     /*
         Server calls
     */
+   /*
     getAttachedDocuments() {
         try {
             getAttchedDocuments({ psaId: this.recordId })
@@ -1656,6 +1683,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[promotionalSalesAgreement.getAttachedDocuments] exception', ex);
         }
     }
+    */
+    /*
     detachFile(documentId, name, index) {
         console.log('[promotionalsalesagreement.detachFile] id, name, index', documentId, name, index);
         console.log('[promotionalsalesagreement.detachFile] attachedFiles', this.attachedFiles);
@@ -1679,6 +1708,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.showToast("error", this.labels.warning.label, error);             
             });
     }
+    */
     getAccount(accountId) {
         console.log('[promotionalSalesAgreement.getAccount] accountId', accountId);
 
@@ -1764,7 +1794,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 }
                 */
                 const newList = result.records.map(item => {
-                    return { item: item, isSelected: false };
+                    const isSelected = this.selectedAccounts == undefined || this.selectedAccounts.length == 0 ? false : this.selectedAccounts.has(item.Id);
+                    return { item: item, isSelected: isSelected };
                 });
                 console.log('[getAccountsForParent] newList', newList);
                 this.childAccounts = newList;
@@ -1842,6 +1873,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.mpoPrestige = this.isMPOPrestige;
         param.limitToSelectedAccounts = this.limitToSelectedAccounts;
         param.isDirectRebate = this.isDirectRebate;
+        param.promotionType = this.promotionType;
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;
             param.wholesalerPreferredName = '';

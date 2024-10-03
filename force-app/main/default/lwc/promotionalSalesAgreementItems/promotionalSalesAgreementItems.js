@@ -88,6 +88,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get captureRebatePerBottle() {
         return this.thePSA != null && this.thePSA.Market__r.Capture_Rebate_per_Bottle__c;
     }
+    get captureRebatePercentage() {
+        return this.fieldSet != null && this.fieldSet.Plan_Rebate_Percentage__c != undefined;
+    }
     get calcProductSplit() {
         if (this.thePSA != undefined) {
             console.log('[psaItems] calcProductSplit', this.thePSA.Market__r.Calculate_PSA_Product_Split__c);
@@ -135,7 +138,15 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     }
 
     fieldSet;
-    @wire(getFieldSet, { objectName: OBJECT_PMI.objectApiName, recordTypeName: '$recordTypeAPIName', marketName: '$marketName' })
+    /*
+    @wire(getFieldSet, { 
+        objectName: OBJECT_PMI.objectApiName, 
+        recordTypeName: '$recordTypeAPIName', 
+        marketName: '$marketName',
+        recordId: '$psaId',
+        promotionType: '$promotionType',
+        channel: '$channel'
+    })
     wiredGetFieldSet({ error, data }) {
         if (data) {
             this.error = undefined;
@@ -146,6 +157,25 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             this.fieldSet = undefined;
             this.error = error;            
         }
+    }
+    */
+    getFieldSetForPSA() {
+        console.log('[getFieldSetForPSA]');
+
+        getFieldSet({
+            objectName: OBJECT_PMI.objectApiName,
+            recordTypeName: this.recordTypeAPIName,
+            marketName: this.marketName,
+            recordId: this.psaId,
+            promotionType: this.thePSA.Promotion_Type__c,
+            channel: this.thePSA.Account__r.Channel__c
+        }).then(result => {
+            this.error = undefined;
+            this.fieldSet = result;
+        }).catch(error => {
+            this.error = error;
+            this.fieldSet = undefined;
+        });
     }
 
     wiredAgreement;
@@ -159,7 +189,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             this.thePSA = undefined;
         } else if (value.data) {
             this.error = undefined;
-            this.thePSA = value.data;
+            this.thePSA = value.data.psa;
             this.recordTypeName = this.thePSA.RecordType.Name;
             this.recordTypeAPIName = this.thePSA.RecordType.DeveloperName;
             this.marketName = this.thePSA.Market__r.Name;
@@ -167,11 +197,19 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
             console.log('[psaItems.getPSA] recordTypeAPIName', this.recordTypeAPIName);
             console.log('[psaItems.getPSA] marketName', this.marketName);
 
+            /*
             if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
                 this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__r.RecordType.Name == 'Parent').Id;
             } else {
                 this.promotionId = this.thePSA.Promotions__r[0].Id;
             }
+            */
+           if (this.thePSA.Promotions__r.length > 1) {
+                this.promotionId = this.thePSA.Promotions__r.find(p => p.Account__c == this.thePSA.Account__c).Id;
+           } else {
+                this.promotionId = this.thePSA.Promotions__r[0].Id;
+           }
+          
             if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
                 this.psaItems.clear();
                 this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
@@ -214,11 +252,14 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     
             }
 
+            this.getFieldSetForPSA();
         }
     };
 
     brands;
     brandsSelected = '';
+
+    @track
     products = {
         records: []
     };

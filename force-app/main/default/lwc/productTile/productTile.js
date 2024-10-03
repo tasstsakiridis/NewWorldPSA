@@ -6,6 +6,7 @@ import LABEL_BOTTLE from '@salesforce/label/c.Bottle';
 import LABEL_BOTTLES from '@salesforce/label/c.Bottles';
 import LABEL_CASE from '@salesforce/label/c.Case';
 import LABEL_CASES from '@salesforce/label/c.Cases';
+import LABEL_GROSS_PROFIT from '@salesforce/label/c.Gross_Profit';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
 import LABEL_SPLIT from '@salesforce/label/c.Split';
 
@@ -13,7 +14,9 @@ export default class ProductTile extends LightningElement {
     labels = {
         bottle: { label: LABEL_BOTTLE, labelPlural: LABEL_BOTTLES, labelLowercase: LABEL_BOTTLE.toLowerCase() },
         case: { label: LABEL_CASE, labelPlural: LABEL_CASES, labelLowercase: LABEL_CASE.toLowerCase() },
-        split: { label: LABEL_SPLIT }
+        grossProfit: { label: LABEL_GROSS_PROFIT },
+        split: { label: LABEL_SPLIT },
+        totalInvestment: { label: LABEL_TOTAL_INVESTMENT }
     };
 
     tileClass = 'tile';
@@ -59,11 +62,21 @@ export default class ProductTile extends LightningElement {
     @api 
     showTotalInvestment;
 
+    @api 
+    captureRebatePercentage;
+
+    @api 
+    market;
+
     quantityFieldValue = 0;
     priceFieldValue = 0;
 
     get showQtyOrPriceFields() {
         return this.quantityFieldName != undefined || this.priceFieldName != undefined;
+    }
+
+    get isMexico() {
+        return this.market == 'Mexico';
     }
 
     get productName() {
@@ -95,7 +108,7 @@ export default class ProductTile extends LightningElement {
         let v = 0;
 
         if (this.psaItem && this.psaItem.Plan_Volume__c != undefined) {
-            if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
+            if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined || this.psaItem.Proposed_Plan_Volume__c == 0) {
                 if (this.captureVolumeInBottles) {
                     v = '<b>' + this.psaItem.Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c) + '</b> ' + LABEL_BOTTLES.toLowerCase();
                 } else {
@@ -114,19 +127,33 @@ export default class ProductTile extends LightningElement {
 
     }
     get planRebate() {
+        console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
         let r = 0;
 
         if (this.psaItem.Plan_Rebate__c != undefined) { 
             if (this.calcSplit) {
                 r = this.psaItem.Product_Split__c;
             } else {
-                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined || this.psaItem.Proposed_Plan_Rebate__c == 0) {
                     r = this.psaItem.Plan_Rebate__c 
                 } else {
                     r = this.psaItem.Proposed_Plan_Rebate__c;                         
                 }    
             }
         }
+
+        return parseFloat(r).toFixed(2);
+    }
+
+    get planRebatePercent() {
+        console.log('[productTile.planRebatePercentage] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
+        let r = this.psaItem.Plan_Rebate_Percentage__c == undefined ? 0 : this.psaItem.Plan_Rebate_Percentage__c;
+
+        return parseFloat(r).toFixed(2);
+    }
+
+    get grossProfit() {
+        let r = this.psaItem.Plan_PSA_Gross_Profit__c == undefined ? 0 : this.psaItem.Plan_PSA_Gross_Profit__c;
 
         return parseFloat(r).toFixed(2);
     }
@@ -139,12 +166,12 @@ export default class ProductTile extends LightningElement {
     }
 
     get psaItemSummary() {
-        //console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
+        console.log('[productTile] psaitem', this.psaItem == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.psaItem)));
         //console.log('[productTile] product', this.product == undefined ? 'undefined' : JSON.parse(JSON.stringify(this.product)));
         if (this.psaItem) {            
             let str = '';
             if (this.psaItem.Plan_Volume__c != undefined) { 
-                if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined) {
+                if (this.psaItem.Plan_Volume__c == this.psaItem.Proposed_Plan_Volume__c || this.psaItem.Proposed_Plan_Volume__c == undefined || this.psaItem.Proposed_Plan_Volume__c == 0) {
                     if (this.captureVolumeInBottles) {
                         str = '<b>'+this.psaItem.Plan_Volume__c * (this.product.Pack_Quantity__c == undefined ? 1 : this.product.Pack_Quantity__c)+'</b> bottles';
                     } else {
@@ -163,7 +190,7 @@ export default class ProductTile extends LightningElement {
                 if (this.calcSplit) {
                     str += ' @ <b>' + this.psaItem.CurrencyIsoCode + ' ' + parseFloat(this.psaItem.Product_Split__c).toFixed(2) + '</b> ' + LABEL_SPLIT;
                 } else {
-                    if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined) {
+                    if (this.psaItem.Plan_Rebate__c == this.psaItem.Proposed_Plan_Rebate__c || this.psaItem.Proposed_Plan_Rebate__c == undefined || this.psaItem.Proposed_Plan_Rebate__c == 0) {
                         if (this.captureRebatePerBottle) {
                             str += ' @ ' + this.psaItem.CurrencyIsoCode + '<b>' + parseFloat(this.psaItem.Plan_Rebate__c) + '</b>/bottle'; 
                         } else {

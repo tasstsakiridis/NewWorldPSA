@@ -53,16 +53,23 @@ import FIELD_TRAINING_ADVOCACY_VALUE from '@salesforce/schema/Promotion_Material
 import FIELD_ORIGINAL_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Original_Training_Advocacy__c';
 import FIELD_PREVIOUS_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Previous_Training_Advocacy__c';
 import FIELD_PROPOSED_TRAINING_ADVOCACY from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Training_Advocacy_Value__c';
+import FIELD_BRAND_SUPPORT from '@salesforce/schema/Promotion_Material_Item__c.Brand_Support__c';
+import FIELD_ORIGINAL_BRAND_SUPPORT from '@salesforce/schema/Promotion_Material_Item__c.Original_Brand_Support__c';
+import FIELD_PREVIOUS_BRAND_SUPPORT from '@salesforce/schema/Promotion_Material_Item__c.Previous_Brand_Support__c';
+import FIELD_PROPOSED_BRAND_SUPPORT from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Brand_Support__c';
 import FIELD_DRINK_STRATEGY from '@salesforce/schema/Promotion_Material_Item__c.Drink_Strategy__c';
 import FIELD_OUTLET_TO_PROVIDE from '@salesforce/schema/Promotion_Material_Item__c.Outlet_to_Provide__c';
 import FIELD_COMMENTS from '@salesforce/schema/Promotion_Material_Item__c.Comments_Long__c';
 import FIELD_PLAN_PSA_GROSS_PROFIT from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_Gross_Profit__c';
 import FIELD_PLAN_REBATE_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate_Volume__c';
 import FIELD_PLAN_REBATE_LIABILITY from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate_Liability__c';
+import FIELD_PRODUCT_PRICE from '@salesforce/schema/Promotion_Material_Item__c.Product_Price__c';
 
 import getProductDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProductDetails';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
 import updatePMITotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updatePMITotals';
+import updatePSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.updatePSA';
+import updateSpreadForPMI from '@salesforce/apex/PromotionalSalesAgreement_Controller.updateSpreadForPMI';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
@@ -316,6 +323,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 this.trainingAdvocacyAmount = value.data.Proposed_Advocacy_Training_Value__c;
             }
 
+            this.brandSupport = value.data.Brand_Support__c || 0;
+
             this.comments = value.data.Comments_Long__c;
 
             //this.brandStatus = value.data.Brand_Status__c;
@@ -387,6 +396,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     get captureTrainingAndAdvocacy() {
         return this.fieldSet != null && this.fieldSet.Training_and_Advocacy__c != null;
     }
+    get captureBrandSupport() {
+        return this.fieldSet != null && this.fieldSet.Brand_Support__c != null;
+    }
     get captureBrandVisibility() {
         //return this.isMexico;
         console.log('captureBrandVisibility', this.fieldSet != null && this.fieldSet.Brand_Visibility__c != null);
@@ -405,6 +417,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     get captureOutletToProvide() {
         return this.fieldSet != null && this.fieldSet.Outlet_to_Provide__c != null;
+    }
+    get captureComments() {
+        return this.fieldSet != null && this.fieldSet.Comments_Long__c != null;
     }
 
     get canDelete() {
@@ -467,6 +482,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     trainingAdvocacyLabel = 'Training & Advocacy';
     trainingAdvocacyPlaceholder = '';
 
+    brandSupport = 0;
+    brandSupportLabel = 'Brand Support';
+    brandSupportPlaceholder = '';
     outletToProvideValues;
     outletToProvideOptions;
     outletToProvideLabel = 'Outlet to Provide';
@@ -570,8 +588,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return this.freeGoodQty * unitCost;
     }
     get planRebateVolume() {
-        console.log('[psaItemForm.planRebateVolume] volumeForcast', this.volumeForecast);
-        console.log('[psaItemForm.planRebateVolume] discountPercent', this.discountPercent);
         let v1 = this.volumeForecast * (this.discountPercent / 100);
         let v2 = parseInt(v1);
         let v3 = v1 - v2;
@@ -583,13 +599,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         return `${this.labels.discountPercent.label} (${this.labels.liability.label}: ${this.planRebateVolume.toFixed(0)})`;
     }
     get rebateLiability() {
-        const price = this.product.Price_per_Case__c == undefined ? 0 : parseFloat(this.product.Price_per_Case__c);    
+        //const price = this.product.Price_per_Case__c == undefined ? 0 : parseFloat(this.product.Price_per_Case__c);    
+        const price = this.product.Wholesale_Price__c == undefined ? 0 : parseFloat(this.product.Wholesale_Price__c);
         const packQty = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
         console.log('[psaItemForm.rebateLiability] product', this.product);
         console.log('[psaItemForm.rebateLiability] price', price);
         console.log('[psaItemForm.rebateLiability] packQty', packQty);
         console.log('[psaItemForm.rebateLiability] rebateVolume', this.planRebateVolume);    
-        return ((this.planRebateVolume / packQty) * price * 1.05).toFixed(2);
+        //return ((this.planRebateVolume / packQty) * price * 1.05).toFixed(2);
+        return (this.planRebateVolume * price * 1.05).toFixed(2);
     }
 
     /**
@@ -649,6 +667,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         if (this.objectInfo.fields["Training_and_Advocacy__c"]) {
             this.trainingAdvocacyLabel = this.objectInfo.fields["Training_and_Advocacy__c"].label;
             this.trainingAdvocacyPlaceholder = this.objectInfo.fields["Training_and_Advocacy__c"].inlineHelpText;
+        }
+        if (this.objectInfo.fields["Brand_Support__c"]) {
+            this.brandSupportLabel = this.objectInfo.fields["Brand_Support__c"].label;
+            this.brandSupportPlaceholder = this.objectInfo.fields["Brand_Support__c"].inlineHelpText;
         }
         if (this.objectInfo.fields["Outlet_to_Provide__c"]) {
             this.outletToProvideLabel = this.objectInfo.fields["Outlet_to_Provide__c"].label;
@@ -757,6 +779,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.listingFee = 0;
         this.promotionalActivityAmount = 0;
         this.trainingAdvocacyAmount = 0;
+        this.brandSupport = 0;
         this.comments = '';        
 
         try {
@@ -857,6 +880,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleTrainingAdvocacyValueChange(event) {
         this.trainingAdvocacyAmount = event.detail.value.trim() == '' ? 0 : event.detail.value;
+    }
+    handleBrandSupportChange(event) {
+        this.brandSupport = event.detail.value.trim() == '' ? 0 : event.detail.value;
     }
     handleOutletToProvideChange(event) {
         this.outletToProvideValues = event.detail.value;
@@ -982,7 +1008,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 let threshold = 0;
                 if (this.psa.Market__r.Change_Threshold_Amount__c == undefined) {
                     const thresholdPercentage = parseFloat(this.psa.Market__r.Promotion_Discount_Threshold__c) || 0;
-                    threshold = parseFloat(this.psa.Original_Total_Investment__c);
+                    //threshold = parseFloat(this.psa.Original_Total_Investment__c);
+                    threshold = 0;
                 } else {
                     threshold = parseFloat(this.psa.Market__r.Change_Threshold_Amount__c);
                 }
@@ -1036,6 +1063,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_PLAN_REBATE_VOLUME.fieldApiName] = this.planRebateVolume;
             fields[FIELD_PSA_FREE_BOTTLE_COST.fieldApiName] = this.freeGoodCost;
 
+            if (this.isMexico) {
+                fields[FIELD_PRODUCT_PRICE.fieldApiName] = this.product.Wholesale_Price__c;
+            }
+
             let freeGoodsVolume = this.freeGoodQty;
             let volume = this.volumeForecast;
             if (this.captureVolumeInBottles) {
@@ -1050,6 +1081,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_PROPOSED_LISTING_FEE.fieldApiName] = this.listingFee;
             fields[FIELD_PROPOSED_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
             fields[FIELD_PROPOSED_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
+            fields[FIELD_PROPOSED_BRAND_SUPPORT.fieldApiName] = this.brandSupport;
 
             var givenDate;
             if (this.freeGoodGivenDate != undefined) {
@@ -1066,6 +1098,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_ORIGINAL_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_ORIGINAL_PROMOTIONAL_ACTIVITY.fieldApiName] = this.promotionalActivityAmount;
                 fields[FIELD_ORIGINAL_TRAINING_ADVOCACY.fieldApiName] = this.trainingAdvocacyAmount;
+                fields[FIELD_ORIGINAL_BRAND_SUPPORT.fieldApiName] = this.brandSupport;
             }
             
             if (this.psaItemId != null) {
@@ -1075,7 +1108,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     fields[FIELD_VOLUME_FORECAST.fieldApiName] = volume;
                     fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                     fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
-                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;   
+                    fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;  
+                    fields[FIELD_BRAND_SUPPORT.fieldApiName] = this.brandSupport; 
                     fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
                     //fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
                     fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
@@ -1085,6 +1119,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_PREVIOUS_LISTING_FEE.fieldApiName] = this.psaItem.Listing_Fee__c;
                 fields[FIELD_PREVIOUS_PROMOTIONAL_ACTIVITY.fieldApiName] = this.psaItem.Promotional_Activity_Value__c;
                 fields[FIELD_PREVIOUS_TRAINING_ADVOCACY.fieldApiName] = this.psaItem.Training_and_Advocacy_Value__c;
+                fields[FIELD_PREVIOUS_BRAND_SUPPORT.fieldApiName] = this.psaItem.Brand_Support__c;
             } else {
                 fields[FIELD_PLAN_REBATE.fieldApiName] = this.discount;
                 fields[FIELD_PLAN_REBATE_PERCENTAGE.fieldApiName] = this.discountPercent;
@@ -1092,6 +1127,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 fields[FIELD_LISTING_FEE.fieldApiName] = this.listingFee;
                 fields[FIELD_PROMOTIONAL_ACTIVITY_VALUE.fieldApiName] = this.promotionalActivityAmount;
                 fields[FIELD_TRAINING_ADVOCACY_VALUE.fieldApiName] = this.trainingAdvocacyAmount;    
+                fields[FIELD_BRAND_SUPPORT.fieldApiName] = this.brandSupport;
                 fields[FIELD_FREE_GOODS_QUANTITY.fieldApiName] = freeGoodsVolume;
                 //fields[FIELD_FREE_GOODS_GIVEN_DATE.fieldApiName] = this.freeGoodGivenDate;
                 fields[FIELD_FREE_GOODS_REASON.fieldApiName] = this.freeGoodReasonValues.join(';');
@@ -1150,9 +1186,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                     }),
                 );
 
-                if (this.isApproved) {
-                    this.updatePSAStatus("Updated");
-                }
                 this.updateTotals('save');
                 refreshApex(this.wiredPSAItem);
                 /*
@@ -1194,10 +1227,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 );
 
                 console.log('[updatePSAItem] isapproved, ischangeabovethreshold', this.isApproved, this.isChangeAboveThreshold);
-                if (this.isApproved && this.isChangeAboveThreshold) {
-                    this.updatePSAStatus("Updated");
-                }
                 this.updateTotals('update');
+                if (this.psa.Is_Approved__c && this.psa.Market__r.Spread_Planned_Values__c) {
+                    this.updateSpread(record.Id);
+                }
                 refreshApex(this.wiredPSAItem);
                 /*
                 try {
@@ -1275,6 +1308,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             .then((status) => {
                 console.log('[updateTotals] status', status);
                 if (!this.isPhone) {
+                    if (action == 'save' || (action == 'update' && this.isApproved && this.isChangeAboveThreshold)) {
+                        this.updatePSAStatus("Updated");
+                    }
+
                     const saveEvent = new CustomEvent('save', {
                         detail: {
                             action: action,
@@ -1291,6 +1328,17 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
     }
 
+    updateSpread() {
+        updateSpreadForPMI({
+            psaId: this.psaId,
+            pmiId: this.psaItemId
+        }).then(() => {
+
+        }).catch((error) => {
+            console.log('[updateSpreadForPMI] error', error);
+        });
+    }
+
     updatePSAStatus(status) {
         const fields = {};
         fields[FIELD_PROMOTION_ACTIVITY_ID.fieldApiName] = this.psaId;
@@ -1299,10 +1347,10 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
         console.log('[psaItemForm.updatePSAStatus] fields', fields);
         const record = { fields };
-        updateRecord(record)
+        updatePSA({ psaId: this.psaId, status: status, hasActualTotals: false })
             .then(() => {                
                 this.isWorking = false;
-                this.dispatchEvent(new CustomEvent('updated'));                
+                //this.dispatchEvent(new CustomEvent('updated'));                
             })
             .catch(error => {
                 this.isWorking = false;

@@ -12,6 +12,7 @@ import LABEL_ACTUAL from '@salesforce/label/c.Actual';
 import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_BALANCE from '@salesforce/label/c.Balance';
+import LABEL_BRAND_SUPPORT from '@salesforce/label/c.Brand_Support';
 import LABEL_CUSTOMER_PROFIT from '@salesforce/label/c.Customer_Profit';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_END_DATE from '@salesforce/label/c.End_Date';
@@ -50,6 +51,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         actual:                 { label: LABEL_ACTUAL },
         back:                   { label: LABEL_BACK },
         balance:                { label: LABEL_BALANCE },
+        brandSupport:           { label: LABEL_BRAND_SUPPORT },
         customerProfit:         { label: LABEL_CUSTOMER_PROFIT },
         details:                { label: LABEL_DETAILS },
         end:                    { label: LABEL_END_DATE },
@@ -86,15 +88,15 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
 
     @track 
     columns = [
-        { label: LABEL_ACCOUNT, fieldName: 'account', type: 'text', wrapText: true, cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
-        { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_ACCOUNT, fieldName: 'account', type: 'text', wrapText: true, cellAttributes: { alignment: 'left' }, markets: ['ALL']},
+        { label: LABEL_PRODUCT, fieldName: 'product', type: 'text', wrapText: true,  cellAttributes: { alignment: 'left' }, markets: ['ALL']},
         { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'actualFreeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_COST, fieldName: 'freeGoodsCost', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
-        { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
-        { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','United Kingdom']},
+        { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['ALL']},
+        { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','France','United Kingdom']},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
-        { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Brazil','Mexico','United Kingdom']},
+        { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['ALL']},
         { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil','United Kingdom']},
         { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
         { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
@@ -103,6 +105,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
         //{ label: LABEL_TRAINING_ADVOCACY, fieldName: 'trainingAdvocacy', type: 'currency', cellAttributes: { alignment: 'right' }},
         //{ label: this.trainingAdvocacyPaidLabel, fieldName: 'trainingAdvocacyPaid', type: 'currency', cellAttributes: { alignment: 'right' }},    
+        { label: LABEL_BRAND_SUPPORT, fieldName: 'brandSupport', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
+        { label: this.brandSupportPaidLabel, fieldName: 'brandSupportPaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
         { label: LABEL_REBATE_VOLUME, fieldName: 'rebateVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_REBATE_PERCENT, fieldName: 'rebatePercent', type: 'percent', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_REBATE_LIABILITY, fieldName: 'rebateLiability', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
@@ -143,27 +147,13 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     showRebateLiability = false;
     showTotalInvestment = false;
     showCustomerProfit = false;
+    showBrandSupport = false;
 
-    /*
-    @wire(getPSA, { psaId: '$psaId'} )
-    wiredGetPSA(value) {
-        this.wiredPSA = value;
-        console.log('[summary.getpsa] wiredpsa', this.wiredPSA);
-        if (value.data) {
-            this.error = undefined;
-            this.thePSA = value.data;
-            this.buildTableData();
-        } else if (value.error) {
-            this.error = value.error;
-            this.data = undefined;
-        }
-    }
-    */
     loadPSA() {
         getPSA({psaId: this.psaId})
         .then(result => {
             this.error = undefined;
-            this.thePSA = result;
+            this.thePSA = result.psa;
             this.buildTableData();
         })
         .catch(error => {
@@ -193,6 +183,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     }
     get totalInvestmentActual9lLabel() {
         return `${LABEL_TOTAL_INVESTMENT} (${LABEL_ACTUAL} 9L)`
+    }
+    get brandSupportPaidLabel() {
+        return `${LABEL_BRAND_SUPPORT} (${LABEL_PAID})`;
     }
 
     get marketName() {
@@ -318,6 +311,15 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     get trainingAdvocacyBalance() {
         return this.trainingAdvocacy - (this.trainingAdvocacyPaid == null ? 0 : this.trainingAdvocacyPaid);
     }
+    get brandSupport() {
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Brand_Support__c);
+    }
+    get brandSupportPaid() {
+        return this.thePSA == undefined || this.thePSA.Total_Brand_Support_Paid__c == undefined ? 0 : parseFloat(this.thePSA.Total_Brand_Support_Paid__c);
+    }
+    get brandSupportBalance() {
+        return this.brandSupport - this.brandSupportPaid;
+    }
     get totalBudget() {
         return this.thePSA == undefined || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
     }
@@ -435,7 +437,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.showCustomerProfit = false;
         console.log('[summary.buildTableData] columns', this.columns);
         console.log('[summary.buildTableData] market name', this.thePSA.Market__r.Name);
-        var cols = [...this.columns.filter(c => c.markets.includes(this.thePSA.Market__r.Name))];
+        var cols = [...this.columns.filter(c => c.markets.includes(this.thePSA.Market__r.Name) || c.markets.includes('ALL'))];
         console.log('[summary.buildTableData] showFreeGoods', this.showFreeGoods);
         if (!this.showFreeGoods) {
             //cols = cols.filter(c => c.fieldName.indexOf('freeGoods') < 0);
@@ -468,9 +470,10 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             //cols = cols.filter(c => c.fieldName != 'totalRebateGP');
         }
         if (this.marketName == 'United Kingdom') {
-            this.showNumberOfQuarters = true;            
+            this.showNumberOfQuarters = true;   
+            this.showBrandSupport = true;
+            this.showTrainingAndAdvocacy = false;         
         } else {
-            this.showTrainingAndAdvocacy = false;
             //cols = cols.filter(c => c.fieldName != 'quartersCaptured');
         }
         
@@ -493,6 +496,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                             promotionalActivityPaid: parseFloat(this.thePSA.Total_Promotional_Activity_Paid__c),
                             trainingAdvocacy: 0,
                             trainingAdvocacyPaid: parseFloat(this.thePSA.Total_Training_and_Advocacy_Paid__c),
+                            brandSupport: 0,
+                            brandSupportPaid: parseFloat(this.thePSA.Total_Brand_Support_Paid__c),
                             pmi: new Map() };                
                 
         var packQty = 1;
@@ -541,7 +546,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     totalPSAGP: parseFloat(pmi.Plan_PSA_Gross_Profit__c),
                     payment: parseFloat(pmi.Total_Payments_Paid__c),
                     productSplit: parseFloat(pmi.Product_Split__c),
-                    freeGoodsCost: parseFloat(pmi.PSA_Free_Bottle_Cost__c == undefined ? 0 : pmi.PSA_Free_Bottle_Cost__c).toFixed(2)
+                    freeGoodsCost: parseFloat(pmi.PSA_Free_Bottle_Cost__c == undefined ? 0 : pmi.PSA_Free_Bottle_Cost__c).toFixed(2),
+                    brandSupport: parseFloat(pmi.Brand_Support__c),
+                    brandSupportPaid: parseFloat(pmi.Total_Brand_Support_Paid__c)
                 });
             });
         }
@@ -616,13 +623,14 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                 row.payment = pmi.payment;
                 row.productSplit = pmi.productSplit;
                 row.freeGoodsCost = pmi.freeGoodsCost;
+                row.brandSupport = pmi.brandSupport;
 
                 row.quartersCaptured = 0;  // Need to calculate or capture how many quarters are captured
                 row.listingFeeBalance = row.listingFee - row.listingFeePaid;
                 row.totalInvestment9L = row.totalInvestment / row.plannedVolume;
                 
                 if (row.actualVolume != undefined && row.actualVolume > 0) {
-                    row.totalInvestmentActual = (row.actualVolume * row.discount) + row.listingFee + row.promotionalActivity + row.trainingAdvocacy;
+                    row.totalInvestmentActual = (row.actualVolume * row.discount) + row.listingFeePaid + row.promotionalActivityPaid + row.trainingAdvocacyPaid;
                     row.totalInvestmentActual9L = row.actualVolume > 0 ? row.totalInvestmentActual / row.actualVolume : 0;    
                 }
         

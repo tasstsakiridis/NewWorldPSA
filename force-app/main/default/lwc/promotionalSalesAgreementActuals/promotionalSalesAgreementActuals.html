@@ -67,6 +67,7 @@
                             <c-promotional-sales-agreement-actuals-form 
                                         psa-id={psaId} 
                                         psa={thePSA}
+                                        actuals={actuals}
                                         promotion-id={selectedAccountId} 
                                         pmia-id={selectedPMIAId} 
                                         pmi-id={selectedPMIId}
@@ -75,6 +76,7 @@
                                         capture-volume-in-bottles={captureVolumeInBottles}
                                         capture-free-goods={captureFreeGoods}
                                         validate-actual-volume={validateActualVolume}
+                                        has-forecast-values={spreadPlannedValues}
                                         is-locked={isLocked}
                                         onclose={handleCloseForm}
                                         onsave={handleSaveForm}></c-promotional-sales-agreement-actuals-form>

@@ -22,7 +22,7 @@
                                                 SourceID = Promotion_Activity__c.Id,
                                                 DSEID = '0',
                                                 OCO = 'Tag',
-                                                LF = '1',
+                                                LF = '0',
                                                 CES = '{!$Label.DocuSign_Title}',
                                                 CEM = '{!$Label.DocuSign_Message}'
                                             ])}" value="Generate DocuSign Document" id="btn_Generate_DocuSign" />

@@ -34,7 +34,11 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         this.currentPageReference = currentPageReference;
         console.log('[psaactuals.setcurrentpagerefernce] pageref', currentPageReference);
         this.psaId = currentPageReference.state.c__psaId;
+        //this.selectedPMIId = currentPageReference.state.c__pmiId;
         this.showActualsForm = currentPageReference.state.c__showActualsForm;
+        if (!this.isMakingChanges && this.showActualsForm) {
+            this.isMakingChanges = true;
+        }
     }
 
     isPhone = (CLIENT_FORM_FACTOR === "Small");
@@ -61,6 +65,12 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     captureVolumeInBottles;
     captureFreeGoods;
     validateActualVolume = false;
+    spreadPlannedValues = false;
+    actuals = [];
+
+    isExpanded = false;
+    isMakingChanges = false;
+    expandedItems = [];
     
     @wire(getPSA, {psaId: '$psaId'})
     getWiredPSA(value) {
@@ -71,7 +81,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.thePSA = undefined;
         } else if (value.data) {
             this.error = undefined;
-            this.thePSA = value.data;
+            this.thePSA = value.data.psa;
+            this.actuals = value.data.actuals;
             this.marketId = this.thePSA.Market__c;
             this.recordTypeName = this.thePSA.RecordType.Name;
             if (this.thePSA.Wholesaler_Preferred__c != undefined) {
@@ -85,6 +96,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.captureVolumeInBottles = this.thePSA.Market__r.Capture_Volume_in_Bottles__c;
             this.captureFreeGoods = this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
             this.validateActualVolume = this.thePSA.Market__r.Validate_Actual_Volume__c;
+            this.spreadPlannedValues = this.thePSA.Market__r.Spread_Planned_Values__c;
             
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.getGLMappingsForPSA();
@@ -171,7 +183,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             console.log('[psaActuals.handleSaveForm] detail.id', event.detail.Id);
             refreshApex(this.wiredPSA)
                 .then(() => {
-                    this.thePSA = this.wiredPSA.data;
+                    this.thePSA = this.wiredPSA.data.psa;
+                    this.actuals = this.wiredPSA.data.actuals;
                     console.log('[psaActuals.handleSaveForm] after refreshapex has returned. thePSa', this.thePSA);
                     this.buildTree();
                     this.handleCloseForm();
@@ -212,7 +225,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     this.showToast('success','Success', this.labels.submit.submittedMessage);
                     refreshApex(this.wiredPSA)
                         .then(() => {
-                            this.thePSA = this.wiredPSA.data;
+                            this.thePSA = this.wiredPSA.data.psa;
+                            this.actuals = this.wiredPSA.data.actuals;
                             this.buildTree();
                             this.handleCloseForm();
                             
@@ -231,11 +245,18 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     handleOnSelect(event) {
         try {
             console.log('handle on select. name', event.detail.name);
+            this.isExpanded = true;
+            this.treeItems.expanded = true;
+            this.isMakingChanges = true;
+
             const parts = event.detail.name.split('_');
             let prefix = event.detail.name.substring(0, 4);
             let id = event.detail.name.substring(4); 
             console.log('[psaactuals.handleonselect] prefix', prefix);       
             console.log('[psaactuals.handleonselect] parts[0]', parts[0]);       
+            if (this.expandedItems.indexOf(parts[1]) < 0) {
+                this.expandedItems.push(parts[1]);
+            }
             let newState;
             if (parts[0] === 'new') {     
                 console.log('[psaactuals.handleonselect] setting up for new pmia');            
@@ -244,17 +265,20 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     c__pmiaId: undefined,
                     c__promotionId: parts[2],
                     c__pmiId: parts[1],
-                    c__showActualsForm: true
+                    c__showActualsForm: true,
+                    c__expandedItems: this.expandedItems
                 };
-            } else if (parts[0] === 'pmia') {
+            } else if (parts[2] === 'pmia') {
                 newState = {
                     c__psaId: this.psaId,
-                    c__pmiaId: parts[1],
+                    c__pmiaId: parts[3],
                     c__promotionId: undefined,
-                    c__pmiId: undefined,
-                    c__showActualsForm: true
+                    c__pmiId: parts[1],
+                    c__showActualsForm: true,
+                    c__expandedItems: this.expandedItems
                 };
-            }            
+            }      
+            console.log('[psaactuals.handleonselect] newstate', newState);      
             if (this.isPhone) {
                 this[NavigationMixin.Navigate]({
                     type: 'standard__component',
@@ -282,16 +306,17 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     }
     buildTree() {
         console.log('[actuals.buildTree] thepsa', this.thePSA);
+        console.log('[actuals.buildTree] isMakingChanges', this.isMakingChanges);
         try {
             const accountTree = {
                 label: this.thePSA.Account__r.Name,
                 name: this.thePSA.Account__c,
                 disabled: false,
-                expanded: true,
+                expanded: this.isMakingChanges,
                 items: []
             };
             let promotionWithParentAccount = this.thePSA.Promotions__r[0];
-            if (this.thePSA.Account__r.RecordType.Name == 'Parent') {
+            if (this.thePSA.Account__r.RecordType.Name.indexOf('Parent') > -1) {
                 promotionWithParentAccount = this.thePSA.Promotions__r.find(p => p.Account__c == this.thePSA.Account__c);
             }
             console.log('[buildTree] accountTree', accountTree);
@@ -306,20 +331,20 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                         label: pmi.Product_Name__c,
                         name: key,
                         disabled: false,
-                        expanded: true,
+                        expanded: this.expandedItems.indexOf(pmi.Id) >= 0,
                         items: []
                     };
 
                     
-                    if (this.thePSA.PMI_Actuals__r && this.thePSA.PMI_Actuals__r.length > 0) {
-                        const actualsForPMI = this.thePSA.PMI_Actuals__r.filter(pmia => pmia.Promotion_Material_Item__c === pmi.Id);
+                    if (this.actuals && this.actuals.length > 0) {
+                        const actualsForPMI = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c === pmi.Id && pmia.Has_Totals__c == false);
                         console.log('[buildtree] actualforpmi', actualsForPMI);
                         if (actualsForPMI) {
                             
                             actualsForPMI.forEach(actual => {
                                 console.log('[buildtree] actual', actual);
                                 console.log('[buildtree] has totals', actual.Has_Totals__c);
-                                if (actual.Has_Totals__c == false) {
+                                //if (actual.Has_Totals__c == false) {
                                     const pd = new Date(actual.Payment_Date__c);
                                     let metatext = '';
                                     if (actual.Rebate_Type__c == 'Volume') {
@@ -338,7 +363,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                             item.items.push({
                                                 label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
                                                 metatext: metatext,
-                                                name: 'pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
+                                                name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
                                                 disabled: false,
                                                 expanded: false,
                                                 items: []    
@@ -353,13 +378,13 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                             paymentDate: actual.Payment_Date__c,
                                             label: pd.toLocaleDateString(userLocale, dateOptions),
                                             metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
-                                            name: 'pmia_'+actual.Id,
+                                            name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id,
                                             disabled: false,
-                                            expanded: true,
+                                            expanded: false,
                                             items: [
                                                 { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
                                                     metatext: metatext,
-                                                    name: 'pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                                    name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
                                                     disabled: false,
                                                     expanded: false,
                                                     items: []
@@ -367,7 +392,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                                         });
                                     }
     
-                                }
+                                //}
                             });
                         } else {
                             pmiTree.items = [];

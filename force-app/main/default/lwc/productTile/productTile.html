@@ -51,15 +51,26 @@
                                         <b><lightning-formatted-number value={psaItem.Product_Split__c} format-style="currency"
                                                 currency-display-as="symbol"></lightning-formatted-number></b>{labels.split.label}
                                     </template>
-                                    <template lwc:else>                                        
-                                        <b><lightning-formatted-number value={planRebate} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b>
-                                        <template lwc:if={captureRebatePerBottle}>/{labels.bottle.labelLowercase}</template>
-                                        <template lwc:else>/{labels.case.labelLowercase}</template>
+                                    <template lwc:else>         
+                                        <template lwc:if={captureRebatePercentage}>
+                                            <b><lightning-formatted-number value={planRebatePercent} format-style="percent-fixed"></lightning-formatted-number></b>
+                                        </template>                               
+                                        <template lwc:else>
+                                            <b><lightning-formatted-number value={planRebate} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b>
+                                            <template lwc:if={captureRebatePerBottle}>/{labels.bottle.labelLowercase}</template>
+                                            <template lwc:else>/{labels.case.labelLowercase}</template>
+                                        </template>
                                     </template>
                                     </span>
                                 </p>
-                                <template if:true={showTotalInvestment}>
-                                    <p><b><lightning-formatted-number value={totalInvestment} format-style="currency" currency-display-as="symbol"></lightning-formatted-number></b> total investment</p>
+                                <template lwc:if={isMexico}>
+                                    <b><lightning-formatted-number value={grossProfit} format-style="currency" currency-display-as="symbol"></lightning-formatted-number> {labels.grossProfit.label}</b>
+                                </template>
+                                <template lwc:else>
+                                    <template if:true={showTotalInvestment}>
+                                        <p><b><lightning-formatted-number value={totalInvestment} format-style="currency"
+                                                    currency-display-as="symbol"></lightning-formatted-number></b> {labels.totalInvestment.label}</p>
+                                    </template>
                                 </template>
                             </div>
                         </template>
