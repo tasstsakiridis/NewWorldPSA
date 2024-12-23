@@ -61,6 +61,7 @@ public with sharing class Brazil_PSA_Contract_Controller {
         DateTime completedDate;
         String formattedCompletedDate;
 
+        /*
         List<ProcessInstance> piList = [SELECT Id, CreatedDate, TargetObjectid, Status, ElapsedTimeInDays, ElapsedTimeInHours, ElapsedTimeInMinutes, 
                                             (SELECT Id, CreatedDate, StepStatus, Comments, Actor.Name, Actor.UserRole.Name, Actor.Title, ElapsedTimeInDays, ElapsedTimeInHours, 
                                                     ElapsedTimeInMinutes, IsPending 
@@ -69,12 +70,20 @@ public with sharing class Brazil_PSA_Contract_Controller {
                                         FROM ProcessInstance 
                                         WHERE TargetObjectId =:thePSA.Id 
                                     ORDER BY CreatedDate];      
+        */
+        List<ProcessInstanceStep> piList = [SELECT Id, Comments, CreatedDate, ElapsedTimeInDays, ElapsedTimeInHours, ElapsedTimeInMinutes, StepStatus,
+                                                Actor.Name, Actor.UserRole.Name, Actor.Title 
+                                            FROM ProcessInstanceStep
+                                            WHERE ProcessInstanceId IN (SELECT Id FROM ProcessInstance WHERE TargetObjectId =:thePSA.Id) 
+                                            ORDER BY CreatedDate];
         if (piList != null && piList.size() > 0) {
             history.CreatedDate = piList.get(0).CreatedDate.format('EE, dd MMM YYYY, h:mm a');
-            for (ProcessInstance pi : piList) {
-                if (pi.StepsAndWorkItems != null) {
-                    System.debug('# of work items: ' + pi.StepsAndWorkItems.size());
-                }
+            for (ProcessInstanceStep pi : piList) {
+                completedDate = pi.CreatedDate;
+                formattedCompletedDate = getFormattedDate(pi.CreatedDate.date());
+                ApprovalHistoryItem ahi = new ApprovalHistoryItem(pi.Actor.Name, pi.StepStatus, pi.Comments, pi.CreatedDate, formattedCompletedDate, pi.Actor.Title, '');
+                history.items.add(ahi);
+                /*
                 if (pi.StepsAndWorkItems != null && pi.StepsAndWorkItems.size() > 0) {                        
                     for(Integer i = 0; i < pi.StepsAndWorkitems.size(); i++) {
                         System.debug('actor: ' + pi.StepsAndWorkItems[i].Actor.Name + ', status: ' + pi.StepsAndWorkItems[i].StepStatus);
@@ -91,6 +100,7 @@ public with sharing class Brazil_PSA_Contract_Controller {
                         history.items.add(ahi);
                     }                    
                 }
+                    */
             }
         }        
 

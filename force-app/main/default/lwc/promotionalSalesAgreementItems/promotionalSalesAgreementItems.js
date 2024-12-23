@@ -106,6 +106,9 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get showTotalInvestment() {
         return this.thePSA != null && this.thePSA.Market__r.Calculate_PSA_Product_Split__c == false;
     }
+    get showGrossProfit() {
+        return this.thePSA != null && this.thePSA.Market__r.Show_Item_Gross_Profit__c;
+    }
     get totalBudget() {
         return this.thePSA == null || this.thePSA.Activity_Budget__c == undefined ? 0 : parseFloat(this.thePSA.Activity_Budget__c);
     }

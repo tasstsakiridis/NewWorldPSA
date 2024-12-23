@@ -70,6 +70,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
 
     isExpanded = false;
     isMakingChanges = false;
+    showExpandedActualsOnLoad = false;
     expandedItems = [];
     
     @wire(getPSA, {psaId: '$psaId'})
@@ -97,7 +98,8 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.captureFreeGoods = this.thePSA.Market__r.Capture_PSA_Free_Goods__c;
             this.validateActualVolume = this.thePSA.Market__r.Validate_Actual_Volume__c;
             this.spreadPlannedValues = this.thePSA.Market__r.Spread_Planned_Values__c;
-            
+            this.showExpandedActualsOnLoad = this.thePSA.Market__r.Show_Expanded_Actuals_on_Load__c;
+
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
             this.getGLMappingsForPSA();
             this.buildTree();
@@ -307,12 +309,13 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     buildTree() {
         console.log('[actuals.buildTree] thepsa', this.thePSA);
         console.log('[actuals.buildTree] isMakingChanges', this.isMakingChanges);
+        console.log('[actuals.buildTree] showExpandedActuals', this.showExpandedActualsOnLoad);
         try {
             const accountTree = {
                 label: this.thePSA.Account__r.Name,
                 name: this.thePSA.Account__c,
                 disabled: false,
-                expanded: this.isMakingChanges,
+                expanded: this.isMakingChanges || this.showExpandedActualsOnLoad,
                 items: []
             };
             let promotionWithParentAccount = this.thePSA.Promotions__r[0];
@@ -324,89 +327,90 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             if (this.thePSA.Promotion_Material_Items__r && this.thePSA.Promotion_Material_Items__r.length > 0) {
                 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-                const pmiItems = this.thePSA.Promotion_Material_Items__r.map(pmi => {                                            
+                let pmiItems = this.thePSA.Promotion_Material_Items__r.map(pmi => {                                            
                     console.log('[buildtree] pmi', pmi);
                     const key = pmi.Id + '_' + promotionWithParentAccount.Id;
-                    const pmiTree = {
+                    let pmiTree = {
                         label: pmi.Product_Name__c,
                         name: key,
                         disabled: false,
-                        expanded: this.expandedItems.indexOf(pmi.Id) >= 0,
+                        expanded: this.expandedItems.indexOf(pmi.Id) >= 0 || this.showExpandedActualsOnLoad,
                         items: []
                     };
 
                     
                     if (this.actuals && this.actuals.length > 0) {
                         const actualsForPMI = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c === pmi.Id && pmia.Has_Totals__c == false);
-                        console.log('[buildtree] actualforpmi', actualsForPMI);
+                        console.log('[buildtree] actualforpmi', JSON.parse(JSON.stringify(actualsForPMI)));
                         if (actualsForPMI) {
-                            
                             actualsForPMI.forEach(actual => {
-                                console.log('[buildtree] actual', actual);
-                                console.log('[buildtree] has totals', actual.Has_Totals__c);
-                                //if (actual.Has_Totals__c == false) {
-                                    const pd = new Date(actual.Payment_Date__c);
-                                    let metatext = '';
-                                    if (actual.Rebate_Type__c == 'Volume') {
-                                        if (this.thePSA.Market__r.Capture_Volume_in_Bottles__c) {
-                                            metatext += 'Actual Qty: ' + (actual.Act_Qty__c * actual.Product_Pack_Qty__c);
-                                        } else {
-                                            metatext += 'Actual Qty: ' + actual.Act_Qty__c;
-                                        }
+                                console.log('[buildTree] actual %o', actual);
+                                const pd = new Date(actual.Payment_Date__c);
+                                let metatext = '';
+                                if (actual.Rebate_Type__c == 'Volume') {
+                                    if (this.thePSA.Market__r.Capture_Volume_in_Bottles__c) {
+                                        metatext += 'Actual Qty: ' + (actual.Act_Qty__c * actual.Product_Pack_Qty__c);
                                     } else {
-                                        metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
+                                        metatext += 'Actual Qty: ' + actual.Act_Qty__c;
                                     }
-                                    let found = false;
-                                    pmiTree.items.forEach(item => {
-                                        if (item.paymentDate == actual.Payment_Date__c) {
-                                            found = true;
-                                            item.items.push({
-                                                label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
-                                                metatext: metatext,
-                                                name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
-                                                disabled: false,
-                                                expanded: false,
-                                                items: []    
-                                            });
-                                            return true;
-                                        }
-                                    });
-                                    console.log('[buildtree] found', found);
-                                    console.log('[buildtree] pmiTree', pmiTree);
-                                    if (!found) {
-                                        pmiTree.items.push({
-                                            paymentDate: actual.Payment_Date__c,
-                                            label: pd.toLocaleDateString(userLocale, dateOptions),
-                                            metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
-                                            name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id,
+                                } else {
+                                    metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
+                                }
+                                let found = false;
+                                pmiTree.items.forEach(item => {
+                                    if (item.paymentDate == actual.Payment_Date__c) {
+                                        found = true;
+                                        item.items.push({
+                                            label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                            metatext: metatext,
+                                            name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
                                             disabled: false,
-                                            expanded: false,
-                                            items: [
-                                                { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
-                                                    metatext: metatext,
-                                                    name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
-                                                    disabled: false,
-                                                    expanded: false,
-                                                    items: []
-                                            }]
+                                            expanded: this.showExpandedActualsOnLoad,
+                                            items: []    
                                         });
+                                        return true;
                                     }
-    
-                                //}
+                                });
+                                console.log('[buildtree] found', found);
+                                console.log('[buildtree] pmiTree.items %o', JSON.parse(JSON.stringify(pmiTree.items)));
+                                if (!found) {
+                                    pmiTree.items.push({
+                                        paymentDate: actual.Payment_Date__c,
+                                        label: pd.toLocaleDateString(userLocale, dateOptions),
+                                        metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
+                                        name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id,
+                                        disabled: false,
+                                        expanded: this.showExpandedActualsOnLoad,
+                                        items: [
+                                            { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                                metatext: metatext,
+                                                name: 'pmi_'+pmi.Id+'_pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                                disabled: false,
+                                                expanded: this.showExpandedActualsOnLoad,
+                                                items: []
+                                        }]
+                                    });
+
+                                    console.log('[buildTree] # of pmiTree.item[0] %s : %s', pmiTree.items[0].metatext, pmiTree.items[0].expanded);
+
+                                }
                             });
                         } else {
                             pmiTree.items = [];
                         }
                     }
-                    console.log('[buildtree] pmiTree', pmiTree);
+                    console.log('[buildtree] pmiTree %o', pmiTree);
                     const createNew = { label:this.labels.createNew.label, name:'new_'+key, disabled:false, expanded:false, items:[] };
                     pmiTree.items.splice(0, 0, createNew);
                     return pmiTree;
                 });
+
                 accountTree.items = pmiItems;
             }
               
             this.treeItems = [accountTree];
+            console.log('[buildTree] # of tree items %i', this.treeItems.length);
+            console.log('[buildTree] treeItems %o', this.treeItems);
         } catch (ex) {
             console.log('[actuals.buildtree] exception', ex);
         }

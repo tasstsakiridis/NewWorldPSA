@@ -1,8 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
-import { createRecord, updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
-import { fireEvent, registerListener, unregisterAllListeners } from 'c/pubsub';
+import { deleteRecord, updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import { refreshApex } from '@salesforce/apex';
@@ -32,6 +31,7 @@ import FIELD_PROMOTION_ID from '@salesforce/schema/PMI_Actual__c.Promotion__c';
 import FIELD_PROMOTION_MATERIAL_ITEM_ID from '@salesforce/schema/PMI_Actual__c.Promotion_Material_Item__c';
 import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/PMI_Actual__c.Promotional_Activity__c';
 import FIELD_REBATE_AMOUNT from '@salesforce/schema/PMI_Actual__c.Rebate_Amount__c';
+import FIELD_START_DATE from '@salesforce/schema/PMI_Actual__c.Start_Date__c';
 import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/PMI_Actual__c.Training_and_Advocacy__c';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account'
@@ -43,11 +43,14 @@ import LABEL_AMOUNT from '@salesforce/label/c.Amount';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMMENTS_TOOLONGMSG from '@salesforce/label/c.Too_Many_Characters';
+import LABEL_DELETE from '@salesforce/label/c.Delete';
+import LABEL_DELETE_MSG from '@salesforce/label/c.Delete_Success';
 import LABEL_ERROR from '@salesforce/label/c.Error';
 import LABEL_FORECAST from '@salesforce/label/c.Forecast';
 import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
 import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
 import LABEL_HELP from '@salesforce/label/c.Help';
+import LABEL_INFO from '@salesforce/label/c.Info';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
 import LABEL_INVOICE_NUMBER from '@salesforce/label/c.Invoice_Number';
 import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
@@ -67,6 +70,8 @@ import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_P
 import LABEL_REMAINING from '@salesforce/label/c.Remaining';
 import LABEL_SAVE from '@salesforce/label/c.Save';
 import LABEL_SKIP from '@salesforce/label/c.Skip'
+import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
+import LABEL_START_DATE_PLACEHOLDER from '@salesforce/label/c.Start_Date_Placeholder';
 import LABEL_STATUS from '@salesforce/label/c.Status';
 import LABEL_TOTAL_DISCOUNT from '@salesforce/label/c.Total_Discount';
 import LABEL_TRAINING_ADVOCACY_PAID from '@salesforce/label/c.Training_and_Advocacy_Paid';
@@ -81,10 +86,12 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         amount                  : { label: LABEL_AMOUNT },
         back                    : { label: LABEL_BACK },
         comments                : { label: LABEL_COMMENTS, tooLongMsg: LABEL_COMMENTS_TOOLONGMSG.replace('{0}', '1024') },
+        delete                  : { label: LABEL_DELETE, msg: LABEL_DELETE_MSG },
         error                   : { label: LABEL_ERROR },
         forecast                : { label: LABEL_FORECAST.toLowerCase() },
         freeGoods               : { label: LABEL_FREE_GOODS },
         help                    : { label: LABEL_HELP },
+        info                    : { label: LABEL_INFO },
         invoice                 : { label: LABEL_INVOICE_NUMBER },
         listingFeePaid          : { label: LABEL_LISTING_FEE_PAID },
         next                    : { label: LABEL_NEXT.toLowerCase() },
@@ -101,6 +108,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         remaining               : { label: LABEL_REMAINING },
         save                    : { label: LABEL_SAVE },
         skip                    : { label: LABEL_SKIP.toLowerCase() },
+        startDate               : { label: LABEL_START_DATE, placeholder: LABEL_START_DATE_PLACEHOLDER },
         status                  : { label: LABEL_STATUS },
         totalDiscount           : { label: LABEL_TOTAL_DISCOUNT },
         trainingAndAdvocacyPaid : { label: LABEL_TRAINING_ADVOCACY_PAID },
@@ -290,6 +298,17 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     productSplit;
     totalPaymentsPaid;
 
+    startDate;
+    get formattedStartDate() {
+        if (this.startDate != null) {
+            var theDate = new Date(this.startDate);
+            return theDate.toISOString();
+        } else {
+            return null;
+        }
+        
+    }
+
     paymentDate;
     hasPaymentDateError;
     get formattedPaymentDate() {
@@ -312,6 +331,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         console.log('[actualsForm.canEdit] isLocked', this.isLocked);
         //return this.approvalStatus !== 'Paid' && this.approvalStatus !== 'Approved';
         return !this.isLocked;
+    }
+    get canDelete() {
+        return this.isNew || this.approvalStatus == 'New';
     }
 
     get isNew() {
@@ -347,6 +369,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
     get captureInvoice() {
         return this.psa != undefined && this.psa.Market__r.Name == 'Mexico';
+    }
+    get captureStartDate() {
+        return this.psa != undefined && this.psa.Market__r.Name == 'France';
     }
 
    rebates;
@@ -387,6 +412,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             );
         }
     }
+    handleDeleteButtonClick() {
+        this.isWorking = true;
+        this.deleteActual(this.thePMIA.Id);
+    }
     handleHelpButtonClick() {
 
     }
@@ -411,6 +440,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
     handlePaymentDateChange(event) {
         this.paymentDate = new Date(event.detail.value);
+    }
+    handleStartDateChange(event) {
+        this.startDate = new Date(event.detail.value);
     }
     handleWholesalerChange(event) {
         this.wholesaler = event.detail.value;
@@ -481,7 +513,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             if (picklist === 'Rebate_Type__c') {
                 this.rebates = picklistValues[picklist].values.map(item => ({
                     rebateType: item.value, 
-                    label: item.value + ' [' + this.labels.remaining.label + ' : %0]',
+                    label: item.value == 'Discount' ? item.value : + ' [' + this.labels.remaining.label + ' : %0]',
                     isVolumeRebate: item.value == 'Volume', 
                     isFreeGoods:  item.value == 'Free Goods',
                     rebateAmount: 0,
@@ -833,10 +865,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             const fields = {};
             
             fields[FIELD_APPROVAL_STATUS.fieldApiName] = this.approvalStatus;
-            fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
+            fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;            
             fields[FIELD_PAYMENT_DATE.fieldApiName] = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
             fields[FIELD_INVOICE_NUMBER.fieldApiName] = this.invoiceNumber;
+            if (this.captureStartDate) {
+                fields[FIELD_START_DATE.fieldApiName] = this.startDate;
+            }
 
             if (this.pmiaId === undefined) {
                 fields['RecordTypeId'] = this.recordTypeId;
@@ -927,7 +962,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             .then(result => {
                 console.log('[createnewpmia.createactuals] result', result);
                 this.isWorking = false;
-                this.updateTotals();
+                this.updateTotals(false);
 
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -983,7 +1018,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 
                 this.isWorking = false;
 
-                this.updateTotals();
+                this.updateTotals(false);
 
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -1023,11 +1058,35 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
     }
 
-    updateTotals() {
+    async deleteActual(pmiaId) {
+        try {
+            await deleteRecord(pmiaId);
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: this.labels.info.label,
+                    message: this.labels.delete.msg,
+                    variant: 'info'
+                })
+            );
+
+            this.dispatchEvent(new CustomEvent('save', { 
+                detail: { Id: pmiaId }
+            }));
+
+            this.updateTotals(true);
+        } catch(ex) {
+            console.log('[promotionalSalesAgreementActualsForm.deleteActual] exception', ex);
+        }
+    }
+
+    updateTotals(exitForm) {
 
         updateActualTotals({psaIds: [this.psaId]})
             .then((status) => {
                 console.log('[updateTotals] status', status);
+                if (exitForm) {
+                    this.goBack();
+                }
             })
             .catch((error) => {
                 console.log('[updateTotals] error', error);

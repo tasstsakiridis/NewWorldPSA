@@ -11,6 +11,9 @@ public with sharing class PSAWrapper {
         @AuraEnabled
         public Integer volumeForecast  { get; set; }
 
+        @AuraEnabled
+        public Integer currentVolume  { get; set; }
+        
         @AuraEnabled 
         public Decimal discount { get; set; }
 
@@ -181,7 +184,19 @@ public with sharing class PSAWrapper {
     public Decimal percentageVisibility { get; set; }
 
     @AuraEnabled 
+    public Decimal probabilityPercentage { get; set; }
+
+    @AuraEnabled 
     public Boolean isDirectRebate { get; set; }
+
+    @AuraEnabled 
+    public String contractType { get; set; }
+
+    @AuraEnabled 
+    public String discountCategory { get; set; }
+
+    @AuraEnabled 
+    public String promoCode { get; set; }
 
     @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
@@ -231,7 +246,11 @@ public with sharing class PSAWrapper {
         this.paymentConfigurations = '';
         this.totalBudget = 0;
         this.percentageVisibility = 0;
+        this.probabilityPercentage = 0;
         this.isDirectRebate = true;
+        this.discountCategory = '';
+        this.promoCode = '';
+        this.contractType = '';
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -265,11 +284,15 @@ public with sharing class PSAWrapper {
         this.wholesalerPreferredName = psa.Wholesaler_Preferred_Name__c;
         this.status = psa.Status__c;
         this.promotionType = psa.Promotion_Type__c;
+        this.discountCategory = psa.Discount_Category__c;
+        this.promoCode = psa.Promo_Code__c;
+        this.contractType = psa.Contract_Type__c;
         this.purchaseOrder = psa.Purchase_Order__c;
         this.comments = psa.Evaluation_Comments__c;
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
         this.totalBudget = psa.Activity_Budget__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
+        this.probabilityPercentage = psa.Probability__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
         this.isDirectRebate = psa.Activity_Type__c == null || psa.Activity_Type__c == 'Direct Rebate';
         this.accountWholesalerPreferred = psa.Account_Wholesaler_Preferred__c;

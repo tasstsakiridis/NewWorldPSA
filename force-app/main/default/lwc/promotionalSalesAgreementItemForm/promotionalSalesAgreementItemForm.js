@@ -33,6 +33,7 @@ import FIELD_VOLUME_FORECAST from '@salesforce/schema/Promotion_Material_Item__c
 import FIELD_ORIGINAL_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Volume__c';
 import FIELD_PREVIOUS_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Volume__c';
 import FIELD_PROPOSED_PLAN_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Proposed_Plan_Volume__c';
+import FIELD_CURRENT_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Current_Volume__c';
 import FIELD_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate__c';
 import FIELD_ORIGINAL_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Original_Plan_Rebate__c';
 import FIELD_PREVIOUS_PLAN_REBATE from '@salesforce/schema/Promotion_Material_Item__c.Previous_Plan_Rebate__c';
@@ -74,6 +75,7 @@ import updateSpreadForPMI from '@salesforce/apex/PromotionalSalesAgreement_Contr
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COST from '@salesforce/label/c.Cost';
+import LABEL_CURRENT_VOLUME from '@salesforce/label/c.CurrentVolume';
 import LABEL_DISCOUNT_PER_BOTTLE from '@salesforce/label/c.Discount_per_Bottle';
 import LABEL_DISCOUNT_PER_9LCASE from '@salesforce/label/c.Discount_per_9LCase';
 import LABEL_DISCOUNT_PERCENT from '@salesforce/label/c.Discount_Percent';
@@ -104,6 +106,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         back                    : { label: LABEL_BACK },
         comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
         cost                    : { label: LABEL_COST },
+        currentVolume           : { label: LABEL_CURRENT_VOLUME },
         discountPerBottle       : { label: LABEL_DISCOUNT_PER_BOTTLE },
         discountPerCase         : { label: LABEL_DISCOUNT_PER_9LCASE, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_DISCOUNT_PER_9LCASE) },
         discountPercent         : { label: LABEL_DISCOUNT_PERCENT },
@@ -147,6 +150,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     @api captureFreeGoods;
     @api captureVolumeInBottles;
     @api captureRebatePerBottle;
+    @api showGrossProfit;
     @api fieldSet;
 
     _totalPlannedSpend = 0;
@@ -296,6 +300,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             let freeGoodsVolume = value.data.Free_Bottle_Quantity__c || 0;
             //this.freeGoodGivenDate = value.data.Free_Goods_Given_Date__c || null;
 
+            let cVolume = value.data.Current_Volume__c || 0;
+            if (this.captureVolumeInBottles || value.data.Activity__r.Market__r.Capture_Volume_in_Bottles__c) {
+                cVolume = cVolume * (value.data.Product_Pack_Qty__c == undefined ? 1 : value.data.Product_Pack_Qty__c);
+            }
+            this.currentVolume = cVolume;
+
             let volume = value.data.Plan_Volume__c || 0;
             if (value.data.Proposed_Plan_Volume__c && value.data.Proposed_Plan_Volume__c != value.data.Plan_Volume__c) {
                 volume = value.data.Proposed_Plan_Volume__c;
@@ -374,6 +384,12 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     get isMexico() {
         return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'Mexico';
     }
+    get isJapan() {
+        return this.psa != undefined && this.psa.Market__r != undefined && this.psa.Market__r.Name == 'Japan';
+    }
+    get captureCurrentVolume() {
+        return this.fieldSet != null && this.fieldSet.Current_Volume__c != null;
+    }
     get captureRebate() {
         //return this.isUKMarket;
         return this.fieldSet != null && this.fieldSet.Plan_Rebate__c != null;
@@ -451,6 +467,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     brandStatusOptions;
     brandStatusLabel = 'Brand Status';
     brandStatusPlaceholder = '';
+
+    currentVolume = 0;
+    currentVolumeLabel = this.labels.currentVolume.label;
 
     volumeForecast = 0;
     volumeForecastLabel = 'Volume Forecast';
@@ -560,14 +579,18 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
     get thisProductGP() {
         let v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : Math.round(parseFloat(this.volumeForecast));
-        const gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
+        let gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
         const packQty = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
 
         if (this.psa.Activity_Type__c != 'Coupon') {
             v += this.planRebateVolume;
         }
 
-        const productGP = (v / packQty) * gpPerCase;
+        let productGP = (v / packQty) * gpPerCase;
+        if (this.isJapan) {
+            gpPerCase = this.product == undefined || this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
+            productGP = v * gpPerCase;
+        }
         
         console.log('[psaItemForm.thisProductGP] gpPerBottle', gpPerCase);
         console.log('[psaItemForm.thisProductGP] activityType', this.psa.Activity_Type__c);
@@ -649,6 +672,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             console.log('[psaitemform.setFieldLabels] brand status placeholder', this.objectInfo.fields["Brand_Status__c"].inlineHelpText);
             this.brandStatusLabel = this.objectInfo.fields["Brand_Status__c"].label;
             this.brandStatusPlaceholder = this.objectInfo.fields["Brand_Status__c"].inlineHelpText;
+        }
+        if (this.objectInfo.fields["Current_Volume__c"]) {
+            this.currentVolumeLabel = this.objectInfo.fields["Current_Volume__c"].label;
         }
         if (this.objectInfo.fields["Listing_Fee__c"]) {
             this.listingFeeLabel = this.objectInfo.fields["Listing_Fee__c"].label;
@@ -776,6 +802,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         this.discount = 0;
         this.discountPercent = 0;
         this.volumeForecast = 0;
+        this.currentVolume = 0;
         this.listingFee = 0;
         this.promotionalActivityAmount = 0;
         this.trainingAdvocacyAmount = 0;
@@ -845,6 +872,13 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleBrandStatusChange(event) {
         this.brandStatusValues = event.detail.value;
+    }
+    handleCurrentVolumeChange(event) {
+        try {
+            this.currentVolume = event.detail.value.trim() == '' ? 0 : event.detail.value;
+        }catch(ex) {
+            console.log('[handleCurrentVolumeChange] exception', ex);
+        }
     }
     handleVolumeForecastChange(event) {
         try {      
@@ -1069,10 +1103,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
             let freeGoodsVolume = this.freeGoodQty;
             let volume = this.volumeForecast;
+            let cVolume = this.currentVolume;
             if (this.captureVolumeInBottles) {
-                volume = this.volumeForecast / (this.product.Pack_Quantity__c == undefined || this.product.Pack_Quantity__c == 0 ? 1 : this.product.Pack_Quantity__c);
+                const packQty = this.product.Pack_Quantity__c == undefined || this.product.Pack_Quantity__c == 0 ? 1 : this.product.Pack_Quantity__c;
+                volume = this.volumeForecast / packQty;
+                cVolume = this.currentVolume / packQty;
                 //freeGoodsVolume = this.freeGoodQty / this.product.Pack_Quantity__c;
             }
+
+            fields[FIELD_CURRENT_VOLUME.fieldApiName] = cVolume;
 
             console.log('[psaItemForm.save] captureVolumeInBottles', this.captureVolumeInBottles);
             console.log('[psaItemForm.save] volume', volume);

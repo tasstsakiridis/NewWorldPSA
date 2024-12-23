@@ -34,7 +34,7 @@
                                             {formattedEndDate}
                                         </td>
                                     </tr>
-                                    <template if:true={showNumberOfQuarters}>
+                                    <template lwc:if={showNumberOfQuarters}>
                                         <tr>
                                             <td class="col1">
                                                 <h4>{labels.numberOfQuarters.label}</h4>
@@ -44,7 +44,7 @@
                                             </td>
                                         </tr>
                                     </template>
-                                    <template if:true={showRebateLiability}>
+                                    <template lwc:if={showRebateLiability}>
                                         <tr>
                                             <td class="col1">
                                                 <h4>{labels.rebateLiability.label}</h4>
@@ -54,7 +54,7 @@
                                             </td>
                                         </tr>
                                     </template>
-                                    <template if:true={showTotalInvestment}>
+                                    <template lwc:if={showTotalInvestment}>
                                         <tr>
                                             <td class="col1">
                                                 <h4>{labels.totalInvestment.label}</h4>
@@ -64,7 +64,18 @@
                                             </td>
                                         </tr>
                                     </template>
-                                    <template if:true={showCustomerProfit}>
+                                    <template lwc:if={showTotalActualInvestment}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.totalActualInvestment.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalActualInvestment}
+                                                    maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template lwc:if={showCustomerProfit}>
                                         <tr>
                                             <td class="col1">
                                                 <h4>{labels.customerProfit.label}</h4>
@@ -73,6 +84,18 @@
                                                 <lightning-formatted-number value={customerProfit} maximum-fraction-digits="0"></lightning-formatted-number>
                                             </td>
                                         </tr>
+                                    </template>
+                                    <template lwc:if={showTotalGP}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.totalGrossProfit.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalGrossProfit} maximum-fraction-digits="2"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template lwc:if={showROI}>
                                         <tr>
                                             <td class="col1">
                                                 <h4>{labels.roi.label}</h4>
