@@ -9,10 +9,12 @@ import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
 import LABEL_ACTUAL from '@salesforce/label/c.Actual';
+import LABEL_ACTUAL_DISCOUNT from '@salesforce/label/c.Actual_Discount';
 import LABEL_ACTUAL_VOLUME from '@salesforce/label/c.ActualVolume';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_BALANCE from '@salesforce/label/c.Balance';
 import LABEL_BRAND_SUPPORT from '@salesforce/label/c.Brand_Support';
+import LABEL_CURRENT_VOLUME from '@salesforce/label/c.CurrentVolume';
 import LABEL_CUSTOMER_PROFIT from '@salesforce/label/c.Customer_Profit';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_END_DATE from '@salesforce/label/c.End_Date';
@@ -26,6 +28,7 @@ import LABEL_NUMBEROFQUARTERS from '@salesforce/label/c.NumberOfQuarters';
 import LABEL_PAID from '@salesforce/label/c.Paid';
 import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
 import LABEL_PLANNED from '@salesforce/label/c.Planned';
+import LABEL_PLANNED_DISCOUNT from '@salesforce/label/c.Plan_Discount';
 import LABEL_PLANNED_VOLUME from '@salesforce/label/c.Planned_Volume';
 import LABEL_PRINT from '@salesforce/label/c.Factsheet_Print';
 import LABEL_PRODUCT from '@salesforce/label/c.Product';
@@ -40,7 +43,9 @@ import LABEL_SPLIT from '@salesforce/label/c.Split';
 import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
 import LABEL_SUMMARY from '@salesforce/label/c.Summary';
 import LABEL_TOTAL from '@salesforce/label/c.Total';
+import LABEL_TOTAL_GROSS_PROFIT from '@salesforce/label/c.Total_Gross_Profit';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.TotalInvestment';
+import LABEL_TOTAL_ACTUAL_INVESTMENT from '@salesforce/label/c.TotalActualInvestment';
 import LABEL_TRAINING_ADVOCACY from '@salesforce/label/c.Training_and_Advocacy';
 import LABEL_VOLUME from '@salesforce/label/c.Volume_Title';
 import LABEL_WORKING from '@salesforce/label/c.Working_PleaseWait';
@@ -52,6 +57,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         back:                   { label: LABEL_BACK },
         balance:                { label: LABEL_BALANCE },
         brandSupport:           { label: LABEL_BRAND_SUPPORT },
+        currentVolume:          { label: LABEL_CURRENT_VOLUME },
         customerProfit:         { label: LABEL_CUSTOMER_PROFIT },
         details:                { label: LABEL_DETAILS },
         end:                    { label: LABEL_END_DATE },
@@ -70,7 +76,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         split:                  { label: LABEL_SPLIT },
         start:                  { label: LABEL_START_DATE },
         summary:                { label: LABEL_SUMMARY },
+        totalGrossProfit:       { label: LABEL_TOTAL_GROSS_PROFIT },
         totalInvestment:        { label: LABEL_TOTAL_INVESTMENT },
+        totalActualInvestment:  { label: LABEL_TOTAL_ACTUAL_INVESTMENT },
         trainingAdvocacy:       { label: LABEL_TRAINING_ADVOCACY },
         total:                  { label: LABEL_TOTAL },
         volume:                 { label: LABEL_VOLUME },
@@ -93,13 +101,16 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_FREE_GOODS, fieldName: 'freeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_GIVEN, fieldName: 'actualFreeGoods', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_FREE_GOODS_COST, fieldName: 'freeGoodsCost', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_CURRENT_VOLUME, fieldName: 'currentVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Japan']},
         { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['ALL']},
+        { label: LABEL_PLANNED_DISCOUNT, fieldName: 'plannedDiscount', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['France','Japan'] },
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','France','United Kingdom']},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
         { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['ALL']},
+        { label: LABEL_ACTUAL_DISCOUNT, fieldName: 'actualDiscount', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['France'] },        
         { label: LABEL_PAYMENTS, fieldName: 'payment', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil','United Kingdom']},
-        { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
-        { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
+        { label: LABEL_LISTING_FEE, fieldName: 'listingFee', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['BeLux','Mexico', 'United Kingdom', 'Japan']},
+        { label: this.listingFeePaidLabel, fieldName: 'listingFeePaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['BeLux','Mexico', 'United Kingdom']},
         //{ label: this.listingFeeBalanceLabel, fieldName: 'listingFeeBalance', type: 'currency', cellAttributes: { alignment: 'right' }},
         { label: LABEL_PROMOTIONAL_ACTIVITY, fieldName: 'promotionalActivity', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
         { label: this.promotionalActivityPaidLabel, fieldName: 'promotionalActivityPaid', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'United Kingdom']},
@@ -110,7 +121,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_REBATE_VOLUME, fieldName: 'rebateVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_REBATE_PERCENT, fieldName: 'rebatePercent', type: 'percent', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_REBATE_LIABILITY, fieldName: 'rebateLiability', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
-        { label: LABEL_GROSS_PROFIT, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
+        { label: LABEL_GROSS_PROFIT, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico', 'Japan']},
         { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil']},
         { label: LABEL_TOTAL_INVESTMENT, fieldName: 'totalInvestment', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom'] },
         { label: this.totalInvestment9lLabel, fieldName: 'totalInvestment9L', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
@@ -146,8 +157,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     showNumberOfQuarters = false;
     showRebateLiability = false;
     showTotalInvestment = false;
+    showTotalActualInvestment = false;
     showCustomerProfit = false;
     showBrandSupport = false;
+    showROI = false;
+    showTotalGP = false;
 
     loadPSA() {
         getPSA({psaId: this.psaId})
@@ -312,7 +326,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         return this.trainingAdvocacy - (this.trainingAdvocacyPaid == null ? 0 : this.trainingAdvocacyPaid);
     }
     get brandSupport() {
-        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Brand_Support__c);
+        return this.thePSA == undefined ? null : parseFloat(this.thePSA.Total_Brand_Support__c);
     }
     get brandSupportPaid() {
         return this.thePSA == undefined || this.thePSA.Total_Brand_Support_Paid__c == undefined ? 0 : parseFloat(this.thePSA.Total_Brand_Support_Paid__c);
@@ -338,6 +352,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     get totalInvestment() {
         return this.thePSA == undefined || this.thePSA.Total_Investment__c == null ? 0 : this.thePSA.Total_Investment__c;
     }
+    get totalActualInvestment() {
+        return this.thePSA == undefined || this.thePSA.Total_Actual_Investment__c == null ? 0 : this.thePSA.Total_Actual_Investment__c;
+    }
     get totalRebateLiability() {
         return this.thePSA == undefined || this.thePSA.Total_Rebate_Liability__c == null ? 0 : this.thePSA.Total_Rebate_Liability__c;
     }
@@ -346,6 +363,9 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
     }
     get customerProfit() {
         return this.thePSA == undefined || this.thePSA.Total_Customer_Profit__c == null ? 0 : this.thePSA.Total_Customer_Profit__c;
+    }
+    get totalGrossProfit() {
+        return this.thePSA == undefined || this.thePSA.Total_PSA_Gross_Profit__c == null ? 0 : this.thePSA.Total_PSA_Gross_Profit__c;
     }
     get roi() {
         return this.thePSA == undefined || this.thePSA.Total_Return_on_Investment__c == null ? 0 : this.thePSA.Total_Return_on_Investment__c;
@@ -435,6 +455,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.showRebateLiability = false;
         this.showTotalInvestment = false;
         this.showCustomerProfit = false;
+        this.showROI = false;
+        this.showTotalGP = false;
         console.log('[summary.buildTableData] columns', this.columns);
         console.log('[summary.buildTableData] market name', this.thePSA.Market__r.Name);
         var cols = [...this.columns.filter(c => c.markets.includes(this.thePSA.Market__r.Name) || c.markets.includes('ALL'))];
@@ -455,12 +477,15 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             this.showTrainingAndAdvocacy = false;
             this.showListingFee = false;
             this.showPayments = false;
+            this.showTotalInvestment = true;
+            this.showTotalActualInvestment = true;
         }
         
         if (this.marketName == 'Mexico') {
             this.showRebateLiability = true;
             this.showTotalInvestment = true;
             this.showCustomerProfit = true;
+            this.showROI = true;
             //cols = cols.filter(c => c.fieldName != 'discount');
             //cols = cols.filter(c => c.fieldName.indexOf('totalInvestment') < 0);
         } else {
@@ -477,6 +502,13 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             //cols = cols.filter(c => c.fieldName != 'quartersCaptured');
         }
         
+        if (this.marketName == 'Japan') {
+            this.showPromotionalActivity = false;
+            this.showTrainingAndAdvocacy = false;
+            this.showTotalGP = true;
+            this.showROI = true;
+        }
+
         if (!this.showProductSplit) {
             //cols = cols.filter(c => c.fieldName != 'productSplit' && c.fieldName != 'payment');
         }
@@ -528,8 +560,11 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     product: pmi.Product_Name__c, 
                     plannedFreeGoods: parseInt(pmi.Free_Bottle_Quantity__c),
                     actualFreeGoods: parseInt(pmi.Total_Actual_Free_Bottle_Qty__c),
+                    currentVolume: parseInt(pmi.Current_Volume__c),
                     plannedVolume: parseFloat(pmi.Plan_Volume__c),
+                    plannedDiscount: parseFloat(pmi.Plan_Volume__c) * parseFloat(pmi.Plan_Rebate__c),
                     actualVolume: parseFloat(pmi.Total_Actual_Volume__c),
+                    actualDiscount: parseFloat(pmi.Total_Actual_Volume__c) * parseFloat(pmi.Plan_Rebate__c),
                     discount: parseFloat(pmi.Plan_Rebate__c),
                     listingFee: parseFloat(pmi.Listing_Fee__c),
                     listingFeePaid: parseFloat(pmi.Total_Listing_Fee_Paid__c),
@@ -538,6 +573,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     trainingAdvocacy: parseFloat(pmi.Training_and_Advocacy_Value__c),
                     trainingAdvocacyPaid: parseFloat(pmi.Total_Training_and_Advocacy_Paid__c),
                     totalInvestment: parseFloat(pmi.Total_Investment__c),
+                    totalActualInvestment: parseFloat(pmi.Total_Actual_Investment__c),
                     packQuantity: parseInt(pmi.Product_Pack_Qty__c),
                     grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c==undefined ? 0 : pmi.Product_Custom__r.Gross_Profit_per_Case__c),
                     rebateVolume: parseFloat(pmi.Plan_Rebate_Volume__c),
@@ -606,7 +642,10 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     volume = pmi.plannedVolume * pmi.packQuantity;
                     actualVolume = pmi.actualVolume * pmi.packQuantity;
                 }
+                row.currentVolume = pmi.currentVolume;
                 row.plannedVolume = volume;
+                row.plannedDiscount = pmi.plannedDiscount,
+                row.actualDiscount = pmi.actualDiscount,
                 row.discount = pmi.discount;
                 row.listingFee = pmi.listingFee;
                 row.promotionalActivity = pmi.promotionalActivity;

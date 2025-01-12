@@ -137,7 +137,7 @@
                     </template>
                     <template if:false={captureEndDate}>
                         <lightning-layout-item size="12" padding="around-small">
-                            <template if:true={isPhone}>
+                            <template lwc:if={isPhone}>
                                 <lightning-layout multiple-rows="true">
                                     <lightning-layout-item size="12">
                                         <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType"  checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
@@ -156,7 +156,7 @@
                                 </lightning-layout>    
 
                             </template>
-                            <template if:false={isPhone}>
+                            <template lwc:else>
                                 <lightning-layout>
                                     <lightning-layout-item size="9">
                                         <template if:true={isLengthInYears}>
@@ -183,46 +183,76 @@
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
                         <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
                         <lightning-layout multiple-rows="true">
-                            <template if:true={isApproved}>
-                                <template if:true={canChangeStatus}>
+                            <template lwc:if={captureCCMDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">CCM Details</h3>
+                                    <lightning-combobox name="i_ContractType" label={labels.contractType.label} value={contractType}
+                                        options={contractTypeOptions} class="slds-m-horizontal_small" disabled={isLocked}
+                                        onchange={handleContractTypeChange}></lightning-combobox>                                                                                  
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_DiscountCategory" label={labels.discountCategory.label} value={discountCategory}
+                                        options={discountCategoryOptions} class="slds-m-horizontal_small" disabled={isLocked}
+                                        onchange={handleDiscountCategoryChange}></lightning-combobox>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                                    <lightning-combobox name="i_PromoCode" label={labels.promoCode.label} value={promoCode}
+                                        options={promoCodeOptions} class="slds-m-horizontal_small" disabled={isLocked}
+                                        onchange={handlePromoCodeChange}></lightning-combobox>
+                                </lightning-layout-item>                                
+                            </template>
+                            <template lwc:if={isApproved}>
+                                <template lwc:if={canChangeStatus}>
                                     <lightning-layout-item size="12" padding="around-small">
                                         <lightning-combobox name="i_Status" label={labels.status.label} value={status} options={statusOptions} class="slds-m-horizontal_small" onchange={handleStatusChange}></lightning-combobox>
                                     </lightning-layout-item>
                                 </template>                                
                             </template>
-                            <template if:true={captureTotalBudget}>
+                            <template lwc:if={captureTotalBudget}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} class="slds-m-horizontal_small" disabled={isLocked} onchange={handleTotalBudgetChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>
-                            <template if:true={capturePercentageVisibility}>
+                            <template lwc:if={captureProbability}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="probabilityPercentage" label={labels.probabilityPercentage.label} step="1"
+                                        value={probabilityPercentage} disabled={isLocked}
+                                        onchange={handleProbabilityPercentageChange}></lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={capturePercentageVisibility}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} disabled={isLocked} onchange={handlePercentageVisibilityChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>
-                            <template if:true={capturePromotionType}>
+                            <template lwc:if={capturePromotionType}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-combobox name="i_PromotionType" label={labels.promotionType.label} value={promotionType} options={promotionTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} onchange={handlePromotionTypeChange}></lightning-combobox>
                                 </lightning-layout-item>
                             </template>
-                            <template if:true={captureActivityType}>
+                            <template lwc:if={captureMenuType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_MenuType" label={labels.menuType.label} value={menuType} options={menuTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} onchange={handleMenuTypeChange}></lightning-combobox>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={captureActivityType}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.activityType.label}</h2>
                                     <lightning-input type="toggle" class="prestige-type-toggle" name="i_ActivityType" checked={isDirectRebate} message-toggle-active={activityTypeActive.label} message-toggle-inactive={activityTypeInactive.label} disabled={isLocked} onchange={handleActivityTypeToggle}></lightning-input>
                                 </lightning-layout-item>    
                             </template>
-                            <template if:true={canAddNewAccountsToPSA}>
+                            <template lwc:if={canAddNewAccountsToPSA}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.limitToSelectedAccounts.label}</h2>
                                     <lightning-input type="toggle" class="prestige-type-toggle" name="i_LimitAccounts" checked={limitToSelectedAccounts} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} disabled={isLocked} onchange={handleLimitToSelectedAccountsToggle}></lightning-input>                                        
                                 </lightning-layout-item>
                             </template>
-                            <template if:true={captureNumberOfPayments}>
+                            <template lwc:if={captureNumberOfPayments}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" disabled={paymentsLocked} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
                                     <!--<lightning-combobox name="i_NumberOfPayments" label={labels.numberOfPayments.label} value={numberOfPayments} options={numberOfPaymentOptions} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-combobox>-->
                                 </lightning-layout-item>
-                                <template if:true={configurePayments}>
+                                <template lwc:if={configurePayments}>
                                     <div style="margin-left: 2em;">
                                         <ul class="slds-m-around_small">
                                             <li>
@@ -252,22 +282,22 @@
                                     -->
                                 </template>
                                 <template if:false={configurePayments}>
-                                    <template if:true={isOnePayment}>
+                                    <template lwc:if={isOnePayment}>
                                         <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
                                     </template>
-                                    <template if:true={isTwoPayments}>
+                                    <template lwc:if={isTwoPayments}>
                                         <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
                                     </template>
-                                    <template if:true={isThreePayments}>
+                                    <template lwc:if={isThreePayments}>
                                         <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
                                     </template>
-                                    <template if:true={isFourPayments}>
+                                    <template lwc:if={isFourPayments}>
                                         <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
                                     </template>    
                                 </template>
                             </template>                                
 
-                            <template if:true={captureMPO}>
+                            <template lwc:if={captureMPO}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.mpoPrestige.label}</h2>
                                     <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
@@ -307,7 +337,7 @@
                                             readonly={isLocked}
                                             onchange={handlePreferredRTMChange}>
                         </lightning-combobox>
-                        <template if:true={hasPreferredRTMError}>
+                        <template lwc:if={hasPreferredRTMError}>
                             <span class="slds-m-horizontal_small input-error">{labels.preferredRTM.error}</span>
                         </template>
                     </lightning-layout-item>
@@ -338,12 +368,12 @@
                         </template>
                     </lightning-layout-item>
                     <lightning-layout-item size="12" small-device-size="12" large-device-size="6" padding="around-small">
-                        <template if:true={hasParentAccountError}>
+                        <template lwc:if={hasParentAccountError}>
                             <div class="slds-m-horizontal_small">
                                 <span class="input-error error-large">{labels.parentAccount.error}</span>
                             </div>
                         </template>
-                        <template if:true={parentAccount}>
+                        <template lwc:if={parentAccount}>
                             <div class="">
                                 <h3 class="slds-m-around_small border-bottom">{labels.signingCustomerHeader.label}</h3>
                                 <template if:true={signingCustomer}>
@@ -359,7 +389,7 @@
                                         </template>
                                     </template>
                                 </template>
-                                <template if:true={hasSigningCustomerError}>
+                                <template lwc:if={hasSigningCustomerError}>
                                     <div class="slds-m-horizontal_small">
                                         <span class="input-error error-large">{labels.signingCustomer.error}</span>
                                     </div>
@@ -395,15 +425,15 @@
                         </template>
                     </lightning-layout-item>
                     <lightning-layout-item size="12">
-                        <template if:true={hasChildAccountsError}>
+                        <template lwc:if={hasChildAccountsError}>
                             <span class="slds-m-horizontal_small input-error">{labels.noAccountsSelected.error}</span>
                         </template>
-                        <template if:true={selectAllChildAccounts}>
+                        <template lwc:if={selectAllChildAccounts}>
                             <span class="slds-m-around_small warning-info">{labels.allAccountSelected.message}</span>
                         </template>
 
-                        <template if:true={accounts}>
-                            <template if:true={accounts.records.length}>
+                        <template lwc:if={accounts}>
+                            <template lwc:if={accounts.records.length}>
                                 <div class="content">
                                     <template for:each={accounts.records} for:item="account">
                                         <c-account-tile key={account.item.Id} 

@@ -22,13 +22,13 @@
         </div>
     </article>
 
-    <template if:true={isWorking}>
+    <template lwc:if={isWorking}>
         <div class="slds-m-around_medium slds-align_absolute-center">
             <lightning-spinner alternative-text={labels.saving.message}></lightning-spinner>
             <p class="slds-text-title_caps">{workingMessage}</p>
         </div>
     </template>
-    <template if:false={isWorking}>
+    <template lwc:else>
     <div class="card-body slds-m-top_small slds-p-top_small">
         <lightning-layout horizontal-align="space" class="slds-m-around_small">
             <lightning-layout-item>
@@ -37,7 +37,7 @@
             <lightning-layout-item>
                 <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
             </lightning-layout-item>
-            <template if:true={canDelete}>
+            <template lwc:if={canDelete}>
                 <lightning-layout-item>
                     <lightning-button-icon data-id="delete" variant="brand" icon-name="utility:delete" label="" title="Delete" alternative-text="Delete" onclick={handleDeleteButtonClick}></lightning-button-icon>
                 </lightning-layout-item>
@@ -55,7 +55,7 @@
                 <lightning-layout>
                     <lightning-layout-item size="6" small-device-size="12" medium-device-size="6">
                         <!-- Total Investment -->      
-                        <div if:true={isUKMarket}>
+                        <div lwc:if={isUKMarket}>
                             <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
                             <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
                                                         format-style="currency"
@@ -63,14 +63,14 @@
                             </lightning-formatted-number>    
                         </div>     
                         <!-- Liability -->     
-                        <div if:true={isMexico}>
+                        <div lwc:if={isMexico}>
                             <p class="slds-text-heading_small">{labels.liability.label}</p>
                             <lightning-formatted-number label={labels.liability.label} value={rebateLiability} format-style="currency"
                                 currency-display-as="symbol">
                             </lightning-formatted-number>
                         </div>
                     </lightning-layout-item>
-                    <template if:true={calcSplit}>
+                    <template lwc:if={calcSplit}>
                         <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
                             <p class="slds-text-heading_small">{labels.split.label}</p>
                             <lightning-formatted-number label={labels.split.label} value={productSplit}
@@ -79,7 +79,7 @@
                             </lightning-formatted-number>
                         </lightning-layout-item>
                     </template>
-                    <template if:true={isMexico}>
+                    <template lwc:if={showGrossProfit}>
                         <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
                             <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
                             <lightning-formatted-number label={labels.grossProfit.label} 
@@ -91,7 +91,7 @@
                     </template>                    
                 </lightning-layout>
             </lightning-layout-item>
-            <template if:true={captureFreeGoods}>
+            <template lwc:if={captureFreeGoods}>
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-input type="number" name="i_FreeGoods"
                                     label={freeGoodsLabel}
@@ -121,7 +121,7 @@
                     </lightning-checkbox-group>
                 </lightning-layout-item>
             </template>
-            <template if:true={captureBrandStatus}>
+            <template lwc:if={captureBrandStatus}>
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-checkbox-group name="i_BrandStatus"
                                             label={brandStatusLabel}
@@ -131,53 +131,58 @@
                                             onchange={handleBrandStatusChange}></lightning-checkbox-group>
                 </lightning-layout-item>              
             </template>
+            <template lwc:if={captureCurrentVolume}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <template lwc:if={captureVolumeInBottles}>
+                        <lightning-input type="number" name="i_CurrentVolume" label={labels.currentVolume.label} value={currentVolume}
+                            step="1" readonly={isDisabled} onchange={handleCurrentVolumeChange}>
+                        </lightning-input>
+                    </template>
+                    <template lwc:else>
+                        <lightning-input type="number" name="i_CurrentVolume" label={labels.currentVolume.label} value={currentVolume} step="0.01"
+                            readonly={isDisabled} onchange={handleCurrentVolumeChange}>
+                        </lightning-input>
+                    </template>                    
+                </lightning-layout-item>
+            </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
-                <template if:false={captureVolumeInBottles}>
-                    <lightning-input type="number" name="i_VolumeForecast" 
-                                    label={labels.volumeForecast.label}
-                                    value={volumeForecast}
-                                    step="0.01"
-                                    readonly={isDisabled}
-                                    onchange={handleVolumeForecastChange}>
+                <template lwc:if={captureVolumeInBottles}>                    
+                    <lightning-input type="number" name="i_VolumeForecast" label={labels.volumeForecastBtl.label} value={volumeForecast}
+                        step="1" readonly={isDisabled} onchange={handleVolumeForecastChange}>
                     </lightning-input>
-                    <template if:true={hasVolumeForecastError}>
-                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
-                    </template>
-    
-                </template>
-                <template if:true={captureVolumeInBottles}>
-                    <lightning-input type="number" name="i_VolumeForecast" 
-                                    label={labels.volumeForecastBtl.label}
-                                    value={volumeForecast}
-                                    step="1"
-                                    readonly={isDisabled}
-                                    onchange={handleVolumeForecastChange}>
-                    </lightning-input>
-                    <template if:true={hasVolumeForecastError}>
+                    <template lwc:if={hasVolumeForecastError}>
                         <span class="slds-m-horizontal_small input-error">{labels.volumeForecastBtl.error}</span>
+                    </template>    
+                </template>
+                <template lwc:else>
+                    <lightning-input type="number" name="i_VolumeForecast" label={labels.volumeForecast.label} value={volumeForecast}
+                        step="0.01" readonly={isDisabled} onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template lwc:if={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
                     </template>
                 </template>
             </lightning-layout-item>
-            <template if:true={captureRebate}>
+            <template lwc:if={captureRebate}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
-                    <template if:true={captureRebatePerBottle}>
+                    <template lwc:if={captureRebatePerBottle}>
                         <lightning-input type="number" name="i_DiscountPerBottle" label={labels.discountPerBottle.label} value={discount} step="0.01"
                             readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
                         </lightning-input>
                     </template>
-                    <template if:false={captureRebatePerBottle}>
+                    <template lwc:else>
                         <lightning-input type="number" name="i_DiscountPerCase" label={labels.discountPerCase.label} value={discount} step="0.01"
                             readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
                         </lightning-input>                    
                     </template>
-                    <template if:true={hasDiscountError}>
+                    <template lwc:if={hasDiscountError}>
                         <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
                     </template>
                 </lightning-layout-item>
             </template>
-            <template if:true={captureRebatePercent}>
+            <template lwc:if={captureRebatePercent}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
                     <lightning-input type="number" name="i_DiscountPercent" 
@@ -188,12 +193,12 @@
                                     onchange={handleDiscountPercentChange}
                                     formatter="percent-fixed">
                     </lightning-input>
-                    <template if:true={hasDiscountError}>
+                    <template lwc:if={hasDiscountError}>
                         <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
                     </template>
                 </lightning-layout-item>
             </template>
-            <template if:true={captureListingFee}>
+            <template lwc:if={captureListingFee}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Listing Fee -->
                     <lightning-input type="number" name="i_ListingFee" 

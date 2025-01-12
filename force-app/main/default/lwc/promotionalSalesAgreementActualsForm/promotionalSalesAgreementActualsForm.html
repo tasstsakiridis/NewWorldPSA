@@ -6,10 +6,14 @@
         <template if:false={isPhone}>
             <lightning-button-group slot="actions">
                 <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" disabled={isLocked} onclick={handleCancelButtonClick} ></lightning-button>
-                <template if:true={canEdit}>
+                <template lwc:if={canEdit}>
                     <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" disabled={isLocked} onclick={handleSaveButtonClick} ></lightning-button>
                 </template>
-                <template if:true={pmiRecords}>
+                <template lwc:if={canDelete}>
+                    <lightning-button label={labels.delete.label} icon-name="utility:delete" title="Delete" class="" disabled={isLocked}
+                        onclick={handleDeleteButtonClick}></lightning-button>
+                </template>
+                <template lwc:if={pmiRecords}>
                     <lightning-formatted-text value={multipleRecordsMessage} ></lightning-formatted-text>
                     <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" disabled={isLocked} onclick={handleSkipButtonClick}></lightning-button>
                     <template if:false={isFirstRecord}>
@@ -23,16 +27,22 @@
             </lightning-button-group>
         </template>
         <div>
-            <template if:true={isPhone}>
+            <template lwc:if={isPhone}>
                 <lightning-layout multiple-rows="true">
                     <lightning-layout-item size="12">
                         <lightning-layout>
                             <lightning-layout-item size="2">
                                 <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" disabled={isLocked} onclick={handleCancelButtonClick}></lightning-button-icon>
                             </lightning-layout-item>
-                            <lightning-layout-item size="7" class="slds-text-align_center">
+                            <lightning-layout-item size="5" class="slds-text-align_center">
                                 <template if:true={canEdit}>
                                     <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" disabled={isLocked} onclick={handleSaveButtonClick}></lightning-button-icon>
+                                </template>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="2">
+                                <template if:true={canDelete}>
+                                    <lightning-button-icon icon-name="utility:delete" title="Delete" alternative-text="Delete" class="slds-m-right_x-small" disabled={isLocked}
+                                        onclick={handleDeleteButtonClick}></lightning-button-icon>
                                 </template>
                             </lightning-layout-item>
                             <lightning-layout-item size="3">
@@ -63,7 +73,7 @@
                         <p class="slds-text-title_caps">{labels.status.label}</p>
                         <span class="slds-text-heading_medium">{approvalStatus}</span>
                     </lightning-layout-item>
-                    <template if:true={captureFreeGoods}>
+                    <template lwc:if={captureFreeGoods}>
                         <lightning-layout-item size="12" padding="around-small">
                             <p class="slds-text-title_caps">{labels.freeGoods.label}</p>
                             <lightning-formatted-number value={actualFreeGoodQty} maximum-fraction-digits="0"
@@ -71,11 +81,11 @@
                         </lightning-layout-item>
                     </template>
                     <lightning-layout-item size="12" padding="around-small">
-                        <template if:true={isPhone}>
+                        <template lwc:if={isPhone}>
                             <p class="slds-text-title_caps">{labels.actualQty.label}</p>
                             <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                         </template>
-                        <template if:false={isPhone}>
+                        <template lwc:else>
                             <p>
                                 <span class="slds-text-title_caps">{actualQtyFormattedLabel}</span>
                             </p>                            
@@ -94,7 +104,7 @@
                         <p class="slds-text-title_caps">{labels.promotionalActivityPaid.label}</p>
                         <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
                     </lightning-layout-item>
-                    <template if:true={captureInvoice}>
+                    <template lwc:if={captureInvoice}>
                         <p class="slds-text-title_caps">{labels.invoice.label}</p>
                         <span class="slds-text-heading_medium">{invoiceNumber}</span>
                     </template>
@@ -113,8 +123,8 @@
                         <span class="slds-text-heading_medium">{comments}</span>
                     </lightning-layout-item>
                 </template>
-                <template if:true={canEdit}>
-                    <template if:true={isNew}>
+                <template lwc:if={canEdit}>
+                    <template lwc:if={isNew}>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <p>{labels.status.label}</p>
                             <span>{approvalStatus}</span>
@@ -126,22 +136,32 @@
                                             value={formattedPaymentDate} 
                                             placeholder={labels.paymentDate.placeholder} 
                                             onchange={handlePaymentDateChange}></lightning-input>
-                            <template if:true={hasPaymentDateError}>
+                            <template lwc:if={hasPaymentDateError}>
                                 <span class="error">{labels.paymentDate.error}</span>
                             </template>
                         </lightning-layout-item>    
+                        <template lwc:if={captureStartDate}>
+                            <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
+                                <lightning-input type="date"
+                                        label={labels.startDate.label}
+                                        name="i_StartDate"
+                                        value={formattedStartDate}
+                                        placeholder={labels.startDate.placeholder}
+                                        onchange={handleStartDateChange}></lightning-input>
+                            </lightning-layout-item>
+                        </template>
 
-                        <template if:true={rebates}>
+                        <template lwc:if={rebates}>
                             <template for:each={rebates} for:item="rebate">                        
                                 <lightning-layout-item key={rebate.rebateType} size="12" padding="around-small" class="slds-m-top_small">                                                                                                
-                                    <template if:true={rebate.isVolumeRebate}>
-                                        <template if:true={rebate.isFreeGoods}>
+                                    <template lwc:if={rebate.isVolumeRebate}>
+                                        <template lwc:if={rebate.isFreeGoods}>
                                             <lightning-input type="number" label={rebate.label} name="i_FreeGoods" value={rebate.rebateAmount}
                                                 placeholder={labels.rebateAmount.placeholder} data-rebate-type={rebate.rebateType}
                                                 onchange={handleRebateAmountChange}>
                                             </lightning-input>
                                         </template>
-                                        <template if:false={rebate.isFreeGoods}>
+                                        <template lwc:else>
                                             <template if:true={showTotalDiscount}>
                                                 <div class="slds-m-bottom_x-small">
                                                     <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount}
@@ -150,23 +170,23 @@
                                                 </div>
                                             </template>
                                             
-                                            <template if:true={isPhone}>
+                                            <template lwc:if={isPhone}>
                                                 <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
                                             </template>
-                                            <template if:true={captureVolumeInBottles}>
+                                            <template lwc:if={captureVolumeInBottles}>
                                                 <lightning-input type="number" label={rebate.label} name="i_ActQty" value={rebate.rebateAmount}
                                                     placeholder={labels.actualQty.placeholder} data-rebate-type={rebate.rebateType} step="1"
                                                     onchange={handleRebateAmountChange}>
                                                 </lightning-input>
                                             </template>
-                                            <template if:false={captureVolumeInBottles}>
+                                            <template lwc:else>
                                                 <lightning-input type="number" label={rebate.label} name="i_ActQty" value={rebate.rebateAmount}
                                                     placeholder={labels.actualQty.placeholder} data-rebate-type={rebate.rebateType} step="0.01"
                                                     onchange={handleRebateAmountChange}>
                                                 </lightning-input>
                                             
                                             </template>
-                                            <template if:true={hasActualQtyError}>
+                                            <template lwc:if={hasActualQtyError}>
                                                 <span class="error">{labels.actualQty.error}</span>
                                             </template>
                                         </template>
@@ -217,7 +237,7 @@
                     </template>
                     <template if:false={isNew}>
                         <lightning-layout-item size="12" padding="around-small">
-                            <template if:true={isSOMUser}>
+                            <template lwc:if={isSOMUser}>
                                 <lightning-combobox name="i_ApprovalStatus"
                                                     label={labels.status.label}
                                                     value={approvalStatus}
@@ -225,7 +245,7 @@
                                                     onchange={handleApprovalStatusChange}>
                                 </lightning-combobox>
                             </template>
-                            <template if:false={isSOMUser}>
+                            <template lwc:else>
                                 <p>{labels.status.label}</p>
                                 <span>{approvalStatus}</span>
                             </template>    
@@ -237,12 +257,12 @@
                                             value={formattedPaymentDate} 
                                             placeholder={labels.paymentDate.placeholder} 
                                             onchange={handlePaymentDateChange}></lightning-input>
-                            <template if:true={hasPaymentDateError}>
+                            <template lwc:if={hasPaymentDateError}>
                                 <span class="error">{labels.paymentDate.error}</span>
                             </template>
                         </lightning-layout-item>    
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_medium">
-                            <template if:true={isVolumeRebate}>
+                            <template lwc:if={isVolumeRebate}>
                                 <div class="slds-m-bottom_x-small">
                                     <p class="slds-text-title_caps">{labels.totalDiscount.label}</p>
                                     <lightning-formatted-number value={totalDiscount} format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number>
@@ -257,24 +277,24 @@
                                                 placeholder={labels.actualQty.placeholder} 
                                                 step="0.01"
                                                 onchange={handleRebateAmountChange}></lightning-input>
-                                <template if:true={hasActualQtyError}>
+                                <template lwc:if={hasActualQtyError}>
                                     <span class="error">{labels.actualQty.error}</span>
                                 </template>    
                             </template>
-                            <template if:false={isVolumeRebate}>
+                            <template lwc:else>
                                 <lightning-input type="currency" 
                                     label={rebateLabel} 
                                     name="i_rebateAmount" value={rebateAmount} 
                                     placeholder={labels.rebateAmount.placeholder} 
                                     data-rebate-type={rebateType}
                                     onchange={handleRebateAmountChange}></lightning-input>
-                                <template if:true={hasRebateAmountError}>
+                                <template lwc:if={hasRebateAmountError}>
                                     <span class="error">{labels.rebateAmount.error}</span>
                                 </template>
 
                             </template>
                         </lightning-layout-item>
-                        <template if:true={captureInvoice}>
+                        <template lwc:if={captureInvoice}>
                             <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                                 <lightning-input name="i_InvoiceNumber" label={labels.invoice.label} value={invoiceNumber}
                                     onchange={handleInvoiceNumberChange}>
@@ -283,7 +303,7 @@
                         </template>
 
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                            <template if:true={isVolumeRebate}>
+                            <template lwc:if={isVolumeRebate}>
                                 <lightning-combobox name="i_Wholesaler"
                                     label={labels.purchasedFrom.label}
                                     value={wholesaler}
