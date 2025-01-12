@@ -51,6 +51,7 @@ import LABEL_CLONE_PSA_INSTRUCTION from '@salesforce/label/c.Clone_PSA_Instructi
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMPANY_DETAILS from '@salesforce/label/c.Company_Details';
 import LABEL_CONTRACT_TYPE from '@salesforce/label/c.Contract_Type';
+import LABEL_CONTRACT_TYPE from '@salesforce/label/c.Contract_Type';
 import LABEL_COUPON from '@salesforce/label/c.Coupon';
 import LABEL_CUSTOMER_DETAILS from '@salesforce/label/c.Customer_Details';
 import LABEL_DATE_RANGE from '@salesforce/label/c.Date_Range';
@@ -60,6 +61,7 @@ import LABEL_DETACH_FILE_CONFIRMATION from '@salesforce/label/c.Detach_File_Conf
 import LABEL_DETACH_FILE_SUCCESS from '@salesforce/label/c.Detach_File_Success';
 import LABEL_DETAILS from '@salesforce/label/c.Details2';
 import LABEL_DIRECT_REBATE from '@salesforce/label/c.Direct_Rebate';
+import LABEL_DISCOUNT_CATEGORY from '@salesforce/label/c.Discount_Category';
 import LABEL_DISCOUNT_CATEGORY from '@salesforce/label/c.Discount_Category';
 import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
 import LABEL_END_DATE_ERROR from '@salesforce/label/c.End_Date_Error';
@@ -96,6 +98,8 @@ import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibili
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
 import LABEL_PREVIEW from '@salesforce/label/c.Preview';
+import LABEL_PROBABILITY from '@salesforce/label/c.Probability';
+import LABEL_PROMO_CODE from '@salesforce/label/c.Promo_Code';
 import LABEL_PROBABILITY from '@salesforce/label/c.Probability';
 import LABEL_PROMO_CODE from '@salesforce/label/c.Promo_Code';
 import LABEL_PROMOTION_TYPE from '@salesforce/label/c.Promotion_Type';
@@ -170,11 +174,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         comments                : { label: LABEL_COMMENTS },
         companyDetails          : { label: LABEL_COMPANY_DETAILS },
         contractType            : { label: LABEL_CONTRACT_TYPE },
+        contractType            : { label: LABEL_CONTRACT_TYPE },
         customerDetails         : { label: LABEL_CUSTOMER_DETAILS },
         deSelectAll             : { label: LABEL_DESELECT_ALL },
         dateRange               : { label: LABEL_DATE_RANGE },
         details                 : { label: LABEL_DETAILS },
         detachFile              : { label: LABEL_DETACH_FILE, successMessage: LABEL_DETACH_FILE_SUCCESS, confirmation: LABEL_DETACH_FILE_CONFIRMATION},
+        discountCategory        : { label: LABEL_DISCOUNT_CATEGORY },
         discountCategory        : { label: LABEL_DISCOUNT_CATEGORY },
         docusign                : { label: 'Send Contract' },
         endDate                 : { label: LABEL_AGREEMENT_END_DATE, error: LABEL_END_DATE_ERROR },
@@ -202,6 +208,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         percentageVisibility    : { label: LABEL_PERCENTAGE_VISIBILITY },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         preview                 : { label: LABEL_PREVIEW },
+        probabilityPercentage   : { label: LABEL_PROBABILITY },
+        promoCode               : { label: LABEL_PROMO_CODE },
         probabilityPercentage   : { label: LABEL_PROBABILITY },
         promoCode               : { label: LABEL_PROMO_CODE },
         promotionType           : { label: LABEL_PROMOTION_TYPE },
@@ -253,6 +261,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     hasChildAccountsError = false;
     hasSigningCustomerError = false;
     probabilityPercentage = 0;
+    probabilityPercentage = 0;
     thePSA;
     startDate = '';
     endDate = '';
@@ -287,6 +296,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     wiredAccount;
     purchaseOrder;
     promotionType;
+    contractType;
+    discountCategory;
+    promoCode;
     contractType;
     discountCategory;
     promoCode;
@@ -543,6 +555,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get capturePercentageVisibility() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Brazil');
     }
+    get captureProbability() {
+        return this.market == undefined || (this.market != undefined && this.market.Name == 'Japan');
+    }
+
     get captureProbability() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Japan');
     }
@@ -1237,6 +1253,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     handleProbabilityPercentageChange(event) {
         this.probabilityPercentage = event.detail.value;
     }
+    handleProbabilityPercentageChange(event) {
+        this.probabilityPercentage = event.detail.value;
+    }
     handleStatusChange(event) {
         this.status = event.detail.value;
         console.log('this.status', this.status);
@@ -1481,6 +1500,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.discountCategory = data.Discount_Category__c;
             this.promoCode = data.Promo_Code__c;
             this.percentageVisibility = data.Percentage_Visibility__c;
+            this.probabilityPercentage = data.Probability__c;
             this.probabilityPercentage = data.Probability__c;
             this.totalBudget = data.Activity_Budget__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
@@ -1947,6 +1967,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         console.log('[save] signingCustomer', this.signingCustomer);
         console.log('[save] wholesalerPreferred', this.wholesalerPreferred);
         console.log('[save] contractType', this.contractType);
+        console.log('[save] contractType', this.contractType);
 
         param.beginDate = this.startDate;
         param.endDate = this.endDate;
@@ -2007,6 +2028,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.status = this.status;
         param.totalBudget = this.totalBudget == undefined ? 0 : this.totalBudget;
         param.percentageVisibility = this.percentageVisibility == undefined ? 0 : this.percentageVisibility;
+        param.probabilityPercentage = this.probabilityPercentage == undefined ? 0 : this.probabilityPercentage;
         param.probabilityPercentage = this.probabilityPercentage == undefined ? 0 : this.probabilityPercentage;
         param.paymentConfigurations = '';
         console.log('paymentConfigurations', this.paymentConfigs);

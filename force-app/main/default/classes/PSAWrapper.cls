@@ -15,6 +15,10 @@ public with sharing class PSAWrapper {
         public Integer currentVolume  { get; set; }
         
         @AuraEnabled 
+        @AuraEnabled
+        public Integer currentVolume  { get; set; }
+        
+        @AuraEnabled 
         public Decimal discount { get; set; }
 
         @AuraEnabled 
@@ -190,7 +194,19 @@ public with sharing class PSAWrapper {
     public Decimal probabilityPercentage { get; set; }
 
     @AuraEnabled 
+    public Decimal probabilityPercentage { get; set; }
+
+    @AuraEnabled 
     public Boolean isDirectRebate { get; set; }
+
+    @AuraEnabled 
+    public String contractType { get; set; }
+
+    @AuraEnabled 
+    public String discountCategory { get; set; }
+
+    @AuraEnabled 
+    public String promoCode { get; set; }
 
     @AuraEnabled 
     public String contractType { get; set; }
@@ -251,7 +267,11 @@ public with sharing class PSAWrapper {
         this.totalBudget = 0;
         this.percentageVisibility = 0;
         this.probabilityPercentage = 0;
+        this.probabilityPercentage = 0;
         this.isDirectRebate = true;
+        this.discountCategory = '';
+        this.promoCode = '';
+        this.contractType = '';
         this.discountCategory = '';
         this.promoCode = '';
         this.contractType = '';
@@ -297,6 +317,7 @@ public with sharing class PSAWrapper {
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
         this.totalBudget = psa.Activity_Budget__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
+        this.probabilityPercentage = psa.Probability__c;
         this.probabilityPercentage = psa.Probability__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
         this.isDirectRebate = psa.Activity_Type__c == null || psa.Activity_Type__c == 'Direct Rebate';

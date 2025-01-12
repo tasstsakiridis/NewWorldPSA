@@ -31,6 +31,7 @@ import FIELD_PROMOTION_ID from '@salesforce/schema/PMI_Actual__c.Promotion__c';
 import FIELD_PROMOTION_MATERIAL_ITEM_ID from '@salesforce/schema/PMI_Actual__c.Promotion_Material_Item__c';
 import FIELD_PROMOTIONAL_ACTIVITY from '@salesforce/schema/PMI_Actual__c.Promotional_Activity__c';
 import FIELD_REBATE_AMOUNT from '@salesforce/schema/PMI_Actual__c.Rebate_Amount__c';
+import FIELD_START_DATE from '@salesforce/schema/PMI_Actual__c.Start_Date__c';
 import FIELD_TRAINING_ADVOCACY from '@salesforce/schema/PMI_Actual__c.Training_and_Advocacy__c';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account'
@@ -864,10 +865,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             const fields = {};
             
             fields[FIELD_APPROVAL_STATUS.fieldApiName] = this.approvalStatus;
-            fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;
+            fields[FIELD_ACTUAL_WHOLESALER.fieldApiName] = this.wholesaler;            
             fields[FIELD_PAYMENT_DATE.fieldApiName] = paymentDateYear + '-' + paymentDateMonth + '-' + paymentDateDay;
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
             fields[FIELD_INVOICE_NUMBER.fieldApiName] = this.invoiceNumber;
+            if (this.captureStartDate) {
+                fields[FIELD_START_DATE.fieldApiName] = this.startDate;
+            }
 
             if (this.pmiaId === undefined) {
                 fields['RecordTypeId'] = this.recordTypeId;
