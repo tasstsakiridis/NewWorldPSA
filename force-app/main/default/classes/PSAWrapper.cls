@@ -202,6 +202,12 @@ public with sharing class PSAWrapper {
     public String promoCode { get; set; }
 
     @AuraEnabled 
+    public String accountOwnerSalesRegion { get; set; }
+
+    @AuraEnabled 
+    public String ownerManager { get; set; }
+
+    @AuraEnabled 
     public List<SelectableItem> accounts { get; set; }
 
     @AuraEnabled 
@@ -255,6 +261,8 @@ public with sharing class PSAWrapper {
         this.discountCategory = '';
         this.promoCode = '';
         this.contractType = '';
+        this.accountOwnerSalesRegion = '';
+        this.ownerManager = '';
 
         this.accounts = new List<SelectableItem>();
         this.accountsToDelete = new List<String>();
@@ -304,5 +312,7 @@ public with sharing class PSAWrapper {
         this.accountWholesalerPreferredName = psa.Account_Wholesaler_Preferred_Name__c;
         this.accountWholesalerAlternate = psa.Account_Wholesaler_Alternate__c;
         this.accountWholesalerAlternateName = psa.Account_Wholesaler_Alternate_Name__c;
+        this.accountOwnerSalesRegion = psa.Account__r.Owner.Sales_Region__c;
+        this.ownerManager = psa.Owner_Manager__c;
     }
 }

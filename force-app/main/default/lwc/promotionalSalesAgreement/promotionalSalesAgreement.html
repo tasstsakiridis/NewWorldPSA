@@ -183,6 +183,28 @@
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
                         <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
                         <lightning-layout multiple-rows="true">
+                            <template lwc:if={showPICDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.pic.label}</h3>
+                                    <p>{personInCharge.name}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.function.label}</h3>
+                                    <p>{personInCharge.function}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.channel.label}</h3>
+                                    <p>{personInCharge.channel}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.group.label}</h3>
+                                    <p>{personInCharge.group}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.approver.label}</h3>
+                                    <p>{personInCharge.approver}</p>                                    
+                                </lightning-layout-item>
+                            </template>
                             <template lwc:if={captureCCMDetails}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <h3 class="slds-text-title_caps slds-m-vertical_small">CCM Details</h3>

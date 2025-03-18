@@ -40,9 +40,11 @@ import LABEL_ALL_ACCOUNTS_SELECTED from '@salesforce/label/c.All_Accounts_Select
 import LABEL_ALTERNATE_RTM from '@salesforce/label/c.Alternate_RTM';
 import LABEL_ALTERNATE_RTM_ERROR from '@salesforce/label/c.Alternate_RTM_Error';
 import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
+import LABEL_APPROVER from '@salesforce/label/c.Approver';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_BUDGET from '@salesforce/label/c.Budget';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
+import LABEL_CHANNEL from '@salesforce/label/c.Channel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
 import LABEL_CLONE from '@salesforce/label/c.Clone';
@@ -65,7 +67,9 @@ import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
 import LABEL_END_DATE_ERROR from '@salesforce/label/c.End_Date_Error';
 import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
 import LABEL_FOUR_PAYMENT_HELPTEXT from '@salesforce/label/c.Four_Payments_HelpText';
+import LABEL_GROUP from '@salesforce/label/c.Group';
 import LABEL_HELP from '@salesforce/label/c.Help';
+import LABEL_FUNCTION from '@salesforce/label/c.Function';
 import LABEL_INFO from '@salesforce/label/c.Info';
 import LABEL_ITEMS from '@salesforce/label/c.Items';
 import LABEL_LENGTH_OF_AGREEMENT_ERROR from '@salesforce/label/c.Length_of_Agreement_Error';
@@ -93,6 +97,7 @@ import LABEL_PARENT_ACCOUNT_SEARCH_RESULTS_ERROR from '@salesforce/label/c.Paren
 import LABEL_PAYMENTS from '@salesforce/label/c.Payments';
 //import LABEL_PAYMENT_CONFIGURATIONS from '@salesforce/label/c.Payment_Configurations';
 import LABEL_PERCENTAGE_VISIBILITY from '@salesforce/label/c.Percentage_Visibility';
+import LABEL_PIC from '@salesforce/label/c.PIC';
 import LABEL_PREFERRED_RTM from '@salesforce/label/c.Preferred_RTM';
 import LABEL_PREFERRED_RTM_ERROR from '@salesforce/label/c.Preferred_RTM_Error';
 import LABEL_PREVIEW from '@salesforce/label/c.Preview';
@@ -161,9 +166,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         all                     : { label: LABEL_ALL, picklistValue: '--'+LABEL_ALL+'--' },
         allAccountSelected      : { message: LABEL_ALL_ACCOUNTS_SELECTED },
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
+        approver                : { label: LABEL_APPROVER },
         back                    : { label: LABEL_BACK },
         budget                  : { label: LABEL_BUDGET },
         cancel                  : { label: LABEL_CANCEL },
+        channel                 : { label: LABEL_CHANNEL },
         change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
         clear                   : { label: LABEL_CLEAR },
         clone                   : { label: LABEL_CLONE, clonedMessage: LABEL_CLONE_SUCCESS_MESSAGE, instruction: LABEL_CLONE_PSA_INSTRUCTION },
@@ -179,6 +186,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         docusign                : { label: 'Send Contract' },
         endDate                 : { label: LABEL_AGREEMENT_END_DATE, error: LABEL_END_DATE_ERROR },
         error                   : { message: LABEL_FORM_ERROR },
+        function                : { label: LABEL_FUNCTION },
+        group                   : { label: LABEL_GROUP },
         help                    : { label: LABEL_HELP },
         items                   : { label: LABEL_ITEMS },
         info                    : { label: LABEL_INFO },
@@ -200,6 +209,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         payments                : { oneHelpText: LABEL_ONE_PAYMENT_HELPTEXT, twoHelpText: LABEL_TWO_PAYMENT_HELPTEXT, threeHelpText: LABEL_THREE_PAYMENT_HELPTEXT, fourHelpText: LABEL_FOUR_PAYMENT_HELPTEXT },
         paymentConfigurations   : { label: LABEL_PAYMENTS },
         percentageVisibility    : { label: LABEL_PERCENTAGE_VISIBILITY },
+        pic                     : { label: LABEL_PIC },
         preferredRTM            : { label: LABEL_PREFERRED_RTM, placeholder: '', error: LABEL_PREFERRED_RTM_ERROR },
         preview                 : { label: LABEL_PREVIEW },
         probabilityPercentage   : { label: LABEL_PROBABILITY },
@@ -259,6 +269,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     isSearching = false;
     isUsingParentAccount = true;
     isSearchingForParent = true;
+    mustSelectChildAccounts = true;
     isDirectRebate = true;
     selectAllChildAccounts = false;
     isMPOPrestige = false;
@@ -300,6 +311,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     canPreDatePSA = false;
     loadOnlyAccountWholesalers = false;
 
+    personInCharge = {
+        name: '',
+        function: '',
+        channel: '',
+        group: '',
+        approver: ''
+    };
 
     isWorking = true;
     workingMessage = this.labels.working.message;    
@@ -408,6 +426,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.capturePromotionType = this.market.Capture_Promotion_Type__c == undefined ? false : this.market.Capture_Promotion_Type__c;
             this.captureCCMDetails = this.market.Capture_CCM_Details__c == undefined ? false : this.market.Capture_CCM_Details__c;
             this.captureMenuType = this.market.Capture_Menu_Type__c == undefined ? false : this.market.Capture_Menu_Type__c;
+            this.mustSelectChildAccounts = this.market.Must_Select_Child_Accounts__c == undefined ? true : this.market.Must_Select_Child_Accounts__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -545,6 +564,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get captureProbability() {
         return this.market == undefined || (this.market != undefined && this.market.Name == 'Japan');
+    }
+    get showPICDetails() {
+        return this.market == undefined || (this.market != undefined && this.market.Show_Person_in_Charge_Details__c == true);
     }
 
     //get canPreDatePSA() {
@@ -1000,6 +1022,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.thePSA.Promotions__r.forEach(p => {
                     this.promotionsToDelete.set(p.Account__c, { id: p.Id, itemItem: p.Account__c });
                 });
+                this.selectedAccounts.clear();
             }
             console.log('[handleClearAccountDetailsClick] promotionsToDelete', this.promotionsToDelete);
         }catch(ex) {
@@ -1441,6 +1464,13 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     Contacts: [data.Contact__r],
                     PromotionId: ''
                 };
+                this.personInCharge = {
+                    name: data.Account__r.Owner.Name,
+                    channel: data.Account__r.Channel__c,
+                    group: data.Account__r.Group__c,
+                    function: data.Account__r.Owner.Sales_Region__c,
+                    approver: data.Account__r.Owner.Manager_Name__c
+                };
                 this.selectedAccountId = data.Account__c;
                 this.isSearchingForParent = false;
                 this.isUsingParentAccount = data.Account__r.RecordType.Name.indexOf('Parent') > -1;
@@ -1647,8 +1677,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 // navigate to new PSA
                 if (result.selected) {
                     this.showToast('success', 'Success', this.labels.clone.clonedMessage.replace('%0', 'PSA'));    
-                    this.recordId = result.id;
-                    refreshApex(this.wiredAgreement);
+                    //this.recordId = result.id;
+                    //refreshApex(this.wiredAgreement);
+                    this[NavigationMixin.Navigate]({
+                        type: 'standard__recordPage',
+                        attributes: {
+                            recordId: result.id,
+                            objectApiName: 'Promotion_Activity__c',
+                            actionName: 'view'
+                        }
+                    }, true);
+                    
                 } else {
                     this.showToast('error', 'Warning', result.description);
                 }
@@ -1712,7 +1751,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.parentAccount == undefined) {
             this.hasParentAccountError = true;
             isValid = false; 
-        } else if (this.isUsingParentAccount && (this.selectedAccounts == undefined || this.selectedAccounts.size == 0)) {
+        } else if (this.isUsingParentAccount &&this.mustSelectChildAccounts && (this.selectedAccounts == undefined || this.selectedAccounts.size == 0)) {
             this.hasChildAccountsError = true;            
             isValid =  false; 
         }
@@ -1811,6 +1850,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.isSearchingForParent = false;
                 this.accounts = undefined;
                 this.pageNumber = 1;
+                
                 if (this.loadOnlyAccountWholesalers && result.Wholesalers__r != undefined) {
                     this.wiredWholesalers = result.Wholesalers__r;
                     let l = result.Wholesalers__r.map(wholesaler => { 
@@ -1823,6 +1863,15 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
                     this.wholesalers = [...l];
                 }
+
+                this.personInCharge = {
+                    name: result.Owner.Name,  
+                    channel: result.Channel__c,
+                    group: result.Group__c, 
+                    function: result.Owner.Sales_Region__c,
+                    approver: result.Owner.Manager_Name__c
+                };
+
                 if (this.isUsingParentAccount) {
                     this.findAccountsForParent(result.Id);
                 }
@@ -1970,6 +2019,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.contractType = this.contractType;
         param.discountCategory = this.discountCategory;
         param.promoCode = this.promoCode;
+        param.accountOwnerSalesRegion = this.user.Sales_Region__c;
+        param.ownerManager = this.user.Manager_Name__c;
+
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;
             param.wholesalerPreferredName = '';
@@ -2037,6 +2089,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 if (!this.selectedAccounts.has(param.parentAccountId)) {
                     param.accounts.push({id: this.parentAccount.PromotionId == undefined ? '' : this.parentAccount.PromotionId, itemId: param.parentAccountId});
                 }
+            } else {
+                param.accounts.push({id: '', itemId: param.parentAccountId});
             }
         } else {
             let pId = '';

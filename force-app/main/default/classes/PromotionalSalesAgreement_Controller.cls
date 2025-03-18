@@ -70,7 +70,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                     Capture_Rebate_per_Bottle__c, Load_only_Account_Wholesalers__c, Validate_Actual_Volume__c,  
                                     Allow_Updates_After_Approval__c, Capture_Promotion_Type__c, Spread_Planned_Values__c,
                                     DocuSign__c, Show_Expanded_Actuals_on_Load__c, Capture_CCM_Details__c, Show_Item_Gross_Profit__c,
-                                    Capture_Menu_Type__c
+                                    Capture_Menu_Type__c, Show_Person_in_Charge_Details__c, Must_Select_Child_Accounts__c
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -122,7 +122,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
     @AuraEnabled(cacheable=true) 
     public static User getUserDetails() {
-        return [SELECT Id, Name, FirstName, LastName, Email
+        return [SELECT Id, Name, FirstName, LastName, Email, Sales_Region__c, Manager_Name__c
                   FROM User 
                  WHERE Id =:UserInfo.getUserId()];
     }
@@ -132,7 +132,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Map<String, Object> result = new Map<String, Object>();
 
         Promotion_Activity__c psa = [SELECT Id, Name, RecordTypeId, RecordType.Name, RecordType.DeveloperName, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.Channel__c,
-                                            Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
+                                            Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, Account_Owner_Sales_Region__c, 
                                             Contact__c, Contact__r.Name, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c, Market__r.Enable_PSA_Preview__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Volume__c, Total_Discount__c, Total_Investment__c, Total_PSA_Gross_Profit__c,
@@ -150,7 +150,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Account_Wholesaler_Preferred__c, Account_Wholesaler_Preferred_Name__c, Account_Wholesaler_Alternate__c, Account_Wholesaler_Alternate_Name__c,
                                             Market__r.Validate_Actual_Volume__c, Market__r.Capture_Promotion_Type__c, Promotion_Type__c, Market__r.Spread_Planned_Values__c,
                                             Total_Brand_Support__c, Total_Brand_Support_Paid__c, Market__r.Show_Expanded_Actuals_on_Load__c, Contract_Type__c, Discount_Category__c, Promo_Code__c,
-                                            Market__r.Show_Item_Gross_Profit__c, Probability__c, Menu_Type__c,
+                                            Market__r.Show_Item_Gross_Profit__c, Probability__c, Menu_Type__c, Market__r.Show_Person_in_Charge_Details__c, Account__r.Owner.Name, 
+                                            Account__r.Group__c, Account__r.Owner.Sales_Region__c, Account__r.Owner.Manager_Name__c, Market__r.DocuSign__c, Owner_Manager__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c, Menu_Type__c 
@@ -240,7 +241,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
     @AuraEnabled
     public static Account getAccountById(String accountId) {
-        return [SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,
+        return [SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState, 
+                    Channel__c, Group__c, Owner.Name, Owner.Sales_Region__c, Owner.Manager_Name__c,
                     (SELECT Id, Name, FirstName, LastName, Email FROM Contacts WHERE Decision_Maker__c = true),
                     (SELECT Id, Wholesaler_Account_Name__c, Wholesaler_Name__c, Wholesaler__c FROM Wholesalers__r WHERE Is_Active__c = true)
                   FROM Account 
@@ -248,7 +250,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
     }
     @AuraEnabled(Cacheable=true)
     public static PagedResult getAccountsByName(String accountName, Boolean isSearchingForParent, String market, String marketName, Integer pageNumber) {        
-        String soql = 'SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState,';
+        String soql = 'SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState, Owner_Sales_Region__c,';
         soql += '(SELECT Id, Name, FirstName, LastName FROM Contacts WHERE Decision_Maker__c = true)';
         soql += ' FROM Account ';
         
@@ -581,6 +583,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Account_Wholesaler_Preferred_Name__c = psaData.accountWholesalerPreferredName;
             psa.Account_Wholesaler_Alternate__c = psaData.accountWholesalerAlternate;
             psa.Account_Wholesaler_Alternate_Name__c = psaData.accountWholesalerAlternateName;
+            psa.Account_Owner_Sales_Region__c = psaData.accountOwnerSalesRegion;
+            psa.Owner_Manager__c = psaData.ownerManager;
 
             if (psaData.marketId == null || psaData.marketId == '') {
                 String marketName = psaData.marketName;
@@ -630,16 +634,37 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     upsert l_Promotions;
                 }
 
+                String mainPromotionId = '';
+                for(Promotion__c p : l_Promotions) {
+                    if (p.Account__c == psa.Account__c) {
+                        mainPromotionId = p.Id;
+                        break;
+                    }
+                }
                 if (psaData.accountsToDelete != null && psaData.accountsToDelete.size() > 0) {
                     // Update Promotion Material Items before deleting the Promotion so we don't lose any items
                     // which will be deleted if they are children of the promotion (Account) we will delete.
-                    List<Promotion_Material_Item__c> items = [SELECT Id, Promotion__c FROM Promotion_Material_Item__c WHERE Activity__c =:psa.Id AND Promotion__c = :psaData.accountsToDelete];
+                    List<Promotion_Material_Item__c> items = [SELECT Id, Activity__c, RecordTypeId, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Plan_Rebate__c, 
+                                                                    Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
+                                                                    Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
+                                                                    Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
+                                                                    Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c,
+                                                                    Brand_Visibility__c, Product_Visibility__c, Free_Goods_Given_Date__c, Free_Goods_Reason__c, Current_Volume__c 
+                                                                FROM Promotion_Material_Item__c 
+                                                                WHERE Activity__c =:psa.Id];
                     if (items != null && items.size() > 0) {
+                        List<Promotion_Material_Item__c> newItems = new List<Promotion_Material_Item__c>();
                         for(Promotion_Material_Item__c pmi : items) {
-                            pmi.Promotion__c = l_Promotions[0].Id;
+                            Promotion_Material_Item__c newPMI = pmi.clone(false, true, false, false);
+                            newPMI.Activity__c = psa.Id;
+                            newPMI.Promotion__c = mainPromotionId;
+                            newItems.add(newPMI);
                         }
+                        for(Promotion_Material_Item__c pmi : newItems) {
+                            System.debug('new item promotionId: ' + pmi.Promotion__c);
+                        }
+                        insert newItems;
                     }
-                    update items;
 
                     List<Promotion__c> promotionsToDelete = [SELECT Id FROM Promotion__c WHERE Id =:psaData.accountsToDelete];
                     if (promotionsToDelete != null && promotionsToDelete.size() > 0) {
@@ -1232,7 +1257,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                         Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
                                                         Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
                                                         Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c,
-                                                        Brand_Visibility__c, Product_Visibility__c, Free_Goods_Given_Date__c, Free_Goods_Reason__c FROM Promotion_Material_Items__r)
+                                                        Brand_Visibility__c, Product_Visibility__c, Free_Goods_Given_Date__c, Free_Goods_Reason__c, Current_Volume__c FROM Promotion_Material_Items__r)
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaId];
 
@@ -1276,11 +1301,19 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 insert newPromotions;
             }
 
+            String mainPromotionId = '';
+            for(Promotion__c p : newPromotions) {
+                if (p.Account__c == newPSA.Account__c) {
+                    mainPromotionId = p.Id;
+                    break;
+                }
+            }
+
             List<Promotion_Material_Item__c> newPMIs = new List<Promotion_Material_Item__c>();
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
                 Promotion_Material_Item__c newPMI = pmi.clone(false, true, false, false);
                 newPMI.Activity__c = newPSA.Id;
-                newPMI.Promotion__c = newPromotions[0].Id;
+                newPMI.Promotion__c = mainPromotionId;
                 newPMI.Total_Listing_Fee_Paid__c = 0;
                 newPMI.Total_Promotional_Activity_Paid__c = 0;
                 newPMI.Total_Training_and_Advocacy_Paid__c = 0;

@@ -53,7 +53,7 @@
         <lightning-layout multiple-rows="true" horizontal-align="center">
             <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
                 <lightning-layout>
-                    <lightning-layout-item size="6" small-device-size="12" medium-device-size="6">
+                    <lightning-layout-item size="4" small-device-size="12" medium-device-size="4">
                         <!-- Total Investment -->      
                         <div lwc:if={isUKMarket}>
                             <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
@@ -69,9 +69,19 @@
                                 currency-display-as="symbol">
                             </lightning-formatted-number>
                         </div>
+                        <div lwc:if={isJapan}>
+                            <p class="slds-text-heading_small">{labels.roi.label}</p>
+                            <lightning-formatted-number value={planROI} maximum-fraction-digits="2" format-style="percent-fixed"></lightning-formatted-number>
+                        </div>
                     </lightning-layout-item>
+                    <template lwc:if={isJapan}>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: center;">
+                            <p class="slds-text-heading_small">{labels.breakEvenVolume.label}</p>
+                            <lightning-formatted-number value={breakEvenVolume} maximum-fraction-digits="0"></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
                     <template lwc:if={calcSplit}>
-                        <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
                             <p class="slds-text-heading_small">{labels.split.label}</p>
                             <lightning-formatted-number label={labels.split.label} value={productSplit}
                                                         format-style="currency"
@@ -80,7 +90,7 @@
                         </lightning-layout-item>
                     </template>
                     <template lwc:if={showGrossProfit}>
-                        <lightning-layout-item size="6" small-device-size="12" medium-device-size="6" style="text-align: right;">
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
                             <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
                             <lightning-formatted-number label={labels.grossProfit.label} 
                                                         value={thisProductGP} 

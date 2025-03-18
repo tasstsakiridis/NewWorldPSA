@@ -62,6 +62,7 @@ import FIELD_DRINK_STRATEGY from '@salesforce/schema/Promotion_Material_Item__c.
 import FIELD_OUTLET_TO_PROVIDE from '@salesforce/schema/Promotion_Material_Item__c.Outlet_to_Provide__c';
 import FIELD_COMMENTS from '@salesforce/schema/Promotion_Material_Item__c.Comments_Long__c';
 import FIELD_PLAN_PSA_GROSS_PROFIT from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_Gross_Profit__c';
+import FIELD_PLAN_PSA_ROI from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_ROI__c';
 import FIELD_PLAN_REBATE_VOLUME from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate_Volume__c';
 import FIELD_PLAN_REBATE_LIABILITY from '@salesforce/schema/Promotion_Material_Item__c.Plan_Rebate_Liability__c';
 import FIELD_PRODUCT_PRICE from '@salesforce/schema/Promotion_Material_Item__c.Product_Price__c';
@@ -93,6 +94,7 @@ import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
 import LABEL_QUANTITY from '@salesforce/label/c.Quantity';
 import LABEL_REASON from '@salesforce/label/c.Reason';
+import LABEL_ROI from '@salesforce/label/c.Roi';
 import LABEL_SAVING_PLEASE_WAIT from '@salesforce/label/c.Saving_Please_Wait';
 import LABEL_SPLIT from '@salesforce/label/c.Split';
 import LABEL_TOTAL_INVESTMENT from '@salesforce/label/c.Total_Investment';
@@ -104,6 +106,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     labels = {
         available               : { label: 'Available' },
         back                    : { label: LABEL_BACK },
+        breakEvenVolume         : { label: 'Break Even' },
         comments                : { label: LABEL_COMMENTS, placeholder: LABEL_INPUT_TEXT_PLACEHOLDER },
         cost                    : { label: LABEL_COST },
         currentVolume           : { label: LABEL_CURRENT_VOLUME },
@@ -123,6 +126,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         promotionalActivity     : { help: 'Promotional Activity help' },
         quantity                : { label: LABEL_QUANTITY },
         reason                  : { label: LABEL_REASON },
+        roi                     : { label: LABEL_ROI },
         outletToProvide         : { help: 'Outlet to Provide help' },
         saving                  : { message: LABEL_SAVING_PLEASE_WAIT },
         saveError               : { message: 'Error saving item' },
@@ -581,25 +585,39 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         let v = this.volumeForecast == undefined || this.volumeForecast == '' ? 0 : Math.round(parseFloat(this.volumeForecast));
         let gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
         const packQty = this.product.Pack_Quantity__c == undefined ? 1 : parseInt(this.product.Pack_Quantity__c);
-
+        if (this.isJapan) {
+            gpPerCase = this.product == undefined || this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
+        }
         if (this.psa.Activity_Type__c != 'Coupon') {
             v += this.planRebateVolume;
         }
 
-        let productGP = (v / packQty) * gpPerCase;
-        if (this.isJapan) {
-            gpPerCase = this.product == undefined || this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
-            productGP = v * gpPerCase;
+        let productGP = v * gpPerCase;
+        if (this.psa.Market__r.Capture_Volume_in_Bottles__c) {
+            productGP = (v / packQty) * gpPerCase;
         }
         
-        console.log('[psaItemForm.thisProductGP] gpPerBottle', gpPerCase);
+        console.log('[psaItemForm.thisProductGP] gpPerCase', gpPerCase);
         console.log('[psaItemForm.thisProductGP] activityType', this.psa.Activity_Type__c);
         console.log('[psaItemForm.thisProductGP] planRebateVolume', this.planRebateVolume);
         console.log('[psaItemForm.thisProductGP] volume', v);
         console.log('[psaItemForm.thisProductGP] packQty', packQty);
-        console.log('[psaItemForm.thisProductGP] productSplit', productGP);
-        
+        console.log('[psaItemForm.thisProductGP] productGP', productGP);
+        console.log('[psaItemForm.handleListingFee] roi', this.roi);
+        console.log('[psaItemForm.handleListingFee] breakEvenVolume', this.breakEvenVolume);
+    
         return productGP;
+    }
+    get planROI() {
+        return this.thisProductGP / this.listingFee;
+    }
+
+    get breakEvenVolume() {
+        let gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 1 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
+        if (this.isJapan) {
+            gpPerCase = this.product == undefined || this.product.Gross_Profit_per_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_per_Case__c);
+        }
+        return Math.ceil(this.listingFee / gpPerCase);    
     }
 
     get freeGoodsLabel() {
@@ -899,6 +917,24 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     handleListingFeeChange(event) {
         this.listingFee = event.detail.value.trim() == '' ? 0 : event.detail.value;
+        /*
+        try {
+            if (this.isJapan) {
+                let gpPerCase = this.product == undefined || this.product.Gross_Profit_Flat_Case__c == undefined ? 0 : parseFloat(this.product.Gross_Profit_Flat_Case__c);
+                const gp = this.thisProductGP;
+                this.roi = gp / this.listingFee;
+                this.breakEvenVolume = Math.round((this.listingFee - gp) / gpPerCase);
+                console.log('[psaItemForm.handleListingFee] gpPerCase', this.gpPerCase);
+                console.log('[psaItemForm.handleListingFee] gp', gp);
+
+                console.log('[psaItemForm.handleListingFee] roi', this.roi);
+                console.log('[psaItemForm.handleListingFee] breakEvenVolume', this.breakEvenVolume);
+
+            }
+        }catch(ex) {
+            console.log('[psaItemForm.handleListingFee] exception', ex.toString());
+        }
+            */
     }
     handleDrinkStrategyChange(event) {
         this.drinkStrategyValues = event.detail.value;
@@ -1094,6 +1130,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
             fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.thisProductGP;
             fields[FIELD_PLAN_REBATE_LIABILITY.fieldApiName] = this.rebateLiability;
+            fields[FIELD_PLAN_PSA_ROI.fieldApiName] = this.roi;
             fields[FIELD_PLAN_REBATE_VOLUME.fieldApiName] = this.planRebateVolume;
             fields[FIELD_PSA_FREE_BOTTLE_COST.fieldApiName] = this.freeGoodCost;
 
