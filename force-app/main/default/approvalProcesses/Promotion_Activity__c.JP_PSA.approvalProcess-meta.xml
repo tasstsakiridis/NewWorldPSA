@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApprovalProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <allowRecall>true</allowRecall>
+    <allowedSubmitters>
+        <type>owner</type>
+    </allowedSubmitters>
+    <approvalPageFields>
+        <field>Name</field>
+        <field>Owner</field>
+        <field>Begin_Date__c</field>
+        <field>End_Date__c</field>
+    </approvalPageFields>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Function_Manager_NKA</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>First approver for Sales Region NKA will be the submitters Function Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>OFF NKA</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Owner</field>
+                <operation>notEqual</operation>
+                <value>Ichiro Nakanishi</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Manager - NKA</label>
+        <name>Manager_NKA</name>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Function_Manager_EAST</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>First approver for Sales Region OFF EAST will be the submitters Function Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>OFF EAST</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner__c</field>
+                <operation>notEqual</operation>
+                <value>Naoki Kitagawa</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Manager - OFF EAST</label>
+        <name>Manager_OFF_EAST</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Function_Manager_WEST</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>First approver for Sales Region OFF WEST will be the submitters Function Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>OFF WEST</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner__c</field>
+                <operation>notEqual</operation>
+                <value>Yasuhiro Matani</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Manager - OFF WEST</label>
+        <name>Manager_OFF_WEST</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <type>userHierarchyField</type>
+            </approver>
+        </assignedApprover>
+        <description>First approver for Sales Region ON will be the submitters Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>ON</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Sales Region ON 1st Approver</label>
+        <name>Sales_Region_ON_1st_Approver</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Function_Manager_ON</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>2nd approver for Sales Region ON will be the submitters Function Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>ON</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner__c</field>
+                <operation>notEqual</operation>
+                <value>Soda Masataka</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Sales Region ON 2nd Approver</label>
+        <name>Sales_Region_ON_2nd_Approver</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Function_Manager_Sales_Planning</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>First approver for Sales Region SALES PLANNING will be the submitters Function Manager</description>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner_Sales_Region__c</field>
+                <operation>equals</operation>
+                <value>SALES PLANNING</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Account_Owner__c</field>
+                <operation>notEqual</operation>
+                <value>Hidetoshi Sasaki</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Manager - SALES PLANNING</label>
+        <name>Manager_SALES_PLANNING</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Finance_Approvers</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Total_Investment__c</field>
+                <operation>greaterOrEqual</operation>
+                <value>&quot;JPY 3,000,000&quot;</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Total_Return_on_Investment__c</field>
+                <operation>lessThan</operation>
+                <value>1.3</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Finance</label>
+        <name>Finance</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_Sales_Director</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Total_Investment__c</field>
+                <operation>greaterOrEqual</operation>
+                <value>&quot;JPY 3,000,000&quot;</value>
+            </criteriaItems>
+        </entryCriteria>
+        <ifCriteriaNotMet>GotoNextStep</ifCriteriaNotMet>
+        <label>Sales Director</label>
+        <name>Sales_Director</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Japan_General_Manager</name>
+                <type>queue</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <entryCriteria>
+            <criteriaItems>
+                <field>Promotion_Activity__c.Total_Investment__c</field>
+                <operation>greaterOrEqual</operation>
+                <value>&quot;JPY 15,000,000&quot;</value>
+            </criteriaItems>
+        </entryCriteria>
+        <label>General Manager</label>
+        <name>General_Manager</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+    <description>Japan PSA approval</description>
+    <emailTemplate>Workflow_Email_Templates/JP_PSA_Manager_Review</emailTemplate>
+    <enableMobileDeviceAccess>true</enableMobileDeviceAccess>
+    <entryCriteria>
+        <criteriaItems>
+            <field>Promotion_Activity__c.RecordType</field>
+            <operation>equals</operation>
+            <value>JP - PSA</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Promotion_Activity__c.Status__c</field>
+            <operation>equals</operation>
+            <value>Submitted</value>
+        </criteriaItems>
+    </entryCriteria>
+    <finalApprovalActions>
+        <action>
+            <name>Activity_Approved</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>Activity_Approved_Date</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>Activity_Final_Approver</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>JP_PSA_Status_Changed</name>
+            <type>Alert</type>
+        </action>
+    </finalApprovalActions>
+    <finalApprovalRecordLock>true</finalApprovalRecordLock>
+    <finalRejectionActions>
+        <action>
+            <name>Activity_Rejected</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>JP_PSA_Status_Changed</name>
+            <type>Alert</type>
+        </action>
+    </finalRejectionActions>
+    <finalRejectionRecordLock>false</finalRejectionRecordLock>
+    <initialSubmissionActions>
+        <action>
+            <name>Activity_Pending_Approval</name>
+            <type>FieldUpdate</type>
+        </action>
+    </initialSubmissionActions>
+    <label>JP - PSA</label>
+    <nextAutomatedApprover>
+        <useApproverFieldOfRecordOwner>true</useApproverFieldOfRecordOwner>
+        <userHierarchyField>Manager</userHierarchyField>
+    </nextAutomatedApprover>
+    <processOrder>25</processOrder>
+    <recallActions>
+        <action>
+            <name>Activity_Recalled</name>
+            <type>FieldUpdate</type>
+        </action>
+    </recallActions>
+    <recordEditability>AdminOrCurrentApprover</recordEditability>
+    <showApprovalHistory>true</showApprovalHistory>
+</ApprovalProcess>

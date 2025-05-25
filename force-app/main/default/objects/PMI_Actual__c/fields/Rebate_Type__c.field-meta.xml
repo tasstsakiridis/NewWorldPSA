@@ -40,6 +40,16 @@
                 <default>false</default>
                 <label>Free Goods</label>
             </value>
+            <value>
+                <fullName>Brand Support</fullName>
+                <default>false</default>
+                <label>Brand Support</label>
+            </value>
+            <value>
+                <fullName>Discount</fullName>
+                <default>false</default>
+                <label>Discount</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

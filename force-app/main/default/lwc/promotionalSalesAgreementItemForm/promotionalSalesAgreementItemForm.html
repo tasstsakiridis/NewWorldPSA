@@ -71,13 +71,13 @@
                         </div>
                         <div lwc:if={isJapan}>
                             <p class="slds-text-heading_small">{labels.roi.label}</p>
-                            <lightning-formatted-number value={planROI} maximum-fraction-digits="2" format-style="percent-fixed"></lightning-formatted-number>
+                            <lightning-formatted-number value={planROI} maximum-fraction-digits="2"></lightning-formatted-number>
                         </div>
                     </lightning-layout-item>
                     <template lwc:if={isJapan}>
                         <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: center;">
-                            <p class="slds-text-heading_small">{labels.breakEvenVolume.label}</p>
-                            <lightning-formatted-number value={breakEvenVolume} maximum-fraction-digits="0"></lightning-formatted-number>
+                            <p class="slds-text-heading_small">{labels.breakEven.label}</p>
+                            <lightning-formatted-number value={breakEven} maximum-fraction-digits="1" format-style="percent"></lightning-formatted-number>
                         </lightning-layout-item>
                     </template>
                     <template lwc:if={calcSplit}>

@@ -43,13 +43,16 @@ import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
 import LABEL_APPROVER from '@salesforce/label/c.Approver';
 import LABEL_BACK from '@salesforce/label/c.Back';
 import LABEL_BUDGET from '@salesforce/label/c.Budget';
+import LABEL_BUDGET_VS_PLANNED_MISMATCH_ERROR from '@salesforce/label/c.Budget_vs_Planned_Mismatch_Error';
 import LABEL_CANCEL from '@salesforce/label/c.Cancel';
+import LABEL_CCM_DETAILS from '@salesforce/label/c.CCM_Details';
 import LABEL_CHANNEL from '@salesforce/label/c.Channel';
 import LABEL_CHANGE from '@salesforce/label/c.Change';
 import LABEL_CLEAR from '@salesforce/label/c.Clear';
 import LABEL_CLONE from '@salesforce/label/c.Clone';
 import LABEL_CLONE_SUCCESS_MESSAGE from '@salesforce/label/c.Clone_Success_Message';
 import LABEL_CLONE_PSA_INSTRUCTION from '@salesforce/label/c.Clone_PSA_Instruction';
+import LABEL_CLOSE from '@salesforce/label/c.Close';
 import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMPANY_DETAILS from '@salesforce/label/c.Company_Details';
 import LABEL_CONTRACT_TYPE from '@salesforce/label/c.Contract_Type';
@@ -170,10 +173,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         back                    : { label: LABEL_BACK },
         budget                  : { label: LABEL_BUDGET },
         cancel                  : { label: LABEL_CANCEL },
+        ccmDetails              : { label: LABEL_CCM_DETAILS }, 
         channel                 : { label: LABEL_CHANNEL },
         change                  : { label: LABEL_CHANGE, labelLowercase: LABEL_CHANGE.toLowerCase() },
         clear                   : { label: LABEL_CLEAR },
         clone                   : { label: LABEL_CLONE, clonedMessage: LABEL_CLONE_SUCCESS_MESSAGE, instruction: LABEL_CLONE_PSA_INSTRUCTION },
+        close                   : { label: LABEL_CLOSE },
         comments                : { label: LABEL_COMMENTS },
         companyDetails          : { label: LABEL_COMPANY_DETAILS },
         contractType            : { label: LABEL_CONTRACT_TYPE },
@@ -285,6 +290,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     agreementRequiresWholesaler = false;
     configurePayments = false;
     allAccountsSelected = false;
+    validatePlannedVsBudgetAmount = false;
     pageNumber = 1;
     pageSize;
     totalItemCount = 0;
@@ -427,6 +433,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.captureCCMDetails = this.market.Capture_CCM_Details__c == undefined ? false : this.market.Capture_CCM_Details__c;
             this.captureMenuType = this.market.Capture_Menu_Type__c == undefined ? false : this.market.Capture_Menu_Type__c;
             this.mustSelectChildAccounts = this.market.Must_Select_Child_Accounts__c == undefined ? true : this.market.Must_Select_Child_Accounts__c;
+            this.validatePlannedVsBudgetAmount = this.market.Validate_Budget_vs_Planned__c == undefined ? false : this.market.Validate_Budget_vs_Planned__c;
         } else if (value.error) {
             this.error = value.error;
             this.market = { Id: '', Name: 'Australia', Maximum_Agreement_Length__c: 3 };
@@ -529,7 +536,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.thePSA == undefined) {
             return false;
         } else {
-            return this.status == 'Approved' || this.status == 'Submitted' || this.status == 'Pending Approval' || this.thePSA.Is_Approved__c == true;
+            return this.status == 'Approved' || this.status == 'Submitted' || this.status == 'Closed' || this.status == 'Pending Approval' || this.thePSA.Is_Approved__c == true;
         }
     }
     get paymentsLocked() {
@@ -567,6 +574,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get showPICDetails() {
         return this.market == undefined || (this.market != undefined && this.market.Show_Person_in_Charge_Details__c == true);
+    }
+    get canCloseAgreement() {
+        return this.market == undefined || (this.market != undefined && this.market.Can_Close_Agreement__c == true);
     }
 
     //get canPreDatePSA() {
@@ -697,7 +707,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get signingCustomer() {
         var customer;
         if (this.parentAccount && this.parentAccount.Contacts && this.parentAccount.Contacts.length > 0) {
-            customer = this.parentAccount.Contacts[0];
+            if (this.thePSA.Contact__c != null && this.parentAccount.Contacts.length > 0 && this.parentAccount.Contacts.findIndex(c => c.Id == this.thePSA.Contact) > -1) {
+                customer = this.parentAccount.Contacts.find(c => c.Id == this.thePSA.Contact__c);
+            } else {
+                customer = this.parentAccount.Contacts[0];
+            }
         }
         return customer;
     }
@@ -851,24 +865,29 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleSubmitForApprovalButtonClick(event) {
         this.isWorking = true;
-        submitForApproval({ psaId: this.recordId })
-            .then(result => {
-                this.isWorking = false;
-                if (result == 'OK') {
-                    this.status = 'Pending Approval';
-                    this.showToast('success','Success', this.labels.submitForApproval.submittedMessage);
-                    refreshApex(this.wiredAgreement);
-                    this.status = this.wiredAgreement.Status__c;
-                } else {
-                    this.showToast('error', 'Warning', result);
-                }
-            })
-            .catch(error => {
-                this.isWorking = false;
-                this.error = error;
-                this.showToast('error', 'Warning', error);
-            });
-
+        if (this.validatePlannedvsBudget()) {
+            submitForApproval({ psaId: this.recordId })
+                .then(result => {
+                    this.isWorking = false;
+                    if (result == 'OK') {
+                        this.status = 'Pending Approval';
+                        this.showToast('success','Success', this.labels.submitForApproval.submittedMessage);
+                        refreshApex(this.wiredAgreement);
+                        this.status = this.wiredAgreement.Status__c;
+                    } else {
+                        this.showToast('error', 'Warning', result);
+                    }
+                })
+                .catch(error => {
+                    this.isWorking = false;
+                    this.error = error;
+                    this.showToast('error', 'Warning', error);
+                });
+                
+        } else {
+            this.isWorking = false;
+            this.showToast('error', this.labels.warning.label, LABEL_BUDGET_VS_PLANNED_MISMATCH_ERROR);
+        }
     }
     handleRecallButtonClick() {
         this.isWorking = true;
@@ -877,21 +896,41 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.isWorking = false;
                 if (result == 'OK') {
                     this.status = 'New';
-                    this.showToast('success', 'Success', this.labels.recall.recalledMessage);
+                    this.showToast('success', this.labels.success.label, this.labels.recall.recalledMessage);
                 } else {
-                    this.showToast('error', 'Warning', msg);
+                    this.showToast('error', this.labels.warning.label, msg);
                 }
             })
             .catch(error => {
                 this.isWorking = false;
                 this.error = error;
-                this.showToast('error', 'Warning', error);
+                this.showToast('error', this.labels.warning.label, error);
             });
     }
     handleCloneButtonClick(event) {
         const today = new Date();
-        this.cloneName = this.parentAccount.Name + '-PSA-' + today.getFullYear() + today.getMonth() + today.getDate();
+        if (this.market.Name == 'Japan') {
+            this.cloneName = this.thePSA.Name + '-' + today.getFullYear() + today.getMonth() + today.getDate();
+        } else {
+            this.cloneName = this.parentAccount.Name + '-PSA-' + today.getFullYear() + today.getMonth() + today.getDate();
+        }
         this.isCloning = true;
+    }
+    handleCloseButtonClick(event) {
+        console.log('[handleCloseButton]');
+        try {
+            this.isWorking = true;
+            const today = new Date();
+            this.status = 'Closed';  
+            this.endDate = today.getFullYear() + '-' + ('00'+today.getMonth()).slice(-2) + '-' + ('00'+today.getDate()).slice(-2);        
+            if (new Date(this.startDate) < today) {
+                this.endDate = this.startDate;
+            }
+            console.log('[handleCloseButton] endDate', this.endDate);
+            this.save();              
+        }catch(ex) {
+            console.log('[handleCloseButton] exception', ex.message);
+        }
     }
     handleSummaryButtonClick(event) {
         this.isWorking = true;
@@ -1066,6 +1105,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleEndDateChange(ev) {
         this.endDate = ev.detail.value;
+        console.log('[handleEndDatechange] endDate', this.endDate);
     }
     handleLengthOfPSAChange(ev) {
         console.log('[handleLengthOfPSAChange] value', ev.detail.value);
@@ -1467,7 +1507,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.personInCharge = {
                     name: data.Account__r.Owner.Name,
                     channel: data.Account__r.Channel__c,
-                    group: data.Account__r.Group__c,
+                    group: data.Account__r.Store_Type__c,
                     function: data.Account__r.Owner.Sales_Region__c,
                     approver: data.Account__r.Owner.Manager_Name__c
                 };
@@ -1763,6 +1803,22 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         return isValid;
     }
 
+    validatePlannedvsBudget() {
+        if (!this.validatePlannedVsBudgetAmount) {
+            return true;
+        }
+
+        let totalProductInvestment = 0;
+        if (this.thePSA.Promotion_Material_Items__r != undefined) {
+            this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
+                totalProductInvestment += pmi.Total_Investment__c;
+            });
+        }
+
+        console.log('[validateBudgetVsPlanned] plannedBudget, totalProductInvestment', this.totalBudget, totalProductInvestment);
+        
+        return this.totalBudget == totalProductInvestment;
+    }
     showToast(type, title, msg) {
         console.log('[showToast] type', type, title, msg);
         try {
@@ -1867,7 +1923,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.personInCharge = {
                     name: result.Owner.Name,  
                     channel: result.Channel__c,
-                    group: result.Group__c, 
+                    group: result.Store_Type__c, 
                     function: result.Owner.Sales_Region__c,
                     approver: result.Owner.Manager_Name__c
                 };
@@ -1978,10 +2034,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             console.log('[loadChildAccounts] exception', ex);
         }
     }
-
+    
     save() {
         try {
-            console.log('psa', this.thePSA);
+            console.log('[save] psa', this.thePSA);
         const param = {
             id: this.thePSA.Id,
             recordTypeId: this.thePSA.RecordTypeId 
@@ -2124,7 +2180,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                             message: this.labels.saveSuccess.message,
                             variant: 'success'
                         }),
-                    );
+                    );    
+
                 } else {
                     this.dispatchEvent(
                         new ShowToastEvent({

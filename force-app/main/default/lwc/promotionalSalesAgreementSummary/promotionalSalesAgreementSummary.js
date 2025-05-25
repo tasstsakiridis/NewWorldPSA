@@ -103,7 +103,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_FREE_GOODS_COST, fieldName: 'freeGoodsCost', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_CURRENT_VOLUME, fieldName: 'currentVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['Japan']},
         { label: LABEL_PLANNED_VOLUME, fieldName: 'plannedVolume', type: 'number',cellAttributes: { alignment: 'right' }, markets: ['ALL']},
-        { label: LABEL_PLANNED_DISCOUNT, fieldName: 'plannedDiscount', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['France','Japan'] },
+        { label: LABEL_PLANNED_DISCOUNT, fieldName: 'plannedDiscount', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Japan'] },
         { label: LABEL_DISCOUNTPERCASE, fieldName: 'discount', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Mexico','France','United Kingdom']},
         { label: LABEL_QUARTERS_CAPTURED, fieldName: 'quartersCaptured', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['United Kingdom']},
         { label: LABEL_ACTUAL_VOLUME, fieldName: 'actualVolume', type: 'number', cellAttributes: { alignment: 'right' }, markets: ['ALL']},
@@ -368,8 +368,23 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         return this.thePSA == undefined || this.thePSA.Total_PSA_Gross_Profit__c == null ? 0 : this.thePSA.Total_PSA_Gross_Profit__c;
     }
     get roi() {
-        return this.thePSA == undefined || this.thePSA.Total_Return_on_Investment__c == null ? 0 : this.thePSA.Total_Return_on_Investment__c;
+        if (this.thePSA != null && this.thePSA.Market__c != null && this.thePSA.Market__r.Name == 'Japan') {
+            return this.thePSA.Total_PSA_ROI__c == undefined ? 0 : this.thePSA.Total_PSA_ROI__c;
+        } else if (this.thePSA != null && this.thePSA.Total_Return_on_Investment__c != null) {
+            return this.thePSA.Total_Return_on_Investment__c;
+        } else {
+            return 0;
+        }
     }
+    /*
+    get roiFormatStyle() {
+        if (this.thePSA != null && this.thePSA.Market__c != null && this.thePSA.Market__r.Name == 'Japan') {
+            return 'percent-fixed';
+        } else {
+            return 'decimal';
+        }
+    }
+    */
 
 
     /**
@@ -458,8 +473,8 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         this.showROI = false;
         this.showTotalGP = false;
         console.log('[summary.buildTableData] columns', this.columns);
-        console.log('[summary.buildTableData] market name', this.thePSA.Market__r.Name);
-        var cols = [...this.columns.filter(c => c.markets.includes(this.thePSA.Market__r.Name) || c.markets.includes('ALL'))];
+        console.log('[summary.buildTableData] market name', this.marketName);
+        var cols = [...this.columns.filter(c => c.markets.includes(this.marketName) || c.markets.includes('ALL'))];
         console.log('[summary.buildTableData] showFreeGoods', this.showFreeGoods);
         if (!this.showFreeGoods) {
             //cols = cols.filter(c => c.fieldName.indexOf('freeGoods') < 0);
@@ -507,6 +522,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
             this.showTrainingAndAdvocacy = false;
             this.showTotalGP = true;
             this.showROI = true;
+            this.showTotalInvestment = true;
         }
 
         if (!this.showProductSplit) {

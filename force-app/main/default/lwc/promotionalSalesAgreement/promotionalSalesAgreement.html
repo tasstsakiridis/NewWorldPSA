@@ -37,6 +37,9 @@
                                     <template if:true={canClone}>
                                         <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
                                     </template>
+                                    <template if:true={canCloseAgreement}>
+                                        <lightning-button label={labels.close.label} icon-name="utility:copy" title="Close" class="slds-m-horizontal_x-small" onclick={handleCloseButtonClick}></lightning-button>
+                                    </template>
                                     <template if:true={canSendContract}>
                                         <lightning-button label={labels.docusign.label} icon-name="utility:edit_form" title="Docusign" class="slds-m-horizontal_x-small" onclick={handleDocusignButtonClick}></lightning-button>
                                     </template>
@@ -207,7 +210,7 @@
                             </template>
                             <template lwc:if={captureCCMDetails}>
                                 <lightning-layout-item size="12" padding="around-small">
-                                    <h3 class="slds-text-title_caps slds-m-vertical_small">CCM Details</h3>
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.ccmDetails.label}</h3>
                                     <lightning-combobox name="i_ContractType" label={labels.contractType.label} value={contractType}
                                         options={contractTypeOptions} class="slds-m-horizontal_small" disabled={isLocked}
                                         onchange={handleContractTypeChange}></lightning-combobox>                                                                                  
@@ -238,7 +241,7 @@
                             <template lwc:if={captureProbability}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="probabilityPercentage" label={labels.probabilityPercentage.label} step="1"
-                                        value={probabilityPercentage} disabled={isLocked}
+                                        value={probabilityPercentage} disabled={isLocked} formatter="percent-fixed"
                                         onchange={handleProbabilityPercentageChange}></lightning-input>
                                 </lightning-layout-item>
                             </template>

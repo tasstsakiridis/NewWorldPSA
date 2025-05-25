@@ -57,6 +57,9 @@ public with sharing class BuildInitialActualsForPSA {
             PMI_Actual__c newActual;
             List<Promotion_Material_Item__c> itemsToUpdate = new List<Promotion_Material_Item__c>();
 
+            Schema.DescribeFieldResult dfrRebateTypes = PMI_Actual__c.Rebate_Type__c.getDescribe();
+            List<Schema.PicklistEntry> rebateTypes = dfrRebateTypes.getPicklistValues();
+        
             for(Promotion_Activity__c pa : activities) {
                 if (pa.Promotion_Material_Items__r != null && pa.Promotion_Material_Items__r.size() > 0) {
                     for(Promotion_Material_Item__c pmi : pa.Promotion_Material_Items__r) {
@@ -83,6 +86,21 @@ public with sharing class BuildInitialActualsForPSA {
                         } 
 
                         addedActuals = false;
+                        for(Schema.PicklistEntry pe : rebateTypes) {
+                            if (pe.isActive()) {
+                                //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
+                                newActual = createPMIActual(pa, pmi, pe.getValue(), pmiaRecordType, configs, true, false, 0, 0);
+                                keyExists = existingExternalKeys.contains(newActual.External_Key__c);
+                                System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
+                                if (!keyExists) {
+                                    actuals.add(newActual);
+                                    addedActuals = true;
+                                }   
+                            }
+                        }
+                        
+                        /*
+                        addedActuals = false;
                         //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
                         newActual = createPMIActual(pa, pmi, 'Volume', pmiaRecordType, configs, true, false, 0, 0);
                         keyExists = existingExternalKeys.contains(newActual.External_Key__c);
@@ -90,7 +108,8 @@ public with sharing class BuildInitialActualsForPSA {
                         if (!keyExists) {
                             actuals.add(newActual);
                             addedActuals = true;
-                        }
+                        }    
+
                         newActual = createPMIActual(pa, pmi, 'Free Goods', pmiaRecordType, configs, true, false, 0, 0);
                         keyExists = existingExternalKeys.contains(newActual.External_Key__c);
                         System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
@@ -137,10 +156,11 @@ public with sharing class BuildInitialActualsForPSA {
                             actuals.add(newActual);
                             addedActuals = true;
                         }
+                        */
                         if (addedActuals) {
                             s_PSAWithActuals.add(pmi.Activity__c);
                         }
-                        
+
                         if (pa.Market__r.Spread_Planned_Values__c) {
                             Integer numberOfMonths = 0;
                             if (pa.Length_of_Agreement__c != null) {
@@ -198,7 +218,7 @@ public with sharing class BuildInitialActualsForPSA {
 
         if (calcSpread) {
             pmia.Forecast_Volume__c = pmi.Plan_Volume__c / numberOfMonths;
-            //pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
+            pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
             pmia.Forecast_Promotional_Activity__c = pmi.Promotional_Activity_Value__c / numberOfMonths;
             pmia.Payment_Date__c = theActivity.Begin_Date__c.addMonths(period);
         }

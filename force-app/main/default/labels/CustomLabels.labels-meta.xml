@@ -352,4 +352,850 @@
         <shortDescription>Input Too Long</shortDescription>
         <value>Input is too long</value>
     </labels>
+    <labels>
+        <fullName>Account</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account</shortDescription>
+        <value>Account</value>
+    </labels>
+    <labels>
+        <fullName>Account_Search_Results</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account Search Results</shortDescription>
+        <value>Accounts matching &quot;%0&quot;</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Discount</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Discount</shortDescription>
+        <value>Actual Discount</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Qty</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Qty</shortDescription>
+        <value>Actual Qty</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Qty_Error</fullName>
+        <categories>errors, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Qty Error</shortDescription>
+        <value>No actual qty entered</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Qty_Placeholder</fullName>
+        <categories>placeholder</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Qty Placeholder</shortDescription>
+        <value>Enter the actual qty sold</value>
+    </labels>
+    <labels>
+        <fullName>Actuals</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actuals</shortDescription>
+        <value>Actuals</value>
+    </labels>
+    <labels>
+        <fullName>Agreement_End_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement End Date</shortDescription>
+        <value>Agreement will end on</value>
+    </labels>
+    <labels>
+        <fullName>Agreement_Start_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Agreement Start Date</shortDescription>
+        <value>This agreement will start at</value>
+    </labels>
+    <labels>
+        <fullName>Alternate_RTM</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Alternate RTM</shortDescription>
+        <value>Alternate RTM</value>
+    </labels>
+    <labels>
+        <fullName>Alternate_RTM_Error</fullName>
+        <categories>errors, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Alternate RTM Error</shortDescription>
+        <value>No Alternate Wholesaler selected</value>
+    </labels>
+    <labels>
+        <fullName>Approval_Submitted</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Approval Submitted</shortDescription>
+        <value>%0 has successfully been submitted for approval</value>
+    </labels>
+    <labels>
+        <fullName>Approver</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Approver</shortDescription>
+        <value>Approver</value>
+    </labels>
+    <labels>
+        <fullName>Back</fullName>
+        <categories>Actions,Buttons</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Back</shortDescription>
+        <value>Back</value>
+    </labels>
+    <labels>
+        <fullName>Break_Even</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Break Even</shortDescription>
+        <value>Break Even</value>
+    </labels>
+    <labels>
+        <fullName>Budget</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Budget</shortDescription>
+        <value>Budget</value>
+    </labels>
+    <labels>
+        <fullName>CCM_Details</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>CCM Details</shortDescription>
+        <value>CCM Details</value>
+    </labels>
+    <labels>
+        <fullName>Cancel</fullName>
+        <categories>Cancel,Action,Button,all,AccountSurvey</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cancel</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Case</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Case</shortDescription>
+        <value>Case</value>
+    </labels>
+    <labels>
+        <fullName>Change</fullName>
+        <categories>labels, messages, buttons</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Change</shortDescription>
+        <value>Change</value>
+    </labels>
+    <labels>
+        <fullName>Channel</fullName>
+        <categories>AccountsNearby</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Channel</shortDescription>
+        <value>Channel</value>
+    </labels>
+    <labels>
+        <fullName>Clear</fullName>
+        <categories>Actions,Buttons</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Clear</shortDescription>
+        <value>Clear</value>
+    </labels>
+    <labels>
+        <fullName>Clone</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Clone</shortDescription>
+        <value>Clone</value>
+    </labels>
+    <labels>
+        <fullName>Clone_PSA_Instruction</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Clone PSA Instruction</shortDescription>
+        <value>Enter the name of the new PSA</value>
+    </labels>
+    <labels>
+        <fullName>Clone_Success_Message</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Clone Success Message</shortDescription>
+        <value>%0 has been successfully cloned</value>
+    </labels>
+    <labels>
+        <fullName>Comments</fullName>
+        <categories>IdeaLounge</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Comments</shortDescription>
+        <value>Comments</value>
+    </labels>
+    <labels>
+        <fullName>Company_Details</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Company Details</shortDescription>
+        <value>Company Details</value>
+    </labels>
+    <labels>
+        <fullName>Contract_Type</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Contract Type</shortDescription>
+        <value>Contract Type</value>
+    </labels>
+    <labels>
+        <fullName>CreateNew</fullName>
+        <categories>Buttons,Filters,Title</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create New</shortDescription>
+        <value>Create New...</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Details</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Customer Details</shortDescription>
+        <value>Customer Details</value>
+    </labels>
+    <labels>
+        <fullName>Date_Range</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Date Range</shortDescription>
+        <value>Date Range</value>
+    </labels>
+    <labels>
+        <fullName>DeSelect_All</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>DeSelect All</shortDescription>
+        <value>DeSelect All</value>
+    </labels>
+    <labels>
+        <fullName>Details2</fullName>
+        <categories>labels, messages, buttons</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Details</shortDescription>
+        <value>Details</value>
+    </labels>
+    <labels>
+        <fullName>Discount_Category</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Discount Category</shortDescription>
+        <value>Discount Category</value>
+    </labels>
+    <labels>
+        <fullName>Discount_per_9LCase</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Discount per 9LCase</shortDescription>
+        <value>Discount per Case (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Discount_per_Bottle</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Discount per Bottle</shortDescription>
+        <value>Discount per Bottle</value>
+    </labels>
+    <labels>
+        <fullName>DocuSign</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>DocuSign</shortDescription>
+        <value>DocuSign</value>
+    </labels>
+    <labels>
+        <fullName>Error</fullName>
+        <categories>Buttons,Filters,Title</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error</shortDescription>
+        <value>Error</value>
+    </labels>
+    <labels>
+        <fullName>Form_Validation_Error</fullName>
+        <categories>errors, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Form Validation Error</shortDescription>
+        <value>There are some issues with the data you entered.  Please review the error messages and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Four_Payments_HelpText</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Four Payments HelpText</shortDescription>
+        <value>&lt;ul&gt;&lt;li&gt;45 DAYS AFTER THE CONTRACT SIGNED ENTERS THE BF SYSTEM&lt;/li&gt;
+&lt;li&gt;40% OF GOALS ACHIEVED&lt;/li&gt;
+&lt;li&gt;60% OF GOALS ACHIEVED&lt;/li&gt;
+&lt;li&gt;80% OF GOALS ACHIEVED&lt;/li&gt;&lt;/ul&gt;</value>
+    </labels>
+    <labels>
+        <fullName>Function</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Function</shortDescription>
+        <value>Function</value>
+    </labels>
+    <labels>
+        <fullName>Group</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Group</shortDescription>
+        <value>Group</value>
+    </labels>
+    <labels>
+        <fullName>Help</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help</shortDescription>
+        <value>Help</value>
+    </labels>
+    <labels>
+        <fullName>Invalid_Input_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Invalid Input Error</shortDescription>
+        <value>%0 entered is invalid</value>
+    </labels>
+    <labels>
+        <fullName>Items</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Items</shortDescription>
+        <value>Items</value>
+    </labels>
+    <labels>
+        <fullName>Length_of_Agreement_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Length of Agreement Error</shortDescription>
+        <value>Please select from one of the Length of Agreement options</value>
+    </labels>
+    <labels>
+        <fullName>Length_of_Agreement_Months</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Length of Agreement Months</shortDescription>
+        <value>Length of Agreement (in months)</value>
+    </labels>
+    <labels>
+        <fullName>Length_of_Agreement_Years</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Length of Agreement Years</shortDescription>
+        <value>Length of Agreement (in years)</value>
+    </labels>
+    <labels>
+        <fullName>Listing_Fee</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Listing Fee</shortDescription>
+        <value>Listing Fee</value>
+    </labels>
+    <labels>
+        <fullName>Listing_Fee_Paid</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Listing Fee Paid</shortDescription>
+        <value>Listing Fee Paid</value>
+    </labels>
+    <labels>
+        <fullName>Loading_Please_Wait</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Loading Please Wait</shortDescription>
+        <value>Loading. Please wait...</value>
+    </labels>
+    <labels>
+        <fullName>Months</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Months</shortDescription>
+        <value>Months</value>
+    </labels>
+    <labels>
+        <fullName>No_Decision_Makers_found_for_Account</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No Decision Makers found for Account</shortDescription>
+        <value>There are no contacts for this account setup as decision makers.</value>
+    </labels>
+    <labels>
+        <fullName>Number_of_Payments</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Number of Payments</shortDescription>
+        <value># of Payments</value>
+    </labels>
+    <labels>
+        <fullName>OK</fullName>
+        <categories>labels, messages, buttons</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>OK</shortDescription>
+        <value>OK</value>
+    </labels>
+    <labels>
+        <fullName>One_Payment_HelpText</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One Payment HelpText</shortDescription>
+        <value>45 DAYS AFTER THE SIGNED CONTRACT ENTERS THE BF SYSTEM</value>
+    </labels>
+    <labels>
+        <fullName>PIC</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PIC</shortDescription>
+        <value>Person in Charge</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Form_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Form Error</shortDescription>
+        <value>Errors found validating/saving the PSA.  Please review and try again.</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Retail_Accounts_Heading</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Retail Accounts Heading</shortDescription>
+        <value>Names of individual outlets in estate and parts of business included in PSA</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Updated_Actuals_Message</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Updated Actuals Message</shortDescription>
+        <value>This agreement has been updated and requires Approval before actuals can be added.</value>
+    </labels>
+    <labels>
+        <fullName>Parent_Account</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Parent Account</shortDescription>
+        <value>Parent Account</value>
+    </labels>
+    <labels>
+        <fullName>Parent_Account_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Parent Account Error</shortDescription>
+        <value>No Parent or Retail Account selected and no Signing Customer selected</value>
+    </labels>
+    <labels>
+        <fullName>Payment_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Payment Date</shortDescription>
+        <value>Payment Date</value>
+    </labels>
+    <labels>
+        <fullName>Payment_Date_Error</fullName>
+        <categories>errors, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Payment Date Error</shortDescription>
+        <value>No payment date selected</value>
+    </labels>
+    <labels>
+        <fullName>Payment_Date_Placeholder</fullName>
+        <categories>placeholder</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Payment Date Placeholder</shortDescription>
+        <value>Enter the date payment of the rebate was made</value>
+    </labels>
+    <labels>
+        <fullName>Planned</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Planned</shortDescription>
+        <value>Planned</value>
+    </labels>
+    <labels>
+        <fullName>Preferred_RTM</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preferred RTM</shortDescription>
+        <value>Preferred RTM</value>
+    </labels>
+    <labels>
+        <fullName>Preferred_RTM_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preferred RTM Error</shortDescription>
+        <value>No Preferred Wholesaler selected</value>
+    </labels>
+    <labels>
+        <fullName>Preview</fullName>
+        <categories>label</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preview</shortDescription>
+        <value>Preview</value>
+    </labels>
+    <labels>
+        <fullName>Probability</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Probability %</shortDescription>
+        <value>Probability %</value>
+    </labels>
+    <labels>
+        <fullName>Processed</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Processed</shortDescription>
+        <value>Processed</value>
+    </labels>
+    <labels>
+        <fullName>Product</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Product</shortDescription>
+        <value>Product</value>
+    </labels>
+    <labels>
+        <fullName>Promo_Code</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Promo Code</shortDescription>
+        <value>Promo Code</value>
+    </labels>
+    <labels>
+        <fullName>Promotion_Type</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Promotion Type</shortDescription>
+        <value>Promotion Type</value>
+    </labels>
+    <labels>
+        <fullName>Purchased_From</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Purchased From</shortDescription>
+        <value>Purchased from</value>
+    </labels>
+    <labels>
+        <fullName>Rebate_Amount_Placeholder</fullName>
+        <categories>placeholder</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rebate Amount Placeholder</shortDescription>
+        <value>Enter the amount of this rebate</value>
+    </labels>
+    <labels>
+        <fullName>Recall</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recall</shortDescription>
+        <value>Recall</value>
+    </labels>
+    <labels>
+        <fullName>Recall_Success</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recall Success</shortDescription>
+        <value>%0 recalled successfully</value>
+    </labels>
+    <labels>
+        <fullName>RouteToMarket</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>RouteToMarket</shortDescription>
+        <value>Route to Market</value>
+    </labels>
+    <labels>
+        <fullName>Save</fullName>
+        <categories>all, AccountSurvey</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Save_Error_Message</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save Error Message</shortDescription>
+        <value>Error saving %0</value>
+    </labels>
+    <labels>
+        <fullName>Save_Success_Message</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save Success Message</shortDescription>
+        <value>All changes saved successfully</value>
+    </labels>
+    <labels>
+        <fullName>Search</fullName>
+        <categories>Actions,Buttons,quicklinks</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Search</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Search_Help_Text</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Search Help Text</shortDescription>
+        <value>Enter the name, part of the name, of an %0 to search for</value>
+    </labels>
+    <labels>
+        <fullName>Select_All</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select All</shortDescription>
+        <value>Select All</value>
+    </labels>
+    <labels>
+        <fullName>Signing_Customer</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Signing Customer</shortDescription>
+        <value>Full name of signing customer</value>
+    </labels>
+    <labels>
+        <fullName>Start_Date_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Start Date Error</shortDescription>
+        <value>No Start Date selected</value>
+    </labels>
+    <labels>
+        <fullName>Status</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Status</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Summary</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary</shortDescription>
+        <value>Summary</value>
+    </labels>
+    <labels>
+        <fullName>Three_Payments_HelpText</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Three Payments HelpText</shortDescription>
+        <value>&lt;ul&gt;&lt;li&gt;45 DAYS AFTER THE CONTRACT SIGNED ENTERS THE BF SYSTEM&lt;/li&gt;
+&lt;li&gt;50% OF GOALS ACHIEVED&lt;/li&gt;
+&lt;li&gt;80% OF GOALS ACHIEVED&lt;/li&gt;&lt;/ul&gt;</value>
+    </labels>
+    <labels>
+        <fullName>Total_Discount</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Discount</shortDescription>
+        <value>Total Discount</value>
+    </labels>
+    <labels>
+        <fullName>Total_Gross_Profit</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Gross Profit</shortDescription>
+        <value>Total Gross Profit</value>
+    </labels>
+    <labels>
+        <fullName>Total_Investment</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Investment</shortDescription>
+        <value>Total Investment</value>
+    </labels>
+    <labels>
+        <fullName>Two_Payments_HelpText</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Two Payments HelpText</shortDescription>
+        <value>&lt;ul&gt;&lt;li&gt;45 DAYS AFTER THE CONTRACT SIGNED ENTERS THE BF SYSTEM&lt;/li&gt;
+&lt;li&gt;60% OF GOALS ACHIEVED&lt;/li&gt;&lt;/ul&gt;</value>
+    </labels>
+    <labels>
+        <fullName>Volume</fullName>
+        <categories>Labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Volume</shortDescription>
+        <value>Volume (cs)</value>
+    </labels>
+    <labels>
+        <fullName>VolumeBottle</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>VolumeBottle</shortDescription>
+        <value>Volume (btl)</value>
+    </labels>
+    <labels>
+        <fullName>Warning_Title</fullName>
+        <categories>labels, buttons, titles</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Warning</shortDescription>
+        <value>WARNING!</value>
+    </labels>
+    <labels>
+        <fullName>Working_PleaseWait</fullName>
+        <categories>Buttons,Filters,Title</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Working PleaseWait</shortDescription>
+        <value>Working.  Please wait...</value>
+    </labels>
+    <labels>
+        <fullName>Years</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Years</shortDescription>
+        <value>Years</value>
+    </labels>
+    <labels>
+        <fullName>CurrentVolume</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>CurrentVolume</shortDescription>
+        <value>Current Volume</value>
+    </labels>
+    <labels>
+        <fullName>No_Accounts_Found_For_Parent</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No Accounts Found For Parent</shortDescription>
+        <value>No Accounts found for %0</value>
+    </labels>
+    <labels>
+        <fullName>Parent_Account_Search_Results_Message</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Parent Account Search Results Message</shortDescription>
+        <value>Accounts matching “%0”.  Tap on an account below to select it and find any of it’s retail accounts.</value>
+    </labels>
+    <labels>
+        <fullName>Payments</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Payments</shortDescription>
+        <value>Payments</value>
+    </labels>
+    <labels>
+        <fullName>Saving_Please_Wait</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saving Please Wait</shortDescription>
+        <value>Saving. Please Wait...</value>
+    </labels>
+    <labels>
+        <fullName>Submit_For_Approval</fullName>
+        <categories>Buttons,Filters,Title</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Submit For Approval</shortDescription>
+        <value>Submit for Approval</value>
+    </labels>
 </CustomLabels>
