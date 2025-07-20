@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
+        <name>CustomField</name>
+        <members>Market__c.Show_Item_Gross_Profit__c</members>
+        <members>Market__c.Show_Person_in_Charge_Details__c</members>
+        <members>Market__c.Validate_Budget_vs_Planned__c</members>
+    </types>
+    <types>
         <name>CustomLabel</name>
         <members>Account</members>
         <members>Account_Search_Results</members>
@@ -19,6 +25,7 @@
         <members>Back</members>
         <members>Break_Even</members>
         <members>Budget</members>
+        <members>Budget_vs_Planned_Mismatch_Error</members>
         <members>Cancel</members>
         <members>Case</members>
         <members>CCM_Details</members>

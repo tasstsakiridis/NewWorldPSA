@@ -71,7 +71,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                     Allow_Updates_After_Approval__c, Capture_Promotion_Type__c, Spread_Planned_Values__c,
                                     DocuSign__c, Show_Expanded_Actuals_on_Load__c, Capture_CCM_Details__c, Show_Item_Gross_Profit__c,
                                     Capture_Menu_Type__c, Show_Person_in_Charge_Details__c, Must_Select_Child_Accounts__c, 
-                                    Can_Close_Agreement__c, Validate_Budget_vs_Planned__c
+                                    Can_Close_Agreement__c, Validate_Budget_vs_Planned__c, Can_Update_Status__c
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -94,7 +94,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
             */
             String userId = UserInfo.getUserId();
             String roleId = UserInfo.getUserRoleId();
-            
+            Market__c userMarket = getUserMarket();
+
             List<GroupMember> groupMembers = [SELECT Id, UserOrGroupId FROM GroupMember WHERE Group.DeveloperName ='UK_SOM'];
             System.debug('# of groupMembers: ' + groupMembers == null ? 0 : groupMembers.size());
             for(GroupMember gm : groupMembers) {
@@ -102,7 +103,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     isSOMUser = true; break;
                 }
             }
-            if (!isSOMUser) {
+            if (!isSOMUser && userMarket.Can_Update_Status__c) {                
                 List<Group> groups = [SELECT Id FROM Group WHERE RelatedId =:roleId];
                 System.debug('# of groups: ' + groups == null ? 0 : groups.size());
                 isSOMUser = groups != null && groups.size() > 0;                
@@ -268,6 +269,10 @@ public with sharing class PromotionalSalesAgreement_Controller {
         whereClause += ' AND Is_Active__c = true ';
         if (marketName == 'Mexico') {
             whereClause += ' AND Status__c = \'Active\'';
+        }
+        
+        if (marketName == 'Japan') {
+            whereClause += ' AND SAP_Customer_Number__c <> NULL';
         }
         
         String limitClause = ' WITH SECURITY_ENFORCED ORDER BY Name LIMIT :pageSize OFFSET :offset';

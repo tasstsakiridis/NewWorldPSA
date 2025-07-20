@@ -92,6 +92,9 @@
         <name>CustomLabel</name>
         <members>Actual_Discount</members>
         <members>Approver</members>
+        <members>Break_Even</members>
+        <members>Budget_vs_Planned_Mismatch_Error</members>
+        <memebrs>CCM_Details</members>
         <members>Contract_Type</members>
         <members>Current_Volume</members>
         <members>Discount_Category</members>

@@ -1198,4 +1198,12 @@
         <shortDescription>Submit For Approval</shortDescription>
         <value>Submit for Approval</value>
     </labels>
+    <labels>
+        <fullName>Budget_vs_Planned_Mismatch_Error</fullName>
+        <categories>error, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Budget vs Planned Mismatch Error</shortDescription>
+        <value>The total Planned Investment of all the products does not match the Planned Budget.</value>
+    </labels>
 </CustomLabels>
