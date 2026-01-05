@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Store_Sub_Type__c</fullName>
+    <externalId>false</externalId>
+    <label>Store Sub-Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Store_Type__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Mexican</fullName>
+                <default>false</default>
+                <label>Mexican</label>
+            </value>
+            <value>
+                <fullName>Epicerie fine</fullName>
+                <default>false</default>
+                <label>Epicerie fine</label>
+            </value>
+            <value>
+                <fullName>Mainstream</fullName>
+                <default>false</default>
+                <label>Mainstream</label>
+            </value>
+            <value>
+                <fullName>Premium</fullName>
+                <default>false</default>
+                <label>Premium</label>
+            </value>
+            <value>
+                <fullName>Exclusive</fullName>
+                <default>false</default>
+                <label>Exclusive</label>
+            </value>
+            <value>
+                <fullName>Salle de concerts</fullName>
+                <default>false</default>
+                <label>Salle de concerts</label>
+            </value>
+            <value>
+                <fullName>Grossiste</fullName>
+                <default>false</default>
+                <label>Grossiste</label>
+            </value>
+            <value>
+                <fullName>Cash &amp; Carry</fullName>
+                <default>false</default>
+                <label>Cash &amp; Carry</label>
+            </value>
+            <value>
+                <fullName>Primary</fullName>
+                <default>false</default>
+                <label>Primary</label>
+            </value>
+            <value>
+                <fullName>Secondary</fullName>
+                <default>false</default>
+                <label>Secondary</label>
+            </value>
+            <value>
+                <fullName>Gastro</fullName>
+                <default>false</default>
+                <label>Gastro</label>
+            </value>
+            <value>
+                <fullName>Food &amp; Cocktails</fullName>
+                <default>false</default>
+                <label>Food &amp; Cocktails</label>
+            </value>
+            <value>
+                <fullName>Brasserie</fullName>
+                <default>false</default>
+                <label>Brasserie</label>
+            </value>
+            <value>
+                <fullName>Mixo</fullName>
+                <default>false</default>
+                <label>Mixo</label>
+            </value>
+            <value>
+                <fullName>Bars de Nuit</fullName>
+                <default>false</default>
+                <label>Bars de Nuit</label>
+            </value>
+            <value>
+                <fullName>Luxe</fullName>
+                <default>false</default>
+                <label>Luxe</label>
+            </value>
+            <value>
+                <fullName>Lifestyle</fullName>
+                <default>false</default>
+                <label>Lifestyle</label>
+            </value>
+            <value>
+                <fullName>Club</fullName>
+                <default>false</default>
+                <label>Club</label>
+            </value>
+            <value>
+                <fullName>Enjoy</fullName>
+                <default>false</default>
+                <label>Enjoy</label>
+            </value>
+            <value>
+                <fullName>Cavistes</fullName>
+                <default>false</default>
+                <label>Cavistes</label>
+            </value>
+            <value>
+                <fullName>American Bar</fullName>
+                <default>false</default>
+                <label>American Bar</label>
+            </value>
+            <value>
+                <fullName>Authentic Bar</fullName>
+                <default>false</default>
+                <label>Authentic Bar</label>
+            </value>
+            <value>
+                <fullName>Chinese</fullName>
+                <default>false</default>
+                <label>Chinese</label>
+            </value>
+            <value>
+                <fullName>Cigar</fullName>
+                <default>false</default>
+                <label>Cigar</label>
+            </value>
+            <value>
+                <fullName>Curry</fullName>
+                <default>false</default>
+                <label>Curry</label>
+            </value>
+            <value>
+                <fullName>Donburi</fullName>
+                <default>false</default>
+                <label>Donburi</label>
+            </value>
+            <value>
+                <fullName>Event</fullName>
+                <default>false</default>
+                <label>Event</label>
+            </value>
+            <value>
+                <fullName>Girls Bar</fullName>
+                <default>false</default>
+                <label>Girls Bar</label>
+            </value>
+            <value>
+                <fullName>Golf / Country Club</fullName>
+                <default>false</default>
+                <label>Golf / Country Club</label>
+            </value>
+            <value>
+                <fullName>Hamburger / Pizza</fullName>
+                <default>false</default>
+                <label>Hamburger / Pizza</label>
+            </value>
+            <value>
+                <fullName>Hotel Bar</fullName>
+                <default>false</default>
+                <label>Hotel Bar</label>
+            </value>
+            <value>
+                <fullName>Izakaya Res.</fullName>
+                <default>false</default>
+                <label>Izakaya Res.</label>
+            </value>
+            <value>
+                <fullName>Karaage</fullName>
+                <default>false</default>
+                <label>Karaage</label>
+            </value>
+            <value>
+                <fullName>Konamono</fullName>
+                <default>false</default>
+                <label>Konamono</label>
+            </value>
+            <value>
+                <fullName>Korean Restaurant</fullName>
+                <default>false</default>
+                <label>Korean Restaurant</label>
+            </value>
+            <value>
+                <fullName>Kushiyaki &amp; Kushiage</fullName>
+                <default>false</default>
+                <label>Kushiyaki &amp; Kushiage</label>
+            </value>
+            <value>
+                <fullName>Life Style Hotel</fullName>
+                <default>false</default>
+                <label>Life Style Hotel</label>
+            </value>
+            <value>
+                <fullName>Mexican Restaurant</fullName>
+                <default>false</default>
+                <label>Mexican Restaurant</label>
+            </value>
+            <value>
+                <fullName>Music</fullName>
+                <default>false</default>
+                <label>Music</label>
+            </value>
+            <value>
+                <fullName>Nightclub</fullName>
+                <default>false</default>
+                <label>Nightclub</label>
+            </value>
+            <value>
+                <fullName>Others</fullName>
+                <default>false</default>
+                <label>Others</label>
+            </value>
+            <value>
+                <fullName>Ramen / Gyoza</fullName>
+                <default>false</default>
+                <label>Ramen / Gyoza</label>
+            </value>
+            <value>
+                <fullName>Snack</fullName>
+                <default>false</default>
+                <label>Snack</label>
+            </value>
+            <value>
+                <fullName>Standard</fullName>
+                <default>false</default>
+                <label>Standard</label>
+            </value>
+            <value>
+                <fullName>Steak &amp; Hamburg</fullName>
+                <default>false</default>
+                <label>Steak &amp; Hamburg</label>
+            </value>
+            <value>
+                <fullName>Students</fullName>
+                <default>false</default>
+                <label>Students</label>
+            </value>
+            <value>
+                <fullName>Sushi</fullName>
+                <default>false</default>
+                <label>Sushi</label>
+            </value>
+            <value>
+                <fullName>Thai</fullName>
+                <default>false</default>
+                <label>Thai</label>
+            </value>
+            <value>
+                <fullName>Washoku</fullName>
+                <default>false</default>
+                <label>Washoku</label>
+            </value>
+            <value>
+                <fullName>Yakiniku Res.</fullName>
+                <default>false</default>
+                <label>Yakiniku Res.</label>
+            </value>
+            <value>
+                <fullName>Cafe</fullName>
+                <default>false</default>
+                <label>Cafe</label>
+            </value>
+            <value>
+                <fullName>Traditional On Trade - Host Club</fullName>
+                <default>false</default>
+                <label>Traditional On Trade - Host Club</label>
+            </value>
+            <value>
+                <fullName>Traditional On Trade - Hostess Bar</fullName>
+                <default>false</default>
+                <label>Traditional On Trade - Hostess Bar</label>
+            </value>
+            <value>
+                <fullName>Traditional On Trade - Cabaret Club</fullName>
+                <default>false</default>
+                <label>Traditional On Trade - Cabaret Club</label>
+            </value>
+            <value>
+                <fullName>Live Music Venue</fullName>
+                <default>false</default>
+                <label>Live Music Venue</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <controllingFieldValue>CLUBS</controllingFieldValue>
+            <controllingFieldValue>BARS DE NUIT</controllingFieldValue>
+            <valueName>Mainstream</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <controllingFieldValue>CLUBS</controllingFieldValue>
+            <controllingFieldValue>Cavistes</controllingFieldValue>
+            <controllingFieldValue>PRESTIGE</controllingFieldValue>
+            <controllingFieldValue>BARS DE NUIT</controllingFieldValue>
+            <valueName>Premium</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <valueName>Authentic Bar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <valueName>Cigar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <valueName>Hotel Bar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <valueName>Music</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BARS</controllingFieldValue>
+            <valueName>Standard</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CLUBS</controllingFieldValue>
+            <controllingFieldValue>Cavistes</controllingFieldValue>
+            <controllingFieldValue>PRESTIGE</controllingFieldValue>
+            <controllingFieldValue>BARS DE NUIT</controllingFieldValue>
+            <valueName>Exclusive</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CLUBS</controllingFieldValue>
+            <valueName>Salle de concerts</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Other</controllingFieldValue>
+            <valueName>Event</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Other</controllingFieldValue>
+            <controllingFieldValue>Supermarket</controllingFieldValue>
+            <valueName>Golf / Country Club</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade</controllingFieldValue>
+            <controllingFieldValue>Entertain</controllingFieldValue>
+            <valueName>Club</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade</controllingFieldValue>
+            <valueName>Girls Bar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade</controllingFieldValue>
+            <valueName>Snack</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Western Cuisine</controllingFieldValue>
+            <valueName>American Bar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Western Cuisine</controllingFieldValue>
+            <valueName>Hamburger / Pizza</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Western Cuisine</controllingFieldValue>
+            <valueName>Mexican Restaurant</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Western Cuisine</controllingFieldValue>
+            <controllingFieldValue>Asian Cuisine</controllingFieldValue>
+            <controllingFieldValue>eCommerce</controllingFieldValue>
+            <valueName>Others</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Western Cuisine</controllingFieldValue>
+            <valueName>Steak &amp; Hamburg</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Drink</controllingFieldValue>
+            <valueName>Mixo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Drink</controllingFieldValue>
+            <valueName>Bars de Nuit</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Eat</controllingFieldValue>
+            <valueName>Gastro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Eat</controllingFieldValue>
+            <valueName>Food &amp; Cocktails</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Eat</controllingFieldValue>
+            <valueName>Brasserie</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Entertain</controllingFieldValue>
+            <valueName>Enjoy</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Sleep</controllingFieldValue>
+            <valueName>Luxe</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Sleep</controllingFieldValue>
+            <valueName>Lifestyle</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Asian Cuisine</controllingFieldValue>
+            <valueName>Chinese</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Asian Cuisine</controllingFieldValue>
+            <valueName>Korean Restaurant</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Asian Cuisine</controllingFieldValue>
+            <valueName>Thai</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Grossiste</controllingFieldValue>
+            <valueName>Grossiste</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Grossiste</controllingFieldValue>
+            <valueName>Primary</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Grossiste</controllingFieldValue>
+            <valueName>Secondary</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Night Clubs</controllingFieldValue>
+            <valueName>Nightclub</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cash and Carry</controllingFieldValue>
+            <valueName>Cash &amp; Carry</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cafe</controllingFieldValue>
+            <valueName>Cafe</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade - Host Club</controllingFieldValue>
+            <valueName>Traditional On Trade - Host Club</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade - Hostess Bar</controllingFieldValue>
+            <valueName>Traditional On Trade - Hostess Bar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Traditional On Trade - Cabaret Club</controllingFieldValue>
+            <valueName>Traditional On Trade - Cabaret Club</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Live Music Venue</controllingFieldValue>
+            <valueName>Live Music Venue</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Curry</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Donburi</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Izakaya Res.</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Karaage</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Konamono</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Kushiyaki &amp; Kushiage</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Ramen / Gyoza</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Sushi</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Washoku</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Japanese Cuisine</controllingFieldValue>
+            <valueName>Yakiniku Res.</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

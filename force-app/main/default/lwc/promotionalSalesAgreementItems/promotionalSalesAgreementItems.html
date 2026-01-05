@@ -81,7 +81,7 @@
                 <lightning-layout>
                     <template if:true={showBrandFilter}>
                         <lightning-layout-item size="3" padding="around-small">
-                            <c-brand-filter ></c-brand-filter>
+                            <c-brand-filter record-id={recordId} used-for={usedFor} include-dry-goods={includeDryGoods} brands={brands} query-for-brands="false"></c-brand-filter>
                         </lightning-layout-item>
                     </template>
                     <lightning-layout-item size="12" small-device-size="12" large-device-size={productLayoutSize} padding="around-small">

@@ -1206,4 +1206,20 @@
         <shortDescription>Budget vs Planned Mismatch Error</shortDescription>
         <value>The total Planned Investment of all the products does not match the Planned Budget.</value>
     </labels>
+    <labels>
+        <fullName>Required</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Required</shortDescription>
+        <value>Required</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Above_Threshold_Change_Error_France</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Above Threshold Change Error France</shortDescription>
+        <value>Changes made are outside the acceptable variance of {0}. Please submit the contract for approval again.</value>
+    </labels>
 </CustomLabels>

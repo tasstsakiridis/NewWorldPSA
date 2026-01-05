@@ -95,6 +95,7 @@ import LABEL_INVALID_INTEGER from '@salesforce/label/c.Invalid_Integer';
 import LABEL_LIABILITY from '@salesforce/label/c.Liability';
 import LABEL_LOADING_PLEASE_WAIT from '@salesforce/label/c.Loading_Please_Wait';
 import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR from '@salesforce/label/c.PSA_Above_Threshold_Change_Error';
+import LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR_FRANCE from '@salesforce/label/c.PSA_Above_Threshold_Change_Error_France';
 import LABEL_QUANTITY from '@salesforce/label/c.Quantity';
 import LABEL_REASON from '@salesforce/label/c.Reason';
 import LABEL_ROI from '@salesforce/label/c.Roi';
@@ -135,7 +136,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
         saveError               : { message: 'Error saving item' },
         saveSuccess             : { message: 'All changes saved successfully'},
         split                   : { label: LABEL_SPLIT },
-        thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR },
+        thresholdError          : { message: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR, france: LABEL_PSA_ABOVE_THRESHOLD_CHANGE_ERROR_FRANCE },
         trainingAdvocacy        : { help: 'Training & Advocacy help' },
         totalInvestment         : { label: LABEL_TOTAL_INVESTMENT },
         volumeForecast          : { label: LABEL_VOLUME_FORECAST_9L, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_9L) },
@@ -452,7 +453,7 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
     }
     get isDisabled() {
         console.log('[psaItemForm] isLocked, isMexico, isEditable', this.isLocked, this.isMexico, this.isLocked && this.isMexico);
-        return this.isLocked && this.isMexico;
+        return this.isLocked && (this.isMexico || this.isJapan);
     }
 
     get psaTotalInvestment() {
@@ -1112,7 +1113,11 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 console.log('[psaitemform.validate] threshold', threshold);
                 if (diff > threshold) {
                     const thresholdString = `${CURRENCY_CODE}  ${threshold}`;
-                    this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.message.replace('{0}', thresholdString));                                                      
+                    if (this.psa.Market__r.Name == 'France') {
+                        this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.france.replace('{0}', thresholdString));                                                      
+                    } else {
+                        this.showToast('warning', this.labels.warning.label, this.labels.thresholdError.message.replace('{0}', thresholdString));                                                      
+                    }
                     this.isChangeAboveThreshold = true;
                 }
             }
@@ -1288,6 +1293,9 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
                 );
 
                 this.updateTotals('save');
+                if (this.isJapan || (this.psa.Is_Approved__c && this.psa.Market__r.Spread_Planned_Values__c)) {
+                    this.updateSpread();
+                }
                 refreshApex(this.wiredPSAItem);
                 /*
                 if (!this.isPhone) {
@@ -1329,8 +1337,8 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
                 console.log('[updatePSAItem] isapproved, ischangeabovethreshold', this.isApproved, this.isChangeAboveThreshold);
                 this.updateTotals('update');
-                if (this.psa.Is_Approved__c && this.psa.Market__r.Spread_Planned_Values__c) {
-                    this.updateSpread(record.Id);
+                if (this.isJapan || (this.psa.Is_Approved__c && this.psa.Market__r.Spread_Planned_Values__c)) {
+                    this.updateSpread();
                 }
                 refreshApex(this.wiredPSAItem);
                 /*

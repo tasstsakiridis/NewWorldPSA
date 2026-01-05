@@ -39,6 +39,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     thePSA; 
     promotionId;
     psaItems = new Map();   
+    brands = [];
     canSubmitForApproval = false;
     error;
     pageNumber = 1;
@@ -287,6 +288,21 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 }
                 return obj;
             });
+            try {
+            if (this.brandsSelected == undefined || this.brandsSelected == '') {
+                let brandList = [];
+                value.data.records.forEach(p => {
+                    if (p.Brand__c != undefined) {
+                        if (brandList.findIndex(b => b.value == p.Brand__c) == -1) {
+                            brandList.push({ label: p.Brand_Name__c, value: p.Brand__c, Name: p.Brand_Name__c, Primary_Logo__c: p.Brand__r.Primary_Logo__c });
+                        } 
+                    }
+                });
+                this.brands = brandList;
+            }
+        } catch(ex) {
+            console.log('exception: ', ex);
+        }
             console.log('[psaItems.getProducts] psaItems', this.psaItems);
             console.log('[psaItems.getProducts] newList', newList);
             this.products = {

@@ -124,7 +124,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
     @AuraEnabled(cacheable=true) 
     public static User getUserDetails() {
-        return [SELECT Id, Name, FirstName, LastName, Email, Sales_Region__c, Manager_Name__c
+        return [SELECT Id, Name, FirstName, LastName, Email, Sales_Region__c, Manager_Name__c, Manager.FirstName, Manager.LastName
                   FROM User 
                  WHERE Id =:UserInfo.getUserId()];
     }
@@ -154,7 +154,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Total_Brand_Support__c, Total_Brand_Support_Paid__c, Market__r.Show_Expanded_Actuals_on_Load__c, Contract_Type__c, Discount_Category__c, Promo_Code__c,
                                             Market__r.Show_Item_Gross_Profit__c, Probability__c, Menu_Type__c, Market__r.Show_Person_in_Charge_Details__c, Account__r.Owner.Name, 
                                             Account__r.Store_Type__c, Account__r.Owner.Sales_Region__c, Account__r.Owner.Manager_Name__c, Market__r.DocuSign__c, Owner_Manager__c, Total_PSA_ROI__c,
-                                            Market__r.Can_Close_Agreement__c, Market__r.Validate_Budget_vs_Planned__c,
+                                            Market__r.Can_Close_Agreement__c, Market__r.Validate_Budget_vs_Planned__c, 
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c, Menu_Type__c 
@@ -272,7 +272,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
         }
         
         if (marketName == 'Japan') {
-            whereClause += ' AND SAP_Customer_Number__c <> NULL';
+            whereClause += ' AND SAP_Customer_Number__c <> NULL AND Used_For__c INCLUDES (\'Promotion\')';
         }
         
         String limitClause = ' WITH SECURITY_ENFORCED ORDER BY Name LIMIT :pageSize OFFSET :offset';
@@ -309,6 +309,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
         if (market == 'Mexico') {
             whereClause += ' AND Status__c = \'Active\'';
         } 
+        if (market == 'Japan') {
+            whereClause += ' AND Used_For__c INCLUDES (\'Promotion\')';
+        }
         whereClause += ' WITH SECURITY_ENFORCED';
         String orderByClause = ' ORDER BY Name';
         //String limitClause = ' LIMIT :pageSize OFFSET :offset';
@@ -362,8 +365,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Market__c market = [SELECT Id FROM Market__c WHERE Name =:marketName LIMIT 1];
         String marketId = market.Id;
 
-        String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Image_Name__c, Pack_Quantity__c, Unit_Size__c, Gross_Profit_per_Case__c, Gross_Profit_Flat_Case__c, Gross_Profit_per_Bottle__c, Unit_Cost__c, Price__c, Price_per_Case__c, Wholesale_Price__c FROM Product__c';
-        soql += ' WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\' AND Used_For__c INCLUDES (\'Promotion\')';
+        String soql = 'SELECT Id, Name, Brand__c, Brand_Name__c, Brand__r.Primary_Logo__c, Image_Name__c, Pack_Quantity__c, Unit_Size__c, Gross_Profit_per_Case__c, ';
+        soql += 'Gross_Profit_Flat_Case__c, Gross_Profit_per_Bottle__c, Unit_Cost__c, Price__c, Price_per_Case__c, Wholesale_Price__c, Is_Popular_Product__c, Sort_Order__c';
+        soql += ' FROM Product__c WHERE IsActive__c = true AND RecordType.Name = \'Wet Goods\' AND Market__c =:marketId AND Supplier__c = \'B-F\' AND Used_For__c INCLUDES (\'Promotion\')';
         if (marketName == 'France') {
             soql += ' AND (Channel__c = \'On\' OR Channel__c = \'Both\') ';
         }
@@ -372,7 +376,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             brandsSelected = brandsSelected.replaceAll(',', '\',\'');    
             soql += ' AND Brand__c IN (' + brandsSelected + ')';
         }
-        soql += ' ORDER BY Name LIMIT :pageSize OFFSET :offset';
+        soql += ' ORDER BY Is_Popular_Product__c DESC, Sort_Order__c, Name LIMIT :pageSize OFFSET :offset';
         PagedResult result = new PagedResult();
         result.pageSize = pageSize;
         result.records = Database.query(soql);
@@ -1300,6 +1304,26 @@ public with sharing class PromotionalSalesAgreement_Controller {
         return msg;
     }
 
+    @AuraEnabled
+    public static String closePSA(String psaId, String closeType, String closeReason) {
+        String result = 'OK';
+        try {
+            Promotion_Activity__c psa = [SELECT Id, Status__c, Rejection_Reason__c 
+                                            FROM Promotion_Activity__c 
+                                            WHERE Id =:psaId];
+                
+            psa.Status__c = closeType == 'close' ? 'Closed' : 'Cancelled';
+            psa.Rejection_Reason__c = closeReason;
+            update psa;
+
+        
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+
+        return result;
+    }
+
     @AuraEnabled 
     public static SimpleListItem clonePSA(String psaId, String newName) {
         SimpleListItem sli = new SimpleListItem('', 'OK', true, '');
@@ -1496,33 +1520,48 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled 
     public static String updateSpreadForPMI(String psaId, String pmiId) {
         try {
-            Promotion_Activity__c pa = [SELECT Id, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c,
-                                            (SELECT Id, Forecast_Volume__c, Forecast_Promotional_Activity__c, Promotion_Material_Item__r.Plan_Volume__c,
-                                                    Promotion_Material_Item__r.Promotional_Activity_Value__c
+            Promotion_Activity__c pa = [SELECT Id, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Market__r.Capture_End_Date__c,
+                                            (SELECT Id, Forecast_Volume__c, Forecast_Listing_Fee__c, Forecast_Promotional_Activity__c, Promotion_Material_Item__r.Plan_Volume__c,
+                                                    Promotion_Material_Item__r.Promotional_Activity_Value__c, Promotion_Material_Item__r.Listing_Fee__c, Rebate_Type__c, Rebate_Amount__c
                                                 FROM PMI_Actuals__r
-                                                WHERE Promotion_Material_Item__c =:pmiId)
+                                                WHERE Promotion_Material_Item__c =:pmiId
+                                                  AND Has_Totals__c = FALSE)
                                             FROM Promotion_Activity__c
                                             WHERE Id =:psaId];
 
             Integer numberOfMonths = 0;
-            if (pa.Length_of_Agreement__c != null) {
+            if (pa.Market__r.Capture_End_Date__c) {
+                Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
+                numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
+            } else {
                 numberOfMonths = pa.Length_of_Agreement__c.intValue();
                 if (pa.Is_Length_in_Years__c) {
                     numberOfMonths = pa.Length_of_Agreement__c.intValue() * 12;
                 }
-            } else {
-                Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
-                numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
             }
             List<PMI_Actual__c> toUpdate = new List<PMI_Actual__c>();
-            for(PMI_Actual__c pmia : pa.PMI_Actuals__r) {
-                pmia.Forecast_Volume__c = pmia.Promotion_Material_Item__r.Plan_Volume__c / numberOfMonths;
-                //pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
-                pmia.Forecast_Promotional_Activity__c = pmia.Promotion_Material_Item__r.Promotional_Activity_Value__c / numberOfMonths;
-                toUpdate.add(pmia);
+            if (pa.PMI_Actuals__r == null || pa.PMI_Actuals__r.size() == 0) {
+                BuildInitialActualsForPSA.buildInitialActuals(new String[] {psaId});
+            } else {
+                for(PMI_Actual__c pmia : pa.PMI_Actuals__r) {
+                    pmia.Forecast_Volume__c = 0;
+                    pmia.Forecast_Listing_Fee__c = 0;
+                    pmia.Forecast_Promotional_Activity__c = 0;
+
+                    if (pmia.Promotion_Material_Item__r.Plan_Volume__c > 0 && pmia.Rebate_Type__c == 'Volume') {
+                        pmia.Forecast_Volume__c = pmia.Promotion_Material_Item__r.Plan_Volume__c / numberOfMonths;
+                    }
+                    if (pmia.Promotion_Material_Item__r.Listing_Fee__c > 0 && pmia.Rebate_Type__c == 'Listing Fee') {
+                        pmia.Forecast_Listing_Fee__c = pmia.Promotion_Material_Item__r.Listing_Fee__c / numberOfMonths;
+                    }
+                    if (pmia.Promotion_Material_Item__r.Promotional_Activity_Value__c > 0 && pmia.Rebate_Type__c == 'Promotional Activity') {
+                        pmia.Forecast_Promotional_Activity__c = pmia.Promotion_Material_Item__r.Promotional_Activity_Value__c / numberOfMonths;
+                    }
+                    toUpdate.add(pmia);
+                }
+                update toUpdate;
             }
 
-            update toUpdate;
         } catch(AuraHandledException ex) {
             return ex.getMessage();
         }

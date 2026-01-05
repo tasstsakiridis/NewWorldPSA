@@ -35,6 +35,8 @@ private class BuildActualsForPSA_Test {
             mUK.Country_ISO_Code_2__c = 'GB';
             mUK.Country_ISO_Code_3__c = 'GBR';
             mUK.Maximum_Agreement_Length__c = 5;
+            mUK.Spread_Planned_Values__c = true;
+            mUK.Allow_Updates_After_Approval__c = true;
             insert mUK;
 
             Account parentAccount = helper.createAccount('Test UK Parent Account', mUK.Id, 'Wholesaler');
@@ -96,6 +98,7 @@ private class BuildActualsForPSA_Test {
             psa1.Reminder_Date__c = psa1.Begin_Date__c;
             psa1.Next_Email_Date__c = psa1.Begin_Date__c;
             psa1.Status__c = 'New';
+            psa1.Market__c = mUK.Id;
             insert psa1;
             
             Promotion__c promo1 = new Promotion__c();
@@ -111,6 +114,13 @@ private class BuildActualsForPSA_Test {
             pmi1.Product_Custom__c = products[0].Id;
             pmi1.Plan_Volume__c = 10;
             pmi1.Plan_Rebate__c = 0;
+            pmi1.Listing_Fee__c = 10000;
+            pmi1.Promotional_Activity_Value__c = 12000;
+            pmi1.Training_and_Advocacy_Value__c = 15000;
+            pmi1.Proposed_Plan_Volume__c = 10;
+            pmi1.Proposed_Listing_Fee__c = 10000;
+            pmi1.Proposed_Promotional_Activity_Value__c = 12000;
+            pmi1.Proposed_Training_Advocacy_Value__c = 15000;
             insert pmi1;
             
             String promotionId = promo1.Id;

@@ -14,7 +14,7 @@
     </types>
     <types>
         <name>CustomField</name>
-        <members>Market__c.Capture_CCM_Drtails__c</members>
+        <members>Market__c.Capture_CCM_Details__c</members>
         <members>Market__c.Capture_Promotion_Type__c</members>
         <members>Market__c.Enable_DocuSign__c</members>
         <members>Market__c.Must_Select_Child_Accounts__c</members>
@@ -104,6 +104,11 @@
         <members>Promo_Code</members>
         <members>Promotion_Type</members>
         <members>Total_Gross_Profit</members>
+    </types>
+    <types>
+        <name>Translations</name>
+        <members>en</members>
+        <members>ja</members>
     </types>
     <version>47.0</version>
 </Package>

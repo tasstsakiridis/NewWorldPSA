@@ -15,18 +15,18 @@
         
         <section>
             <template if:true={brands}>
-                <template if:true={brands.records.length}>
+                <template if:true={brands.length}>
                     <div class="content">
-                        <template for:each={brands.records} for:item="brand">
-                            <c-brand-tile key={brand.Id} 
+                        <template for:each={brands} for:item="brand">
+                            <c-brand-tile key={brand.value} 
                                         brand={brand} 
                                         onselected={handleSelected}
                                         ondeselected={handleDeSelected} ></c-brand-tile>
                         </template>    
                     </div>
                     <c-paginator page-number={pageNumber}
-                                 page-size={brands.pageSize}
-                                 total-item-count={brands.totalItemCount}
+                                 page-size="50"
+                                 total-item-count={brands.length}
                                  object-type={labels.brand.labelPlural}
                                  onprevious={handlePreviousPage}
                                  onnext={handleNextPage}></c-paginator>

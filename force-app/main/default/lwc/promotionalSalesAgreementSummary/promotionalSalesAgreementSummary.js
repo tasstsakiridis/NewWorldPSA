@@ -591,7 +591,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
                     totalInvestment: parseFloat(pmi.Total_Investment__c),
                     totalActualInvestment: parseFloat(pmi.Total_Actual_Investment__c),
                     packQuantity: parseInt(pmi.Product_Pack_Qty__c),
-                    grossProfit: parseFloat(pmi.Product_Custom__r.Gross_Profit_per_Case__c==undefined ? 0 : pmi.Product_Custom__r.Gross_Profit_per_Case__c),
+                    grossProfit: parseFloat(pmi.Product_Custom__r == undefined || pmi.Product_Custom__r.Gross_Profit_per_Case__c==undefined ? 0 : pmi.Product_Custom__r.Gross_Profit_per_Case__c),
                     rebateVolume: parseFloat(pmi.Plan_Rebate_Volume__c),
                     rebateLiability: parseFloat(pmi.Plan_Rebate_Liability__c),
                     rebatePercent: (parseFloat(pmi.Plan_Rebate_Percentage__c)/100),
