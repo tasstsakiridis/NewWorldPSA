@@ -27,6 +27,9 @@ public with sharing class PSAWrapper {
         public Decimal listingFee { get; set; }
 
         @AuraEnabled 
+        public Decimal fee { get; set; }
+
+        @AuraEnabled 
         public String drinkStrategy { get; set; }
 
         @AuraEnabled 
@@ -67,6 +70,36 @@ public with sharing class PSAWrapper {
 
         @AuraEnabled 
         public Decimal planRebateVolume { get; set; }
+
+        @AuraEnabled 
+        public Decimal price { get; set; }
+
+        @AuraEnabled 
+        public Decimal cvs { get; set; }
+
+        @AuraEnabled 
+        public Decimal excise { get; set; }
+
+        @AuraEnabled 
+        public Decimal cosNetofICP { get; set; }
+
+        @AuraEnabled 
+        public Decimal educationTax { get; set; }
+
+        @AuraEnabled 
+        public Decimal localCOS { get; set; }
+
+        @AuraEnabled 
+        public Decimal vapCOS { get; set; }
+
+        @AuraEnabled 
+        public Decimal planSNS { get; set; }
+    
+        @AuraEnabled 
+        public Decimal planGP { get; set; }
+    
+        @AuraEnabled 
+        public Decimal planGPM { get; set; }
 
     }
 
@@ -180,8 +213,17 @@ public with sharing class PSAWrapper {
     @AuraEnabled
     public String paymentConfigurations { get; set; }
 
+    @AuraEnabled
+    public String paymentConfigurationComments { get; set; }
+
     @AuraEnabled 
     public Decimal totalBudget { get; set; }
+
+    @AuraEnabled 
+    public Decimal fee { get; set; }
+
+    @AuraEnabled 
+    public Decimal accountPromotionalBudget { get; set; }
 
     @AuraEnabled 
     public Decimal percentageVisibility { get; set; }
@@ -254,7 +296,10 @@ public with sharing class PSAWrapper {
         this.limitToSelectedAccounts = true;
         this.numberOfPayments = 1;
         this.paymentConfigurations = '';
+        this.paymentConfigurationComments = '';
         this.totalBudget = 0;
+        this.fee = 0;
+        this.accountPromotionalBudget = 0;
         this.percentageVisibility = 0;
         this.probabilityPercentage = 0;
         this.isDirectRebate = true;
@@ -304,6 +349,8 @@ public with sharing class PSAWrapper {
         this.comments = psa.Evaluation_Comments__c;
         this.numberOfPayments = Integer.valueOf(psa.Number_of_Payments__c);
         this.totalBudget = psa.Activity_Budget__c;
+        this.fee = psa.Planned_Fee__c;
+        this.accountPromotionalBudget = psa.Account_Promotional_Budget__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
         this.probabilityPercentage = psa.Probability__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;

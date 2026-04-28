@@ -1222,4 +1222,12 @@
         <shortDescription>PSA Above Threshold Change Error France</shortDescription>
         <value>Changes made are outside the acceptable variance of {0}. Please submit the contract for approval again.</value>
     </labels>
+    <labels>
+        <fullName>Sent_to_CCM</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sent to CCM</shortDescription>
+        <value>Sent to CCM</value>
+    </labels>
 </CustomLabels>

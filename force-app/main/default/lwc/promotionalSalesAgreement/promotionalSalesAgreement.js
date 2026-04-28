@@ -31,7 +31,11 @@ import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
 import userId from '@salesforce/user/Id';
 
 import LABEL_ACCOUNT from '@salesforce/label/c.Account';
+import LABEL_ACCOUNT_PROMOTIONAL_BUDGET from '@salesforce/label/c.Account_Promotional_Budget';
+import LABEL_ACCOUNT_PROMOTIONAL_BUDGET_ERROR from '@salesforce/label/c.Account_Promotional_Budget_Error';
+import LABEL_ACCOUNT_PROMOTIONAL_BUDGET_REMAINING from '@salesforce/label/c.Account_Promotional_Budget_Remaining';
 import LABEL_ACCOUNT_SEARCH_RESULTS from '@salesforce/label/c.Account_Search_Results';
+import LABEL_ACCOUNTS from '@salesforce/label/c.Accounts';
 import LABEL_ACTIVITY_TYPE from '@salesforce/label/c.Activity_Type';
 import LABEL_ACTUALS from '@salesforce/label/c.Actuals';
 import LABEL_AGREEMENT_END_DATE from '@salesforce/label/c.Agreement_End_Date';
@@ -74,6 +78,8 @@ import LABEL_DIRECT_REBATE from '@salesforce/label/c.Direct_Rebate';
 import LABEL_DISCOUNT_CATEGORY from '@salesforce/label/c.Discount_Category';
 import LABEL_DOCUSIGN from '@salesforce/label/c.DocuSign';
 import LABEL_END_DATE_ERROR from '@salesforce/label/c.End_Date_Error';
+import LABEL_FEE from '@salesforce/label/c.Fee';
+import LABEL_FEE_GREATER_THAN_BUDGET_ERROR from '@salesforce/label/c.Fee_Greater_Than_Budget_Error';
 import LABEL_FORM_ERROR from '@salesforce/label/c.PSA_Form_Error';
 import LABEL_FOUR_PAYMENT_HELPTEXT from '@salesforce/label/c.Four_Payments_HelpText';
 import LABEL_GROUP from '@salesforce/label/c.Group';
@@ -81,6 +87,7 @@ import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_FUNCTION from '@salesforce/label/c.Function';
 import LABEL_INFO from '@salesforce/label/c.Info';
 import LABEL_ITEMS from '@salesforce/label/c.Items';
+import LABEL_KOREA_PSA_BUDGET_ERROR from '@salesforce/label/c.Korea_PSA_Budget_Error';
 import LABEL_LENGTH_OF_AGREEMENT_ERROR from '@salesforce/label/c.Length_of_Agreement_Error';
 import LABEL_LENGTH_OF_AGREEMENT_YEARS from '@salesforce/label/c.Length_of_Agreement_Years';
 import LABEL_LENGTH_OF_AGREEMENT_MONTHS from '@salesforce/label/c.Length_of_Agreement_Months';
@@ -131,8 +138,10 @@ import LABEL_SELECT_ALL from '@salesforce/label/c.Select_All';
 import LABEL_SIGNING_CUSTOMER from '@salesforce/label/c.Signing_Customer';
 import LABEL_NO_START_DATE_ERROR from '@salesforce/label/c.Start_Date_Error';
 import LABEL_PREDATED_ERROR from '@salesforce/label/c.PreDated_Error';
+import LABEL_SENT_TO_CCM from '@salesforce/label/c.Sent_to_CCM';
 import LABEL_SIGNING_CUSTOMER_ERROR from '@salesforce/label/c.Signing_Customer_Error';
 import LABEL_STATUS from '@salesforce/label/c.Status';
+import LABEL_STORE_TYPE from '@salesforce/label/c.StoreType';
 import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 import LABEL_SUCCESS from '@salesforce/label/c.Success';
 import LABEL_SUMMARY from '@salesforce/label/c.Summary';
@@ -170,7 +179,9 @@ const paymentColumns = [
 
 export default class PromotionalSalesAgreement extends NavigationMixin(LightningElement) {
     labels = {
-        account                 : { label: LABEL_ACCOUNT },        
+        account                 : { label: LABEL_ACCOUNT, label: LABEL_ACCOUNTS },        
+        accountPromotionalBudget: { label: LABEL_ACCOUNT_PROMOTIONAL_BUDGET, error: LABEL_ACCOUNT_PROMOTIONAL_BUDGET_ERROR },
+        accountPromotionalBudgetRemaining : { label: LABEL_ACCOUNT_PROMOTIONAL_BUDGET_REMAINING },
         accountSearchResults    : { label: LABEL_ACCOUNT_SEARCH_RESULTS },
         activityType            : { label: LABEL_ACTIVITY_TYPE, checked: LABEL_DIRECT_REBATE, unchecked: LABEL_COUPON },
         actuals                 : { label: LABEL_ACTUALS },
@@ -180,7 +191,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         alternateRTM            : { label: LABEL_ALTERNATE_RTM, placeholder: '', error: LABEL_ALTERNATE_RTM_ERROR},
         approver                : { label: LABEL_APPROVER },
         back                    : { label: LABEL_BACK },
-        budget                  : { label: LABEL_BUDGET },
+        budget                  : { label: LABEL_BUDGET, koreaError: LABEL_KOREA_PSA_BUDGET_ERROR },
         cancel                  : { label: LABEL_CANCEL, cancelMessage: LABEL_CANCEL_SUCCESS_MESSAGE },
         ccmDetails              : { label: LABEL_CCM_DETAILS }, 
         channel                 : { label: LABEL_CHANNEL },
@@ -200,6 +211,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         docusign                : { label: 'Send Contract' },
         endDate                 : { label: LABEL_AGREEMENT_END_DATE, error: LABEL_END_DATE_ERROR },
         error                   : { message: LABEL_FORM_ERROR },
+        fee                     : { label: LABEL_FEE, budgetError: LABEL_FEE_GREATER_THAN_BUDGET_ERROR },
         function                : { label: LABEL_FUNCTION },
         group                   : { label: LABEL_GROUP },
         help                    : { label: LABEL_HELP },
@@ -242,10 +254,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         searchBy                : { label: LABEL_SEARCH_BY },
         searchHelpText          : { label: LABEL_SEARCH_HELP_TEXT },
         selectAll               : { label: LABEL_SELECT_ALL },
+        sentToCCM               : { label: LABEL_SENT_TO_CCM },
         signingCustomer         : { error: LABEL_SIGNING_CUSTOMER_ERROR },
         signingCustomerHeader   : { label: LABEL_SIGNING_CUSTOMER },        
         startDate               : { label: LABEL_AGREEMENT_START_DATE, error: LABEL_NO_START_DATE_ERROR, preDatedPSAError: LABEL_PREDATED_ERROR },
         status                  : { label: LABEL_STATUS },
+        storeType               : { label: LABEL_STORE_TYPE },
         submitForApproval       : { label: LABEL_SUBMIT_FOR_APPROVAL, submittedMessage: LABEL_APPROVAL_SUBMITTED.replace('%0', 'PSA') },
         success                 : { label: LABEL_SUCCESS },
         summary                 : { label: LABEL_SUMMARY },
@@ -268,6 +282,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
 
     @api recordId;
     
+    @track
+    hasBudgetError = false;
+
+    @track
+    hasFeeError = false;
+
     error;
     errors;
     hasLengthOfPSAError = false;
@@ -281,7 +301,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     hasContractTypeError = false;
     hasDiscountCategoryError = false;
     hasPromoCodeError = false;
-    hasBudgetError = false;
+    budgetErrorMessage = this.labels.required.label;
     isBudgetRequired = false;
     probabilityPercentage = 0;
     thePSA;
@@ -303,6 +323,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     capturePromotionType = false;
     captureMenuType = false;
     captureContractType = false;
+    captureAgreementLevelDetails = false;
     agreementRequiresWholesaler = false;
     configurePayments = false;
     allAccountsSelected = false;
@@ -326,7 +347,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     comments;
     numberOfPayments = 1;
     totalBudget = 0;
+    fee = 0;
     percentageVisibility = 0;
+    accountPromotionalBudget = 0;
+    accountPromotionalBudgetRemaining = 0;
+    accountPromotionalBudgetUsed = 0;
     activityTypeActive = { label: this.labels.activityType.checked, value: this.labels.activityType.checked };
     activityTypeInactive = { label: this.labels.activityType.unchecked, value: this.labels.activityType.unchecked };    
     canAddNewAccountsToPSA = false;
@@ -338,6 +363,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         function: '',
         channel: '',
         group: '',
+        storeType: '',
         approver: ''
     };
 
@@ -455,6 +481,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.captureMenuType = this.market.Capture_Menu_Type__c == undefined ? false : this.market.Capture_Menu_Type__c;
             this.mustSelectChildAccounts = this.market.Must_Select_Child_Accounts__c == undefined ? true : this.market.Must_Select_Child_Accounts__c;
             this.validatePlannedVsBudgetAmount = this.market.Validate_Budget_vs_Planned__c == undefined ? false : this.market.Validate_Budget_vs_Planned__c;
+            this.captureAgreementLevelDetails = this.market.Capture_Agreement_Level_Plan_Details__c == undefined ? false : this.market.Capture_Agreement_Level_Plan_Details__c;
 
             this.isBudgetRequired = this.captureTotalBudget;
             console.log('[psa.getmarket] isBudgetRequired', this.isBudgetRequired);
@@ -533,6 +560,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     get isSubmitted() {
         return this.status == 'Submitted' || this.status == 'Pending Approval';
     }
+    get boomiProcessed() {
+        return this.thePSA == undefined || this.thePSA.Boomi_Processed__c == undefined ? false : this.thePSA.Boomi_Processed__c;
+    }
     get canClone() {
         return this.thePSA != null && (this.thePSA.Promotions__r != null && this.thePSA.Promotions__r.length > 0) && (this.thePSA.Promotion_Material_Items__r != null && this.thePSA.Promotion_Material_Items__r.length > 0);
     }
@@ -574,6 +604,12 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     get isMexico() {
         return this.thePSA != null && this.thePSA.Market__r != null && this.thePSA.Market__r.Name == 'Mexico';
+    }
+    get isKorea() {
+        return this.market != null && this.market.Name == 'Korea';
+    }
+    get isJapan() {
+        return this.market != null && this.market.Name == 'Japan';
     }
     get isApproved() {
         return this.thePSA != null && (this.thePSA.Status__c == 'Approved' || this.thePSA.Is_Approved__c);
@@ -620,6 +656,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     status = 'New';
     get psaStatus() {
         return this.status;
+    }
+
+    get sapAgreementNumber() {
+        return this.thePSA == undefined || this.thePSA.SAP_Agreement_Number__c == undefined ? '' : this.thePSA.SAP_Agreement_Number__c;
     }
 
     cloneName = '';
@@ -1174,7 +1214,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         if (this.configurePayments) {
             let payConfigs = [];
             for(let i = 1; i <= this.numberOfPayments; i++) {
-                payConfigs.push({ payment_number: i, percent_achieved: 0 });
+                payConfigs.push({ payment_number: i, percent_achieved: 0, comments: '' });
             }
             this.paymentConfigs = [...payConfigs];
         }
@@ -1188,6 +1228,17 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }catch(ex) {
             console.log('[handlePaymentConfigChange] exception', ex);
         }
+    }
+    handlePaymentConfigCommentChange(ev) {
+        try {
+        console.log('[handlePaymentConfigAmountChange] value', ev.detail.value);
+        console.log('[handlePaymentConfigAmountChange] payment number', ev.target.dataset.paymentnumber);
+            const paymentNumber = ev.target.dataset.paymentnumber - 1;
+            this.paymentConfigs[paymentNumber].comments = ev.detail.value;
+        }catch(ex) {
+            console.log('[handlePaymentConfigAmountChange] exception', ex);
+        }
+
     }
     handlePaymentConfigurationsSave(ev) {
         try {
@@ -1345,6 +1396,27 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleTotalBudgetChange(event) {
         this.totalBudget = event.detail.value;
+        if (this.isKorea) {
+            this.budgetError = false;
+            console.log('[handleBudgetChange] budget, promobudget', parseFloat(this.totalBudget), parseFloat(this.accountPromotionalBudgetRemaining));
+            if (parseFloat(this.totalBudget) > parseFloat(this.accountPromotionalBudgetRemaining)) {
+                console.log('[handleBudgetChange] budget greater than promotional budget');
+                this.hasBudgetError = true;
+                this.budgetErrorMessage = this.labels.accountPromotionalBudget.error.replace('%0', 'PSA');
+                this.showToast("error", this.labels.warning.label, this.budgetErrorMessage);
+            }
+        }
+    }
+    handleFeeChange(event) {
+        console.log('fee, budget', parseFloat(event.detail.value), parseFloat(this.totalBudget));
+        if (parseFloat(event.detail.value) > parseFloat(this.totalBudget)) {
+            console.log('[handleFeeChange] fee greater than budget');
+            this.showToast("error", this.labels.warning.label, this.labels.fee.budgetError);
+            this.hasFeeError = true;
+        } else {
+            this.hasFeeError = false;
+            this.fee = event.detail.value;
+        }
     }
     handlePercentageVisibilityChange(event) {
         this.percentageVisibility = event.detail.value;
@@ -1367,7 +1439,27 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.menuType = event.detail.value;
     }
     handleContractTypeChange(event) {
+        try {
         this.contractType = event.detail.value;
+        this.discountCategory = undefined;
+        this.promoCode = undefined;
+        let controllingValue = this.picklistValuesMap["Discount_Category__c"].controllerValues[event.detail.value];
+        console.log('[handleContractTypeChange] controllingValue', controllingValue);
+        let options = [];
+        this.picklistValuesMap["Discount_Category__c"].values.forEach(pc => {
+            console.log('discount category picklist value validfor', pc.validFor);
+            console.log('has controlling value', pc.validFor.indexOf(controllingValue));
+            if (pc.validFor.indexOf(controllingValue) >= 0) {
+                options.push({ label: pc.label, value: pc.value });
+            }
+        });
+
+            console.log('[handleContractTypeChange] options', options);
+
+            this.discountCategoryOptions = [...options];
+        }catch(ex) {
+            console.log('[handleContractTypeChange] exception', ex.message);
+        }
     }
     handleDiscountCategoryChange(event) {
         try {
@@ -1540,7 +1632,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         //this.thePSA = Object.assign(this.thePSA, record);            
         try {
             this.thePSA = { ...data };
-            console.log('[getAgreement] psa', this.thePSA);
+            console.log('[loadPSADetails] psa', this.thePSA);
             this.psaId = data.Id;
             this.recordTypeId = data.RecordTypeId;
             this.allAccountsSelected = data.All_Child_Accounts_Included;
@@ -1554,7 +1646,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     ShippingState: data.Account__r.ShippingState,
                     ShippingCountry: data.Account__r.ShippingCountry,
                     Contacts: [data.Contact__r],
-                    PromotionId: ''
+                    PromotionId: '',
+                    Promotional_Budget__c: data.Account_Promotional_Budget__c
                 };
                 this.personInCharge = {
                     name: data.Account__r.Owner.Name,
@@ -1573,20 +1666,26 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 }
                 //this.template.querySelector("lightning-input.account-type-toggle").checked = this.isUsingParentAccount;
             }
-            if (data.Number_of_Payments__c != undefined) {
+            if (data.Number_of_Payments__c == undefined) {
+                this.paymentConfigs = [{ payment_number: 1, percent_achieved: 0, comments: '' }];
+            } else {
                 this.numberOfPayments = data.Number_of_Payments__c.toString();  
 
                 let pconfigs = [];
-                if (data.Payment_Configurations__c != undefined) {
+                if (data.Payment_Configurations__c == undefined) {
+                    pconfigs = [{ payment_number: 1, percent_achieved: 0, comments: '' }];
+                } else {
                          
                     const pconfigItems = data.Payment_Configurations__c.split(',');
+                    const pconfigComments = data.Payment_Configuration_Comments__c == undefined ? [] : data.Payment_Configuration_Comments__c.split('|');
                     console.log('pconfigs', pconfigItems);
+                    console.log('pconfigComments', pconfigComments);
                     console.log('pconfigs length', pconfigItems.length);
                     
+                    var comment = '';
                     for(var pcCtr = 0; pcCtr < pconfigItems.length; pcCtr++) {
-                        console.log('pconfigs['+pcCtr+']', pconfigItems[pcCtr]);
-                        pconfigs.push({payment_number: (pcCtr + 1), percent_achieved: pconfigItems[pcCtr]});
-                        
+                        comment = (pcCtr > pconfigComments.length) ? '' : pconfigComments[pcCtr];
+                        pconfigs.push({payment_number: (pcCtr + 1), percent_achieved: pconfigItems[pcCtr], comments: comment});                        
                     }
                     
                     //for(let i = 0; i < pconfigs.length; i++) {
@@ -1596,6 +1695,8 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.paymentConfigs = [...pconfigs];
                 
             }
+
+            console.log('[loadPSADetails] paymentConfigs', this.paymentConfigs);
             
             this.promotionType = data.Promotion_Type__c;
             this.menuType = data.Menu_Type__c;
@@ -1605,6 +1706,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             this.percentageVisibility = data.Percentage_Visibility__c;
             this.probabilityPercentage = data.Probability__c;
             this.totalBudget = data.Activity_Budget__c;
+            this.fee = data.Planned_Fee__c;
             this.isMPOPrestige = data.MPO_Prestige__c;
             this.limitToSelectedAccounts = data.Limit_to_Selected_Accounts__c;
             this.status = data.Status__c;
@@ -1840,7 +1942,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         this.hasContractTypeError = false;
         this.hasDiscountCategoryError = false;
         this.hasPromoCodeError = false;
-
+        this.hasFeeError = false;
+        this.hasBudgetError = false;
+        this.budgetErrorMessage = '';
+        
         if (this.captureEndDate) {
             const edate = new Date(this.endDate);
             const sdate = new Date(this.startDate);
@@ -1906,7 +2011,23 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
             }
             if (this.totalBudget == undefined || this.totalBudget == 0) {
                 this.hasBudgetError = true;
+                this.budgetError = this.labels.required.label;
                 isValid = false;
+            }
+        }
+        if (this.market.Name == 'Korea') {
+            // Budget for this PSA should not be greater than remaining Account Promotional Budget
+            if (parseFloat(this.fee) > parseFloat(this.totalBudget)) {
+                this.hasFeeError = true;
+                isValid = false;
+                this.showToast("error", this.labels.warning.label, this.labels.fee.budgetError);
+            }
+            if (parseFloat(this.totalBudget) > parseFloat(this.accountPromotionalBudgetRemaining)) {
+                isValid = false;
+                let err_msg = this.labels.accountPromotionalBudget.error.replace('%0', 'PSA');
+                this.hasBudgetError = true;
+                this.budgetErrorMessage = err_msg;
+                this.showToast("error", this.labels.warning.label, err_msg);
             }
         }
 
@@ -2037,6 +2158,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     function: result.Owner.Sales_Region__c,
                     approver: result.Owner.Manager_Name__c
                 };
+
+                this.accountPromotionalBudget = result.Promotional_Budget__c;
+                this.accountPromotionalBudgetRemaining = result.Promotional_Budget_Remaining__c;
+                this.accountPromotionalBudgetUsed = result.Promotional_Budget_Used__c;
 
                 if (this.isUsingParentAccount) {
                     this.findAccountsForParent(result.Id);
@@ -2190,6 +2315,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.promoCode = this.promoCode;
         param.accountOwnerSalesRegion = this.user.Sales_Region__c;
         param.ownerManager = this.user.Manager.FirstName + ' ' + this.user.Manager.LastName;        
+        param.accountPromotionalBudget = this.accountPromotionalBudget;
 
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;
@@ -2229,9 +2355,11 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.purchaseOrder = this.purchaseOrder == undefined ? '' : this.purchaseOrder;
         param.status = this.status;
         param.totalBudget = this.totalBudget == undefined ? 0 : this.totalBudget;
+        param.fee = this.fee == undefined ? 0 : this.fee;
         param.percentageVisibility = this.percentageVisibility == undefined ? 0 : this.percentageVisibility;
         param.probabilityPercentage = this.probabilityPercentage == undefined ? 0 : this.probabilityPercentage;
         param.paymentConfigurations = '';
+        param.paymentConfigurationComments = '';
         console.log('paymentConfigurations', this.paymentConfigs);
         if (this.paymentConfigs.length > 0) {
             for(let i = 0; i < this.paymentConfigs.length; i++) {
@@ -2240,10 +2368,14 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 if (i == 0 && isNaN(percentage)) {
                     percentage = 0;
                 } else {
-                }
+                }                
                 param.paymentConfigurations += percentage + ',';
+
+                var cmt = this.paymentConfigs[i].comments || '';
+                param.paymentConfigurationComments += cmt + '|';
             }
             param.paymentConfigurations = param.paymentConfigurations.slice(0, -1);
+            param.paymentConfigurationComments = param.paymentConfigurationComments.slice(0, -1);
             console.log('[save] payment configurations', param.paymentConfigurations);
         }
         

@@ -12,6 +12,7 @@ import createActuals from '@salesforce/apex/PromotionalSalesAgreement_Controller
 import getPMIADetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPMIADetails';
 import updateActualTotals from '@salesforce/apex/PromotionalSalesAgreement_Controller.updateActualTotals';
 import getIsSOMUser from '@salesforce/apex/PromotionalSalesAgreement_Controller.getIsSOMUser';
+import findWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controller.findWholesalers';
 
 import OBJECT_PMIA from '@salesforce/schema/PMI_Actual__c';
 
@@ -45,6 +46,8 @@ import LABEL_COMMENTS from '@salesforce/label/c.Comments';
 import LABEL_COMMENTS_TOOLONGMSG from '@salesforce/label/c.Too_Many_Characters';
 import LABEL_DELETE from '@salesforce/label/c.Delete';
 import LABEL_DELETE_MSG from '@salesforce/label/c.Delete_Success';
+import LABEL_EFFECTIVENESS from '@salesforce/label/c.Effectiveness';
+import LABEL_EFFECTIVENESS_9L from '@salesforce/label/c.Effectiveness_9L';
 import LABEL_ERROR from '@salesforce/label/c.Error';
 import LABEL_FORECAST from '@salesforce/label/c.Forecast';
 import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
@@ -52,6 +55,7 @@ import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Err
 import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_INFO from '@salesforce/label/c.Info';
 import LABEL_INVALID_INPUT_ERROR from '@salesforce/label/c.Invalid_Input_Error';
+import LABEL_INVOICE_DATE from '@salesforce/label/c.Invoice_Date';
 import LABEL_INVOICE_NUMBER from '@salesforce/label/c.Invoice_Number';
 import LABEL_LISTING_FEE_PAID from '@salesforce/label/c.Listing_Fee_Paid';
 import LABEL_NEXT from '@salesforce/label/c.Next';
@@ -69,6 +73,7 @@ import LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR from '@salesforce/label/c.Rebate_
 import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_Placeholder';
 import LABEL_REMAINING from '@salesforce/label/c.Remaining';
 import LABEL_SAVE from '@salesforce/label/c.Save';
+import LABEL_SEARCH from '@salesforce/label/c.Search';
 import LABEL_SKIP from '@salesforce/label/c.Skip'
 import LABEL_START_DATE from '@salesforce/label/c.Start_Date';
 import LABEL_START_DATE_PLACEHOLDER from '@salesforce/label/c.Start_Date_Placeholder';
@@ -77,6 +82,8 @@ import LABEL_TOTAL_DISCOUNT from '@salesforce/label/c.Total_Discount';
 import LABEL_TRAINING_ADVOCACY_PAID from '@salesforce/label/c.Training_and_Advocacy_Paid';
 import LABEL_VOLUME_FORECAST_BTL from '@salesforce/label/c.VolumeBottle';
 import LABEL_WARNING from '@salesforce/label/c.Warning_Title';
+import LABEL_WHOLESALER from '@salesforce/label/c.Wholesaler';
+import LABEL_WHOLESALERS from '@salesforce/label/c.Wholesalers';
  
 export default class PromotionalSalesAgreementActualsForm extends NavigationMixin(LightningElement) {
     labels = {
@@ -87,12 +94,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         back                    : { label: LABEL_BACK },
         comments                : { label: LABEL_COMMENTS, tooLongMsg: LABEL_COMMENTS_TOOLONGMSG.replace('{0}', '1024') },
         delete                  : { label: LABEL_DELETE, msg: LABEL_DELETE_MSG },
+        effectiveness           : { label: LABEL_EFFECTIVENESS_9L },
+        effectiveness_btl       : { label: LABEL_EFFECTIVENESS },
         error                   : { label: LABEL_ERROR },
         forecast                : { label: LABEL_FORECAST.toLowerCase() },
         freeGoods               : { label: LABEL_FREE_GOODS },
         help                    : { label: LABEL_HELP },
         info                    : { label: LABEL_INFO },
         invoice                 : { label: LABEL_INVOICE_NUMBER },
+        invoiceDate             : { label: LABEL_INVOICE_DATE },
         listingFeePaid          : { label: LABEL_LISTING_FEE_PAID },
         next                    : { label: LABEL_NEXT.toLowerCase() },
         nineLitreVolume         : { label: LABEL_NINELITREVOLUME },
@@ -107,6 +117,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         rebatePaidAbovePlanned  : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
         remaining               : { label: LABEL_REMAINING },
         save                    : { label: LABEL_SAVE },
+        search                  : { label: LABEL_SEARCH },
         skip                    : { label: LABEL_SKIP.toLowerCase() },
         startDate               : { label: LABEL_START_DATE, placeholder: LABEL_START_DATE_PLACEHOLDER },
         status                  : { label: LABEL_STATUS },
@@ -115,6 +126,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         validation              : { error: LABEL_FORM_VALIDATION_ERROR },
         volumeBtl               : { label: LABEL_VOLUME_FORECAST_BTL, error: LABEL_INVALID_INPUT_ERROR.replace('%0', LABEL_VOLUME_FORECAST_BTL) },        
         warning                 : { label: LABEL_WARNING },
+        wholesaler              : { label: LABEL_WHOLESALER, labelPlural: LABEL_WHOLESALERS }
     };    
 
     @wire(CurrentPageReference)
@@ -180,8 +192,19 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }
     }
 
+    isSOMUser = false;
     @wire(getIsSOMUser)
-    isSOMUser;
+    wiredGetIsSOMUser({ error, data }) {
+        console.log('[getIsSOMUser] data', data);
+        console.log('[getIsSOMUser] error', error);
+        if (data) {
+            this.error = undefined;
+            this.isSOMUser = data;
+        } else if (error) {
+            this.error = error;
+            this.isSOMUser = false;
+        }
+    }
 
     @api 
     psaId;
@@ -222,11 +245,23 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     isLocked;
 
+    _wholesalers;
+    @api
+    get wholesalers() {
+        return this._wholesalers;
+    }
+    set wholesalers(val) {
+        this._wholesalers = val;
+        this.wholesalerOptions = val;
+        console.log('[set wholesalers] wholesalerOptions', this.wholesalerOptions);
+    }
+
     error;
     thePMIA;
     thePMI;
     theAccount;
     isWorking = false;    
+    isSearching = false;
 
     showTotalDiscount = true;
 
@@ -237,6 +272,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     accountLabel;
     
     wholesaler;
+    wholesalers;
+    wholesalerName;
+    showWholesalerOptions = false;
+    wholesalerSearchString = '';
 
     forecastedVolume;
     forecastedListingFee;
@@ -374,6 +413,21 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         return this.psa != undefined && this.psa.Market__r.Name == 'France';
     }
 
+    get isKorea() {
+        return this.psa != undefined && this.psa.Market__r.Name == 'Korea';
+    }
+    
+    get paymentDateLabel() {
+        let lbl = this.labels.paymentDate.label;
+        if (this.isKorea) {
+            lbl = this.labels.invoiceDate.label;
+        }
+
+        return lbl;
+    }
+
+
+
    rebates;
 
     /**
@@ -444,12 +498,39 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     handleStartDateChange(event) {
         this.startDate = new Date(event.detail.value);
     }
-    handleWholesalerChange(event) {
+    focusWholesalerOptions() {
+        this.showWholesalerOptions = true;
+        console.log('[focusWholesalerOptions] wholesalerOptions', this.wholesalerOptions);
+    }
+    handleWholesalerChange(event) {        
         this.wholesaler = event.detail.value;
         if (this.wholesaler === this.psa.Wholesaler_Preferred__c) {
             this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c;
         } else {
             this.wholesalerName = this.psa.Wholesaler_Alternate_Name__c;
+        }
+    }
+    handleSearchWholesalerChange(event) {
+        try {
+            this.wholesalerSearchString = event.detail.value;
+            this.wholesalerOptions = undefined;
+            let options = this._wholesalers.filter(w => w.Name.indexOf(event.detail.value) >= 0);
+            this.wholesalerOptions = [...options];        
+        }catch(ex) {
+            console.log('[handleSearchWholesalerChange] exception', ex);
+        }
+    }
+    handleWholesalerSelected(event) {
+        console.log('[handleWholesalerSelected] event.target', event.target);
+        try {
+            this.wholesaler = event.currentTarget.dataset.wholesalerId;
+            this.wholesalerName = this._wholesalers.find(w => w.Id == this.wholesaler).Name;
+            this.wholesalerSearchString = this.wholesalerName;            
+            this.showWholesalerOptions = false;
+
+            console.log('[handleWholesalerSelected] selectedWholesalerId, name', this.wholesaler, this.wholesalerName);
+        }catch(ex) {
+            console.log('[handleWholesalerSelected] ex', ex);
         }
     }
     handleInvoiceNumberChange(event) {
@@ -614,9 +695,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 if (this.rebateType == 'Volume') {
                     this.remainingRebate = this.plannedVolume - this.totalActualVolume;
                     this.forecasted = this.forecastedVolume;
-                    typeLabel = this.labels.nineLitreVolume.label;
+                    typeLabel = this.isKorea ? this.labels.effectiveness.label : this.labels.nineLitreVolume.label;
                     if (this.captureVolumeInBottles) {
-                        typeLabel = this.labels.volumeBtl.label;
+                        typeLabel = this.isKorea ? this.labels.effectiveness_btl.label : this.labels.volumeBtl.label;
                     }
 
                 } else if (this.rebateType == 'Free Goods') {

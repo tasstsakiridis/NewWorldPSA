@@ -51,56 +51,121 @@
         </lightning-layout>        
 
         <lightning-layout multiple-rows="true" horizontal-align="center">
-            <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
-                <lightning-layout>
-                    <lightning-layout-item size="4" small-device-size="12" medium-device-size="4">
-                        <!-- Total Investment -->      
-                        <div lwc:if={isUKMarket}>
-                            <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
-                            <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
-                                                        format-style="currency"
-                                                        currency-display-as="symbol">
-                            </lightning-formatted-number>    
-                        </div>     
-                        <!-- Liability -->     
-                        <div lwc:if={isMexico}>
-                            <p class="slds-text-heading_small">{labels.liability.label}</p>
-                            <lightning-formatted-number label={labels.liability.label} value={rebateLiability} format-style="currency"
-                                currency-display-as="symbol">
+            <template lwc:if={isKorea}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.increment.bottleLabel}</p>
+                            <lightning-formatted-number label={labels.increment.bottleLabel} 
+                                                        value={bottleIncrement} 
+                                                        format-style="decimal"
+                                                        minimum-integer-digits="1"
+                                                        minimum-fraction-digits="0"
+                                                        maximum-fraction-digits="0">
                             </lightning-formatted-number>
-                        </div>
-                        <div lwc:if={isJapan}>
-                            <p class="slds-text-heading_small">{labels.roi.label}</p>
-                            <lightning-formatted-number value={planROI} maximum-fraction-digits="2"></lightning-formatted-number>
-                        </div>
-                    </lightning-layout-item>
-                    <template lwc:if={isJapan}>
-                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: center;">
-                            <p class="slds-text-heading_small">{labels.breakEven.label}</p>
-                            <lightning-formatted-number value={breakEven} maximum-fraction-digits="1" format-style="percent"></lightning-formatted-number>
-                        </lightning-layout-item>
-                    </template>
-                    <template lwc:if={calcSplit}>
-                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
-                            <p class="slds-text-heading_small">{labels.split.label}</p>
-                            <lightning-formatted-number label={labels.split.label} value={productSplit}
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.increment.case9LLabel}</p>
+                            <lightning-formatted-number label={labels.increment.case9LLabel} 
+                                                        value={case9LIncrement} 
+                                                        format-style="decimal"
+                                                        minimum-integer-digits="1"
+                                                        minimum-fraction-digits="0"
+                                                        maximum-fraction-digits="0">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.totalCost.label}</p>
+                            <lightning-formatted-number label={labels.totalCost.label} 
+                                                        value={totalCost} 
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>
-                        </lightning-layout-item>
-                    </template>
-                    <template lwc:if={showGrossProfit}>
-                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
-                            <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
-                            <lightning-formatted-number label={labels.grossProfit.label} 
-                                                        value={thisProductGP} 
+                        </lightning-layout-item>                        
+                    </lightning-layout>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.gpDoNothing.label}</p>
+                            <lightning-formatted-number label={labels.gpDoNothing.label} 
+                                                        value={currentVolumeGPper9LCase} 
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.gpEffectiveness.label}</p>
+                            <lightning-formatted-number label={labels.gpEffectiveness.label} 
+                                                        value={planGPper9LCase} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.gpNetOfTotalCost.label}</p>
+                            <lightning-formatted-number label={labels.gpNetOfTotalCost.label} 
+                                                        value={gpNetOfTotalCost} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                    </lightning-layout>
+                </lightning-layout-item>
+            </template>  
+            <template lwc:else>
+                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4">
+                            <!-- Total Investment -->      
+                            <div lwc:if={isUKMarket}>
+                                <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
+                                <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>    
+                            </div>     
+                            <!-- Liability -->     
+                            <div lwc:if={isMexico}>
+                                <p class="slds-text-heading_small">{labels.liability.label}</p>
+                                <lightning-formatted-number label={labels.liability.label} value={rebateLiability} format-style="currency"
+                                    currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </div>
+                            <div lwc:if={isJapan}>
+                                <p class="slds-text-heading_small">{labels.roi.label}</p>
+                                <lightning-formatted-number value={planROI} maximum-fraction-digits="2"></lightning-formatted-number>
+                            </div>
                         </lightning-layout-item>
-                    </template>                    
-                </lightning-layout>
-            </lightning-layout-item>
+                        <template lwc:if={isJapan}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: center;">
+                                <p class="slds-text-heading_small">{labels.breakEven.label}</p>
+                                <lightning-formatted-number value={breakEven} maximum-fraction-digits="1" format-style="percent"></lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={calcSplit}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
+                                <p class="slds-text-heading_small">{labels.split.label}</p>
+                                <lightning-formatted-number label={labels.split.label} value={productSplit}
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={showGrossProfit}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
+                                <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
+                                <lightning-formatted-number label={labels.grossProfit.label} 
+                                                            value={thisProductGP} 
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>   
+                    </lightning-layout>
+                </lightning-layout-item>
+            </template>               
+
             <template lwc:if={captureFreeGoods}>
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-input type="number" name="i_FreeGoods"
@@ -154,11 +219,16 @@
                         </lightning-input>
                     </template>                    
                 </lightning-layout-item>
+                <template lwc:if={isKorea}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-input type="number" name="f_current_volume_9L" label={labels.currentVolume9L.label} value={currentVolume9LCase} disabled="true"></lightning-input>
+                    </lightning-layout-item>
+                </template>
             </template>
             <lightning-layout-item size="12" padding="around-small">
                 <!-- Volume Forecast -->
                 <template lwc:if={captureVolumeInBottles}>                    
-                    <lightning-input type="number" name="i_VolumeForecast" label={labels.volumeForecastBtl.label} value={volumeForecast}
+                    <lightning-input type="number" name="i_VolumeForecast" label={volumeForecastBtlLabel} value={volumeForecast}
                         step="1" readonly={isDisabled} onchange={handleVolumeForecastChange}>
                     </lightning-input>
                     <template lwc:if={hasVolumeForecastError}>
@@ -174,6 +244,12 @@
                     </template>
                 </template>
             </lightning-layout-item>
+            <template lwc:if={isKorea}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="number" name="f_volume_effectiveness_9L" label={labels.effectiveness.label} value={effectiveness9L}
+                            disabled="true"></lightning-input>
+                </lightning-layout-item>                        
+            </template>
             <template lwc:if={captureRebate}>
                 <lightning-layout-item size="12" padding="around-small">
                     <!-- Discounts per Case -->
@@ -206,6 +282,18 @@
                     <template lwc:if={hasDiscountError}>
                         <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
                     </template>
+                </lightning-layout-item>
+            </template>
+            <template lwc:if={captureFee}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Listing Fee -->
+                    <lightning-input type="number" name="i_Fee" 
+                                    label={feeLabel}
+                                    value={fee}
+                                    readonly={isDisabled}
+                                    onchange={handleFeeChange}
+                                    formatter="currency">
+                    </lightning-input>
                 </lightning-layout-item>
             </template>
             <template lwc:if={captureListingFee}>

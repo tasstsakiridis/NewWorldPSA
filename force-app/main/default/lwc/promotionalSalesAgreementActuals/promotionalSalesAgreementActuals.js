@@ -9,6 +9,7 @@ import { refreshApex } from '@salesforce/apex';
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getGLMappings from '@salesforce/apex/PromotionalSalesAgreement_Controller.getGLMappings';
 import submitForApproval from '@salesforce/apex/PromotionalSalesAgreement_Controller.submitActualsForApproval';
+import getWholesalers from '@salesforce/apex/PromotionalSalesAgreement_Controller.getWholesalers';
 
 import userLocale from '@salesforce/i18n/locale';
 
@@ -101,8 +102,13 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
             this.showExpandedActualsOnLoad = this.thePSA.Market__r.Show_Expanded_Actuals_on_Load__c;
 
             console.log('[psaactuals.wholesalerOptions] wholesalerOptions', this.wholesalerOptions);
+
             this.getGLMappingsForPSA();
             this.buildTree();
+
+            if (this.thePSA.Market__r.Name == 'Mexico' || (this.thePSA.Market__r.Name == 'Korea')) {
+                this.getWholesalersForMarket();
+            }
         }
     }
 
@@ -145,6 +151,20 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         }).catch(error => {
             this.error = error;
             this.glMappings = undefined;
+        });
+    }
+
+    wholesalers;
+    getWholesalersForMarket() {
+        getWholesalers({
+            market: this.thePSA.Market__c
+        }).then(result => {
+            this.wholesalers = result;
+            this.error = undefined;
+            console.log('[getWholesalers] wholesalers', result);
+        }).catch(error => {
+            this.error = error;
+            this.wholesalers = undefined;
         });
     }
 

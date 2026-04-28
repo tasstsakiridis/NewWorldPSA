@@ -22,15 +22,21 @@
                             <div class="section">                                
                                 <h4 class="slds-text-title_caps">{labels.details.label}</h4>
                                 <table class="slds-m-left_x-small slds-m-top_small">
+                                    <template lwc:if={showCustomerName}>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.customer.label}</h4></td>
+                                            <td class="col2">{customerName}</td>
+                                        </tr>
+                                    </template>
                                     <tr>
                                         <td class="col1"><h4>{labels.start.label}</h4></td>
-                                        <td class="col2"><!--<lightning-formatted-date-time value={startDate} year="numeric" day="2-digit" month="long" weekday="long" time-zone={timeZone}></lightning-formatted-date-time>-->
+                                        <td class="col2">
                                             {formattedStartDate}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="col1"><h4>{labels.end.label}</h4></td>
-                                        <td class="col2"><!--<lightning-formatted-date-time value={endDate} year="numeric" day="2-digit" month="long" weekday="long"></lightning-formatted-date-time>-->
+                                        <td class="col2">
                                             {formattedEndDate}
                                         </td>
                                     </tr>
@@ -105,10 +111,20 @@
                                             </td>
                                         </tr>
                                     </template>
+                                    <template lwc:if={showBreakEven}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.breakEven.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={breakEven} maximum-fraction-digits="2" format-style="decimal"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </table>
                             </div>                          
                         </lightning-layout-item>
-                        <template if:true={showFreeGoods}>
+                        <template lwc:if={showFreeGoods}>
                             <lightning-layout-item padding="around-small">
                                 <div class="section">
                                     <h4 class="slds-text-title_caps">{labels.freeGoods.label}</h4>
@@ -133,20 +149,38 @@
                         <lightning-layout-item padding="around-small">
                             <div class="section">
                                 <h4 class="slds-text-title_caps">{labels.volume.label}</h4>
-                                <table class="slds-m-left_x-small slds-m-top_small">
-                                    <tr>
-                                        <td class="col1"><h4>{labels.planned.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-number value={totalVolume} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col1"><h4 style="text-transform:capitalize;">{labels.actual.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-number value={totalActualVolume} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col1"><h4>{labels.balance.label}</h4></td>
-                                        <td class="col2"><lightning-formatted-number value={volumeBalance} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
-                                    </tr>
-                                </table>
+                                <template lwc:if={isJapan}>
+                                    <table class="slds-m-left_x-small slds-m-top_small">
+                                        <tr>
+                                            <td class="col1"><h4>{labels.totalDNVol.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalDNVolume} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.totalDOVol.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalVolume} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.incrementalVolume.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalIncrementalVolume} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
+                                        </tr>
+                                    </table>
+                                </template>
+                                <template lwc:else>
+                                    <table class="slds-m-left_x-small slds-m-top_small">
+                                        <tr>
+                                            <td class="col1"><h4>{labels.planned.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalVolume} type="number" maximum-fraction-digits="2" ></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4 style="text-transform:capitalize;">{labels.actual.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={totalActualVolume} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={volumeBalance} type="number" maximum-fraction-digits="2"></lightning-formatted-number></td>
+                                        </tr>
+                                    </table>
+                                </template>
                             </div>
                         </lightning-layout-item>
                         <template if:true={showPayments}>
@@ -165,6 +199,27 @@
                                         <tr>
                                             <td class="col1"><h4>{labels.balance.label}</h4></td>
                                             <td class="col2"><lightning-formatted-number value={paymentsBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                        <template if:true={showFee}>
+                            <lightning-layout-item padding="around-small">
+                                <div class="section">
+                                    <h4 class="slds-text-title_caps">{labels.fee.label}</h4>
+                                    <table class="slds-m-left_x-small slds-m-top_small">
+                                        <tr>
+                                            <td class="col1"><h4>{labels.total.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={fee} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.paid.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={feePaid} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1"><h4>{labels.balance.label}</h4></td>
+                                            <td class="col2"><lightning-formatted-number value={feeBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
                                         </tr>
                                     </table>
                                 </div>

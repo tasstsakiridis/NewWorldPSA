@@ -1,0 +1,25 @@
+<template>
+    <lightning-modal-header label={header}></lightning-modal-header>
+    <lightning-modal-body>
+        <div class="slds-m-around__small">
+            <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} value={wholesalerSearchString} is-loading={isSearching} onchange={handleSearchWholesalerChange}></lightning-input>
+            <div class="slds-float_right slds-m-top_x-small">
+                <lightning-button label={labels.search.label} icon-name="utility:search" title="Search for Wholesaler" alternative-text="Search for Wholesaler" class="slds-m-left_small" disabled={isSearching} onclick={handleWholesalerSearchButtonClick}></lightning-button>
+            </div>
+        </div>
+        <template lwc:if={error}>
+            <lightning-formatted-text value={error}></lightning-formatted-text>
+        </template>
+        <template lwc:else>
+            <template for:each={options} for:item="option">
+                <div class="slds-p-around_small lgc-bg" key={option.Id}>
+                    <lightning-tile label={option.Name} href={option.Id}>
+                        <lightning-button variant="base" data-record-id={option.Id} onclick={handleItemSelected}>
+                            {option.Name}
+                        </lightning-button>
+                    </lightning-tile>
+                </div>
+            </template>
+        </template>
+    </lightning-modal-body>
+</template>

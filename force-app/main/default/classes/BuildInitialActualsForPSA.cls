@@ -10,9 +10,10 @@ public with sharing class BuildInitialActualsForPSA {
 
         List<Promotion_Activity__c> activities = [SELECT Id, Begin_Date__c, End_Date__c, Market__c, Market__r.Name, Market__r.Spread_Planned_Values__c, Market__r.Capture_End_Date__c,
                                                         RecordTypeId, RecordType.Name, Wholesaler_Preferred__c, Has_Actual_Totals__c, Length_of_Agreement__c, Is_Length_in_Years__c,
-                                                        Market__r.Allow_Updates_After_Approval__c,
-                                                    (SELECT Id, Activity__c, RecordTypeId, RecordType.Name, Promotion__c, Product_Custom__c, Plan_Volume__c, Plan_Rebate__c, Listing_Fee__c, Promotional_Activity_Value__c,
-                                                            Training_and_Advocacy_Value__c, Proposed_Plan_Volume__c, Proposed_Plan_Rebate__c, Proposed_Listing_Fee__c, Proposed_Promotional_Activity_Value__c, Proposed_Training_Advocacy_Value__c
+                                                        Market__r.Allow_Updates_After_Approval__c, Market__r.Capture_Volume_in_Bottles__c, Planned_Fee__c, Market__r.Capture_Agreement_Level_Plan_Details__c,
+                                                    (SELECT Id, Activity__c, RecordTypeId, RecordType.Name, Promotion__c, Product_Custom__c, Plan_Volume__c, Plan_Volume_Bottles__c, Plan_Rebate__c, Listing_Fee__c, Promotional_Activity_Value__c,
+                                                            Training_and_Advocacy_Value__c, Proposed_Plan_Volume__c, Proposed_Plan_Rebate__c, Proposed_Listing_Fee__c, Proposed_Promotional_Activity_Value__c, Proposed_Training_Advocacy_Value__c,
+                                                            Fee__c, Proposed_Fee__c
                                                         FROM Promotion_Material_Items__r)
                                                     FROM Promotion_Activity__c 
                                                     WHERE Id =:activityIds];
@@ -71,6 +72,9 @@ public with sharing class BuildInitialActualsForPSA {
                             }
                             if (pmi.Proposed_Plan_Rebate__c != null && pmi.Plan_Rebate__c != pmi.Proposed_Plan_Rebate__c) {
                                 pmi.Plan_Rebate__c = pmi.Proposed_Plan_Rebate__c;
+                            }
+                            if (pmi.Proposed_Fee__c != null && pmi.Fee__c != pmi.Proposed_Fee__c) {
+                                pmi.Fee__c = pmi.Proposed_Fee__c;
                             }
                             if (pmi.Proposed_Listing_Fee__c != null && pmi.Listing_Fee__c != pmi.Proposed_Listing_Fee__c) {
                                 pmi.Listing_Fee__c = pmi.Proposed_Listing_Fee__c;
@@ -190,6 +194,14 @@ public with sharing class BuildInitialActualsForPSA {
                                         actualsToCreate.add(newActual);
                                     }
                                 }
+                                if (pmi.Fee__c > 0) {
+                                    newActual = createPMIActual(pa, pmi, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    if (existingExternalKeys.contains(newActual.External_Key__c)) {
+                                        actualsToUpdate.add(newActual);
+                                    } else {
+                                        actualsToCreate.add(newActual);
+                                    }
+                                }
                                 if (pmi.Listing_Fee__c > 0) {
                                     newActual = createPMIActual(pa, pmi, 'Listing Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
@@ -251,6 +263,9 @@ public with sharing class BuildInitialActualsForPSA {
         if (calcSpread) {
             if (rebateType == 'Volume') {
                 pmia.Forecast_Volume__c = pmi.Plan_Volume__c / numberOfMonths;
+                if (theActivity.Market__r.Capture_Volume_in_Bottles__c) {
+                    pmia.Forecast_Volume__c = pmi.Plan_Volume_Bottles__c / numberOfMonths;
+                }
             }
             if (rebateType == 'Listing Fee') {
                 pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
@@ -258,6 +273,11 @@ public with sharing class BuildInitialActualsForPSA {
             if (rebateType == 'Promotional Activity') {
                 pmia.Forecast_Promotional_Activity__c = pmi.Promotional_Activity_Value__c / numberOfMonths;
             }
+
+            if (theActivity.Market__r.Capture_Agreement_Level_Plan_Details__c) {
+                pmia.Forecast_Fee__c = theActivity.Planned_Fee__c / numberOfMonths;
+            }
+
             pmia.Payment_Date__c = theActivity.Begin_Date__c.addMonths(period);
         }
 

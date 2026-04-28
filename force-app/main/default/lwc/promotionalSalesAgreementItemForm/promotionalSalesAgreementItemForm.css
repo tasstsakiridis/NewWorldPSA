@@ -21,7 +21,12 @@ img.product {
 .label {
     font-size: 0.75rem;
 }
-
+.font-size_small {
+    font-size: 10pt;
+}
+.align_right {
+    text-align: right;
+}
 select {
     width: 100%;
     border-radius: 5px;

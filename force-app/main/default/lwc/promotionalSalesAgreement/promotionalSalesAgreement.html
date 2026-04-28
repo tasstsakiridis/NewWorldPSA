@@ -16,6 +16,14 @@
                                         <span>&nbsp;</span>
                                         <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                       
                                     </h1>
+                                    <template lwc:if={sapAgreementNumber}>                                        
+                                        <h3>                                            
+                                            <span class="slds-text-title_caps slds-text-title_bold slds-truncate" title={sapAgreementNumber}>CCM #: {sapAgreementNumber}</span>
+                                            <template lwc:if={boomiProcessed}>
+                                                <span class="slds-text-title_caps slds-text-color_success slds-m-left_medium">[{labels.sentToCCM.label}]</span>
+                                            </template>
+                                        </h3>                                        
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +234,14 @@
                                     <p>{personInCharge.channel}</p>                                    
                                 </lightning-layout-item>
                                 <lightning-layout-item size="12" padding="around-small">
-                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.group.label}</h3>
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">
+                                        <template lwc:if={isKorea}>
+                                            {labels.storeType.label}
+                                        </template>
+                                        <template lwc:else>
+                                            {labels.group.label}
+                                        </template>
+                                    </h3>
                                     <p>{personInCharge.group}</p>                                    
                                 </lightning-layout-item>
                                 <lightning-layout-item size="12" padding="around-small">
@@ -272,9 +287,25 @@
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} class="slds-m-horizontal_small" disabled={isLocked} required={isBudgetRequired} onchange={handleTotalBudgetChange}></lightning-input>
                                 </lightning-layout-item>
-                                <template if:true={hasBudgetError}>
-                                    <span class="slds-m-horizontal_small input-error">{labels.required.label}</span>
-                                </template>            
+                                <template lwc:if={hasBudgetError}>
+                                    <span class="slds-m-horizontal_small input-error">{budgetErrorMessage}</span>
+                                </template>    
+                                <template lwc:if={captureAgreementLevelDetails}>
+                                    <lightning-layout-item size="12" padding="around-small">
+                                        <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
+                                    </lightning-layout-item>
+                                    <template lwc:if={hasFeeError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
+                                    </template>    
+                                </template>
+                                <template lwc:if={isKorea}>
+                                    <lightning-layout-item size="12" padding="around-small">
+                                        <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
+                                    </lightning-layout-item>   
+                                    <lightning-layout-item size="12" padding="around-small">
+                                        <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
+                                    </lightning-layout-item>   
+                                </template>     
                             </template>
                             <template lwc:if={captureProbability}>
                                 <lightning-layout-item size="12" padding="around-small">
@@ -320,7 +351,8 @@
                                         <ul class="slds-m-around_small">
                                             <li>
                                                 <div style="display: inline-block; margin-right: 20px;"><h4>{labels.paymentConfigurations.label}</h4></div>
-                                                <div style="display: inline-block;"><h4>%</h4></div>
+                                                <div style="display: inline-block;"><h4>% or $</h4></div>
+                                                <div style="display: inline-block; float: right; margin-left: 20px; margin-right: 20px;"><h4>{labels.comments.label}</h4></div>
                                             </li>
                                             <template for:each={paymentConfigs} for:item="paymentConfig">                                                
                                                 <li key={paymentConfig.payment_number}>
@@ -329,7 +361,13 @@
                                                         <div style="display: inline-block;"><lightning-input type="number" data-paymentnumber={paymentConfig.payment_number} 
                                                                         value={paymentConfig.percent_achieved}
                                                                         readonly={isLocked} 
-                                                                        onchange={handlePaymentConfigChange}></lightning-input></div>
+                                                                        onchange={handlePaymentConfigChange}></lightning-input>
+                                                        </div>
+                                                        <div style="display: inline-block; margin-left: 20px;"><lightning-input type="text" data-paymentnumber={paymentConfig.payment_number} 
+                                                                        value={paymentConfig.comments}
+                                                                        readonly={isLocked} 
+                                                                        onchange={handlePaymentConfigCommentChange}></lightning-input>
+                                                        </div>
                                                     </div>
                                                 </li>
                                             </template>
@@ -501,6 +539,7 @@
                                     <template for:each={accounts.records} for:item="account">
                                         <c-account-tile key={account.item.Id} 
                                                         account={account}
+                                                        showaddress="true"
                                                         onselected={handleAccountSelected}
                                                         ondeselected={handleAccountDeSelected}
                                                         class="slds-m-around_x-small"></c-account-tile>

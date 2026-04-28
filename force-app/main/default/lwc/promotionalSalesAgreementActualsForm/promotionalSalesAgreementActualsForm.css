@@ -1,3 +1,10 @@
 .error {
     color: red;
 }
+.bold {
+    font-weight: bold;
+}
+.lookup-items {
+    height: 300px;
+    overflow-y: scroll;
+}

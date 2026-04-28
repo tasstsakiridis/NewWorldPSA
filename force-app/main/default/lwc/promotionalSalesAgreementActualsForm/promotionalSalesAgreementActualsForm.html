@@ -126,12 +126,12 @@
                 <template lwc:if={canEdit}>
                     <template lwc:if={isNew}>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                            <p>{labels.status.label}</p>
-                            <span>{approvalStatus}</span>
+                            <p class="slds-text-title_caps">{labels.status.label}</p>
+                            <span class="slds-text-heading_medium">{approvalStatus}</span>
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <lightning-input type="date" 
-                                            label={labels.paymentDate.label} 
+                                            label={paymentDateLabel} 
                                             name="i_PaymentDate" 
                                             value={formattedPaymentDate} 
                                             placeholder={labels.paymentDate.placeholder} 
@@ -217,12 +217,17 @@
                             </lightning-layout-item>
                         </template> 
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                            <lightning-combobox name="i_Wholesaler"
-                                label={labels.purchasedFrom.label}
-                                value={wholesaler}
-                                options={wholesalerOptions}
-                                onchange={handleWholesalerChange}>
-                            </lightning-combobox>
+                            <template lwc:if={isKorea}>
+                                <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} is-loading={isSearching} readonly={isLocked} onchange={handleSearchWholesalerChange}></lightning-input>
+                            </template>
+                            <template lwc:else>
+                                <lightning-combobox name="i_Wholesaler"
+                                    label={labels.purchasedFrom.label}
+                                    value={wholesaler}
+                                    options={wholesalerOptions}
+                                    onchange={handleWholesalerChange}>
+                                </lightning-combobox>
+                            </template>
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <lightning-textarea name="i_Comments"
@@ -246,13 +251,13 @@
                                 </lightning-combobox>
                             </template>
                             <template lwc:else>
-                                <p>{labels.status.label}</p>
-                                <span>{approvalStatus}</span>
+                                <p class="slds-text-title_caps">{labels.status.label}</p>
+                                <span class="slds-text-heading_medium">{approvalStatus}</span>
                             </template>    
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <lightning-input type="date" 
-                                            label={labels.paymentDate.label} 
+                                            label={paymentDateLabel} 
                                             name="i_PaymentDate" 
                                             value={formattedPaymentDate} 
                                             placeholder={labels.paymentDate.placeholder} 
@@ -304,12 +309,42 @@
 
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                             <template lwc:if={isVolumeRebate}>
-                                <lightning-combobox name="i_Wholesaler"
-                                    label={labels.purchasedFrom.label}
-                                    value={wholesaler}
-                                    options={wholesalerOptions}
-                                    onchange={handleWholesalerChange}>
-                                </lightning-combobox>
+                                <template lwc:if={isKorea}>
+                                    <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} 
+                                            value={wholesalerSearchString} 
+                                            is-loading={isSearching} 
+                                            readonly={isLocked} 
+                                            onchange={handleSearchWholesalerChange}
+                                            onfocus={focusWholesalerOptions}></lightning-input>
+
+                                    <template lwc:if={showWholesalerOptions}>
+                                        <template lwc:if={wholesalerOptions}>                                                                                
+                                            <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid slds-m-around_small" role="listbox">
+                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                    <template for:each={wholesalerOptions} for:item="w">
+                                                        <li key={w.Id} data-wholesaler-id={w.Id} role="presentation" class="slds-listbox__item slds-m-horizontal_small" onclick={handleWholesalerSelected}>
+                                                            <div class="slds-media slds-listbox__option slds-listbox__options_plain slds-media_small" role="option">
+                                                                <span class="slds-media__body">
+                                                                    <span class="slds-truncate" title={w.Name} data-wholesaler-id={w.Id}>
+                                                                        {w.Name}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    </template>    
+                                                </ul>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-combobox name="i_Wholesaler"
+                                        label={labels.purchasedFrom.label}
+                                        value={wholesaler}
+                                        options={wholesalerOptions}
+                                        onchange={handleWholesalerChange}>
+                                    </lightning-combobox>
+                                </template>
                             </template>
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
