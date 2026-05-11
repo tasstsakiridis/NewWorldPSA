@@ -58,13 +58,29 @@ public with sharing class BuildInitialActualsForPSA {
             Boolean keyExists = false;
             String pmiaRecordType = '';
             PMI_Actual__c newActual;
+            String promotionId = '';
+            Integer numberOfMonths = 0;
             List<Promotion_Material_Item__c> itemsToUpdate = new List<Promotion_Material_Item__c>();
 
             Schema.DescribeFieldResult dfrRebateTypes = PMI_Actual__c.Rebate_Type__c.getDescribe();
             List<Schema.PicklistEntry> rebateTypes = dfrRebateTypes.getPicklistValues();
         
             for(Promotion_Activity__c pa : activities) {
+                if (pa.Market__r.Capture_End_Date__c) {
+                    Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
+                    numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
+                } else {
+                    numberOfMonths = pa.Length_of_Agreement__c.intValue();
+                    if (pa.Is_Length_in_Years__c) {
+                        numberOfMonths = pa.Length_of_Agreement__c.intValue() * 12;
+                    }
+                }
+                System.debug('[BuildInitialActuals] startDate: ' + pa.Begin_Date__c);
+                System.debug('[BuildInitialActuals] endDate: ' + pa.End_Date__c);
+                System.debug('[BuildInitialActuals] # of months: ' + numberOfMonths);
+
                 if (pa.Promotion_Material_Items__r != null && pa.Promotion_Material_Items__r.size() > 0) {
+                    promotionId = pa.Promotion_Material_Items__r[0].Promotion__c;
                     for(Promotion_Material_Item__c pmi : pa.Promotion_Material_Items__r) {
                         if (pa.Market__r.Allow_Updates_After_Approval__c) {
                             if (pmi.Proposed_Plan_Volume__c != null && pmi.Plan_Volume__c != pmi.Proposed_Plan_Volume__c) {
@@ -97,7 +113,7 @@ public with sharing class BuildInitialActualsForPSA {
                         for(Schema.PicklistEntry pe : rebateTypes) {
                             if (pe.isActive()) {
                                 //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
-                                newActual = createPMIActual(pa, pmi, pe.getValue(), pmiaRecordType, configs, true, false, 0, 0);
+                                newActual = createPMIActual(pa, promotionId, pmi, pe.getValue(), pmiaRecordType, configs, true, false, 0, 0);
                                 keyExists = existingExternalKeys.contains(newActual.External_Key__c);
                                 System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
                                 if (keyExists) {
@@ -108,86 +124,15 @@ public with sharing class BuildInitialActualsForPSA {
                                 }   
                             }
                         }
-                        
-                        /*
-                        addedActuals = false;
-                        //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
-                        newActual = createPMIActual(pa, pmi, 'Volume', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }    
 
-                        newActual = createPMIActual(pa, pmi, 'Free Goods', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-                        //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Listing Fee-0';
-                        newActual = createPMIActual(pa, pmi, 'Listing Fee', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-                        //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Promotional Activity-0';
-                        newActual = createPMIActual(pa, pmi, 'Promotional Activity', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-                        //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Training & Advocacy-0';
-                        newActual = createPMIActual(pa, pmi, 'Training & Advocacy', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-
-                        newActual = createPMIActual(pa, pmi, 'Branding Support', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);   
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-            
-                        newActual = createPMIActual(pa, pmi, 'Payment', pmiaRecordType, configs, true, false, 0, 0);
-                        keyExists = existingExternalKeys.contains(newActual.External_Key__c);
-                        if (!keyExists) {
-                            actuals.add(newActual);
-                            addedActuals = true;
-                        }
-                        */
                         if (addedActuals) {
                             s_PSAWithActuals.add(pmi.Activity__c);
                         }
 
                         if (pa.Market__r.Spread_Planned_Values__c) {
-                            Integer numberOfMonths = 0;
-                            if (pa.Market__r.Capture_End_Date__c) {
-                                Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
-                                numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
-                            } else {
-                                numberOfMonths = pa.Length_of_Agreement__c.intValue();
-                                if (pa.Is_Length_in_Years__c) {
-                                    numberOfMonths = pa.Length_of_Agreement__c.intValue() * 12;
-                                }
-                            }
-                            System.debug('[BuildInitialActuals] startDate: ' + pa.Begin_Date__c);
-                            System.debug('[BuildInitialActuals] endDate: ' + pa.End_Date__c);
-                            System.debug('[BuildInitialActuals] # of months: ' + numberOfMonths);
                             for(Integer mm = 0; mm < numberOfMonths; mm++) {
                                 if (pmi.Plan_Volume__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Volume', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, promotionId, pmi, 'Volume', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -195,7 +140,7 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                                 if (pmi.Fee__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, promotionId, pmi, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -203,7 +148,7 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                                 if (pmi.Listing_Fee__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Listing Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, promotionId, pmi, 'Listing Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -211,7 +156,7 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                                 if (pmi.Promotional_Activity_Value__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Promotional Activity', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, promotionId, pmi, 'Promotional Activity', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -222,8 +167,20 @@ public with sharing class BuildInitialActualsForPSA {
                         }
                     }
                 }
+
                 
+                if (pa.Market__r.Name == 'Korea' && pa.Market__r.Spread_Planned_Values__c) {
+                    for(Integer mm = 0; mm < numberOfMonths; mm++) {
+                        newActual = createPMIActual(pa, promotionId, null, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                        if (existingExternalKeys.contains(newActual.External_Key__c)) {
+                            actualsToUpdate.add(newActual);
+                        } else {
+                            actualsToCreate.add(newActual);
+                        }
+                    }
+                }
                 pa.Has_Actual_Totals__c = true;
+
             }
 
             if (actualsToCreate.size() > 0) {
@@ -244,21 +201,26 @@ public with sharing class BuildInitialActualsForPSA {
         }
     }
 
-    static PMI_Actual__c createPMIActual(Promotion_Activity__c theActivity, Promotion_Material_Item__c pmi, String rebateType, String recordTypeId, List<SAP_Interfaced_Data_Configuration__c> configs, Boolean isTotal, Boolean calcSpread, Integer numberOfMonths, Integer period) {
+    static PMI_Actual__c createPMIActual(Promotion_Activity__c theActivity, String promotionId, Promotion_Material_Item__c pmi, String rebateType, String recordTypeId, List<SAP_Interfaced_Data_Configuration__c> configs, Boolean isTotal, Boolean calcSpread, Integer numberOfMonths, Integer period) {
+
         PMI_Actual__c pmia = new PMI_Actual__c();
         pmia.RecordTypeId = recordTypeId;
         pmia.Activity__c = theActivity.Id;
-        pmia.Promotion__c = pmi.Promotion__c;
-        pmia.Promotion_Material_Item__c = pmi.Id;
+        pmia.Promotion__c = pmi == null ? promotionId : pmi.Promotion__c;
+        pmia.Promotion_Material_Item__c = pmi == null ? null : pmi.Id;
         pmia.Actual_Wholesaler__c = theActivity.Wholesaler_Preferred__c;
         pmia.Has_Totals__c = isTotal;
         pmia.Period__c = period;
         pmia.Approval_Status__c = isTotal ? 'Rebate Complete' : 'New';
-        pmia.External_Key__c = pmi.Promotion__c + '_' + pmi.Id + '_'+rebateType+(isTotal ? '_total' : '')+'-'+period;
         pmia.Rebate_Type__c = rebateType;
         pmia.Rebate_Amount__c = 0;
         pmia.Act_Qty__c = 0;
         pmia.Payment_Date__c = Date.today();
+        if (pmi == null) {
+            pmia.External_Key__c = promotionId + '_header_' + rebateType + (isTotal ? '_total' : '') + '-' + period; 
+        } else {
+            pmia.External_Key__c = pmi.Promotion__c + '_' + pmi.Id + '_' + rebateType + (isTotal ? '_total' : '') + '-' + period;
+        }
 
         if (calcSpread) {
             if (rebateType == 'Volume') {

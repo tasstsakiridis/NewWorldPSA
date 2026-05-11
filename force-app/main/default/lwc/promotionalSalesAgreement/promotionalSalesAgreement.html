@@ -290,23 +290,23 @@
                                 <template lwc:if={hasBudgetError}>
                                     <span class="slds-m-horizontal_small input-error">{budgetErrorMessage}</span>
                                 </template>    
-                                <template lwc:if={captureAgreementLevelDetails}>
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
-                                    </lightning-layout-item>
-                                    <template lwc:if={hasFeeError}>
-                                        <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
-                                    </template>    
-                                </template>
-                                <template lwc:if={isKorea}>
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
-                                    </lightning-layout-item>   
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
-                                    </lightning-layout-item>   
-                                </template>     
                             </template>
+                            <template lwc:if={captureAgreementLevelDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
+                                </lightning-layout-item>
+                                <template lwc:if={hasFeeError}>
+                                    <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
+                                </template>    
+                            </template>
+                            <template lwc:if={isKorea}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                            </template>     
                             <template lwc:if={captureProbability}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="probabilityPercentage" label={labels.probabilityPercentage.label} step="1"

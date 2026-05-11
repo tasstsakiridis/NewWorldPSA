@@ -226,6 +226,9 @@ public with sharing class PSAWrapper {
     public Decimal accountPromotionalBudget { get; set; }
 
     @AuraEnabled 
+    public Decimal accountPromotionalTargetROI { get; set; }
+
+    @AuraEnabled 
     public Decimal percentageVisibility { get; set; }
 
     @AuraEnabled 
@@ -300,6 +303,7 @@ public with sharing class PSAWrapper {
         this.totalBudget = 0;
         this.fee = 0;
         this.accountPromotionalBudget = 0;
+        this.accountPromotionalTargetROI = 0;
         this.percentageVisibility = 0;
         this.probabilityPercentage = 0;
         this.isDirectRebate = true;
@@ -351,6 +355,7 @@ public with sharing class PSAWrapper {
         this.totalBudget = psa.Activity_Budget__c;
         this.fee = psa.Planned_Fee__c;
         this.accountPromotionalBudget = psa.Account_Promotional_Budget__c;
+        this.accountPromotionalTargetROI = psa.Account_Promotional_Target_ROI__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
         this.probabilityPercentage = psa.Probability__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;

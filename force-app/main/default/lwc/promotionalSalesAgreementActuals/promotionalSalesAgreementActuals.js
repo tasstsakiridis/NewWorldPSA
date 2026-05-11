@@ -15,8 +15,9 @@ import userLocale from '@salesforce/i18n/locale';
 
 import LABEL_APPROVAL_SUBMITTED from '@salesforce/label/c.Approval_Submitted';
 import LABEL_BACK from '@salesforce/label/c.Back';
-import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_CREATE_NEW from '@salesforce/label/c.CreateNew';
+import LABEL_HELP from '@salesforce/label/c.Help';
+import LABEL_FEE from '@salesforce/label/c.Fee';
 import LABEL_PSA_UPDATED_ACTUALS_MESSAGE from '@salesforce/label/c.PSA_Updated_Actuals_Message';
 import LABEL_SUBMIT_FOR_APPROVAL from '@salesforce/label/c.Submit_For_Approval';
 
@@ -125,7 +126,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         return this.thePSA == null ? false : this.thePSA.Is_Approved__c;
     }
     get canEdit() {
-        console.log('[canEdit] status, isapproved', this.psaStatus, this.isApproved);
+        console.log('[psaactuals.canEdit] status, isapproved', this.psaStatus, this.isApproved);
         return this.psaStatus != 'Updated' && this.psaStatus != 'Submit' && this.psaStatus != 'Pending Approval' && this.isApproved;
     }
 
@@ -133,19 +134,19 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         return this.thePSA != undefined && this.thePSA.PMI_Actual_Status__c != undefined && (this.thePSA.PMI_Actual_Status__c == 'Submit' || this.thePSA.PMI_Actual_Status__c == 'Pending');
     }
     get canSubmitForApproval() {
-        console.log('[actuals.canSubmitForApproval] canEdit, market, isLocked', this.canEdit, this.market, this.isLocked);
-        return this.canEdit && this.market == 'Mexico' && !this.isLocked;
+        console.log('[psaactuals.canSubmitForApproval] canEdit, market, isLocked', this.canEdit, this.market, this.isLocked);
+        return this.canEdit && (this.market == 'Mexico' || this.market == 'Korea') && !this.isLocked;
     }
 
     glMappings;
     getGLMappingsForPSA() {
-        console.log('[getGLMappings] marketId', this.marketId);
-        console.log('[getGLMappings] recordType', this.recordTypeName);
+        console.log('[psactuals.getGLMappings] marketId', this.marketId);
+        console.log('[psaactuals.getGLMappings] recordType', this.recordTypeName);
         getGLMappings({             
             marketId: this.marketId, 
             recordTypeName: this.recordTypeName 
         }).then(result => {
-            console.log('[getGLMappings] glMappsing', result);
+            console.log('[psaactuals.getGLMappings] glMappsing', result);
             this.glMappings = result;
             this.error = undefined;
         }).catch(error => {
@@ -161,7 +162,10 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
         }).then(result => {
             this.wholesalers = result;
             this.error = undefined;
-            console.log('[getWholesalers] wholesalers', result);
+            console.log('[psaactuals.getWholesalers] wholesalers', result);
+            if (this.thePSA.Market__r.Name == 'Mexico' || this.thePSA.Market__r.Name == 'Korea') {
+                this.wholesalerOptions = result;
+            }
         }).catch(error => {
             this.error = error;
             this.wholesalers = undefined;
@@ -267,6 +271,7 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
     handleOnSelect(event) {
         try {
             console.log('handle on select. name', event.detail.name);
+            console.log('[handle on select] psa', this.thePSA);
             this.isExpanded = true;
             this.treeItems.expanded = true;
             this.isMakingChanges = true;
@@ -358,7 +363,6 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                         items: []
                     };
 
-                    
                     if (this.actuals && this.actuals.length > 0) {
                         const actualsForPMI = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c === pmi.Id && pmia.Has_Totals__c == false);
                         console.log('[buildtree] actualforpmi', JSON.parse(JSON.stringify(actualsForPMI)));
@@ -425,7 +429,69 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     return pmiTree;
                 });
 
+                let headerTree = {
+                    label: LABEL_FEE,
+                    name: promotionWithParentAccount.Id,
+                    disabled: false,
+                    expanded: this.expandedItems.indexOf(promotionWithParentAccount.Id) >= 0 || this.showExpandedActualsOnLoad,
+                    items: []
+                };
+                const headerActuals = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c == null && pmia.Promotion__c == promotionWithParentAccount.Id);
+                console.log('[buildTree] headerActuals', headerActuals);
+                if (headerActuals) {
+                    headerActuals.forEach(actual => {
+                        const pd = new Date(actual.Payment_Date__c);
+                        let metatext = '';
+                        if (actual.Rebate_Type__c == 'Volume') {
+                            if (this.thePSA.Market__r.Capture_Volume_in_Bottles__c) {
+                                metatext += 'Actual Qty: ' + (actual.Act_Qty__c * actual.Product_Pack_Qty__c);
+                            } else {
+                                metatext += 'Actual Qty: ' + actual.Act_Qty__c;
+                            }
+                        } else {
+                            metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
+                        }
+                        let found = false;
+                        headerTree.items.forEach(item => {
+                            if (item.paymentDate == actual.Payment_Date__c) {
+                                found = true;
+                                item.items.push({
+                                    label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                    metatext: metatext,
+                                    name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
+                                    disabled: false,
+                                    expanded: this.showExpandedActualsOnLoad,
+                                    items: []    
+                                });
+                                return true;
+                            }
+                        });
+                        if (!found) {
+                            headerTree.items.push({
+                                paymentDate: actual.Payment_Date__c,
+                                label: pd.toLocaleDateString(userLocale, dateOptions),
+                                metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
+                                name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id,
+                                disabled: false,
+                                expanded: this.showExpandedActualsOnLoad,
+                                items: [
+                                    { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
+                                        metatext: metatext,
+                                        name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
+                                        disabled: false,
+                                        expanded: this.showExpandedActualsOnLoad,
+                                        items: []
+                                }]
+                            });
+                        }
+                    });
+                }                
                 accountTree.items = pmiItems;
+                if (headerActuals) {
+                    const createNewHeaderItem = { label:this.labels.createNew.label, name:'new_header', disabled:false, expanded:false, items:[] };
+                    headerTree.items.splice(0, 0, createNewHeaderItem);
+                    accountTree.items.splice(0, 0, headerTree);
+                }
             }
               
             this.treeItems = [accountTree];

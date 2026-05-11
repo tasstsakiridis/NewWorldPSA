@@ -72,8 +72,10 @@ import FIELD_PRODUCT_PRICE from '@salesforce/schema/Promotion_Material_Item__c.P
 import FIELD_PLAN_PSA_ROI from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_ROI__c';
 import FIELD_GROSS_PROFIT_PER_CASE_9L from '@salesforce/schema/Promotion_Material_Item__c.Gross_Profit_per_Case_9L__c';
 import FIELD_PLAN_PSA_GP_PER_CASE from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_GP_per_Case__c';
+import FIELD_PLAN_PSA_GP_NET_OF_TOTAL_COST from '@salesforce/schema/Promotion_Material_Item__c.Plan_PSA_GP_Net_of_Total_Cost__c';
 import FIELD_PRODUCT_GP_PER_BOTTLE from '@salesforce/schema/Promotion_Material_Item__c.Product_Gross_Profit_per_Bottle__c';
 import FIELD_PRODUCT_GP_PER_CASE_9L from '@salesforce/schema/Promotion_Material_Item__c.Product_Gross_Profit_per_Case_9L__c';
+import FIELD_TOTAL_PLAN_INVESTMENT from '@salesforce/schema/Promotion_Material_Item__c.Total_Plan_Investment__c';
 
 import getProductDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProductDetails';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
@@ -315,12 +317,15 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
 
             const accountChannel = this.psa.Account__r.Channel__c;
             const accountStoreType = this.psa.Account__r.Store_Type__c;
-            if (this.product != undefined && this.product.Product_Pricing__r != undefined && this.product.Product_Pricing__r.length > 0) {
+            if (this.product.Product_Pricing__r != undefined && this.product.Product_Pricing__r.length > 0) {
                 const pricing = this.product.Product_Pricing__r.find(p => p.Channel__c == accountChannel && (p.Store_Type__c == null || p.Store_Type__c == accountStoreType));
                 if (pricing != undefined) {
                     this.gpPerBottle = pricing.GP_per_Bottle__c;
                     this.gpPer9LCase = pricing.GP_per_Case_9L__c;
                 }
+            } else {
+                this.gpPerBottle = this.product.Gross_Profit_per_Bottle__c;
+                this.gpPer9LCase = this.product.Gross_Profit_per_Case__c;
             }
 
             this.finishedLoadingProduct = true;
@@ -1308,7 +1313,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_BRAND_VISIBILITY.fieldApiName] = this.brandVisibilityValues.join(';');
             fields[FIELD_PRODUCT_VISIBILITY.fieldApiName] = this.productVisibilityValues.join(';');
             fields[FIELD_COMMENTS.fieldApiName] = this.comments;
-            fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.thisProductGP;
             fields[FIELD_PLAN_REBATE_LIABILITY.fieldApiName] = this.rebateLiability;
             fields[FIELD_PLAN_REBATE_VOLUME.fieldApiName] = this.planRebateVolume;
             fields[FIELD_PSA_FREE_BOTTLE_COST.fieldApiName] = this.freeGoodCost;
@@ -1318,13 +1322,16 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             fields[FIELD_TOTAL_PLAN_INVESTMENT.fieldApiName] = this.totalInvestment;
             fields[FIELD_PRODUCT_GP_PER_BOTTLE.fieldApiName] = this.gpPerBottle;
             fields[FIELD_PRODUCT_GP_PER_CASE_9L.fieldApiName] = this.gpPer9LCase;
-
+            fields[FIELD_PLAN_PSA_GP_NET_OF_TOTAL_COST.fieldApiName] = this.gpNetOfTotalCost;
 
             if (this.isMexico) {
                 fields[FIELD_PRODUCT_PRICE.fieldApiName] = this.product.Wholesale_Price__c;
             }
             if (this.isKorea) {
                 fields[FIELD_PRODUCT_PRICE.fieldApiName] = this.product.Price__c == undefined ? 0 : this.product.Price__c;
+                fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.planGPper9LCase;
+            } else {
+                fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.thisProductGP;
             }
 
             let freeGoodsVolume = this.freeGoodQty;

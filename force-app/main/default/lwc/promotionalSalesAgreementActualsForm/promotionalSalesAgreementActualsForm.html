@@ -60,10 +60,12 @@
                     <p class="slds-text-title_caps">{labels.account.label}</p>
                     <span class="slds-text-heading_medium">{accountName}</span>
                 </lightning-layout-item>
-                <lightning-layout-item size="12" padding="around-small">
-                    <p class="slds-text-title_caps">{labels.product.label}</p>
-                    <span class="slds-text-heading_medium">{productName}</span>
-                </lightning-layout-item>
+                <template lwc:if={pmiId}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.product.label}</p>
+                        <span class="slds-text-heading_medium">{productName}</span>
+                    </lightning-layout-item>
+                </template>
                 <template if:false={canEdit}>
                     <lightning-layout-item size="12" padding="around-small">
                         <p class="slds-text-title_caps">{labels.processed.label}</p>
@@ -240,7 +242,7 @@
                         </lightning-layout-item>
 
                     </template>
-                    <template if:false={isNew}>
+                    <template lwc:else>
                         <lightning-layout-item size="12" padding="around-small">
                             <template lwc:if={isSOMUser}>
                                 <lightning-combobox name="i_ApprovalStatus"
@@ -299,6 +301,7 @@
 
                             </template>
                         </lightning-layout-item>
+
                         <template lwc:if={captureInvoice}>
                             <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                                 <lightning-input name="i_InvoiceNumber" label={labels.invoice.label} value={invoiceNumber}
@@ -308,43 +311,41 @@
                         </template>
 
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                            <template lwc:if={isVolumeRebate}>
-                                <template lwc:if={isKorea}>
-                                    <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} 
-                                            value={wholesalerSearchString} 
-                                            is-loading={isSearching} 
-                                            readonly={isLocked} 
-                                            onchange={handleSearchWholesalerChange}
-                                            onfocus={focusWholesalerOptions}></lightning-input>
+                            <template lwc:if={isKorea}>
+                                <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} 
+                                        value={wholesalerSearchString} 
+                                        is-loading={isSearching} 
+                                        readonly={isLocked} 
+                                        onchange={handleSearchWholesalerChange}
+                                        onfocus={focusWholesalerOptions}></lightning-input>
 
-                                    <template lwc:if={showWholesalerOptions}>
-                                        <template lwc:if={wholesalerOptions}>                                                                                
-                                            <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid slds-m-around_small" role="listbox">
-                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                    <template for:each={wholesalerOptions} for:item="w">
-                                                        <li key={w.Id} data-wholesaler-id={w.Id} role="presentation" class="slds-listbox__item slds-m-horizontal_small" onclick={handleWholesalerSelected}>
-                                                            <div class="slds-media slds-listbox__option slds-listbox__options_plain slds-media_small" role="option">
-                                                                <span class="slds-media__body">
-                                                                    <span class="slds-truncate" title={w.Name} data-wholesaler-id={w.Id}>
-                                                                        {w.Name}
-                                                                    </span>
+                                <template lwc:if={showWholesalerOptions}>
+                                    <template lwc:if={wholesalerOptions}>                                                                                
+                                        <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid slds-m-around_small" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                <template for:each={wholesalerOptions} for:item="w">
+                                                    <li key={w.Id} data-wholesaler-id={w.Id} role="presentation" class="slds-listbox__item slds-m-horizontal_small" onclick={handleWholesalerSelected}>
+                                                        <div class="slds-media slds-listbox__option slds-listbox__options_plain slds-media_small" role="option">
+                                                            <span class="slds-media__body">
+                                                                <span class="slds-truncate" title={w.Name} data-wholesaler-id={w.Id}>
+                                                                    {w.Name}
                                                                 </span>
-                                                            </div>
-                                                        </li>
-                                                    </template>    
-                                                </ul>
-                                            </div>
-                                        </template>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>    
+                                            </ul>
+                                        </div>
                                     </template>
                                 </template>
-                                <template lwc:else>
-                                    <lightning-combobox name="i_Wholesaler"
-                                        label={labels.purchasedFrom.label}
-                                        value={wholesaler}
-                                        options={wholesalerOptions}
-                                        onchange={handleWholesalerChange}>
-                                    </lightning-combobox>
-                                </template>
+                            </template>
+                            <template lwc:elseif={isVolumeRebate}>
+                                <lightning-combobox name="i_Wholesaler"
+                                    label={labels.purchasedFrom.label}
+                                    value={wholesaler}
+                                    options={wholesalerOptions}
+                                    onchange={handleWholesalerChange}>
+                                </lightning-combobox>
                             </template>
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
