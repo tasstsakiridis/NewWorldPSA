@@ -60,6 +60,16 @@
                                             </td>
                                         </tr>
                                     </template>
+                                    <template lwc:if={showPSABudget}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.budget.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={psaBudget} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
                                     <template lwc:if={showTotalInvestment}>
                                         <tr>
                                             <td class="col1">

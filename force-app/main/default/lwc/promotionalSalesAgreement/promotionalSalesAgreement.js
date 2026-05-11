@@ -352,6 +352,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     accountPromotionalBudget = 0;
     accountPromotionalBudgetRemaining = 0;
     accountPromotionalBudgetUsed = 0;
+    accountPromotionalTargetROI = 0;
     activityTypeActive = { label: this.labels.activityType.checked, value: this.labels.activityType.checked };
     activityTypeInactive = { label: this.labels.activityType.unchecked, value: this.labels.activityType.unchecked };    
     canAddNewAccountsToPSA = false;
@@ -1396,26 +1397,18 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
     }
     handleTotalBudgetChange(event) {
         this.totalBudget = event.detail.value;
-        if (this.isKorea) {
-            this.budgetError = false;
-            console.log('[handleBudgetChange] budget, promobudget', parseFloat(this.totalBudget), parseFloat(this.accountPromotionalBudgetRemaining));
-            if (parseFloat(this.totalBudget) > parseFloat(this.accountPromotionalBudgetRemaining)) {
-                console.log('[handleBudgetChange] budget greater than promotional budget');
-                this.hasBudgetError = true;
-                this.budgetErrorMessage = this.labels.accountPromotionalBudget.error.replace('%0', 'PSA');
-                this.showToast("error", this.labels.warning.label, this.budgetErrorMessage);
-            }
-        }
     }
     handleFeeChange(event) {
-        console.log('fee, budget', parseFloat(event.detail.value), parseFloat(this.totalBudget));
-        if (parseFloat(event.detail.value) > parseFloat(this.totalBudget)) {
+        console.log('fee, budget', parseFloat(event.detail.value), parseFloat(this.accountPromotionalBudgetRemaining));
+        if (parseFloat(event.detail.value) > parseFloat(this.accountPromotionalBudgetRemaining)) {
             console.log('[handleFeeChange] fee greater than budget');
-            this.showToast("error", this.labels.warning.label, this.labels.fee.budgetError);
+            let err_msg = this.labels.accountPromotionalBudget.error.replace('%0', 'PSA');
+            this.showToast("error", this.labels.warning.label, err_msg);
             this.hasFeeError = true;
         } else {
             this.hasFeeError = false;
             this.fee = event.detail.value;
+            this.totalBudget = this.fee;
         }
     }
     handlePercentageVisibilityChange(event) {
@@ -1647,7 +1640,9 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     ShippingCountry: data.Account__r.ShippingCountry,
                     Contacts: [data.Contact__r],
                     PromotionId: '',
-                    Promotional_Budget__c: data.Account_Promotional_Budget__c
+                    Promotional_Budget__c: data.Account__r.Promotional_Budget__c,
+                    Promotional_Budget_Remaining__c: data.Account__r.Promotional_Budget_Remaining__c,
+                    Target__c: data.Target__c
                 };
                 this.personInCharge = {
                     name: data.Account__r.Owner.Name,
@@ -1656,6 +1651,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                     function: data.Account__r.Owner.Sales_Region__c,
                     approver: data.Account__r.Owner.Manager_Name__c
                 };
+                this.accountPromotionalBudget = data.Account__r.Promotional_Budget__c;
+                this.accountPromotionalBudgetRemaining = data.Account__r.Promotional_Budget_Remaining__c;
+                this.accountPromotionalBudgetUsed = data.Account__r.Promotional_Budget_Used__c;
+                this.accountPromotionalTargetROI = data.Account__r.Target__c;
                 this.selectedAccountId = data.Account__c;
                 this.isSearchingForParent = false;
                 this.isUsingParentAccount = data.Account__r.RecordType.Name.indexOf('Parent') > -1;
@@ -2017,16 +2016,10 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         }
         if (this.market.Name == 'Korea') {
             // Budget for this PSA should not be greater than remaining Account Promotional Budget
-            if (parseFloat(this.fee) > parseFloat(this.totalBudget)) {
+            if (parseFloat(this.fee) > parseFloat(this.accountPromotionalBudgetRemaining)) {
                 this.hasFeeError = true;
-                isValid = false;
-                this.showToast("error", this.labels.warning.label, this.labels.fee.budgetError);
-            }
-            if (parseFloat(this.totalBudget) > parseFloat(this.accountPromotionalBudgetRemaining)) {
-                isValid = false;
                 let err_msg = this.labels.accountPromotionalBudget.error.replace('%0', 'PSA');
-                this.hasBudgetError = true;
-                this.budgetErrorMessage = err_msg;
+                isValid = false;
                 this.showToast("error", this.labels.warning.label, err_msg);
             }
         }
@@ -2162,6 +2155,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
                 this.accountPromotionalBudget = result.Promotional_Budget__c;
                 this.accountPromotionalBudgetRemaining = result.Promotional_Budget_Remaining__c;
                 this.accountPromotionalBudgetUsed = result.Promotional_Budget_Used__c;
+                this.accountPromotionalTargetROI = result.Target__c;
 
                 if (this.isUsingParentAccount) {
                     this.findAccountsForParent(result.Id);
@@ -2316,6 +2310,7 @@ export default class PromotionalSalesAgreement extends NavigationMixin(Lightning
         param.accountOwnerSalesRegion = this.user.Sales_Region__c;
         param.ownerManager = this.user.Manager.FirstName + ' ' + this.user.Manager.LastName;        
         param.accountPromotionalBudget = this.accountPromotionalBudget;
+        param.accountPromotionalTargetROI = this.accountPromotionalTargetROI;
 
         if (this.wholesalerPreferred == undefined || this.wholesalerPreferred == '-none-') {
             param.wholesalerPreferredId = null;
