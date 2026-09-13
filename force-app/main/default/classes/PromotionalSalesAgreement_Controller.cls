@@ -71,7 +71,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                     Allow_Updates_After_Approval__c, Capture_Promotion_Type__c, Spread_Planned_Values__c,
                                     DocuSign__c, Show_Expanded_Actuals_on_Load__c, Capture_CCM_Details__c, Show_Item_Gross_Profit__c,
                                     Capture_Menu_Type__c, Show_Person_in_Charge_Details__c, Must_Select_Child_Accounts__c, 
-                                    Can_Close_Agreement__c, Validate_Budget_vs_Planned__c, Can_Update_Status__c, Capture_Agreement_Level_Plan_Details__c
+                                    Can_Close_Agreement__c, Validate_Budget_vs_Planned__c, Can_Update_Status__c, Capture_Agreement_Level_Plan_Details__c,
+                                    Promotional_On_Premise_Target_ROI__c, Promotional_Off_Premise_Target_ROI__c
                               FROM Market__c 
                              WHERE Name =:marketName 
                              LIMIT 1];
@@ -134,7 +135,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
         Map<String, Object> result = new Map<String, Object>();
 
         Promotion_Activity__c psa = [SELECT Id, Name, RecordTypeId, RecordType.Name, RecordType.DeveloperName, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.Channel__c,
-                                            Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, Account_Owner_Sales_Region__c, 
+                                            Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, Account_Owner_Sales_Region__c,
+                                            Account__r.Promotional_Budget__c, Account__r.Promotional_Budget_Remaining__c, Account__r.Promotional_Budget_Used__c, Account__r.Promotional_Budget_Used_Percent__c,
                                             Contact__c, Contact__r.Name, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                             Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c, Market__r.Enable_PSA_Preview__c,
                                             Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Volume__c, Total_Discount__c, Total_Investment__c, Total_PSA_Gross_Profit__c,
@@ -155,15 +157,17 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Market__r.Show_Item_Gross_Profit__c, Probability__c, Menu_Type__c, Market__r.Show_Person_in_Charge_Details__c, Account__r.Owner.Name, 
                                             Account__r.Store_Type__c, Account__r.Owner.Sales_Region__c, Account__r.Owner.Manager_Name__c, Market__r.DocuSign__c, Owner_Manager__c, Total_PSA_ROI__c,
                                             Market__r.Can_Close_Agreement__c, Market__r.Validate_Budget_vs_Planned__c, Account_Promotional_Budget__c, Total_Fee__c, Total_Fee_Paid__c, SAP_Agreement_Number__c,
-                                            Boomi_Processed__c, SAP_Interface_Error__c, Planned_Fee__c, Total_Current_Volume__c, Total_PSA_Break_Even__c,
+                                            Boomi_Processed__c, SAP_Interface_Error__c, Planned_Fee__c, Total_Current_Volume__c, Total_PSA_Break_Even__c, Account_Promotional_Target_ROI__c, Account_Promotional_Budget_Remaining__c,
+                                            Total_Plan_Volume_GP_After_Cost__c, Total_PSA_Plan_Cost__c, Market__r.Capture_Agreement_Level_Plan_Details__c, Account_Owner__c, Total_PSA_Actual_ROI__c,
+                                            Total_PSA_Actual_Cost__c, Total_PSA_Actual_GP_Net_of_Cost__c, Total_PSA_Actual_Gross_Profit__c,
                                             (SELECT Id, Account__c, AccountName__c, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.ShippingStreet, 
                                                     Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode, 
                                                     Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c, Menu_Type__c,
                                                     Total_Fee_Paid__c
                                                     FROM Promotions__r),
                                             (SELECT Id, Promotion__c, Product_Custom__c, Product_Name__c, Brand__c, Approval_Status__c, Plan_Volume__c, Current_Volume__c, Plan_Rebate__c, 
-                                                    Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c,
-                                                    Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c,
+                                                    Brand_Status__c, Drink_Strategy__c, Outlet_to_Provide__c, Status__c, Listing_Fee__c, Promotional_Activity__c, Current_Volume_Bottles__c,
+                                                    Promotional_Activity_Value__c, Quantity__c, Training_and_Advocacy__c, Training_and_Advocacy_Value__c, Plan_Volume_Bottles__c,
                                                     Total_Investment__c, Comments_Long__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c,
                                                     Total_Training_and_Advocacy_Paid__c, Original_Plan_Volume__c, Original_Plan_Rebate__c, Original_Listing_Fee__c,
                                                     Original_Promotional_Activity__c, Original_Training_Advocacy__c, Total_Actual_Volume__c, Previous_Plan_Volume__c, 
@@ -174,8 +178,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                     Brand_Visibility__c, Product_Visibility__c, Plan_Rebate_Percentage__c, Plan_Rebate_Liability__c, Plan_Rebate_Volume__c,
                                                     Plan_PSA_Gross_Profit__c, Product_Custom__r.Gross_Profit_Flat_Case__c, PSA_Free_Bottle_Cost__c, Total_Actual_Free_Bottle_Qty__c,
                                                     Brand_Support__c, Original_Brand_Support__c, Proposed_Brand_Support__c, Previous_Brand_Support__c, Total_Actual_Investment__c, 
-                                                    Product_Price__c, Product_Gross_Profit_per_Bottle__c, Product_Gross_Profit_per_Case_9L__c, 
-                                                    Fee__c, Total_Fee_Paid__c, Plan_PSA_ROI__c, Total_Plan_Investment__c, Total_Plan_Investment_9L__c, Current_Volume_Gross_Profit__c
+                                                    Product_Price__c, Product_Gross_Profit_per_Bottle__c, Product_Gross_Profit_per_Case_9L__c, Plan_PSA_GP_Net_of_Total_Cost__c,
+                                                    Fee__c, Total_Fee_Paid__c, Plan_PSA_ROI__c, Total_Plan_Investment__c, Total_Plan_Investment_9L__c, Current_Volume_Gross_Profit__c,
+                                                    Plan_Volume_9L__c, Total_Actual_Volume_9L__c, Current_Volume_9L__c
                                                     FROM Promotion_Material_Items__r), 
                                             (SELECT Id, ContentDocumentId, ContentDocument.Title, ContentDocument.FileType, ContentDocument.FileExtension,
                                                     ContentDocument.LatestPublishedVersionId FROM ContentDocumentLinks) 
@@ -249,8 +254,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
     @AuraEnabled
     public static Account getAccountById(String accountId) {
         return [SELECT Id, Name, ShippingStreet, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState, 
-                    Channel__c, Store_Type__c, Owner.Name, Owner.Sales_Region__c, Owner.Manager_Name__c, Promotional_Budget__c,
-                    Promotional_Budget_Remaining__c, Promotional_Budget_Used__c,
+                    Channel__c, Store_Type__c, OwnerId, Owner.Name, Owner.Sales_Region__c, Owner.Manager_Name__c, Promotional_Budget__c,
+                    Promotional_Budget_Remaining__c, Promotional_Budget_Used__c, Target__c,
                     (SELECT Id, Name, FirstName, LastName, Email FROM Contacts WHERE Decision_Maker__c = true),
                     (SELECT Id, Wholesaler_Account_Name__c, Wholesaler_Name__c, Wholesaler__c FROM Wholesalers__r WHERE Is_Active__c = true)
                   FROM Account 
@@ -472,7 +477,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
     @AuraEnabled
     public static PMI_Actual__c getPMIADetails(String pmiaId) {
-        return [SELECT Id, Name, RecordTypeId, RecordType.Name, Activity__c, Promotion__c, Account__c, Account_Name__c,
+        return [SELECT Id, Name, RecordTypeId, RecordType.Name, Activity__c, Activity__r.Planned_Fee__c, Activity__r.Total_Fee_Paid__c, Promotion__c, Account__c, Account_Name__c,
                        Promotion_Material_Item__c, Product__c, Product_Name__c, Payment_Date__c, Act_Qty__c, Actual_Discount__c, 
                        Plan_Payment__c, Promotion_Material_Item__r.Plan_Volume__c, Promotion_Material_Item__r.Plan_Rebate__c,
                        Boomi_Processed__c, LastModifiedDate, Approval_Status__c, Actual_Wholesaler__c, Actual_Wholesaler__r.Name,
@@ -623,6 +628,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Activity_Budget__c = psaData.totalBudget;
             psa.Planned_Fee__c = psaData.fee;
             psa.Account_Promotional_Budget__c = psaData.accountPromotionalBudget;
+            psa.Account_Promotional_Target_ROI__c = psaData.accountPromotionalTargetROI;
             psa.Percentage_Visibility__c = psaData.percentageVisibility;
             psa.Probability__c = psaData.probabilityPercentage;
             psa.Payment_Configurations__c = psaData.paymentConfigurations;
@@ -634,6 +640,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Account_Wholesaler_Preferred_Name__c = psaData.accountWholesalerPreferredName;
             psa.Account_Wholesaler_Alternate__c = psaData.accountWholesalerAlternate;
             psa.Account_Wholesaler_Alternate_Name__c = psaData.accountWholesalerAlternateName;
+            psa.Account_Owner__c = psaData.accountOwner;
             psa.Account_Owner_Sales_Region__c = psaData.accountOwnerSalesRegion;
             psa.Owner_Manager__c = psaData.ownerManager;
 
@@ -673,7 +680,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             }
 
             System.debug('sap contract code: ' + psa.SAP_Contract_Code__c);
-            if (psa.RecordType.DeveloperName == 'JP_PSA') {
+            if (psa.RecordType.DeveloperName == 'JP_PSA' || psa.RecordType.DeveloperName == 'KR_PSA') {
                 if (psa.SAP_Contract_Code__c == 'ZXL6') {
                     List<Account> theAccounts = [SELECT Id, Name, RecordType.DeveloperName, Customer_Type__c FROM Account WHERE Id =:psa.Account__c];
                     if (theAccounts != null && theAccounts.size() > 0) {
@@ -688,6 +695,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                         }
                     }
                 } else if (psa.SAP_Contract_Code__c == 'ZXL3') {
+                    psa.SAP_Field_Combination__c = '0001';
+                } else if (psa.SAP_Contract_Code__c == 'ZXSC') {
                     psa.SAP_Field_Combination__c = '0001';
                 }
             }
@@ -866,6 +875,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
         List<String> returnIds = new List<String>();
 
         try {
+            Promotion_Material_Item__c pmi = [SELECT Id, Plan_Volume__c, Plan_Rebate__c FROM Promotion_Material_Item__c WHERE Id =:pmiId];
+
             List<PMI_Actual__c> actualsToCreate = new List<PMI_Actual__c>();
             for(PSARebate rebate : rebates) {
                 if (rebate.rebateAmount > 0) {
@@ -888,7 +899,6 @@ public with sharing class PromotionalSalesAgreement_Controller {
                             pmia.Act_Qty__c = rebate.rebateAmount / productPackQty;
                         }
 
-                        Promotion_Material_Item__c pmi = [SELECT Id, Plan_Volume__c, Plan_Rebate__c FROM Promotion_Material_Item__c WHERE Id =:pmiId];
                         pmia.Rebate_Amount__c = rebate.rebateAmount * pmi.Plan_Rebate__c; 
                     } else if (rebate.rebateType == 'Free Goods') {
                         pmia.Rebate_Amount__c = rebate.rebateAmount;
@@ -940,23 +950,32 @@ public with sharing class PromotionalSalesAgreement_Controller {
             List<Promotion_Activity__c> activities = [SELECT Id, Total_Actual_Volume__c, Total_Actual_Discount__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                             Total_Training_and_Advocacy_Paid__c, Market__r.Capture_Volume_in_Bottles__c, Activity_Budget__c, Total_Payments_Paid__c,
                                             Total_Actual_Volume_Bottles__c, Total_Actual_Free_Bottle_Qty__c, SalesProposal_Actuals_Updated__c, Total_Brand_Support_Paid__c,
-                                            Total_Fee_Paid__c,
+                                            Total_Fee_Paid__c, Total_PSA_Actual_ROI__c, Market__r.Capture_End_Date__c, Begin_Date__c, End_Date__c, Total_PSA_Actual_Gross_Profit__c, 
+                                            Total_PSA_Actual_GP_Net_of_Cost__c, Total_PSA_Actual_Cost__c, Market__r.Name, Planned_Fee__c, Account__r.Promotional_Budget__c, Account__r.Promotional_Budget_Used__c,
                                                 (SELECT Id, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, Total_Fee_Paid__c,
                                                         Total_Training_and_Advocacy_Paid__c, Total_Planned_Discount__c, Total_Actual_Discount__c, Total_Planned_Qty__c 
                                                         FROM Promotions__r),
                                                 (SELECT Id, Promotion__c, Product_Custom__c, Total_Listing_Fee_Paid__c, Total_Promotional_Activity_Paid__c, 
                                                         Total_Training_and_Advocacy_Paid__c, Total_Actual_Volume__c, Total_Actual_Investment__c, Product_Pack_Qty__c,
-                                                        Total_Actual_Free_Bottle_Qty__c, Total_Fee_Paid__c
+                                                        Total_Actual_Free_Bottle_Qty__c, Total_Fee_Paid__c, Current_Volume__c, Current_Volume_Bottles__c,
+                                                        Product_Gross_Profit_per_Bottle__c, Product_Gross_Profit_per_Case_9L__c, Plan_Rebate__c, Total_Actual_Cost__c,
+                                                        Total_Actual_Discount_Bottles__c, Total_Actual_Discount__c
                                                         FROM Promotion_Material_Items__r), 
-                                                (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Act_Qty__c, Listing_Fee__c,
+                                                (SELECT Id, Activity__c, Promotion__c, Promotion_Material_Item__c, Product_Name__c, Act_Qty__c, Listing_Fee__c,
                                                         Promotional_Activity__c, Training_and_Advocacy__c, Promotion_Material_Item__r.Plan_Rebate__c,
                                                         Promotion_Material_Item__r.Listing_Fee__c, Promotion_Material_Item__r.Promotional_Activity_Value__c, Promotion_Material_Item__r.Fee__c,
                                                         Promotion_Material_Item__r.Training_and_Advocacy_Value__c, Proposed_Discount__c, Rebate_Type__c, Rebate_Amount__c
-                                                        FROM PMI_Actuals__r WHERE Approval_Status__c = 'Approved' OR Approval_Status__c = 'Paid' OR Approval_Status__c = 'Rebate Complete')
+                                                        FROM PMI_Actuals__r WHERE Has_Totals__c = false AND (Approval_Status__c = 'Approved' OR Approval_Status__c = 'Rebate Complete' OR Approval_Status__c = 'Paid' OR Approval_Status__c = 'New'))
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaIds];
             
             Map<Id, Promotion_Material_Item__c> m_PMIs = new Map<Id, Promotion_Material_Item__c>();
+            Map<Id, Decimal> m_Accounts = new Map<Id, Decimal>();
+            Decimal totalActualCost = 0;
+            Decimal totalActualGP = 0;
+            Decimal totalActualGPNetOfCost = 0;
+            Decimal totalCurrentVolumeGP = 0;
+            Integer numberOfMonths = 1;
 
             for(Promotion_Activity__c psa : activities) {
                 psa.Total_Actual_Volume__c = 0;
@@ -970,7 +989,24 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 psa.Total_Actual_Investment__c = 0;
                 psa.Total_Payments_Paid__c = 0;
                 psa.Total_Brand_Support_Paid__c = 0;
+                psa.Total_PSA_Actual_ROI__c = 0;
+                psa.Total_PSA_Actual_Gross_Profit__c = 0;
+                psa.Total_PSA_Actual_GP_Net_of_Cost__c = 0;
+                psa.Total_PSA_Actual_Cost__c = 0;
 
+                totalActualCost = 0;
+                totalActualGPNetOfCost = 0;
+                totalCurrentVolumeGP = 0;
+
+                if (psa.Market__r.Capture_End_Date__c) {
+                    Date startDate = Date.newInstance(psa.Begin_Date__c.year(), psa.Begin_Date__c.month(), 1);
+                    numberOfMonths = startDate.monthsBetween(psa.End_Date__c)+1;
+                } else {
+                    numberOfMonths = psa.Length_of_Agreement__c.intValue();
+                    if (psa.Is_Length_in_Years__c) {
+                        numberOfMonths = psa.Length_of_Agreement__c.intValue() * 12;
+                    }
+                }
                 /*
                 Map<Id, Promotion__c> m_Promotions = new Map<Id, Promotion__c>();
                 for(Promotion__c p : psa.Promotions__r) {
@@ -986,7 +1022,8 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     pmi.Total_Payments_Paid__c = 0;
                     pmi.Total_Brand_Support_Paid__c = 0;
                     pmi.Total_Fee_Paid__c = 0;
-                    
+                    pmi.Total_Actual_Cost__c = 0;
+
                     m_PMIs.put(pmi.Id, pmi);
                 }
 
@@ -1001,10 +1038,18 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 Decimal totalDiscount = 0;
                 Decimal packQty = 0;
                 Decimal brandSupport = 0;
+                Decimal actualCost = 0;
+                Decimal actualGPNetOfCost = 0;
+                Decimal currentVolumeGP = 0;
+                Decimal actualVolumeGP = 0;
 
                 Promotion__c p;
                 Promotion_Material_Item__c pmi;
                 for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
+                    if (psa.Market__r.Name != 'Korea' && pmia.Approval_Status__c == 'New') {
+                        continue;
+                    }
+
                     rebateAmount = pmia.Rebate_Amount__c == null ? 0 : pmia.Rebate_Amount__c;
                     
                     /*
@@ -1014,60 +1059,139 @@ public with sharing class PromotionalSalesAgreement_Controller {
                     if (p.Total_Promotional_Activity_Paid__c == null) { p.Total_Promotional_Activity_Paid__c = 0; }
                     if (p.Total_Training_and_Advocacy_Paid__c == null) { p.Total_Training_and_Advocacy_Paid__c = 0; }
                     */
-                    pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
 
-                    System.debug('[updateActuals] pmiaId: ' + pmia.Id);
-                    System.debug('[updateActuals] rebateType: ' + pmia.Rebate_Type__c);
-                    System.debug('[updateActuals] rebateAmount: ' + pmia.Rebate_Amount__c);
+                    pmi = null;
+                    if (String.isNotEmpty(pmia.Promotion_Material_Item__c)) {
+                        pmi = m_PMIs.get(pmia.Promotion_Material_Item__c);
+                    }
+
+                    System.debug('[updateActuals.pmia] pmiaId: ' + pmia.Id);
+                    System.debug('[updateActuals.pmia] product: ' + pmia.Product_Name__c);
+                    System.debug('[updateActuals.pmia] rebateType: ' + pmia.Rebate_Type__c);
+                    System.debug('[updateActuals.pmia] rebateAmount: ' + pmia.Rebate_Amount__c);
                     if (pmia.Rebate_Type__c == 'Listing Fee') {
                         psa.Total_Listing_Fee_Paid__c += rebateAmount;
                         //p.Total_Listing_Fee_Paid__c += rebateAmount;
-                        pmi.Total_Listing_Fee_Paid__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Listing_Fee_Paid__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Fee') {
                         psa.Total_Fee_Paid__c += rebateAmount;
-                        pmi.Total_Fee_Paid__c += rebateAmount;
+                        totalActualCost += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Fee_Paid__c += rebateAmount;
+                        }
+                        System.debug('[updateActuals.pmia.fee] totalActualCost: ' + totalActualCost);
+
                     } else if (pmia.Rebate_Type__c == 'Promotional Activity') {
                         psa.Total_Promotional_Activity_Paid__c += rebateAmount;
                         //p.Total_Promotional_Activity_Paid__c += rebateAmount;
-                        pmi.Total_Promotional_Activity_Paid__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Promotional_Activity_Paid__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Training & Advocacy') {
                         psa.Total_Training_and_Advocacy_Paid__c += rebateAmount;
                         //p.Total_Training_and_Advocacy_Paid__c += rebateAmount;
-                        pmi.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Training_and_Advocacy_Paid__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Payment') {
                         psa.Total_Payments_Paid__c += rebateAmount;
-                        pmi.Total_Payments_Paid__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Payments_Paid__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Free Goods') {
                         psa.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
-                        pmi.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Actual_Free_Bottle_Qty__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Brand Support') {
                         psa.Total_Brand_Support_Paid__c += rebateAmount;
-                        pmi.Total_Brand_Support_Paid__c += rebateAmount;
+                        if (pmi != null) {
+                            pmi.Total_Brand_Support_Paid__c += rebateAmount;
+                        }
                     } else if (pmia.Rebate_Type__c == 'Volume') {
                         actualQty = pmia.Act_Qty__c == null ? 0 : pmia.Act_Qty__c;
-                        packQty = pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
+                        packQty = pmi == null || pmi.Product_Pack_Qty__c == null ? 1 : pmi.Product_Pack_Qty__c;
                         //if (psa.Market__r.Capture_Volume_in_Bottles__c) {
                         //    actualQty = actualQty * packQty;
                         //}
                         
-                        System.debug('[actualQty: ' + actualQty);
+                        currentVolumeGP = 0;
+                        totalDiscount = 0;
+                        System.debug('[updateActuals.pmia.volume] actualQty: ' + actualQty);
+                        System.debug('[updateActuals.pmia.volume] currentVolume: ' + pmi.Current_Volume__c);
+                        System.debug('[updateActuals.pmia.volume] currentVolumeBottles: ' + pmi.Current_Volume_Bottles__c);
+                        System.debug('[updateActuals.pmia.volume] gpPerBottle: ' + pmi.Product_Gross_Profit_per_Bottle__c);
+                        System.debug('[updateActuals.pmia.volume] gpPerCase: ' + pmi.Product_Gross_Profit_per_Case_9L__c);
+
                         totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
 
-                        psa.Total_Actual_Volume__c += actualQty;        
-                        psa.Total_Actual_Volume_Bottles__c += actualQty * packQty;            
-                        psa.Total_Actual_Discount__c += totalDiscount;
-                        //p.Total_Actual_Discount__c += totalDiscount;
-                        pmi.Total_Actual_Volume__c += actualQty;
+                        if (pmi != null) {
+                            //totalDiscount = actualQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
+                            pmi.Total_Actual_Cost__c += totalDiscount;
+                            psa.Total_Actual_Discount__c += pmia.Rebate_Amount__c;
+                            psa.Total_Actual_Volume__c += actualQty;        
+                            pmi.Total_Actual_Volume__c += actualQty;                                
+                            psa.Total_Actual_Volume_Bottles__c += actualQty * packQty;            
+                            if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                                actualVolumeGP = actualQty * packQty * pmi.Product_Gross_Profit_per_Bottle__c;
+                                currentVolumeGP = (pmi.Current_Volume_Bottles__c / numberOfMonths) * pmi.Product_Gross_Profit_per_Bottle__c;
+                                totalDiscount = actualQty * packQty * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
+                            } else {
+                                actualVolumeGP = actualQty * pmi.Product_Gross_Profit_per_Case_9L__c;
+                                currentVolumeGP = (pmi.Current_Volume__c / numberOfMonths) * pmi.Product_Gross_Profit_per_Case_9L__c;
+                            }
+
+                            totalActualGP += actualVolumeGP;
+                        }
+
+                        
+                        totalActualCost += totalDiscount;
+                        totalCurrentVolumeGP += currentVolumeGP;
+
+                        System.debug('[updateActuals.pmia.volume] totalDiscount: ' + totalDiscount);
+                        System.debug('[updateActuals.pmia.volume] totalActualCost: ' + totalActualCost);
+                        System.debug('[updateActuals.pmia.volume] currentVolumeGP: ' + currentVolumeGP);
+                        System.debug('[updateActuals.pmia.volume] totalCurrentVolumeGP: ' + totalCurrentVolumeGP);
                     }
 
                     //m_Promotions.put(p.Id, p);
-                    m_PMIs.put(pmi.Id, pmi);
+                    if (pmi != null) {
+                        m_PMIs.put(pmi.Id, pmi);
+                    }
 
                 }
 
+                System.debug('[updateActuals] totalActualGP: ' + totalActualGP);
+                System.debug('[updateActuals] totalActualCost: ' + totalActualCost);
+                System.debug('[updateActuals] totalCurrentVolumeGP: ' + totalCurrentVolumeGP);
+                System.debug('[updateActuals] totalActualVolume: ' + psa.Total_Actual_Volume__c);
+                System.debug('[updateActuals] totalActualVolumeBottles: ' + psa.Total_Actual_Volume_Bottles__c);
+
+                totalActualGPNetOfCost = totalActualGP - totalActualCost;
+                System.debug('[updateActuals] totalActualGPNetofCost: ' + totalActualGPNetOfCost);
+
+                if (totalActualCost > 0) {
+                    psa.Total_PSA_Actual_ROI__c = (totalActualGPNetOfCost - totalCurrentVolumeGP) / totalActualCost;                
+                }
+                System.debug('[updateActuals] totalPSAActualROI: ' + psa.Total_PSA_Actual_ROI__c);
+
+                psa.Total_PSA_Actual_Gross_Profit__c = totalActualGP;
+                psa.Total_PSA_Actual_GP_Net_of_Cost__c = totalActualGPNetOfCost;
+                psa.Total_PSA_Actual_Cost__c = totalActualCost;
                 psa.Total_Actual_Investment__c = psa.Total_Actual_Discount__c + psa.Total_Listing_Fee_Paid__c + psa.Total_Promotional_Activity_Paid__c + psa.Total_Training_and_Advocacy_Paid__c;
                 psa.SalesProposal_Actuals_Updated__c = false;
 
+                if (psa.Market__r.Name == 'Korea') {
+                    System.debug('[updateActuals] psa.Total_Fee_Paid__c: ' + psa.Total_Fee_Paid__c);    
+                    System.debug('[updateActuals] psa.Planned_Fee__c: ' + psa.Planned_Fee__c);
+                    if (psa.Total_Fee_Paid__c > psa.Planned_Fee__c) {
+                        Decimal balance = psa.Account__r.Promotional_Budget_Used__c - psa.Planned_Fee__c + psa.Total_Fee_Paid__c;
+                        m_Accounts.put(psa.Account__c, balance);
+                        System.debug('[updateActuals] accountId: ' + psa.Account__c + ', balance: ' + balance);
+                    }
+                }
             }
 
             if (m_PMIs.size() > 0) {
@@ -1075,6 +1199,18 @@ public with sharing class PromotionalSalesAgreement_Controller {
             }
 
             update activities;
+
+            System.debug('# of accounts to update: ' + m_Accounts.size());
+            if (m_Accounts.size() > 0) {
+                List<Account> accountsToUpdate = new List<Account>();
+                for (Id acctId : m_Accounts.keySet()) {
+                    Account a = new Account();
+                    a.Id = acctId;
+                    a.Promotional_Budget_Used__c = m_Accounts.get(acctId);
+                    accountsToUpdate.add(a);
+                }
+                update accountsToUpdate;
+            }
         }catch(Exception ex) {
             msg = ex.getMessage();   
             System.debug('update totals exception ' + ex.getMessage());         
@@ -1092,7 +1228,9 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                             Market__r.Calculate_PSA_Product_Split__c, Activity_Budget__c, Total_Volume_Bottles__c, Total_Free_Bottle_Quantity__c, Total_PSA_Gross_Profit__c,
                                             Total_Free_Bottle_Cost__c, Total_Rebate_Volume__c, Total_Rebate_Liability__c, Total_Customer_Profit__c, Total_Return_on_Investment__c, Total_Brand_Support__c,
                                             Total_Current_Volume__c, Total_PSA_Plan_Cost__c, Total_Current_Volume_GP__c, Total_Plan_Volume_GP__c, Total_Plan_Volume_GP_After_Cost__c, Total_PSA_ROI__c,
-                                            Total_Current_Volume_GP_per_Case__c, Total_Plan_Volume_GP_per_Case__c, Total_PSA_Break_Even__c, Total_Fee__c, Market__r.Capture_Agreement_Level_Plan_Details__c, Planned_Fee__c,
+                                            Total_Current_Volume_GP_per_Case__c, Total_Plan_Volume_GP_per_Case__c, Total_PSA_Break_Even__c, Total_Fee__c, Market__r.Capture_Agreement_Level_Plan_Details__c, 
+                                            Planned_Fee__c, Total_Current_Volume_Bottles__c, Is_Under_Promotional_Target_ROI__c, Market__r.Promotional_On_Premise_Target_ROI__c, Market__r.Promotional_Off_Premise_Target_ROI__c,
+                                            Account__r.Channel__c, Account__r.Target__c,
                                                 (SELECT Id, Total_Listing_Fee__c, Total_Fee__c, Total_Promotional_Activity__c, Total_Training_and_Advocacy__c, Total_Planned_Discount__c, Budget_Amount_PL__c 
                                                    FROM Promotions__r),
                                                 (SELECT Id, Promotion__c, Product_Custom__c, Plan_Volume__c, Plan_Rebate__c, Listing_Fee__c, Fee__c, Promotional_Activity_Value__c, 
@@ -1100,12 +1238,13 @@ public with sharing class PromotionalSalesAgreement_Controller {
                                                         Product_Split__c, Product_Unit_Size__c, Free_Bottle_Quantity__c, PSA_Free_Bottle_Cost__c, Product_Custom__r.Gross_Profit_per_Bottle__c,
                                                         Plan_Rebate_Liability__c, Plan_Rebate_Volume__c, Plan_PSA_Gross_Profit__c, Brand_Support__c, Current_Volume__c, Current_Volume_Gross_Profit__c,
                                                         Current_Volume_GP_per_Case__c, Total_PSA_Plan_Cost__c, Plan_PSA_GP_per_Case_After_Cost__c, Plan_PSA_GP_per_Case__c, Total_Plan_Investment__c,
-                                                        Total_Plan_Investment_9L__c
+                                                        Total_Plan_Investment_9L__c, Current_Volume_9L__c, Plan_Volume_9L__c, Gross_Profit_per_Case_9L__c, Product_Gross_Profit_per_Case_9L__c, Product_Gross_Profit_per_Bottle__c
                                                    FROM Promotion_Material_Items__r)
                                         FROM Promotion_Activity__c 
                                         WHERE Id =:psaId];
             
             psa.Total_Current_Volume__c = 0;
+            psa.Total_Current_Volume_Bottles__c = 0;
             psa.Total_Volume__c = 0;
             psa.Total_Volume_Bottles__c = 0;
             psa.Total_Discount__c = 0;
@@ -1131,7 +1270,6 @@ public with sharing class PromotionalSalesAgreement_Controller {
             psa.Total_PSA_ROI__c = 0;
             psa.Total_Current_Volume_GP_per_Case__c = 0;
             psa.Total_Plan_Volume_GP_per_Case__c = 0;
-            psa.Total_Plan_Volume_GP_After_Cost__c = 0;
             psa.Total_PSA_Break_Even__c = 0;
 
             /*
@@ -1144,6 +1282,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
             }
             */
             Decimal currentVolume = 0;
+            Decimal currentVolume9L = 0;
             Decimal volume = 0;
             Decimal rebate = 0;
             Decimal listingFee = 0;
@@ -1160,19 +1299,20 @@ public with sharing class PromotionalSalesAgreement_Controller {
             Decimal rebateVolume = 0;
             Decimal planGrossProfit = 0;
             Decimal brandSupport = 0;
-            Decimal currentVolumeGP = 0;
             Decimal totalCost = 0;
             Decimal currentVolumeGPperCase = 0;
             Decimal planVolumeGPperCase = 0;
             Decimal planVolumeGPperCaseAfterCost = 0;
             Decimal breakEven = 0;
             Decimal fee = 0;
+            Decimal gpPerCase = 0;
 
             List<Promotion_Material_Item__c> pmiToUpdate = new List<Promotion_Material_Item__c>();
 
             for(Promotion_Material_Item__c pmi : psa.Promotion_Material_Items__r) {
-                volume = pmi.Plan_Volume__c == null ? 0 : pmi.Plan_Volume__c;
+                volume = pmi.Plan_Volume__c == null ? 0 : pmi.Plan_Volume__c;                
                 currentVolume = pmi.Current_Volume__c == null ? 0 : pmi.Current_Volume__c;
+                currentVolume9L = pmi.Current_Volume_9L__c == null ? 0 : pmi.Current_Volume_9L__c;
                 rebate = pmi.Plan_Rebate__c == null ? 0 : pmi.Plan_Rebate__c;
                 listingFee = pmi.Listing_Fee__c == null ? 0 : pmi.Listing_Fee__c;
                 fee = pmi.Fee__c == null ? 0 : pmi.Fee__c;
@@ -1187,8 +1327,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 rebateLiability = pmi.Plan_Rebate_Liability__c == null ? 0 : pmi.Plan_Rebate_Liability__c;
                 planGrossProfit = pmi.Plan_PSA_Gross_Profit__c == null ? 0 : pmi.Plan_PSA_Gross_Profit__c;
                 brandSupport = pmi.Brand_Support__c == null ? 0 : pmi.Brand_Support__c;
-                currentVolumeGP = pmi.Current_Volume_Gross_Profit__c == null ? 0 : pmi.Current_Volume_Gross_Profit__c;
-                currentVolumeGPperCase = pmi.Current_Volume_GP_per_Case__c == null ? 0 : pmi.Current_Volume_GP_per_Case__c;
+                gpPerCase = pmi.Gross_Profit_per_Case_9L__c == null ? 0 : pmi.Gross_Profit_per_Case_9L__c;
                 totalCost = pmi.Total_PSA_Plan_Cost__c == null ? 0 : pmi.Total_PSA_Plan_Cost__c;
                 planVolumeGPperCase = pmi.Plan_PSA_GP_per_Case__c == null ? 0 : pmi.Plan_PSA_GP_per_Case__c;
                 planVolumeGPperCaseAfterCost = pmi.Plan_PSA_GP_per_Case_After_Cost__c == null ? 0 : pmi.Plan_PSA_GP_per_Case_After_Cost__c;
@@ -1208,6 +1347,7 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 }
 
                 psa.Total_Current_Volume__c += currentVolume;
+                psa.Total_Current_Volume_Bottles__c += currentVolume * packQty;
                 psa.Total_Volume__c += volume;
                 psa.Total_Volume_Bottles__c += volume * packQty;
                 psa.Total_Discount__c += volume * rebate;
@@ -1223,7 +1363,16 @@ public with sharing class PromotionalSalesAgreement_Controller {
                 psa.Total_PSA_Gross_Profit__c += planGrossProfit;
                 psa.Total_Brand_Support__c += brandSupport;
                 psa.Total_PSA_Plan_Cost__c += totalCost;
-                psa.Total_Current_Volume_GP__c += currentVolumeGP;
+                if (psa.Market__r.Name == 'Korea') {
+                    if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                        psa.Total_Current_Volume_GP__c += currentVolume * packQty * pmi.Product_Gross_Profit_per_Bottle__c;
+                    } else {
+                        psa.Total_Current_Volume_GP__c += currentVolume * pmi.Product_Gross_Profit_per_Case_9L__c;
+                    }
+                } else {
+                    psa.Total_Current_Volume_GP__c += currentVolume9L * gpPerCase;
+                }
+                
                 /*
                 for(Promotion__c p : psa.Promotions__r) {
                     p.Total_Planned_Discount__c = pmi.Plan_Volume__c * pmi.Plan_Rebate__c;
@@ -1264,6 +1413,11 @@ public with sharing class PromotionalSalesAgreement_Controller {
 
             }
 
+            if (psa.Market__r.Name == 'Korea') {
+                psa.Total_Fee__c = psa.Planned_Fee__c == null ? 0 : psa.Planned_Fee__c;
+                psa.Total_PSA_Plan_Cost__c += psa.Total_Fee__c;                
+            }
+
             if (!psa.Is_Approved__c) {
                 psa.Original_Total_Investment__c = psa.Total_Investment__c;
             }
@@ -1288,6 +1442,28 @@ public with sharing class PromotionalSalesAgreement_Controller {
             if (psa.Total_Investment__c > 0) {                
                 psa.Total_PSA_ROI__c = (psa.Total_PSA_Gross_Profit__c - psa.Total_Current_Volume_GP__c) / psa.Total_Investment__c;
             }    
+
+            if (psa.Market__r.Name == 'Korea') {
+                psa.Total_Plan_Volume_GP_After_Cost__c = psa.Total_PSA_Gross_Profit__c - psa.Total_PSA_Plan_Cost__c;
+                if (psa.Total_PSA_Plan_Cost__c > 0) {
+                    psa.Total_PSA_ROI__c = (psa.Total_Plan_Volume_GP_After_Cost__c - psa.Total_Current_Volume_GP__c) / psa.Total_PSA_Plan_Cost__c;
+                }
+                Decimal targetROI = psa.Account__r.Target__c;
+                if (targetROI == 0) {
+                    if (psa.Account__r.Channel__c == 'On') {
+                        targetROI = psa.Market__r.Promotional_On_Premise_Target_ROI__c;
+                    } else {
+                        targetROI = psa.Market__r.Promotional_Off_Premise_Target_ROI__c;
+                    }
+
+                }
+                psa.Is_Under_Promotional_Target_ROI__c = psa.Total_PSA_ROI__c < targetROI;
+                System.debug('[updatePMITotals] total_plan_volume_gp_after_cost: ' + psa.Total_Plan_Volume_GP_After_Cost__c);
+                System.debug('[updatePMITotals] total psa gross profit: ' + psa.Total_PSA_Gross_Profit__c);
+                System.debug('[updatePMITotals] total psa plan cost: ' + psa.Total_PSA_Plan_Cost__c);
+                System.debug('[updatePMITotals] total current volume gp: ' + psa.Total_Current_Volume_GP__c);
+                System.debug('[updatePMITotals] total psa roi: ' + psa.Total_PSA_ROI__c);
+            }
 
             psa.Total_Customer_Profit__c = psa.Total_PSA_Gross_Profit__c - psa.Total_Investment__c;
             if (psa.Total_Investment__c != 0) {
@@ -1335,18 +1511,105 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static String submitActualsForApproval(string psaId){
         String msg = 'OK';
         try {
-            Promotion_Activity__c psa = [SELECT Id, SalesProposal_Actuals_Updated__c, PMI_Actual_Status__c, 
-                                            (SELECT Id, Approval_Status__c FROM PMI_Actuals__r WHERE Approval_Status__c = 'New') 
+            Promotion_Activity__c psa = [SELECT Id, SalesProposal_Actuals_Updated__c, PMI_Actual_Status__c, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c,
+                                            Market__r.Capture_End_Date__c, Market__r.Capture_Volume_in_Bottles__c, Account_Promotional_Target_ROI__c, Requires_Special_Approval__c,
+                                            Planned_Fee__c, Total_PSA_Actual_ROI__c, Total_PSA_ROI__c,
+                                            (SELECT Id, Approval_Status__c, Act_Qty__c, Rebate_Type__c, Rebate_Amount__c, Promotion_Material_Item__r.Plan_Volume__c, Promotion_Material_Item__r.Current_Volume__c,
+                                                    Promotion_Material_Item__r.Plan_Volume_Bottles__c, Promotion_Material_Item__r.Current_Volume_Bottles__c, Promotion_Material_Item__r.Plan_Rebate__c,
+                                                    Product_Pack_Qty__c, Product_Name__c, Promotion_Material_Item__r.Product_Gross_Profit_per_Bottle__c, Promotion_Material_Item__r.Product_Gross_Profit_per_Case_9L__c
+                                               FROM PMI_Actuals__r WHERE Has_Totals__c = FALSE) 
                                            FROM Promotion_Activity__c WHERE Id =:psaId];
-            if (psa != null && psa.PMI_Actuals__r != null && psa.PMI_Actuals__r.size() > 0) {
-                for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
-                    pmia.Approval_Status__c = 'Submit';
-                }
-                update psa.PMI_Actuals__r;
 
-                psa.PMI_Actual_Status__c = 'Submit';
-                psa.SalesProposal_Actuals_Updated__c = true;
-                update psa;
+            Decimal totalFeePaid = 0;
+            Decimal totalCurrentVolume = 0;
+            Decimal totalCurrentVolumeGrossProfit = 0;
+            Decimal totalActualVolume = 0;
+            Decimal totalActualPSAGrossProfit = 0;
+            Decimal totalCost = 0;
+            Decimal productGP = 0;
+            Integer numberOfMonths = 1;
+            Decimal currentVolume = 0;
+            Decimal actualVolume = 0;
+
+            List<PMI_Actual__c> actualsToSubmit = new List<PMI_Actual__c>();
+            if (psa != null && psa.PMI_Actuals__r != null && psa.PMI_Actuals__r.size() > 0) {
+                if (psa.Market__r.Capture_End_Date__c) {
+                    Date startDate = Date.newInstance(psa.Begin_Date__c.year(), psa.Begin_Date__c.month(), 1);
+                    numberOfMonths = startDate.monthsBetween(psa.End_Date__c)+1;
+                } else {
+                    numberOfMonths = psa.Length_of_Agreement__c.intValue();
+                    if (psa.Is_Length_in_Years__c) {
+                        numberOfMonths = psa.Length_of_Agreement__c.intValue() * 12;
+                    }
+                }
+
+                for(PMI_Actual__c pmia : psa.PMI_Actuals__r) {
+                    if (pmia.Rebate_Amount__c > 0 || pmia.Act_Qty__c > 0) {
+                        if (pmia.Approval_Status__c == 'New') {
+                            pmia.Approval_Status__c = 'Submit';
+                            actualsToSubmit.add(pmia); 
+                        }
+
+                        if (pmia.Rebate_Type__c == 'Fee') {
+                            totalFeePaid += pmia.Rebate_Amount__c;
+                        }
+                        if (pmia.Rebate_Type__c == 'Volume') {
+                            //totalActualVolume += pmia.Act_Qty__c;
+                            if (pmia.Promotion_Material_Item__r != null) {
+                                if (psa.Market__r.Capture_Volume_in_Bottles__c) {
+                                    currentVolume = pmia.Promotion_Material_Item__r.Current_Volume_Bottles__c / numberOfMonths;
+                                    productGP = pmia.Promotion_Material_Item__r.Product_Gross_Profit_per_Bottle__c;
+                                    actualVolume = pmia.Act_Qty__c * pmia.Product_Pack_Qty__c;
+                                } else {
+                                    currentVolume = pmia.Promotion_Material_Item__r.Current_Volume__c / numberOfMonths;
+                                    productGP = pmia.Promotion_Material_Item__r.Product_Gross_Profit_per_Case_9L__c;
+                                    actualVolume = pmia.Act_Qty__c;
+                                }
+                            }
+
+                            System.debug('[submitActualsForApproval] product: ' + pmia.Product_Name__c + ', productPackQty: ' + pmia.Product_Pack_Qty__c + ', act_qty: ' + pmia.Act_Qty__c + ', rebateAmount: ' + pmia.Rebate_Amount__c + ', actualVolume: ' + actualVolume + ', currentVolume: ' + currentVolume + ', gp: ' + productGP);
+
+                            totalActualVolume += actualVolume;
+                            totalActualPSAGrossProfit += actualVolume * productGP;
+                            totalCurrentVolumeGrossProfit += currentVolume * productGP;
+                            totalCurrentVolume += currentVolume;
+                            if (pmia.Promotion_Material_Item__r.Plan_Rebate__c > 0) {
+                                totalCost += actualVolume * pmia.Promotion_Material_Item__r.Plan_Rebate__c;
+                            }
+                        }
+                    }
+                }
+
+                totalCost += totalFeePaid;
+                System.debug('[submitActualsForApproval] totalCost: ' + totalCost);
+                System.debug('[submitActualsForApproval] totalFeePaid: ' + totalFeePaid);
+                System.debug('[submitActualsForApproval] plannedPaid: ' + psa.Planned_Fee__c);
+                System.debug('[submitActualsForApproval] totalActualsPSAGrossProfit: ' + totalActualPSAGrossProfit);
+                System.debug('[submitActualsForApproval] totalCurrentVolumeGrossProfit: ' + totalCurrentVolumeGrossProfit);
+                if (totalCost > 0) {
+                    Decimal gpNetOfTotalCost = totalActualPSAGrossProfit - totalCost;
+                    psa.Total_PSA_Actual_ROI__c = (gpNetOfTotalCost - totalCurrentVolumeGrossProfit) / totalCost;
+                    Decimal actualROI = psa.Total_PSA_Actual_ROI__c.setScale(5, System.RoundingMode.HALF_UP);
+                    Decimal plannedROI = psa.Total_PSA_ROI__c.setScale(5, System.RoundingMode.HALF_UP);
+                    System.debug('[submitActualsForApproval] actualROI: ' + actualROI);
+                    System.debug('[submitActualsForApproval] plannedROI: ' + plannedROI);
+                    if (totalFeePaid <= psa.Planned_Fee__c) {
+                        psa.Requires_Special_Approval__c = actualROI < plannedROI;
+                    } else {
+                        psa.Requires_Special_Approval__c = true;                        
+                    }
+
+                    System.debug('[submitActualsForApproval] requires special approval: ' + psa.Requires_Special_Approval__c);
+                }
+                
+                if (actualsToSubmit.size() > 0) {
+                    update actualsToSubmit;
+
+                    psa.PMI_Actual_Status__c = 'Submit';
+                    psa.SalesProposal_Actuals_Updated__c = true;
+                    update psa;
+                }
+
             }
         } catch (Exception ex) {
             msg = ex.getMessage();
@@ -1358,13 +1621,18 @@ public with sharing class PromotionalSalesAgreement_Controller {
     public static String submitForApproval(String psaId) {
         String msg = 'OK';
         try {
-            Promotion_Activity__c psa = [SELECT Id, Status__c, Market__r.Name, Total_Investment__c 
+            Promotion_Activity__c psa = [SELECT Id, Status__c, Market__r.Name, Total_Investment__c,
+                                            (SELECT Id  FROM Checklist__r WHERE Required__c = TRUE AND Completed__c = FALSE AND Required_For__c INCLUDES ('Approval')) 
                                            FROM Promotion_Activity__c 
                                            WHERE Id =:psaId];
 
             if (psa != null) {
-                psa.Status__c = 'Submitted';
-                update psa;
+                if (psa.Checklist__r != null && psa.Checklist__r.size() > 0) {
+                    throw new bfException(System.Label.Approval_Checklist_Items_Not_Completed_Message);
+                } else {
+                    psa.Status__c = 'Submitted';
+                    update psa;
+                }
 
                 /*
                 *  Note.  By setting the Status to Submitted will trigger the Promotion Activity - UK process
@@ -1429,15 +1697,16 @@ public with sharing class PromotionalSalesAgreement_Controller {
         SimpleListItem sli = new SimpleListItem('', 'OK', true, '');
 
         try {
-            Promotion_Activity__c psa = [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name,
+            Promotion_Activity__c psa = [SELECT Id, Name, RecordTypeId, RecordType.Name, Account__c, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.Name, Account__r.Channel__c,
                                                 Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, Account__r.ShippingCountry, Account__r.ShippingPostalCode,
+                                                Account__r.Promotional_Budget__c, Account__r.Promotional_Budget_Remaining__c, Account__r.Promotional_Budget_Used__c,
                                                 Contact__c, Contact__r.Name,Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Begin_Date__c, End_Date__c, Length_of_Agreement__c, Is_Length_in_Years__c, Channel__c,
                                                 Premise__c, Market__c, Market__r.Name, Status__c, Wholesaler_Preferred__c, Wholesaler_Preferred_Name__c,
                                                 Wholesaler_Alternate__c, Wholesaler_Alternate_Name__c, Total_Listing_Fee__c, Total_Listing_Fee_Paid__c,
                                                 Total_Promotional_Activity__c, Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy__c, Reminder_Date__c,
                                                 Is_Approved__c, Date_Approved__c, Total_Training_and_Advocacy_Paid__c, Total_Volume__c, Total_Actual_Volume__c, Purchase_Order__c,
                                                 Total_Investment__c, Number_of_Payments__c, Payment_Configurations__c, Payment_Configuration_Comments__c, Activity_Type__c, Limit_to_Selected_Accounts__c,
-                                                Contract_Type__c, Promo_Code__c, Discount_Category__c, Probability__c, 
+                                                Contract_Type__c, Promo_Code__c, Discount_Category__c, Probability__c, Market__r.Promotional_On_Premise_Target_ROI__c, Market__r.Promotional_Off_Premise_Target_ROI__c,
                                                 (SELECT Id, Account__c, AccountName__c, Account__r.ShippingStreet, Account__r.ShippingCity, Account__r.ShippingState, 
                                                         Account__r.ShippingCountry, Account__r.ShippingPostalCode, Total_Actual_Qty__c, Total_Listing_Fee_Paid__c, 
                                                         Total_Promotional_Activity_Paid__c, Total_Training_and_Advocacy_Paid__c FROM Promotions__r),
@@ -1470,6 +1739,14 @@ public with sharing class PromotionalSalesAgreement_Controller {
             newPSA.Number_of_Payments__c = 1;
             newPSA.Payment_Configurations__c = '';
             newPSA.Payment_Configuration_Comments__c = '';
+            newPSA.Account_Promotional_Budget__c = psa.Account__r.Promotional_Budget__c;
+            newPSA.Account_Promotional_Budget_Remaining__c = psa.Account__r.Promotional_Budget_Remaining__c;
+            if (psa.Account__r.Channel__c == 'On') {
+                newPSA.Account_Promotional_Target_ROI__c = psa.Market__r.Promotional_On_Premise_Target_ROI__c;
+            } else {
+                newPSA.Account_Promotional_Target_ROI__c = psa.Market__r.Promotional_Off_Premise_Target_ROI__c;
+            }
+
             if (newPSA.Is_Length_in_Years__c) {
                 newPSA.End_Date__c = newPSA.Begin_Date__c.addYears(Integer.valueOf(newPSA.Length_of_Agreement__c));
             } else {

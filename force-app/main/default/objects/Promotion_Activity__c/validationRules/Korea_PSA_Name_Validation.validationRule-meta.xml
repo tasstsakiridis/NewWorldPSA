@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Korea_PSA_Name_Validation</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ($RecordType.DeveloperName = &quot;KR_PSA&quot;),
+  OR(
+    NOT(BEGINS(Name, &quot;FY&quot;)),
+    IF(
+      OR((LOWER(RIGHT(Name, 3)) = &quot;new&quot;), (LOWER(RIGHT(Name, 5)) = &quot;renew&quot;)),
+      FALSE,
+      TRUE
+    )
+  )
+)</errorConditionFormula>
+    <errorMessage>Name does meet the formatting standard.  Name for PSA must start with the fiscal year (FY) and end with either New or Renew.  Format example:  FY26-Account Name-City-NEW or FY26-Account Name-City-RENEW</errorMessage>
+</ValidationRule>

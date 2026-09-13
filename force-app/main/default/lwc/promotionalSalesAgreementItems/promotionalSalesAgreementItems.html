@@ -16,6 +16,11 @@
                                         <span>&nbsp;</span>
                                         <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                        
                                     </h1>
+                                    <h4><span class="slds-text-tile_caps slds-text-title_bold slds-truncate slds-m-bottom_small">CCM # {sapAgreementNumber}</span>
+                                        <template lwc:if={boomiProcessed}>
+                                            <span class="slds-text-color_success slds-text-title_caps slds-text-title_bold slds-m-bottom_small slds-m-left_small">[{labels.boomiProcessed.label}]</span>
+                                        </template>
+                                    </h4>
                                 </div>
                             </div>
                             <template if:true={psaItems}>
@@ -99,7 +104,7 @@
                                                 capture-rebate-percentage={captureRebatePercentage}
                                                 market={marketName}
                                                 onselected={handleProductSelected} ></c-product-tile>
-                                </template>    
+                                </template>   
                             </div>
                             <c-paginator page-number={pageNumber}
                                             page-size={products.pageSize}

@@ -14,8 +14,10 @@ import getFieldSet from '@salesforce/apex/PromotionalSalesAgreement_Controller.g
 import getPSA from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSA';
 import getProducts from '@salesforce/apex/PromotionalSalesAgreement_Controller.getProducts';
 import getPSAItemDetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPSAItemDetails';
+import getBrands from '@salesforce/apex/PromotionalSalesAgreement_Controller.getBrands';
 
 import LABEL_BACK from '@salesforce/label/c.Back';
+import LABEL_BOOMI_PROCESSED from '@salesforce/label/c.Sent_to_CCM';
 import LABEL_HELP from '@salesforce/label/c.Help';
 import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PRODUCTS from '@salesforce/label/c.Products';
@@ -23,11 +25,12 @@ import LABEL_PRODUCTS from '@salesforce/label/c.Products';
 
 export default class PromotionsalSalesAgreementItems extends NavigationMixin(LightningElement) {
     labels = {
-        back         : { label: LABEL_BACK },
-        help         : { label: LABEL_HELP },
-        product      : { label: LABEL_PRODUCT, labelPlural: LABEL_PRODUCTS },
-        viewSelected : { label: 'view selected' },
-        allProducts  : { label: 'all products' }        
+        back                : { label: LABEL_BACK },
+        boomiProcessed      : { label: LABEL_BOOMI_PROCESSED },
+        help                : { label: LABEL_HELP },
+        product             : { label: LABEL_PRODUCT, labelPlural: LABEL_PRODUCTS },
+        viewSelected        : { label: 'view selected' },
+        allProducts         : { label: 'all products' }        
     };    
     
     @api psaId;
@@ -72,6 +75,13 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     get psaStatus() {
         return this.thePSA == null ? 'New' : this.thePSA.Status__c;
     }
+    get sapAgreementNumber() {
+        return this.thePSA == undefined ? '' : this.thePSA.SAP_Agreement_Number__c;
+    }
+    get boomiProcessed() {
+        return this.thePSA == undefined ? '' : this.thePSA.Boomi_Processed__c;
+    }
+
     get isLocked() {
         if (this.thePSA == null) {
             return false;
@@ -142,29 +152,8 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     }
 
     fieldSet;
-    /*
-    @wire(getFieldSet, { 
-        objectName: OBJECT_PMI.objectApiName, 
-        recordTypeName: '$recordTypeAPIName', 
-        marketName: '$marketName',
-        recordId: '$psaId',
-        promotionType: '$promotionType',
-        channel: '$channel'
-    })
-    wiredGetFieldSet({ error, data }) {
-        if (data) {
-            this.error = undefined;
-            this.fieldSet = data;
-            console.log('[getFieldset] fieldSet', this.fieldSet);
-        } else if (error) {
-            console.log('[getFieldset] error', error);
-            this.fieldSet = undefined;
-            this.error = error;            
-        }
-    }
-    */
     getFieldSetForPSA() {
-        console.log('[getFieldSetForPSA]');
+        console.log('[psaItems.getFieldSetForPSA]');
 
         getFieldSet({
             objectName: OBJECT_PMI.objectApiName,
@@ -219,7 +208,6 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 this.thePSA.Promotion_Material_Items__r.forEach(pmi => {
                     this.psaItems.set(pmi.Product_Custom__c, pmi);
                 });
-                console.log('psaItems', this.psaItems);
                 const newList = this.products.records.map(p => {
                     const newItem = {
                         id: p.id,
@@ -238,8 +226,6 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                     records: newList,
                     totalItemCount: this.products.totalItemCount
                 };
-
-                console.log('products', this.products);
     
             } else {
                 this.psaItems.clear();
@@ -248,13 +234,11 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 }
             }
 
-            if (this.loadProducts) {
-                //this.pageNumber = 1;
-            } else {
-                console.log('[handlesave] products', this.products);
-                console.log('[psaItems.handlesavepsa] products', this.products);
-    
-            }
+            console.log('[psaItems.getAgreement] # of psaitems', this.psaItems.size);
+            this.psaItems.forEach(p => {
+                console.log('[psaItems.getAgreement] psaItems', p);                
+            });
+            console.log('[psaItems.getAgreement] products', this.products);
 
             this.getFieldSetForPSA();
         }
@@ -271,7 +255,7 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
     @wire(getProducts, {pageNumber: '$pageNumber', brandsSelected: '$brandsSelected'})
     wiredGetProducts(value) {
         this.wiredProducts = value;
-        console.log('[wiredgetproducts] value', value);
+        console.log('[psaItems.getProducts] value', value);
         if (value.error) {
             this.error = value.error;
             this.products = undefined;
@@ -288,21 +272,23 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 }
                 return obj;
             });
+            /*
             try {
-            if (this.brandsSelected == undefined || this.brandsSelected == '') {
-                let brandList = [];
-                value.data.records.forEach(p => {
-                    if (p.Brand__c != undefined) {
-                        if (brandList.findIndex(b => b.value == p.Brand__c) == -1) {
-                            brandList.push({ label: p.Brand_Name__c, value: p.Brand__c, Name: p.Brand_Name__c, Primary_Logo__c: p.Brand__r.Primary_Logo__c });
-                        } 
-                    }
-                });
-                this.brands = brandList;
+                if (this.brandsSelected == undefined || this.brandsSelected == '') {
+                    let brandList = [];
+                    value.data.records.forEach(p => {
+                        if (p.Brand__c != undefined) {
+                            if (brandList.findIndex(b => b.value == p.Brand__c) == -1) {
+                                brandList.push({ label: p.Brand_Name__c, value: p.Brand__c, Name: p.Brand_Name__c, Primary_Logo__c: p.Brand__r.Primary_Logo__c });
+                            } 
+                        }
+                    });
+                    this.brands = brandList;
+                }
+            } catch(ex) {
+                console.log('exception: ', ex);
             }
-        } catch(ex) {
-            console.log('exception: ', ex);
-        }
+                */
             console.log('[psaItems.getProducts] psaItems', this.psaItems);
             console.log('[psaItems.getProducts] newList', newList);
             this.products = {
@@ -311,13 +297,34 @@ export default class PromotionsalSalesAgreementItems extends NavigationMixin(Lig
                 records: newList,
                 totalItemCount: value.data.totalItemCount
             };
-            console.log('[getProducts] products', this.products);
-            if (this.isPhone && this.isThisTass) {
-                alert('finished loading products');
-            }    
+            console.log('[psaItems.getProducts] products', this.products);
+   
         }
     }
 
+    brandPageNumber = 1;
+    wiredBrands;
+    @wire(getBrands, { pageNumber: '$brandPageNumber'})
+    wiredGetBrands(value) {
+        this.wiredBrands = value;
+        console.log('[getBrands] value', value);
+        if (value.error) {
+            this.error = value.error;
+            this.wiredBrands = undefined;
+            this.brands = undefined;
+        } else if (value.data) {
+            let brandList = value.data.records.map(b => {
+                return {
+                    label: b.Name,
+                    value: b.Id,
+                    Name: b.Name,
+                    Primary_Logo__c: b.Primary_Logo__c
+                };
+            });
+            this.brands = brandList;
+            console.log('[getBrands] brands', this.brands);
+        }
+    }
     wiredPSAItem;
     @wire(getPSAItemDetails, { psaItemId: '$psaItemId'})
     wiredGetPSAItem(value) {

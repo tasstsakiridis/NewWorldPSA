@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAP_Contract_Type__c</fullName>
+    <externalId>false</externalId>
+    <label>SAP Contract Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Contract_Type__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Group Billback</fullName>
+                <default>false</default>
+                <label>Group Billback</label>
+            </value>
+            <value>
+                <fullName>Scan Claims - Distributor</fullName>
+                <default>false</default>
+                <label>Scan Claims - Distributor</label>
+            </value>
+            <value>
+                <fullName>Retailer Billback</fullName>
+                <default>false</default>
+                <label>Retailer Billback</label>
+            </value>
+            <value>
+                <fullName>Lumpsum</fullName>
+                <default>false</default>
+                <label>Lumpsum</label>
+            </value>
+            <value>
+                <fullName>Distributor Billback</fullName>
+                <default>false</default>
+                <label>Distributor Billback</label>
+            </value>
+            <value>
+                <fullName>ZYND</fullName>
+                <default>false</default>
+                <label>ZYND</label>
+            </value>
+            <value>
+                <fullName>ZYCA</fullName>
+                <default>false</default>
+                <label>ZYCA</label>
+            </value>
+            <value>
+                <fullName>ZYPD</fullName>
+                <default>false</default>
+                <label>ZYPD</label>
+            </value>
+            <value>
+                <fullName>ZYVI</fullName>
+                <default>false</default>
+                <label>ZYVI</label>
+            </value>
+            <value>
+                <fullName>ZYLO</fullName>
+                <default>false</default>
+                <label>ZYLO</label>
+            </value>
+            <value>
+                <fullName>ZYVE</fullName>
+                <default>false</default>
+                <label>ZYVE</label>
+            </value>
+            <value>
+                <fullName>ZYGB</fullName>
+                <default>false</default>
+                <label>ZYGB</label>
+            </value>
+            <value>
+                <fullName>ZXL3</fullName>
+                <default>false</default>
+                <label>ZXL3</label>
+            </value>
+            <value>
+                <fullName>ZXL6</fullName>
+                <default>false</default>
+                <label>ZXL6</label>
+            </value>
+            <value>
+                <fullName>ZXS3</fullName>
+                <default>false</default>
+                <label>ZXS3</label>
+            </value>
+            <value>
+                <fullName>ZXSC</fullName>
+                <default>false</default>
+                <label>ZXSC</label>
+            </value>
+            <value>
+                <fullName>ZXLC</fullName>
+                <default>false</default>
+                <label>ZXLC</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>ZXL6</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banner Trading Terms</controllingFieldValue>
+            <valueName>Group Billback</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>ZXS3</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Shopper Investment</controllingFieldValue>
+            <valueName>Scan Claims - Distributor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Performance Contract</controllingFieldValue>
+            <valueName>ZXSC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banner Customer Investment</controllingFieldValue>
+            <controllingFieldValue>Banner Shopper Lumpsum Investment</controllingFieldValue>
+            <controllingFieldValue>Retail Store Investment</controllingFieldValue>
+            <controllingFieldValue>On Premise Investment</controllingFieldValue>
+            <valueName>Retailer Billback</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Contract</controllingFieldValue>
+            <valueName>ZXLC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Direct Customer Trading Terms</controllingFieldValue>
+            <valueName>Distributor Billback</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <valueName>ZXL3</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

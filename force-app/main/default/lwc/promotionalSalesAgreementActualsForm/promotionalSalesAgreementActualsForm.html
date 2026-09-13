@@ -3,29 +3,6 @@
         <h3 slot="title" class="slds-text-title_caps">
             {labels.actuals.label}
         </h3>
-        <template if:false={isPhone}>
-            <lightning-button-group slot="actions">
-                <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" disabled={isLocked} onclick={handleCancelButtonClick} ></lightning-button>
-                <template lwc:if={canEdit}>
-                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" disabled={isLocked} onclick={handleSaveButtonClick} ></lightning-button>
-                </template>
-                <template lwc:if={canDelete}>
-                    <lightning-button label={labels.delete.label} icon-name="utility:delete" title="Delete" class="" disabled={isLocked}
-                        onclick={handleDeleteButtonClick}></lightning-button>
-                </template>
-                <template lwc:if={pmiRecords}>
-                    <lightning-formatted-text value={multipleRecordsMessage} ></lightning-formatted-text>
-                    <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" disabled={isLocked} onclick={handleSkipButtonClick}></lightning-button>
-                    <template if:false={isFirstRecord}>
-                        <lightning-button label={labels.prev.label} icon-name="utility:left" title="Previous" class="" disabled={isLocked} onclick={handlePreviousRecordButtonClick}></lightning-button>                        
-                    </template>                    
-                    <template if:false={isLastRecord}>
-                        <lightning-button label={labels.next.label} icon-name="utility:right" title="Next" class="" disabled={isLocked} onclick={handleNextRecordButtonClick}></lightning-button>                        
-                    </template>                    
-                </template>
-                <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
-            </lightning-button-group>
-        </template>
         <div>
             <template lwc:if={isPhone}>
                 <lightning-layout multiple-rows="true">
@@ -51,7 +28,30 @@
                         </lightning-layout>
                     </lightning-layout-item>
                 </lightning-layout>
-            </template>    
+            </template>   
+            <template lwc:else>
+                <lightning-button-group slot="actions">
+                    <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" disabled={isLocked} onclick={handleCancelButtonClick} ></lightning-button>
+                    <template lwc:if={canEdit}>
+                        <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" disabled={isLocked} onclick={handleSaveButtonClick} ></lightning-button>
+                    </template>
+                    <template lwc:if={canDelete}>
+                        <lightning-button label={labels.delete.label} icon-name="utility:delete" title="Delete" class="" disabled={isLocked}
+                            onclick={handleDeleteButtonClick}></lightning-button>
+                    </template>
+                    <template lwc:if={pmiRecords}>
+                        <lightning-formatted-text value={multipleRecordsMessage} ></lightning-formatted-text>
+                        <lightning-button label={labels.skip.label} icon-name="utility:skip" title="Skip" class="" disabled={isLocked} onclick={handleSkipButtonClick}></lightning-button>
+                        <template if:false={isFirstRecord}>
+                            <lightning-button label={labels.prev.label} icon-name="utility:left" title="Previous" class="" disabled={isLocked} onclick={handlePreviousRecordButtonClick}></lightning-button>                        
+                        </template>                    
+                        <template if:false={isLastRecord}>
+                            <lightning-button label={labels.next.label} icon-name="utility:right" title="Next" class="" disabled={isLocked} onclick={handleNextRecordButtonClick}></lightning-button>                        
+                        </template>                    
+                    </template>
+                    <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                </lightning-button-group>
+            </template> 
         </div>
 
         <div class="card-body slds-m-top_small">
@@ -60,67 +60,10 @@
                     <p class="slds-text-title_caps">{labels.account.label}</p>
                     <span class="slds-text-heading_medium">{accountName}</span>
                 </lightning-layout-item>
-                <lightning-layout-item size="12" padding="around-small">
-                    <p class="slds-text-title_caps">{labels.product.label}</p>
-                    <span class="slds-text-heading_medium">{productName}</span>
-                </lightning-layout-item>
-                <template if:false={canEdit}>
+                <template lwc:if={pmiId}>
                     <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.processed.label}</p>
-                        <span class="slds-text-heading_medium">{processedMessage}</span>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.status.label}</p>
-                        <span class="slds-text-heading_medium">{approvalStatus}</span>
-                    </lightning-layout-item>
-                    <template lwc:if={captureFreeGoods}>
-                        <lightning-layout-item size="12" padding="around-small">
-                            <p class="slds-text-title_caps">{labels.freeGoods.label}</p>
-                            <lightning-formatted-number value={actualFreeGoodQty} maximum-fraction-digits="0"
-                                class="slds-text-heading_medium"></lightning-formatted-number>
-                        </lightning-layout-item>
-                    </template>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <template lwc:if={isPhone}>
-                            <p class="slds-text-title_caps">{labels.actualQty.label}</p>
-                            <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
-                        </template>
-                        <template lwc:else>
-                            <p>
-                                <span class="slds-text-title_caps">{actualQtyFormattedLabel}</span>
-                            </p>                            
-                        </template>
-                        <lightning-formatted-number value={actualQty} maximum-fraction-digits="0" class="slds-text-heading_medium" ></lightning-formatted-number>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.paymentDate.label}</p>
-                        <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.listingFeePaid.label}</p>
-                        <lightning-formatted-number value={listingFeePaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.promotionalActivityPaid.label}</p>
-                        <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
-                    </lightning-layout-item>
-                    <template lwc:if={captureInvoice}>
-                        <p class="slds-text-title_caps">{labels.invoice.label}</p>
-                        <span class="slds-text-heading_medium">{invoiceNumber}</span>
-                    </template>
-                    <!--
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.trainingAdvocacyPaid.label}</p>
-                        <lightning-formatted-number value={trainingAndAdvocacyPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
-                    </lightning-layout-item>
-                    -->
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
-                        <span class="slds-text-heading_medium">{wholesalerName}</span>
-                    </lightning-layout-item>
-                    <lightning-layout-item size="12" padding="around-small">
-                        <p class="slds-text-title_caps">{labels.comments.label}</p>
-                        <span class="slds-text-heading_medium">{comments}</span>
+                        <p class="slds-text-title_caps">{labels.product.label}</p>
+                        <span class="slds-text-heading_medium">{productName}</span>
                     </lightning-layout-item>
                 </template>
                 <template lwc:if={canEdit}>
@@ -162,7 +105,7 @@
                                             </lightning-input>
                                         </template>
                                         <template lwc:else>
-                                            <template if:true={showTotalDiscount}>
+                                            <template lwc:if={showTotalDiscount}>
                                                 <div class="slds-m-bottom_x-small">
                                                     <p class="slds-text-title_caps">{labels.totalDiscount.label} : <lightning-formatted-number value={totalDiscount}
                                                             format-style="currency" maximum-fraction-digits="2"></lightning-formatted-number>
@@ -191,14 +134,14 @@
                                             </template>
                                         </template>
                                     </template>
-                                    <template if:false={rebate.isVolumeRebate}>
+                                    <template lwc:else>
                                         <lightning-input type="currency" 
                                             label={rebate.label} 
                                             name="i_rebateAmount" value={rebate.rebateAmount} 
                                             placeholder={labels.rebateAmount.placeholder} 
                                             data-rebate-type={rebate.rebateType}
                                             onchange={handleRebateAmountChange}></lightning-input>
-                                        <template if:true={hasRebateAmountError}>
+                                        <template lwc:if={hasRebateAmountError}>
                                             <span class="error">{labels.rebateAmount.error}</span>
                                         </template>
 
@@ -207,7 +150,7 @@
                             </template>
                         </template>
 
-                        <template if:true={captureInvoice}>
+                        <template lwc:if={captureInvoice}>
                             <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                                 <lightning-input name="i_InvoiceNumber" 
                                             label={labels.invoice.label} 
@@ -240,7 +183,7 @@
                         </lightning-layout-item>
 
                     </template>
-                    <template if:false={isNew}>
+                    <template lwc:else>
                         <lightning-layout-item size="12" padding="around-small">
                             <template lwc:if={isSOMUser}>
                                 <lightning-combobox name="i_ApprovalStatus"
@@ -287,10 +230,11 @@
                                 </template>    
                             </template>
                             <template lwc:else>
-                                <lightning-input type="currency" 
+                                <lightning-input type="number" 
                                     label={rebateLabel} 
                                     name="i_rebateAmount" value={rebateAmount} 
                                     placeholder={labels.rebateAmount.placeholder} 
+                                    formatter="currency"
                                     data-rebate-type={rebateType}
                                     onchange={handleRebateAmountChange}></lightning-input>
                                 <template lwc:if={hasRebateAmountError}>
@@ -299,6 +243,7 @@
 
                             </template>
                         </lightning-layout-item>
+
                         <template lwc:if={captureInvoice}>
                             <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
                                 <lightning-input name="i_InvoiceNumber" label={labels.invoice.label} value={invoiceNumber}
@@ -308,43 +253,41 @@
                         </template>
 
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
-                            <template lwc:if={isVolumeRebate}>
-                                <template lwc:if={isKorea}>
-                                    <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} 
-                                            value={wholesalerSearchString} 
-                                            is-loading={isSearching} 
-                                            readonly={isLocked} 
-                                            onchange={handleSearchWholesalerChange}
-                                            onfocus={focusWholesalerOptions}></lightning-input>
+                            <template lwc:if={isKorea}>
+                                <lightning-input type="search" name="i_search_wholesaler" label={labels.purchasedFrom.label} 
+                                        value={wholesalerSearchString} 
+                                        is-loading={isSearching} 
+                                        readonly={isLocked} 
+                                        onchange={handleSearchWholesalerChange}
+                                        onfocus={focusWholesalerOptions}></lightning-input>
 
-                                    <template lwc:if={showWholesalerOptions}>
-                                        <template lwc:if={wholesalerOptions}>                                                                                
-                                            <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid slds-m-around_small" role="listbox">
-                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                    <template for:each={wholesalerOptions} for:item="w">
-                                                        <li key={w.Id} data-wholesaler-id={w.Id} role="presentation" class="slds-listbox__item slds-m-horizontal_small" onclick={handleWholesalerSelected}>
-                                                            <div class="slds-media slds-listbox__option slds-listbox__options_plain slds-media_small" role="option">
-                                                                <span class="slds-media__body">
-                                                                    <span class="slds-truncate" title={w.Name} data-wholesaler-id={w.Id}>
-                                                                        {w.Name}
-                                                                    </span>
+                                <template lwc:if={showWholesalerOptions}>
+                                    <template lwc:if={wholesalerOptions}>                                                                                
+                                        <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid slds-m-around_small" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                <template for:each={wholesalerOptions} for:item="w">
+                                                    <li key={w.Id} data-wholesaler-id={w.Id} role="presentation" class="slds-listbox__item slds-m-horizontal_small" onclick={handleWholesalerSelected}>
+                                                        <div class="slds-media slds-listbox__option slds-listbox__options_plain slds-media_small" role="option">
+                                                            <span class="slds-media__body">
+                                                                <span class="slds-truncate" title={w.Name} data-wholesaler-id={w.Id}>
+                                                                    {w.Name}
                                                                 </span>
-                                                            </div>
-                                                        </li>
-                                                    </template>    
-                                                </ul>
-                                            </div>
-                                        </template>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>    
+                                            </ul>
+                                        </div>
                                     </template>
                                 </template>
-                                <template lwc:else>
-                                    <lightning-combobox name="i_Wholesaler"
-                                        label={labels.purchasedFrom.label}
-                                        value={wholesaler}
-                                        options={wholesalerOptions}
-                                        onchange={handleWholesalerChange}>
-                                    </lightning-combobox>
-                                </template>
+                            </template>
+                            <template lwc:elseif={isVolumeRebate}>
+                                <lightning-combobox name="i_Wholesaler"
+                                    label={labels.purchasedFrom.label}
+                                    value={wholesaler}
+                                    options={wholesalerOptions}
+                                    onchange={handleWholesalerChange}>
+                                </lightning-combobox>
                             </template>
                         </lightning-layout-item>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">
@@ -357,7 +300,80 @@
                             </lightning-textarea>
                         </lightning-layout-item>
                     </template>
-                </template>                
+                </template>  
+                <template lwc:else>
+                    <!-- If user can't edit Actual, show read only details of the PMI Actual record--> 
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.processed.label}</p>
+                        <span class="slds-text-heading_medium">{processedMessage}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.status.label}</p>
+                        <span class="slds-text-heading_medium">{approvalStatus}</span>
+                    </lightning-layout-item>
+                    <template lwc:if={captureFreeGoods}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p class="slds-text-title_caps">{labels.freeGoods.label}</p>
+                            <lightning-formatted-number value={actualFreeGoodQty} maximum-fraction-digits="0"
+                                class="slds-text-heading_medium"></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={isFeeRebate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p class="slds-text-title_caps">{labels.fee.label}</p>
+                            <lightning-formatted-number value={feePaid} format-style="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" currency-display-as="code" currency-code={CURRENCY_CODE} ></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={isVolumeRebate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <template lwc:if={isPhone}>
+                                <p class="slds-text-title_caps">{labels.actualQty.label}</p>
+                                <p class="slds-text-title_caps">[{labels.planned.label} : {plannedVolume}]</p>
+                            </template>
+                            <template lwc:else>
+                                <p>
+                                    <span class="slds-text-title_caps">{actualQtyFormattedLabel}</span>
+                                </p>                            
+                            </template>
+                            <lightning-formatted-number value={actualQty} maximum-fraction-digits="0" class="slds-text-heading_medium" ></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.paymentDate.label}</p>
+                        <lightning-formatted-date-time value={formattedPaymentDate} month="long" day="2-digit" weekday="long" class="slds-text-heading_medium"></lightning-formatted-date-time>
+                    </lightning-layout-item>
+                    <template lwc:if={showListingFeeRebate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p class="slds-text-title_caps">{labels.listingFeePaid.label}</p>
+                            <lightning-formatted-number value={listingFeePaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={showPromotionalActivityRebate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p class="slds-text-title_caps">{labels.promotionalActivityPaid.label}</p>
+                            <lightning-formatted-number value={promotionalActivityPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={captureInvoice}>
+                        <p class="slds-text-title_caps">{labels.invoice.label}</p>
+                        <span class="slds-text-heading_medium">{invoiceNumber}</span>
+                    </template>
+                    <!--
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.trainingAdvocacyPaid.label}</p>
+                        <lightning-formatted-number value={trainingAndAdvocacyPaid} type="currency" maximum-fraction-digits="2" class="slds-text-heading_medium" ></lightning-formatted-number>
+                    </lightning-layout-item>
+                    -->
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.purchasedFrom.label}</p>
+                        <span class="slds-text-heading_medium">{wholesalerName}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.comments.label}</p>
+                        <span class="slds-text-heading_medium">{comments}</span>
+                    </lightning-layout-item>
+                </template>
+
             </lightning-layout>
         </div>
     </lightning-card>

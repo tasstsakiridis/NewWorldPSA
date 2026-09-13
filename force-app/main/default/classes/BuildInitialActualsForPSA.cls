@@ -58,13 +58,30 @@ public with sharing class BuildInitialActualsForPSA {
             Boolean keyExists = false;
             String pmiaRecordType = '';
             PMI_Actual__c newActual;
+            Integer numberOfMonths = 0;
             List<Promotion_Material_Item__c> itemsToUpdate = new List<Promotion_Material_Item__c>();
 
             Schema.DescribeFieldResult dfrRebateTypes = PMI_Actual__c.Rebate_Type__c.getDescribe();
             List<Schema.PicklistEntry> rebateTypes = dfrRebateTypes.getPicklistValues();
         
-            for(Promotion_Activity__c pa : activities) {
+            for(Promotion_Activity__c pa : activities) {                
+                numberOfMonths = 0;
                 if (pa.Promotion_Material_Items__r != null && pa.Promotion_Material_Items__r.size() > 0) {
+                    if (pa.Market__r.Spread_Planned_Values__c) {
+                        if (pa.Market__r.Capture_End_Date__c) {
+                            Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
+                            numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
+                        } else {
+                            numberOfMonths = pa.Length_of_Agreement__c.intValue();
+                            if (pa.Is_Length_in_Years__c) {
+                                numberOfMonths = pa.Length_of_Agreement__c.intValue() * 12;
+                            }
+                        }
+                        System.debug('[BuildInitialActuals] startDate: ' + pa.Begin_Date__c);
+                        System.debug('[BuildInitialActuals] endDate: ' + pa.End_Date__c);
+                        System.debug('[BuildInitialActuals] # of months: ' + numberOfMonths);
+                    }
+
                     for(Promotion_Material_Item__c pmi : pa.Promotion_Material_Items__r) {
                         if (pa.Market__r.Allow_Updates_After_Approval__c) {
                             if (pmi.Proposed_Plan_Volume__c != null && pmi.Plan_Volume__c != pmi.Proposed_Plan_Volume__c) {
@@ -97,7 +114,7 @@ public with sharing class BuildInitialActualsForPSA {
                         for(Schema.PicklistEntry pe : rebateTypes) {
                             if (pe.isActive()) {
                                 //externalKey = pmi.Promotion__c + '_' + pmi.Id + '_Volume-0';
-                                newActual = createPMIActual(pa, pmi, pe.getValue(), pmiaRecordType, configs, true, false, 0, 0);
+                                newActual = createPMIActual(pa, pmi, pmi.Promotion__c, pe.getValue(), pmiaRecordType, configs, true, false, 0, 0);
                                 keyExists = existingExternalKeys.contains(newActual.External_Key__c);
                                 System.debug('externalKey: ' + newActual.External_Key__c + ', exists: ' + keyExists);                
                                 if (keyExists) {
@@ -172,30 +189,17 @@ public with sharing class BuildInitialActualsForPSA {
                         }
 
                         if (pa.Market__r.Spread_Planned_Values__c) {
-                            Integer numberOfMonths = 0;
-                            if (pa.Market__r.Capture_End_Date__c) {
-                                Date startDate = Date.newInstance(pa.Begin_Date__c.year(), pa.Begin_Date__c.month(), 1);
-                                numberOfMonths = startDate.monthsBetween(pa.End_Date__c)+1;
-                            } else {
-                                numberOfMonths = pa.Length_of_Agreement__c.intValue();
-                                if (pa.Is_Length_in_Years__c) {
-                                    numberOfMonths = pa.Length_of_Agreement__c.intValue() * 12;
-                                }
-                            }
-                            System.debug('[BuildInitialActuals] startDate: ' + pa.Begin_Date__c);
-                            System.debug('[BuildInitialActuals] endDate: ' + pa.End_Date__c);
-                            System.debug('[BuildInitialActuals] # of months: ' + numberOfMonths);
                             for(Integer mm = 0; mm < numberOfMonths; mm++) {
                                 if (pmi.Plan_Volume__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Volume', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, pmi, pmi.Promotion__c, 'Volume', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
                                         actualsToCreate.add(newActual);
                                     }
                                 }
-                                if (pmi.Fee__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                if (pmi.Fee__c > 0 && pa.Market__r.Name != 'Korea') {
+                                    newActual = createPMIActual(pa, pmi, pmi.Promotion__c, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -203,7 +207,7 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                                 if (pmi.Listing_Fee__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Listing Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, pmi, pmi.Promotion__c, 'Listing Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -211,7 +215,7 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                                 if (pmi.Promotional_Activity_Value__c > 0) {
-                                    newActual = createPMIActual(pa, pmi, 'Promotional Activity', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                                    newActual = createPMIActual(pa, pmi, pmi.Promotion__c, 'Promotional Activity', pmiaRecordType, configs, false, true, numberOfMonths, mm);
                                     if (existingExternalKeys.contains(newActual.External_Key__c)) {
                                         actualsToUpdate.add(newActual);
                                     } else {
@@ -219,6 +223,18 @@ public with sharing class BuildInitialActualsForPSA {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                if (pa.Market__r.Spread_Planned_Values__c && pa.Market__r.Capture_Agreement_Level_Plan_Details__c && pa.Planned_Fee__c > 0) {
+                    Promotion_Material_Item__c pmi = pa.Promotion_Material_Items__r[0];
+                    for(Integer mm = 0; mm < numberOfMonths; mm++) {
+                        newActual = createPMIActual(pa, null, pmi.Promotion__c, 'Fee', pmiaRecordType, configs, false, true, numberOfMonths, mm);
+                        if (existingExternalKeys.contains(newActual.External_Key__c)) {
+                            actualsToUpdate.add(newActual);
+                        } else {
+                            actualsToCreate.add(newActual);
                         }
                     }
                 }
@@ -244,34 +260,42 @@ public with sharing class BuildInitialActualsForPSA {
         }
     }
 
-    static PMI_Actual__c createPMIActual(Promotion_Activity__c theActivity, Promotion_Material_Item__c pmi, String rebateType, String recordTypeId, List<SAP_Interfaced_Data_Configuration__c> configs, Boolean isTotal, Boolean calcSpread, Integer numberOfMonths, Integer period) {
+    static PMI_Actual__c createPMIActual(Promotion_Activity__c theActivity, Promotion_Material_Item__c pmi, String promotionId, String rebateType, String recordTypeId, List<SAP_Interfaced_Data_Configuration__c> configs, Boolean isTotal, Boolean calcSpread, Integer numberOfMonths, Integer period) {
         PMI_Actual__c pmia = new PMI_Actual__c();
         pmia.RecordTypeId = recordTypeId;
         pmia.Activity__c = theActivity.Id;
-        pmia.Promotion__c = pmi.Promotion__c;
-        pmia.Promotion_Material_Item__c = pmi.Id;
+        pmia.Promotion__c = promotionId;
+        if (pmi != null) {
+            pmia.Promotion_Material_Item__c = pmi.Id;
+        }
         pmia.Actual_Wholesaler__c = theActivity.Wholesaler_Preferred__c;
         pmia.Has_Totals__c = isTotal;
         pmia.Period__c = period;
         pmia.Approval_Status__c = isTotal ? 'Rebate Complete' : 'New';
-        pmia.External_Key__c = pmi.Promotion__c + '_' + pmi.Id + '_'+rebateType+(isTotal ? '_total' : '')+'-'+period;
+        if (pmi == null) {
+            pmia.External_Key__c = promotionId + '_' + theActivity.Id + '_' + rebateType + (isTotal ? '_total' : '') + '-' + period;
+        } else {
+            pmia.External_Key__c = pmi.Promotion__c + '_' + pmi.Id + '_'+rebateType+(isTotal ? '_total' : '')+'-'+period;
+        }
         pmia.Rebate_Type__c = rebateType;
         pmia.Rebate_Amount__c = 0;
         pmia.Act_Qty__c = 0;
         pmia.Payment_Date__c = Date.today();
 
         if (calcSpread) {
-            if (rebateType == 'Volume') {
-                pmia.Forecast_Volume__c = pmi.Plan_Volume__c / numberOfMonths;
-                if (theActivity.Market__r.Capture_Volume_in_Bottles__c) {
-                    pmia.Forecast_Volume__c = pmi.Plan_Volume_Bottles__c / numberOfMonths;
+            if (pmi != null) {
+                if (rebateType == 'Volume') {
+                    pmia.Forecast_Volume__c = pmi.Plan_Volume__c / numberOfMonths;
+                    if (theActivity.Market__r.Capture_Volume_in_Bottles__c) {
+                        pmia.Forecast_Volume__c = pmi.Plan_Volume_Bottles__c / numberOfMonths;
+                    }
                 }
-            }
-            if (rebateType == 'Listing Fee') {
-                pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
-            }
-            if (rebateType == 'Promotional Activity') {
-                pmia.Forecast_Promotional_Activity__c = pmi.Promotional_Activity_Value__c / numberOfMonths;
+                if (rebateType == 'Listing Fee') {
+                    pmia.Forecast_Listing_Fee__c = pmi.Listing_Fee__c / numberOfMonths;
+                }
+                if (rebateType == 'Promotional Activity') {
+                    pmia.Forecast_Promotional_Activity__c = pmi.Promotional_Activity_Value__c / numberOfMonths;
+                }
             }
 
             if (theActivity.Market__r.Capture_Agreement_Level_Plan_Details__c) {

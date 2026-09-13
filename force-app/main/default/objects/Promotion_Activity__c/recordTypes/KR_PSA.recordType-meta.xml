@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KR_PSA</fullName>
+    <active>true</active>
+    <description>Korea PSA</description>
+    <label>KR - PSA</label>
+    <picklistValues>
+        <picklist>Contract_Type__c</picklist>
+        <values>
+            <fullName>CCM Lump Sum Contract</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CCM Lump Sum Manual Distribution</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CCM Performance Contract</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Discount_Category__c</picklist>
+        <values>
+            <fullName>Customer Admin%2FOther</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Admin%2FOther - Performance Contract</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promotional Discount</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promotional Discount - Performance Contract</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Visibility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Visibility - eCommerce</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>PMI_Actual_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Paid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recalled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reviewed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Submit</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Promo_Code__c</picklist>
+        <values>
+            <fullName>Central Processing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Original</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Data</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Data Fee - Indirect</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Data Fee - Key Period</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Display</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDLP Key Selling Period</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Guideline Discounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Store Media</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incentive Trip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Online Visibility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other Promo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other Visibility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Price Promo H%26L</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Price Support</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promo Discount - Fixed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Promotional Discount</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ranging</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Visibility Bonus</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Visibility Fees - Fixed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>eCommerce</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

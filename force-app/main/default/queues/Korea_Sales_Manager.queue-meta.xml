@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <doesIncludeBosses>true</doesIncludeBosses>
+    <doesSendEmailToMembers>true</doesSendEmailToMembers>
+    <name>Korea Sales Manager</name>
+    <queueMembers>
+        <users>
+            <user>hara_kim@b-f.com</user>
+            <user>hyeonjeong_lee@b-f.com</user>
+            <user>kyunam_kim@b-f.com</user>
+            <user>minji_kang@b-f.com</user>
+            <user>tass_tsakiridis@b-f.com</user>
+        </users>
+    </queueMembers>
+    <queueSobject>
+        <sobjectType>Promotion_Activity__c</sobjectType>
+    </queueSobject>
+</Queue>

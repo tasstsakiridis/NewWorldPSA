@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Discount_Category__c</fullName>
+    <description>The discount category or type of contract that will be mapped to the Contract Type field in CCM</description>
+    <externalId>false</externalId>
+    <label>Discount Category</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Contract_Type__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Base Rebate</fullName>
+                <default>false</default>
+                <label>Base Rebate</label>
+            </value>
+            <value>
+                <fullName>Guideline Discounts</fullName>
+                <default>false</default>
+                <label>Guideline Discounts</label>
+            </value>
+            <value>
+                <fullName>Functional Rebate</fullName>
+                <default>false</default>
+                <label>Functional Rebate</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate</fullName>
+                <default>false</default>
+                <label>Performance Rebate</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L</label>
+            </value>
+            <value>
+                <fullName>Visibility</fullName>
+                <default>false</default>
+                <label>Visibility</label>
+            </value>
+            <value>
+                <fullName>Customer Original</fullName>
+                <default>false</default>
+                <label>Customer Original</label>
+            </value>
+            <value>
+                <fullName>Distribution</fullName>
+                <default>false</default>
+                <label>Distribution</label>
+            </value>
+            <value>
+                <fullName>Other Promo</fullName>
+                <default>false</default>
+                <label>Other Promo</label>
+            </value>
+            <value>
+                <fullName>E-Commerce</fullName>
+                <default>false</default>
+                <label>E-Commerce</label>
+            </value>
+            <value>
+                <fullName>Logistic</fullName>
+                <default>false</default>
+                <label>Logistic</label>
+            </value>
+            <value>
+                <fullName>EDLP - Key Selling Period</fullName>
+                <default>false</default>
+                <label>EDLP - Key Selling Period</label>
+            </value>
+            <value>
+                <fullName>Customer Admin/Other</fullName>
+                <default>false</default>
+                <label>Customer Admin/Other</label>
+            </value>
+            <value>
+                <fullName>Promotional Discount</fullName>
+                <default>false</default>
+                <label>Promotional Discount</label>
+            </value>
+            <value>
+                <fullName>Visibility - eCommerce</fullName>
+                <default>false</default>
+                <label>Visibility - eCommerce</label>
+            </value>
+            <value>
+                <fullName>Customer Admin/Other - Performance Contract</fullName>
+                <default>false</default>
+                <label>Customer Admin/Other - Performance Contract</label>
+            </value>
+            <value>
+                <fullName>Promotional Discount - Performance Contract</fullName>
+                <default>false</default>
+                <label>Promotional Discount - Performance Contract</label>
+            </value>
+            <value>
+                <fullName>Guideline Discounts - External Performance Contract</fullName>
+                <default>false</default>
+                <label>Guideline Discounts - External Performance Contract</label>
+            </value>
+            <value>
+                <fullName>Promotional Discount - External Performance Contract</fullName>
+                <default>false</default>
+                <label>Promotional Discount - External Performance Contract</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>Guideline Discounts</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Functional Rebate</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Performance Rebate</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>Price Promo H&amp;L</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM Lump Sum Contract</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Visibility</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Customer Original</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Distribution</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>Other Promo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <valueName>E-Commerce</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM External Lump Sum Contract</controllingFieldValue>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>EDLP - Key Selling Period</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM Lump Sum Contract</controllingFieldValue>
+            <valueName>Customer Admin/Other</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <controllingFieldValue>CCM Lump Sum Contract</controllingFieldValue>
+            <valueName>Promotional Discount</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Lump Sum Manual Distribution</controllingFieldValue>
+            <valueName>Visibility - eCommerce</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Performance Contract</controllingFieldValue>
+            <valueName>Customer Admin/Other - Performance Contract</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM Performance Contract</controllingFieldValue>
+            <valueName>Promotional Discount - Performance Contract</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>Guideline Discounts - External Performance Contract</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CCM External Performance Contract</controllingFieldValue>
+            <valueName>Promotional Discount - External Performance Contract</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

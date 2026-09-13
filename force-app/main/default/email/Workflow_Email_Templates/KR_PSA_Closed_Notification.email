@@ -1,0 +1,1 @@
+Agreement {!Promotion_Activity__c.Name} has been closed as of {!Promotion_Activity__c.End_Date__c}.

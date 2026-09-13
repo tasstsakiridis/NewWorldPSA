@@ -159,14 +159,14 @@
                 <h2 class="slds-text-title_caps slds-m-around_small">{labels.dateRange.label}</h2>
                 <lightning-layout multiple-rows="true" class="slds-m-vertical_small">
                     <lightning-layout-item size="12" padding="around-small">
-                        <lightning-input type="date" name="i_StartDate" label={labels.startDate.label} value={startDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleStartDateChange}></lightning-input>
+                        <lightning-input type="date" name="i_StartDate" label={startDateLabel} value={startDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleStartDateChange}></lightning-input>
                         <template if:true={hasStartDateError}>
                             <span class="slds-m-horizontal_small input-error">{labels.startDate.error}</span>
                         </template>
                     </lightning-layout-item>
                     <template if:true={captureEndDate}>
                         <lightning-layout-item size="12" padding="around-small">
-                            <lightning-input type="date" name="i_EndDate" label={labels.endDate.label} value={endDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleEndDateChange}></lightning-input>
+                            <lightning-input type="date" name="i_EndDate" label={endDateLabel} value={endDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleEndDateChange}></lightning-input>
                             <template if:true={hasEndDateError}>
                                 <span class="slds-m-horizontal_small input-error">{labels.endDate.error}</span>
                             </template>    
@@ -215,6 +215,11 @@
                         <lightning-layout-item size="12" padding="around-small">
                             <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.agreementEndDate.label}</h2>
                             <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={showDateGuidance}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p><lightning-formatted-text value={labels.psaDateGuidance.label}></lightning-formatted-text></p>
                         </lightning-layout-item>
                     </template>
                     <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
@@ -290,23 +295,23 @@
                                 <template lwc:if={hasBudgetError}>
                                     <span class="slds-m-horizontal_small input-error">{budgetErrorMessage}</span>
                                 </template>    
-                                <template lwc:if={captureAgreementLevelDetails}>
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
-                                    </lightning-layout-item>
-                                    <template lwc:if={hasFeeError}>
-                                        <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
-                                    </template>    
-                                </template>
-                                <template lwc:if={isKorea}>
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
-                                    </lightning-layout-item>   
-                                    <lightning-layout-item size="12" padding="around-small">
-                                        <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
-                                    </lightning-layout-item>   
-                                </template>     
                             </template>
+                            <template lwc:if={captureAgreementLevelDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
+                                </lightning-layout-item>
+                                <template lwc:if={hasFeeError}>
+                                    <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
+                                </template>    
+                            </template>
+                            <template lwc:if={isKorea}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                            </template>     
                             <template lwc:if={captureProbability}>
                                 <lightning-layout-item size="12" padding="around-small">
                                     <lightning-input type="number" name="probabilityPercentage" label={labels.probabilityPercentage.label} step="1"

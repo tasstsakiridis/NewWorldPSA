@@ -226,6 +226,9 @@ public with sharing class PSAWrapper {
     public Decimal accountPromotionalBudget { get; set; }
 
     @AuraEnabled 
+    public Decimal accountPromotionalTargetROI { get; set; }
+
+    @AuraEnabled 
     public Decimal percentageVisibility { get; set; }
 
     @AuraEnabled 
@@ -242,6 +245,9 @@ public with sharing class PSAWrapper {
 
     @AuraEnabled 
     public String promoCode { get; set; }
+
+    @AuraEnabled 
+    public String accountOwner { get; set; }
 
     @AuraEnabled 
     public String accountOwnerSalesRegion { get; set; }
@@ -300,12 +306,14 @@ public with sharing class PSAWrapper {
         this.totalBudget = 0;
         this.fee = 0;
         this.accountPromotionalBudget = 0;
+        this.accountPromotionalTargetROI = 0;
         this.percentageVisibility = 0;
         this.probabilityPercentage = 0;
         this.isDirectRebate = true;
         this.discountCategory = '';
         this.promoCode = '';
         this.contractType = '';
+        this.accountOwner = '';
         this.accountOwnerSalesRegion = '';
         this.ownerManager = '';
 
@@ -351,6 +359,7 @@ public with sharing class PSAWrapper {
         this.totalBudget = psa.Activity_Budget__c;
         this.fee = psa.Planned_Fee__c;
         this.accountPromotionalBudget = psa.Account_Promotional_Budget__c;
+        this.accountPromotionalTargetROI = psa.Account_Promotional_Target_ROI__c;
         this.percentageVisibility = psa.Percentage_Visibility__c;
         this.probabilityPercentage = psa.Probability__c;
         this.limitToSelectedAccounts = psa.Limit_to_Selected_Accounts__c;
@@ -359,6 +368,7 @@ public with sharing class PSAWrapper {
         this.accountWholesalerPreferredName = psa.Account_Wholesaler_Preferred_Name__c;
         this.accountWholesalerAlternate = psa.Account_Wholesaler_Alternate__c;
         this.accountWholesalerAlternateName = psa.Account_Wholesaler_Alternate_Name__c;
+        this.accountOwner = psa.Account__r.OwnerId;
         this.accountOwnerSalesRegion = psa.Account__r.Owner.Sales_Region__c;
         this.ownerManager = psa.Owner_Manager__c;
     }

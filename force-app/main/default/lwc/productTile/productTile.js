@@ -32,6 +32,16 @@ export default class ProductTile extends LightningElement {
         unregisterAllListeners(this);
     }
 
+    _psaItem;
+    @api 
+    get psaItem() {
+        return this._psaItem;
+    }
+    set psaItem(val) {
+        this._psaItem = val;
+        console.log('[productTile.set psaitem] psaItem', val);
+    }
+
     @api 
     keepSelection = false;
 
@@ -157,9 +167,6 @@ export default class ProductTile extends LightningElement {
 
         return parseFloat(r).toFixed(2);
     }
-
-    @api 
-    psaItem;
 
     get psaItemId() {
         return this.psaItem == undefined ? undefined : this.psaItem.Id;

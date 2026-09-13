@@ -1,12 +1,14 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
-import { deleteRecord, updateRecord, getRecordNotifyChange } from 'lightning/uiRecordApi';
+import { deleteRecord, updateRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import { refreshApex } from '@salesforce/apex';
 
 import CLIENT_FORM_FACTOR from '@salesforce/client/formFactor';
+
+import CURRENCY_CODE from '@salesforce/i18n/currencyCode';
 
 import createActuals from '@salesforce/apex/PromotionalSalesAgreement_Controller.createActuals';
 import getPMIADetails from '@salesforce/apex/PromotionalSalesAgreement_Controller.getPMIADetails';
@@ -49,6 +51,7 @@ import LABEL_DELETE_MSG from '@salesforce/label/c.Delete_Success';
 import LABEL_EFFECTIVENESS from '@salesforce/label/c.Effectiveness';
 import LABEL_EFFECTIVENESS_9L from '@salesforce/label/c.Effectiveness_9L';
 import LABEL_ERROR from '@salesforce/label/c.Error';
+import LABEL_FEE from '@salesforce/label/c.Fee';
 import LABEL_FORECAST from '@salesforce/label/c.Forecast';
 import LABEL_FREE_GOODS from '@salesforce/label/c.Free_Goods';
 import LABEL_FORM_VALIDATION_ERROR from '@salesforce/label/c.Form_Validation_Error';
@@ -70,6 +73,7 @@ import LABEL_PRODUCT from '@salesforce/label/c.Product';
 import LABEL_PROMOTIONAL_ACTIVITY_PAID from '@salesforce/label/c.Promotional_Activity_Paid';
 import LABEL_PURCHASED_FROM from '@salesforce/label/c.Purchased_From';
 import LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR from '@salesforce/label/c.Rebate_Amount_Above_Planned_Error';
+import LABEL_REBATE_AMOUNT_ABOVE_PROMOTIONAL_BUDGET_ERROR from '@salesforce/label/c.Rebate_Amount_Above_Promotional_Budget_Error';
 import LABEL_REBATE_AMOUNT_PLACEHOLDER from '@salesforce/label/c.Rebate_Amount_Placeholder';
 import LABEL_REMAINING from '@salesforce/label/c.Remaining';
 import LABEL_SAVE from '@salesforce/label/c.Save';
@@ -97,6 +101,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         effectiveness           : { label: LABEL_EFFECTIVENESS_9L },
         effectiveness_btl       : { label: LABEL_EFFECTIVENESS },
         error                   : { label: LABEL_ERROR },
+        fee                     : { label: LABEL_FEE },     
         forecast                : { label: LABEL_FORECAST.toLowerCase() },
         freeGoods               : { label: LABEL_FREE_GOODS },
         help                    : { label: LABEL_HELP },
@@ -115,6 +120,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         purchasedFrom           : { label: LABEL_PURCHASED_FROM },
         rebateAmount            : { placeholder: LABEL_REBATE_AMOUNT_PLACEHOLDER },
         rebatePaidAbovePlanned  : { error: LABEL_REBATE_AMOUNT_ABOVE_PLANNED_ERROR },
+        rebateAmountAboveBudget  : { error: LABEL_REBATE_AMOUNT_ABOVE_PROMOTIONAL_BUDGET_ERROR },
         remaining               : { label: LABEL_REMAINING },
         save                    : { label: LABEL_SAVE },
         search                  : { label: LABEL_SEARCH },
@@ -132,9 +138,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
         this.currentPageReference = currentPageReference;
-        console.log('[psaactualsform.setcurrentpagereference] pageref', currentPageReference);
-        console.log('[psaactualsform.setcurrentpagereference] ids', this.psaId, this.promotionId, this.pmiId, this.pmiaId);
-        console.log('[psaactualsform.setcurrentpagereference] psa', this.psa);
+        console.log('[actualsform.setcurrentpagereference] pageref', currentPageReference);
+        console.log('[actualsform.setcurrentpagereference] ids', this.psaId, this.promotionId, this.pmiId, this.pmiaId);
+        console.log('[actualsform.setcurrentpagereference] psa', this.psa);
         this.psaId = currentPageReference.state.c__psaId;
         this.promotionId = currentPageReference.state.c__promotionId;
         this.pmiId = currentPageReference.state.c__pmiId;
@@ -179,8 +185,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     picklistValuesMap;
     @wire(getPicklistValuesByRecordType, { objectApiName: OBJECT_PMIA, recordTypeId: '$recordTypeId' })
     wiredPicklistValues({ error, data }) {
-        console.log('[getPicklistValues] data', data);
-        console.log('[getPicklistValues] error', error);
+        console.log('[actualsForm.getPicklistValues] data', data);
+        console.log('[actualsForm.getPicklistValues] error', error);
         if (data) {
             this.error = undefined;
             this.picklistValuesMap = data.picklistFieldValues;
@@ -195,8 +201,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     isSOMUser = false;
     @wire(getIsSOMUser)
     wiredGetIsSOMUser({ error, data }) {
-        console.log('[getIsSOMUser] data', data);
-        console.log('[getIsSOMUser] error', error);
+        console.log('[actualsForm.getIsSOMUser] data', data);
+        console.log('[actualsForm.getIsSOMUser] error', error);
         if (data) {
             this.error = undefined;
             this.isSOMUser = data;
@@ -209,8 +215,16 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api 
     psaId;
 
+    _thePSA;
     @api 
-    psa;
+    get psa() {
+        return this._thePSA;
+    }
+    set psa(val) {
+        this._thePSA = JSON.parse(val);
+        console.log('[actualsForm.set psa] val', val);
+        console.log('[actualsForm.set psa] psa', this._thePSA);
+    }
 
     @api 
     actuals;
@@ -227,8 +241,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     @api
     glMappings;
 
+    _wholesalerOptions;
     @api 
-    wholesalerOptions;
+    get wholesalerOptions() {
+        return this._wholesalerOptions;
+    }
+    set wholesalerOptions(val) {
+        this._wholesalerOptions = val;
+        console.log('[actualsForm.set wholesalersOptions] wholesalerOptions', this._wholesalerOptions);
+    }
 
     @api 
     captureVolumeInBottles;
@@ -253,7 +274,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     set wholesalers(val) {
         this._wholesalers = val;
         this.wholesalerOptions = val;
-        console.log('[set wholesalers] wholesalerOptions', this.wholesalerOptions);
+        console.log('[actualsForm.set wholesalers] wholesalerOptions', this.wholesalerOptions);
     }
 
     error;
@@ -289,6 +310,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     comments;
     invoiceNumber;
 
+    plannedFee;
+    feePaid;
+    forecastedFee;
+
     rebateType;
     rebateLabel;
     rebateAmount;
@@ -300,13 +325,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     actualQtyPlaceholder;
     hasActualQtyError;
     get actualQtyFormattedLabel() {
-        console.log('[actualQtyFormattedLabel] actualqtylabel', this.labels.actualQty.label);
-        console.log('[actualQtyFormattedLabel] isPhone', this.isPhone);
-        console.log('[actualQtyFormattedLabel] plannedVolume', this.plannedVolume);
-        console.log('[actualQtyFormattedLabel] captureVolumeInBottles', this.captureVolumeInBottles);
-        let lbl = this.labels.nineLitreVolume.label;
+        console.log('[actualsForm.actualQtyFormattedLabel] actualqtylabel', this.labels.actualQty.label);
+        console.log('[actualsForm.actualQtyFormattedLabel] isPhone', this.isPhone);
+        console.log('[actualsForm.actualQtyFormattedLabel] plannedVolume', this.plannedVolume);
+        console.log('[actualsForm.actualQtyFormattedLabel] captureVolumeInBottles', this.captureVolumeInBottles);
+        let lbl = this.isKorea ? this.labels.effectiveness.label : this.labels.nineLitreVolume.label;
         if (this.captureVolumeInBottles) {
-            lbl = this.labels.volumeBtl.label;
+            lbl = this.isKorea ? this.labels.effectiveness_btl.label : this.labels.volumeBtl.label;
         }
 
         if (!this.isPhone) {
@@ -351,8 +376,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     paymentDate;
     hasPaymentDateError;
     get formattedPaymentDate() {
-        console.log('[actuals.formattedpaymentdate]');
-        console.log('[actuals.formattedPaymentDate] paymentDate', this.paymentDate);
+        console.log('[actualsForm.formattedpaymentdate]');
+        console.log('[actualsForm.formattedPaymentDate] paymentDate', this.paymentDate);
         var theDate = this.paymentDate == null ? new Date() : new Date(this.paymentDate);
         return theDate.toISOString();
     }
@@ -369,6 +394,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
         console.log('[actualsForm.canEdit] isLocked', this.isLocked);
         //return this.approvalStatus !== 'Paid' && this.approvalStatus !== 'Approved';
+        if (this.isKorea) {
+            return !this.isLocked && this.approvalStatus !== 'Paid' && this.approvalStatus !== 'Approved';
+        }
         return !this.isLocked;
     }
     get canDelete() {
@@ -426,15 +454,26 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         return lbl;
     }
 
+    get showListingFeeRebate() {
+        return this.rebates != undefined && this.rebates.find(rt => rt.value == 'Listing Fee');
+    }
+    get showPromotionalActivityRebate() {
+        return this.rebates != undefined && this.rebates.find(rt => rt.value == 'Promotional Activity');
+    }
+    get showFreeGoodsRebate() {
+        return this.rebates != undefined && this.rebates.find(rt => rt.value == 'Free Goods');
+    }
+    get isFeeRebate() {
+        return this.rebateType == 'Fee';
+    }
 
-
-   rebates;
+    rebates;
 
     /**
      * Handle lifecycle evnts
      */
     connectedCallback() {
-        console.log('[psaactualform.connectedCallback] pmiaId', this.pmiaId);
+        console.log('[actualsform.connectedCallback] pmiaId', this.pmiaId);
         /*
         if (this.thePMIA != undefined && this.pmiaId !== this.thePMIA.Id) {
             refreshApex(this.wiredPMIActual);
@@ -442,7 +481,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         */
     }
     renderedCallback() {
-        console.log('[psaactualform.renderredCallback] pmiaId', this.pmiaId);
+        console.log('[actualsform.renderredCallback] pmiaId', this.pmiaId);
     }
     /**
      * Handle local events
@@ -485,11 +524,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
     handleApprovalStatusChange(event) {
         this.approvalStatus = event.detail.value;
-        console.log('[handleapprovalstatuschange] approvalstatus', this.approvalStatus);
+        console.log('[actualsForm.handleapprovalstatuschange] approvalstatus', this.approvalStatus);
     }
     handleActualQtyChange(event) {
         this.actualQty = event.detail.value;
-        console.log('[handleActualQtyChange] actualqty', this.actualQty);
+        console.log('[actualsForm.handleActualQtyChange] actualqty', this.actualQty);
         this.totalDiscount = this.actualQty * this.plannedDiscount;
     }
     handlePaymentDateChange(event) {
@@ -500,7 +539,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
     focusWholesalerOptions() {
         this.showWholesalerOptions = true;
-        console.log('[focusWholesalerOptions] wholesalerOptions', this.wholesalerOptions);
+        console.log('[actualsForm.focusWholesalerOptions] wholesalerOptions', this.wholesalerOptions);
     }
     handleWholesalerChange(event) {        
         this.wholesaler = event.detail.value;
@@ -517,33 +556,33 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             let options = this._wholesalers.filter(w => w.Name.indexOf(event.detail.value) >= 0);
             this.wholesalerOptions = [...options];        
         }catch(ex) {
-            console.log('[handleSearchWholesalerChange] exception', ex);
+            console.log('[actualsForm.handleSearchWholesalerChange] exception', ex);
         }
     }
     handleWholesalerSelected(event) {
-        console.log('[handleWholesalerSelected] event.target', event.target);
+        console.log('[actualsForm.handleWholesalerSelected] event.target', event.target);
         try {
             this.wholesaler = event.currentTarget.dataset.wholesalerId;
             this.wholesalerName = this._wholesalers.find(w => w.Id == this.wholesaler).Name;
             this.wholesalerSearchString = this.wholesalerName;            
             this.showWholesalerOptions = false;
 
-            console.log('[handleWholesalerSelected] selectedWholesalerId, name', this.wholesaler, this.wholesalerName);
+            console.log('[actualsForm.handleWholesalerSelected] selectedWholesalerId, name', this.wholesaler, this.wholesalerName);
         }catch(ex) {
-            console.log('[handleWholesalerSelected] ex', ex);
+            console.log('[actualsForm.handleWholesalerSelected] ex', ex);
         }
     }
     handleInvoiceNumberChange(event) {
         this.invoiceNumber = event.detail.value;
     }
     handleRebateAmountChange(event) {
-        console.log('[handleRebateAmountChange]');
+        console.log('[actualsForm.handleRebateAmountChange]');
         event.preventDefault();
         if (this.isNew) {
             const type = event.currentTarget.dataset.rebateType;
-            console.log('[handleRebateAmountChange] type: ', type);
+            console.log('[actualsForm.handleRebateAmountChange] type: ', type);
             this.rebates.forEach(rebate => {
-                console.log('[handleRebateAmountChange] rebate.rebateType, remaining', rebate.rebateType, rebate.remaining);
+                console.log('[actualsForm.handleRebateAmountChange] rebate.rebateType, remaining', rebate.rebateType, rebate.remaining);
                 if (rebate.rebateType == type) {
                     rebate.rebateAmount = event.detail.value;
                     return true;
@@ -552,7 +591,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             if (type == 'Volume') {
                 this.totalDiscount = event.detail.value * this.plannedDiscount;
             }
-            console.log('[handleRebateAmountChange] rebates', this.rebates);    
+            console.log('[actualsForm.handleRebateAmountChange] rebates', this.rebates);    
         } else {
             this.rebateAmount = event.detail.value;
         }
@@ -566,9 +605,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
      */
     getRecordTypeId() {
         if (this.objectInfo.recordTypeInfos) {
-            console.log('[get recordtypeid] objectinfo', this.objectInfo);
+            console.log('[actualsForm.get recordtypeid] objectinfo', this.objectInfo);
             const rtis = this.objectInfo.recordTypeInfos;
-            console.log('[get recordtypeid] rtis', rtis);
+            console.log('[actualsForm.get recordtypeid] rtis', rtis);
             /*
             if (this.psa.Market__r.Name == 'United Kingdom') {
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'UK - PSA');
@@ -578,18 +617,18 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === 'MX - PSA');
             }*/
             this.recordTypeId = Object.keys(rtis).find(rti => rtis[rti].name === this.psa.RecordType.Name);
-            console.log('[get recordtypeid] rtis', Object.keys(rtis));
-            console.log('[get recordtypeid] recordtypeid', this.recordTypeId);
+            console.log('[actualsForm.get recordtypeid] rtis', Object.keys(rtis));
+            console.log('[actualsForm.get recordtypeid] recordtypeid', this.recordTypeId);
         }    
     }
 
 
     setFieldOptions(picklistValues) {
-        console.log('[setFieldOptions] picklistValues', picklistValues);
+        console.log('[actualsForm.setFieldOptions] picklistValues', picklistValues);
         Object.keys(picklistValues).forEach(picklist => {            
             if (picklist === 'Approval_Status__c') {
                 this.approvalStatusOptions = this.setFieldOptionsForField(picklistValues, picklist);
-                console.log('[psaactualsform.setfieldoptions] approvalstatusoptions', this.approvalStatusOptions);
+                console.log('[actualsform.setfieldoptions] approvalstatusoptions', this.approvalStatusOptions);
             }
             if (picklist === 'Rebate_Type__c') {
                 this.rebates = picklistValues[picklist].values.map(item => ({
@@ -603,7 +642,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             }
         });
 
-        console.log('[setFieldOptions] finished loading field options.  pmiaId', this.pmiaId);
+        console.log('[actualsForm.setFieldOptions] rebates', this.rebates);
+        console.log('[actualsForm.setFieldOptions] finished loading field options.  pmiaId', this.pmiaId);
         //this.loadPSA();
 
         if (this.pmiaId == undefined) {
@@ -614,7 +654,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
     
     setFieldOptionsForField(picklistValues, picklist) {        
-        console.log('[setFieldOptionsForField] picklist field', picklist);
+        console.log('[actualsForm.setFieldOptionsForField] picklist field', picklist);
         return picklistValues[picklist].values.map(item => ({
             label: item.label,
             value: item.value
@@ -622,10 +662,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
    
     loadPMIADetails() {
-        console.log('[pmiaForm.loadPMIADetails] pmiaId', this.pmiaId);
+        console.log('[actualsForm..loadPMIADetails] pmiaId', this.pmiaId);
         getPMIADetails({pmiaId: this.pmiaId})
         .then(result => { 
-            console.log('[pmiaForm.loadPMIADetails] result', result);
+            console.log('[actualsForm..loadPMIADetails] result', result);
             try {
                 this.thePMIA = result;
                 this.productName = this.thePMIA.Product_Name__c;
@@ -637,39 +677,49 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.processed = this.thePMIA.Boomi_Processed__c;
                 this.comments = this.thePMIA.Comments__c;
                 this.processedDate = this.thePMIA.Processed_Date__c;
-                this.plannedVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c);
-                this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
+                this.plannedFee = parseFloat(this.thePMIA.Activity__r.Planned_Fee__c);
+                this.feePaid = parseFloat(this.thePMIA.Activity__r.Total_Fee_Paid__c);
+                if (this.thePMIA.Approval_Status__c == 'New' && this.thePMIA.Rebate_Type__c == 'Fee') {
+                    this.feePaid -= parseFloat(this.thePMIA.Rebate_Amount__c);
+                }
+                if (this.thePMIA.Promotion_Material_Item__c != null) {
+                    this.plannedVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c);
+                    this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
+                    this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);            
+                    this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c);
+                    this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c);
+                    this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c);
+                    this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c);
+                    this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c);
+                    this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c);
+                    this.totalPaymentsPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Payments_Paid__c).toFixed(2);
+                    this.productSplit = parseFloat(this.thePMIA.Promotion_Material_Item__r.Product_Split__c).toFixed(2);
+                    this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c || 0;
+                    this.freeGoodsQty = this.thePMIA.Promotion_Material_Item__r.Free_Bottle_Quantity__c || 0;
+                    this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c) || 0;
+                    this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c) || 0;
+                    this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c) || 0;
+                    this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c) || 0;
+                    this.totalActualFreeGoodsQty = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Free_Bottle_Qty__c) || 0;
+                    this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c) || 0;
+                    this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c) || 0;
+                    this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c) || 0;
+
+                }
                 //this.productPackQty = parseInt(this.thePMIA.Product_Pack_Qty__c);
                 this.wholesaler = this.thePMIA.Actual_Wholesaler__c;
                 this.wholesalerName = this.thePMIA.Actual_Wholesaler__c == undefined ? '' : this.thePMIA.Actual_Wholesaler__r.Name;
+                this.wholesalerSearchString = this.wholesalerName;
                 this.isVolumeRebate = this.thePMIA.Rebate_Type__c == 'Volume';
                 this.isFreeGoodsRebate = this.thePMIA.Rebate_Type__c == 'Free Goods';
+                this.actualQty = this.isVolumeRebate ? parseFloat(this.thePMIA.Act_Qty__c) : 0;
                 this.rebateAmount = this.isVolumeRebate ? parseFloat(this.thePMIA.Act_Qty__c) : parseFloat(this.thePMIA.Rebate_Amount__c);
                 this.rebateType = this.thePMIA.Rebate_Type__c;    
-                this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c);            
-                this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c);
-                this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c);
-                this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c);
-                this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c);
-                this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c);
-                this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c);
                 this.activityBudget = parseFloat(this.thePMIA.Activity__r.Activity_Budget__c);
-                this.totalPaymentsPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Payments_Paid__c).toFixed(2);
-                this.productSplit = parseFloat(this.thePMIA.Promotion_Material_Item__r.Product_Split__c).toFixed(2);
                 this.invoiceNumber = this.thePMIA.Invoice_Number__c;
 
-                console.log('[loadPMIADetails] captureVolumeInBottles', this.captureVolumeInBottles);
-                console.log('[loadPMIADetails] thePMI', this.thePMI);
-                this.plannedVolume = this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c || 0;
-                this.freeGoodsQty = this.thePMIA.Promotion_Material_Item__r.Free_Bottle_Quantity__c || 0;
-                this.listingFeePlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Listing_Fee__c) || 0;
-                this.promotionalActivityPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Promotional_Activity_Value__c) || 0;
-                this.trainingAndAdvocacyPlanned = parseFloat(this.thePMIA.Promotion_Material_Item__r.Training_and_Advocacy_Value__c) || 0;
-                this.totalActualVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Volume__c) || 0;
-                this.totalActualFreeGoodsQty = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Actual_Free_Bottle_Qty__c) || 0;
-                this.listingFeePaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Listing_Fee_Paid__c) || 0;
-                this.promotionalActivityPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Promotional_Activity_Paid__c) || 0;
-                this.trainingAndAdvocacyPaid = parseFloat(this.thePMIA.Promotion_Material_Item__r.Total_Training_and_Advocacy_Paid__c) || 0;
+                console.log('[actualsForm.loadPMIADetails] captureVolumeInBottles', this.captureVolumeInBottles);
+                console.log('[actualsForm.loadPMIADetails] thePMI', this.thePMI);
 
                 this.forecastedVolume = parseFloat(this.thePMIA.Forecast_Volume__c) || 0;
                 this.forecastedListingFee = parseFloat(this.thePMIA.Forecast_Listing_Fee__c) || 0;
@@ -677,6 +727,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
                 if (this.captureVolumeInBottles) {
                     if (this.isVolumeRebate) {
+                        this.actualQty = this.actualQty * this.productPackQty;
                         this.rebateAmount = this.rebateAmount * this.productPackQty;
                     }
                     this.plannedVolume = this.plannedVolume * this.productPackQty;
@@ -685,8 +736,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     //this.totalActualFreeGoodsQty = this.totalActualFreeGoodsQty * this.productPackQty;
                 }
 
-                console.log('[loadPMIADetails] freeGoodsQty', this.freeGoodsQty);
-                console.log('[loadPMIADetails] totalActualFreeGoodsQty', this.totalActualFreeGoodsQty);
+                console.log('[actualsForm.loadPMIADetails] freeGoodsQty', this.freeGoodsQty);
+                console.log('[actualsForm.loadPMIADetails] totalActualFreeGoodsQty', this.totalActualFreeGoodsQty);
 
                 this.remainingRebate = 0;
                 this.forecasted = 0;
@@ -704,6 +755,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     this.remainingRebate = this.freeGoodsQty - this.totalActualFreeGoodsQty;
                     if (this.remainingRebate < 0) { this.remainingRebate = 0; }
                     this.forecasted = 0;
+                } else if (this.rebateType == 'Fee') {
+                    this.remainingRebate = this.plannedFee - this.feePaid;
+                    this.forecasted = 0;
                 } else if (this.rebateType == 'Listing Fee') {
                     this.remainingRebate = this.listingFeePlanned - this.listingFeePaid;
                     this.forecasted = this.forecastedListingFee;
@@ -719,8 +773,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     console.log('remainingRebate, activityBudget, totalPaymentsPaid', this.remainingRebate, this.productSplit, this.totalPaymentsPaid);              
                 }
 
-                console.log('forecasted', this.forecasted, this.rebateType, this.thePMIA);
-                if (this.hasForecastValues) {
+                console.log('[actualsForm.loadPMIADetails] forecasted', this.forecasted, this.rebateType, this.thePMIA);
+                if (this.hasForecastValues && this.forecasted > 0) {
                     this.rebateLabel = `${typeLabel} [${this.labels.remaining.label} : ${this.remainingRebate.toFixed(2)}] [${this.labels.forecast.label} : ${this.forecasted.toFixed(2)}]`;
                 } else {
                     this.rebateLabel = `${typeLabel} [${this.labels.remaining.label} : ${this.remainingRebate.toFixed(2)}]`;
@@ -733,8 +787,10 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                         rebate.forecasted = this.forecasted;
                     }    
                 }
+
+                console.log('[actualsForm.loadPMIADetails] rebates', this.rebates);
             }catch(ex) {
-                console.log('[loadPMIADetails] exception', ex);
+                console.log('[actualsForm.loadPMIADetails] exception', ex);
             }
         })  
         .catch(error => {
@@ -746,8 +802,8 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
     createNewActual() {
         try {
-        console.log('createNewActual.psa', this.psa);
-        console.log('createNewActual.wholesalerOptions', this.wholesalerOptions);
+        console.log('actualsForm.createNewActual.psa', this.psa);
+        console.log('actualsForm.createNewActual.wholesalerOptions', this.wholesalerOptions);
         this.wholesaler = this.psa.Wholesaler_Preferred__c;
         this.wholesalerName = this.psa.Wholesaler_Preferred_Name__c || '';
         this.activityBudget = parseFloat(this.psa.Activity_Budget__c || 0);
@@ -758,7 +814,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         }
 
         this.thePMI = this.psa.Promotion_Material_Items__r.find(p => p.Id === this.pmiId);
-        console.log('[createnewactuals] thePMI', this.thePMI);
+        console.log('[actualsForm.createnewactuals] thePMI', this.thePMI);
         if (this.thePMI) {
             this.productName = this.thePMI.Product_Name__c;
             this.plannedDiscount = parseFloat(this.thePMI.Plan_Rebate__c);
@@ -793,7 +849,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.forecastedPromotionalActivity = 0;
         this.wholesaler = undefined;
         
-        console.log('[ccreatenewactuals] rebates', this.rebates);
+        console.log('[actualsForm.createnewactuals] rebates', this.rebates);
         if (this.rebates) {
             try {
                 this.rebates.forEach(rebate => {
@@ -836,21 +892,21 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     
                     //rebate.label = rebate.label.replace("%0", rebate.remaining);
                     //rebate.label = rebate.label.replace("%1", rebate.forecasted);
-                    console.log('rebatelabel', rebate.label);
+                    console.log('actualsForm.rebatelabel', rebate.label);
                 });    
-                console.log('rebates', this.rebates);
+                console.log('[actualsForm.createnewactuals] rebates', this.rebates);
     
             }catch(rex) {
-                console.log('[createnewactuals] rebates exception', rex);
+                console.log('[actualsForm.createnewactuals] rebates exception', rex);
             }
         }
         }catch(ex) {
-            console.log('[createnewactuals] exception', ex);
+            console.log('[actualsForm.createnewactuals] exception', ex);
         }
     }
 
     goBack() {
-        console.log('[pmiaForm.goBack]');
+        console.log('[actualsForm..goBack]');
         if (this.isPhone) {
             this[NavigationMixin.Navigate]({
                 type: 'standard__component',
@@ -867,14 +923,14 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
 
     getUpdatedPageReference(stateChanges) {
-        console.log('[psaactuals.getupdatedpagereference] statechanges', stateChanges);
+        console.log('[actualsForm..getupdatedpagereference] statechanges', stateChanges);
         return Object.assign({}, this.currentPageReference, {
             state: Object.assign({}, this.currentPageReference.state, stateChanges)
         });
     }
 
     validateForm() {
-        console.log('[validateform]');
+        console.log('[actualsForm.validateform] psa', this.psa);
         let isValid = true;
         this.hasPaymentDateError = false;
         this.hasActualQtyError = false;
@@ -883,8 +939,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
         this.hasPaymentDateError = (this.paymentDate == undefined);
 
         let hasRebateError = false;
+        let errorMessage = this.labels.rebatePaidAbovePlanned.error;
         if (this.isNew) {
-            console.log('[validateform] rebates', this.rebates);
+            console.log('[actualsForm.validateform] rebates', this.rebates);
             this.rebates.forEach(rebate => {
                 if (rebate.remaining < parseFloat(rebate.rebateAmount) && (rebate.rebateType == 'Volume' && this.validateActualVolume == true)) {
                     hasRebateError = true;
@@ -892,30 +949,50 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 }                        
             });
         } else {
-            console.log('[validateForm] rebateType, rebateAmount, remainingRebate, thePMIA', this.rebateType, this.rebateAmount, this.remainingRebate, this.thePMIA);
+            
+            console.log('[actualsForm.validateForm] rebateType, rebateAmount, remainingRebate, thePMIA', this.rebateType, this.rebateAmount, this.remainingRebate, this.thePMIA);
             let total = 0;
             if (this.rebateType == 'Volume' && this.validateActualVolume == true) {
                 total = this.remainingRebate + this.thePMIA.Act_Qty__c;   // Add back the previous actual volume 
                 hasRebateError = parseFloat(this.rebateAmount) > total;
-                console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualVolume, total);
+                console.log('[actualsForm.validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualVolume, total);
             } else if (this.rebateType == 'Free Goods') {
                 total = this.remainingFreeGoods + this.totalActualFreeGoodsQty;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
-                console.log('[validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualFreeGoodsQty, total);
+                console.log('[actualsForm.validateForm] rebateAmount, remainingRebate, totalActualVolume, total', parseFloat(this.rebateAmount), this.remainingRebate, this.totalActualFreeGoodsQty, total);
             } else if (this.rebateType == 'Listing Fee') {
                 total = this.remainingRebate + this.totalListingFeePaid;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
-                console.log('[validateForm] rebateAmount, remainingRebate, totalListingFeePaid', this.rebateAmount, this.remainingRebate, this.totalListingFeePaid, total);
+                console.log('[actualsForm.validateForm] rebateAmount, remainingRebate, totalListingFeePaid', this.rebateAmount, this.remainingRebate, this.totalListingFeePaid, total);
             } else if (this.rebateType == 'Promotional Activity') {
                 total = this.remainingRebate + this.totalPromotionalActivityPaid;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
-                console.log('[validateForm] rebateAmount, remainingRebate, totalPromotionalActivityPaid', this.rebateAmount, this.remainingRebate, this.totalPromotionalActivityPaid, total);
+                console.log('[actualsForm.validateForm] rebateAmount, remainingRebate, totalPromotionalActivityPaid', this.rebateAmount, this.remainingRebate, this.totalPromotionalActivityPaid, total);
             } else if (this.rebateType == 'Training & Advocacy') {
                 total = this.remainingRebate + this.totalTrainingAndAdvocacyPaid;
                 hasRebateError = parseFloat(this.rebateAmount) > total;
-                console.log('[validateForm] rebateAmount, remainingRebate, totalTrainingAndAdvocacyPaid', this.rebateAmount, this.remainingRebate, this.totalTrainingAndAdvocacyPaid, total);
+                console.log('[actualsForm.validateForm] rebateAmount, remainingRebate, totalTrainingAndAdvocacyPaid', this.rebateAmount, this.remainingRebate, this.totalTrainingAndAdvocacyPaid, total);
             } else if (this.rebateType == 'Payment') {
                 total = this.remainingRebate + this.totalPayments;
+            } else if (this.rebateType == 'Fee') {
+                const amt = parseFloat(this.rebateAmount);
+                const remaining = this.plannedFee - this.feePaid;
+                if (amt > remaining) {
+                    let diff = remaining < 0 ? amt : amt - remaining;
+                    const remainingBudget = parseFloat(this.psa.Account__r.Promotional_Budget_Remaining__c);
+                    console.log('[actualsForm.validateForm] remainingBudget', this.psa.Account__r.Promotional_Budget_Remaining__c);
+                    if (diff > remainingBudget) {
+                        hasRebateError = true;
+                        errorMessage = this.labels.rebateAmountAboveBudget.error;
+                    }
+                    console.log('[actualsForm.validateForm] amt, diff', amt, diff);
+                }
+                    
+                console.log('[actualsForm.validateForm] remaining', remaining);
+                console.log('[actualsForm.validateForm] plannedFee', this.plannedFee);
+                console.log('[actualsForm.validateForm] totalFeePaid', this.feePaid);
+                console.log('[actualsForm.validateForm] remainingRebate', this.remainingRebate);
+                console.log('[actualsForm.validateForm] rebateAmount', this.rebateAmount);                
             }
 
         }
@@ -924,7 +1001,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
-                    message: this.labels.rebatePaidAbovePlanned.error,
+                    message: errorMessage,
                     variant: 'error' 
                 }),
             );  
@@ -935,13 +1012,13 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
     }
 
     save() {   
-        console.log('[save]');   
+        console.log('[actualsForm.save]');   
         try {
             const pd = new Date(this.paymentDate);
             const paymentDateYear = pd.getFullYear().toString();
             const paymentDateMonth = ('00' + (pd.getMonth()+1)).slice(-2);
             const paymentDateDay = ('00' + pd.getDate()).slice(-2);
-            console.log('[psaactualform.save] date parts', paymentDateYear, paymentDateMonth, paymentDateDay);          
+            console.log('[actualsForm.save] date parts', paymentDateYear, paymentDateMonth, paymentDateDay);          
 
             const fields = {};
             
@@ -963,11 +1040,11 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                     fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName] = this.pmiId;
                 }
 
-                console.log('[psaactualform.save] paymentDate, pd', this.paymentDate, pd);  
+                console.log('[actualsForm.save] paymentDate, pd', this.paymentDate, pd);  
                 const dateString = paymentDateYear + paymentDateMonth + paymentDateDay;
-                console.log('[psaactualform.save] dateString', dateString);
+                console.log('[actualsForm.save] dateString', dateString);
                 const externalKey = this.promotionId + '_' + fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName] + '_' + dateString;
-                console.log('[psaactualform.save] externalKey', externalKey);
+                console.log('[actualsForm.save] externalKey', externalKey);
                 fields[FIELD_EXTERNAL_KEY.fieldApiName] = externalKey;
                 fields[FIELD_PERIOD.fieldApiName] = 0;
                 fields[FIELD_ACTIVITY_ID.fieldApiName] = this.psaId;
@@ -990,20 +1067,20 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                         fields[FIELD_REBATE_AMOUNT.fieldApiName] = this.rebateAmount / this.productPackQty;
                     }
                 }
-                console.log('[save] rebateAmount', this.rebateAmount);
-                console.log('[save] fields', fields);
+                console.log('[actualsForm.save] rebateAmount', this.rebateAmount);
+                console.log('[actualsForm.save] fields', fields);
                 const record = { fields };
                 this.updatePMIA(record);
             }
         } catch(ex) {
-            console.log('[psaactualsform.save] exception', ex);
+            console.log('[actualsForm..save] exception', ex);
         }
     }
 
 
     createNewPMIA(record) {        
-        console.log('[pmiaForm.createNewPMIA] record', record);
-        console.log('[pmiaForm.createNewPMIA] glMappings', this.glMappings);
+        console.log('[actualsForm..createNewPMIA] record', record);
+        console.log('[actualsForm..createNewPMIA] glMappings', this.glMappings);
         const pmiId = record.fields[FIELD_PROMOTION_MATERIAL_ITEM_ID.fieldApiName];
         const promotionId = record.fields[FIELD_PROMOTION_ID.fieldApiName];
         this.rebates.forEach(r => {
@@ -1017,15 +1094,15 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 r.hasTotals = true;
             } else {           
                 const pmia = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c == pmiId && pmia.Rebate_Type__c == r.rebateType);
-                console.log('[pmiaForm.createNewPMIA] rebateType, pmiId, pmia', r.rebateType, pmiId, pmia);
+                console.log('[actualsForm.createNewPMIA] rebateType, pmiId, pmia', r.rebateType, pmiId, pmia);
                 //r.hasTotals = pmia == null;
                 var index = pmia == null ? 0 : pmia.length;
                 r.hasTotals = index == 0;
                 r.externalKey = promotionId + '_' + pmiId + '_' + r.rebateType + '-' + index;
             }
         });
-        console.log('[pmiaForm.createNewPMIA] rebates', this.rebates);
-        console.log(']pmiaForm.createNewPMIA] record', record);
+        console.log('[actualsForm.createNewPMIA] rebates', this.rebates);
+        console.log('[actualsForm.createNewPMIA] record', record);
         createActuals({psaId: this.psaId, 
                         psaName: this.psa.Name,
                             recordTypeId: this.recordTypeId, 
@@ -1041,7 +1118,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                             comments: this.comments,
                             rebates: this.rebates })
             .then(result => {
-                console.log('[createnewpmia.createactuals] result', result);
+                console.log('[actualsForm.createactuals] result', result);
                 this.isWorking = false;
                 this.updateTotals(false);
 
@@ -1075,7 +1152,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
             })
             .catch(error => {
-                console.log('[createnewpmia.createactuals] exception', error);
+                console.log('[actualsForm.createactuals] exception', error);
                 let msg = '';
                 if (error.body.fieldErrors && error.body.fieldErrors.length > 0) {
                     error.body.fieldErrors.forEach(err => { msg += err.message + '\n'; });                    
@@ -1093,7 +1170,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             });
     }
     async updatePMIA(record) {
-        console.log('[pmiaForm.update] record', record);
+        console.log('[actualsForm.update] record', record);
         await updateRecord(record)
             .then(() => {
                 
@@ -1112,20 +1189,20 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 try {
                 if (!this.isPhone) {
                     refreshApex(this.wiredPMIActual);
-                    console.log('[pmiaForm.update] refreshedApex');
+                    console.log('[actualsForm.update] refreshedApex');
                     const saveEvent = new CustomEvent('save', {
                         detail: record
                     });
                     this.dispatchEvent(saveEvent);
                 }
                 }catch(ex){
-                    console.log('[updateRecord success] dispatchevent exception', ex);                    
+                    console.log('[actualsForm.updateRecord success] dispatchevent exception', ex);                    
                 }
 
             })
             .catch(error => {
                 this.isWorking = false;
-                console.log('[updateRecord] error', error);
+                console.log('[actualsForm.updateRecord] error', error);
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Error updating Actuals',
@@ -1135,7 +1212,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 );
             });
 
-        getRecordNotifyChange([{ recordId: this.pmiaId }]);
+        await notifyRecordUpdateAvailable([{ recordId: this.pmiaId }]);
 
     }
 
@@ -1156,21 +1233,21 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
 
             this.updateTotals(true);
         } catch(ex) {
-            console.log('[promotionalSalesAgreementActualsForm.deleteActual] exception', ex);
+            console.log('[actualsForm.deleteActual] exception', ex);
         }
     }
 
-    updateTotals(exitForm) {
+    async updateTotals(exitForm) {
 
         updateActualTotals({psaIds: [this.psaId]})
             .then((status) => {
-                console.log('[updateTotals] status', status);
+                console.log('[actualsForm.updateTotals] status', status);
                 if (exitForm) {
                     this.goBack();
                 }
             })
             .catch((error) => {
-                console.log('[updateTotals] error', error);
+                console.log('[actualsForm.updateTotals] error', error);
             });
     }
 }

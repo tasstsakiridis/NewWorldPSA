@@ -34,17 +34,19 @@
             <lightning-layout-item>
                 <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Back" alternative-text="Back" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
             </lightning-layout-item>
-            <lightning-layout-item>
-                <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
-            </lightning-layout-item>
-            <template lwc:if={canDelete}>
+            <template lwc:if={isNotDisabled}>
                 <lightning-layout-item>
-                    <lightning-button-icon data-id="delete" variant="brand" icon-name="utility:delete" label="" title="Delete" alternative-text="Delete" onclick={handleDeleteButtonClick}></lightning-button-icon>
+                    <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
+                </lightning-layout-item>
+                <template lwc:if={canDelete}>
+                    <lightning-layout-item>
+                        <lightning-button-icon data-id="delete" variant="brand" icon-name="utility:delete" label="" title="Delete" alternative-text="Delete" onclick={handleDeleteButtonClick}></lightning-button-icon>
+                    </lightning-layout-item>
+                </template>
+                <lightning-layout-item>
+                    <lightning-button-icon data-id="clear" icon-name="utility:recycle_bin_empty" label="" title="Clear" alternative-text="Clear" onclick={handleClearButtonClick}></lightning-button-icon>
                 </lightning-layout-item>
             </template>
-            <lightning-layout-item>
-                <lightning-button-icon data-id="clear" icon-name="utility:recycle_bin_empty" label="" title="Clear" alternative-text="Clear" onclick={handleClearButtonClick}></lightning-button-icon>
-            </lightning-layout-item>
             <lightning-layout-item>
                 <lightning-button-icon data-id="help" icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right" onclick={handleHelpButtonClick}></lightning-button-icon>
             </lightning-layout-item>
@@ -87,17 +89,17 @@
                 <lightning-layout-item size="12" padding="around-small">
                     <lightning-layout>
                         <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
-                            <p class="slds-text-heading_small font-size_small">{labels.gpDoNothing.label}</p>
+                            <p class="slds-text-heading_small font-size_small">{labels.organicGrossProfit.label}</p>
                             <lightning-formatted-number label={labels.gpDoNothing.label} 
-                                                        value={currentVolumeGPper9LCase} 
+                                                        value={currentVolumeGPperBottle} 
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>
                         </lightning-layout-item>                        
                         <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
-                            <p class="slds-text-heading_small font-size_small">{labels.gpEffectiveness.label}</p>
+                            <p class="slds-text-heading_small font-size_small">{labels.investmentGrossProfit.label}</p>
                             <lightning-formatted-number label={labels.gpEffectiveness.label} 
-                                                        value={planGPper9LCase} 
+                                                        value={planGPperBottle} 
                                                         format-style="currency"
                                                         currency-display-as="symbol">
                             </lightning-formatted-number>
@@ -209,19 +211,19 @@
             <template lwc:if={captureCurrentVolume}>
                 <lightning-layout-item size="12" padding="around-small">
                     <template lwc:if={captureVolumeInBottles}>
-                        <lightning-input type="number" name="i_CurrentVolume" label={labels.currentVolume.label} value={currentVolume}
+                        <lightning-input type="number" name="i_CurrentVolume" label={currentVolumeLabel} value={currentVolume}
                             step="1" readonly={isDisabled} onchange={handleCurrentVolumeChange}>
                         </lightning-input>
                     </template>
                     <template lwc:else>
-                        <lightning-input type="number" name="i_CurrentVolume" label={labels.currentVolume.label} value={currentVolume} step="0.01"
+                        <lightning-input type="number" name="i_CurrentVolume" label={currentVolumeLabel} value={currentVolume} step="0.01"
                             readonly={isDisabled} onchange={handleCurrentVolumeChange}>
                         </lightning-input>
                     </template>                    
                 </lightning-layout-item>
                 <template lwc:if={isKorea}>
                     <lightning-layout-item size="12" padding="around-small">
-                        <lightning-input type="number" name="f_current_volume_9L" label={labels.currentVolume9L.label} value={currentVolume9LCase} disabled="true"></lightning-input>
+                        <lightning-input type="number" name="f_current_volume_9L" label={labels.organicPerformance9L.label} value={currentVolume9LCase} disabled="true"></lightning-input>
                     </lightning-layout-item>
                 </template>
             </template>

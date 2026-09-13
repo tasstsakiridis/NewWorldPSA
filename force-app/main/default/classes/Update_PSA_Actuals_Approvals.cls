@@ -5,7 +5,7 @@ public with sharing class Update_PSA_Actuals_Approvals {
     @InvocableMethod
     public static void Update_PSA_Actuals_Approvals(List<String> activityIds) {
         List<Promotion_Activity__c> activities = [SELECT Id, SalesProposal_Actuals_Updated__c, PMI_Actual_Status__c,
-                                                    (SELECT Id, Approval_Status__c FROM PMI_Actuals__r WHERE Approval_Status__c = 'Submit')
+                                                    (SELECT Id, Approval_Status__c FROM PMI_Actuals__r WHERE Approval_Status__c = 'Submit' OR Approval_Status__c = 'Reviewed')
                                                     FROM Promotion_Activity__c
                                                     WHERE Id =:activityIds];
 
@@ -29,6 +29,7 @@ public with sharing class Update_PSA_Actuals_Approvals {
             }            
         }
 
+        System.debug('# of actuals to update: ' + actualsToUpdate.size());
         if (actualsToUpdate.size() > 0) {
             update actualsToUpdate;
             update activities;

@@ -60,6 +60,16 @@
                                             </td>
                                         </tr>
                                     </template>
+                                    <template lwc:if={showPSABudget}>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.budget.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={psaBudget} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            </td>
+                                        </tr>
+                                    </template>
                                     <template lwc:if={showTotalInvestment}>
                                         <tr>
                                             <td class="col1">
@@ -97,10 +107,35 @@
                                                 <h4>{labels.totalGrossProfit.label}</h4>
                                             </td>
                                             <td class="col2">
-                                                <lightning-formatted-number value={totalGrossProfit} maximum-fraction-digits="2"></lightning-formatted-number>
+                                                <lightning-formatted-number value={totalGrossProfit} maximum-fraction-digits={precision}></lightning-formatted-number>
+                                                <template lwc:if={showActualTotals}>
+                                                    <span class="slds-m-left_x-small">(<lightning-formatted-number value={totalActualGrossProfit} maximum-fraction-digits={precision}></lightning-formatted-number>)</span>
+                                                </template>
                                             </td>
                                         </tr>
-                                    </template>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.totalCost.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalCost} maximum-fraction-digits={precision}></lightning-formatted-number>
+                                                <template lwc:if={showActualTotals}>
+                                                    <span class="slds-m-left_x-small">(<lightning-formatted-number value={totalActualCost} maximum-fraction-digits={precision}></lightning-formatted-number>)</span>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col1">
+                                                <h4>{labels.totalGPNetOfCost.label}</h4>
+                                            </td>
+                                            <td class="col2">
+                                                <lightning-formatted-number value={totalGPNetOfCost} maximum-fraction-digits={precision}></lightning-formatted-number>
+                                                <template lwc:if={showActualTotals}>
+                                                    <span class="slds-m-left_x-small">(<lightning-formatted-number value={totalActualGPNetOfCost} maximum-fraction-digits={precision}></lightning-formatted-number>)</span>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>                                    
                                     <template lwc:if={showROI}>
                                         <tr>
                                             <td class="col1">
@@ -108,6 +143,9 @@
                                             </td>
                                             <td class="col2">
                                                 <lightning-formatted-number value={roi} maximum-fraction-digits="2" format-style="decimal"></lightning-formatted-number>
+                                                <template lwc:if={showActualTotals}>
+                                                    <span class="slds-m-left_x-small">(<lightning-formatted-number value={actualROI} maximum-fraction-digits="2" format-style="decimal"></lightning-formatted-number>)</span>
+                                                </template>
                                             </td>
                                         </tr>
                                     </template>
@@ -211,15 +249,15 @@
                                     <table class="slds-m-left_x-small slds-m-top_small">
                                         <tr>
                                             <td class="col1"><h4>{labels.total.label}</h4></td>
-                                            <td class="col2"><lightning-formatted-number value={fee} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                            <td class="col2"><lightning-formatted-number value={fee} format-style="currency" minimum-fraction-digits={precision} maximum-fraction-digits={precision} currency-display-as="code"></lightning-formatted-number></td>
                                         </tr>
                                         <tr>
                                             <td class="col1"><h4>{labels.paid.label}</h4></td>
-                                            <td class="col2"><lightning-formatted-number value={feePaid} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                            <td class="col2"><lightning-formatted-number value={feePaid} format-style="currency" minimum-fraction-digits={precision} maximum-fraction-digits={orecision} currency-display-as="code"></lightning-formatted-number></td>
                                         </tr>
                                         <tr>
                                             <td class="col1"><h4>{labels.balance.label}</h4></td>
-                                            <td class="col2"><lightning-formatted-number value={feeBalance} format-style="currency" minimum-fraction-digits="2" maximum-fraction-digits="2" currency-display-as="code"></lightning-formatted-number></td>
+                                            <td class="col2"><lightning-formatted-number value={feeBalance} format-style="currency" minimum-fraction-digits={precision} maximum-fraction-digits={orecision} currency-display-as="code"></lightning-formatted-number></td>
                                         </tr>
                                     </table>
                                 </div>

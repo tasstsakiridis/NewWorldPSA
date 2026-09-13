@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Promotional_Budget_Used_Percent__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(AND(Promotional_Budget__c &gt; 0, Promotional_Budget_Used__c &gt; 0), Promotional_Budget_Used__c / Promotional_Budget__c, 0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Promotional Budget Used %</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Percent</type>
+</CustomField>
