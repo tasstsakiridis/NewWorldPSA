@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Promo_Code__c</fullName>
+    <externalId>false</externalId>
+    <label>Promo Code</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Discount_Category__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Base Rebate</fullName>
+                <default>false</default>
+                <label>Base Rebate</label>
+            </value>
+            <value>
+                <fullName>Guideline Discounts</fullName>
+                <default>false</default>
+                <label>Guideline Discounts</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Direct</fullName>
+                <default>false</default>
+                <label>Data Fee - Direct</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Indirect</fullName>
+                <default>false</default>
+                <label>Data Fee - Indirect</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate - Direct</fullName>
+                <default>false</default>
+                <label>Performance Rebate - Direct</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate - Indirect</fullName>
+                <default>false</default>
+                <label>Performance Rebate - Indirect</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L (Off)</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L (Off)</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L (On)</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L (On)</label>
+            </value>
+            <value>
+                <fullName>Chirashi (Store Leaflet)</fullName>
+                <default>false</default>
+                <label>Chirashi (Store Leaflet)</label>
+            </value>
+            <value>
+                <fullName>Space Fee</fullName>
+                <default>false</default>
+                <label>Space Fee</label>
+            </value>
+            <value>
+                <fullName>Customer Platform</fullName>
+                <default>false</default>
+                <label>Customer Platform</label>
+            </value>
+            <value>
+                <fullName>Instore Ad Fee</fullName>
+                <default>false</default>
+                <label>Instore Ad Fee</label>
+            </value>
+            <value>
+                <fullName>Customer Point</fullName>
+                <default>false</default>
+                <label>Customer Point</label>
+            </value>
+            <value>
+                <fullName>Customer Application</fullName>
+                <default>false</default>
+                <label>Customer Application</label>
+            </value>
+            <value>
+                <fullName>Sweepstake</fullName>
+                <default>false</default>
+                <label>Sweepstake</label>
+            </value>
+            <value>
+                <fullName>Off-Premise Listing Fee</fullName>
+                <default>false</default>
+                <label>Off-Premise Listing Fee</label>
+            </value>
+            <value>
+                <fullName>Listing Fee (BS)</fullName>
+                <default>false</default>
+                <label>Listing Fee (BS)</label>
+            </value>
+            <value>
+                <fullName>Listing Fee (Outlet)</fullName>
+                <default>false</default>
+                <label>Listing Fee (Outlet)</label>
+            </value>
+            <value>
+                <fullName>On-Premise Free Bottle</fullName>
+                <default>false</default>
+                <label>On-Premise Free Bottle</label>
+            </value>
+            <value>
+                <fullName>Incentive Tour</fullName>
+                <default>false</default>
+                <label>Incentive Tour</label>
+            </value>
+            <value>
+                <fullName>Exhibition</fullName>
+                <default>false</default>
+                <label>Exhibition</label>
+            </value>
+            <value>
+                <fullName>E-Commerce Visibility</fullName>
+                <default>false</default>
+                <label>E-Commerce Visibility</label>
+            </value>
+            <value>
+                <fullName>Logistics</fullName>
+                <default>false</default>
+                <label>Logistics</label>
+            </value>
+            <value>
+                <fullName>EDLP</fullName>
+                <default>false</default>
+                <label>EDLP</label>
+            </value>
+            <value>
+                <fullName>Promotional Discount</fullName>
+                <default>false</default>
+                <label>Promotional Discount</label>
+            </value>
+            <value>
+                <fullName>Data - Key Period</fullName>
+                <default>false</default>
+                <label>Data - Key Period</label>
+            </value>
+            <value>
+                <fullName>Central Processing</fullName>
+                <default>false</default>
+                <label>Central Processing</label>
+            </value>
+            <value>
+                <fullName>Incentive Trip</fullName>
+                <default>false</default>
+                <label>Incentive Trip</label>
+            </value>
+            <value>
+                <fullName>Price Support</fullName>
+                <default>false</default>
+                <label>Price Support</label>
+            </value>
+            <value>
+                <fullName>Base Discount</fullName>
+                <default>false</default>
+                <label>Base Discount</label>
+            </value>
+            <value>
+                <fullName>Promo Discount - Fixed</fullName>
+                <default>false</default>
+                <label>Promo Discount - Fixed</label>
+            </value>
+            <value>
+                <fullName>In Store Media</fullName>
+                <default>false</default>
+                <label>In Store Media</label>
+            </value>
+            <value>
+                <fullName>Online Visibility</fullName>
+                <default>false</default>
+                <label>Online Visibility</label>
+            </value>
+            <value>
+                <fullName>Visibility Fees - Fixed</fullName>
+                <default>false</default>
+                <label>Visibility Fees - Fixed</label>
+            </value>
+            <value>
+                <fullName>Other Visibility</fullName>
+                <default>false</default>
+                <label>Other Visibility</label>
+            </value>
+            <value>
+                <fullName>Visibility Bonus</fullName>
+                <default>false</default>
+                <label>Visibility Bonus</label>
+            </value>
+            <value>
+                <fullName>Display</fullName>
+                <default>false</default>
+                <label>Display</label>
+            </value>
+            <value>
+                <fullName>Visibility Agreements - indirect</fullName>
+                <default>false</default>
+                <label>Visibility Agreements - indirect</label>
+            </value>
+            <value>
+                <fullName>eCommerce</fullName>
+                <default>false</default>
+                <label>eCommerce</label>
+            </value>
+            <value>
+                <fullName>Ranging</fullName>
+                <default>false</default>
+                <label>Ranging</label>
+            </value>
+            <value>
+                <fullName>Data</fullName>
+                <default>false</default>
+                <label>Data</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Key Period</fullName>
+                <default>false</default>
+                <label>Data Fee - Key Period</label>
+            </value>
+            <value>
+                <fullName>Customer Original</fullName>
+                <default>false</default>
+                <label>Customer Original</label>
+            </value>
+            <value>
+                <fullName>Other Promo</fullName>
+                <default>false</default>
+                <label>Other Promo</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L</label>
+            </value>
+            <value>
+                <fullName>EDLP Key Selling Period</fullName>
+                <default>false</default>
+                <label>EDLP Key Selling Period</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Logistic</controllingFieldValue>
+            <valueName>Logistics</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDLP - Key Selling Period</controllingFieldValue>
+            <valueName>EDLP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <controllingFieldValue>Customer Admin/Other - Performance Contract</controllingFieldValue>
+            <controllingFieldValue>Functional Rebate</controllingFieldValue>
+            <valueName>Data Fee - Indirect</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <valueName>Data - Key Period</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <valueName>Central Processing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <valueName>Incentive Trip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <valueName>Data</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Admin/Other</controllingFieldValue>
+            <valueName>Data Fee - Key Period</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Promotional Discount</controllingFieldValue>
+            <controllingFieldValue>Customer Original</controllingFieldValue>
+            <valueName>Promotional Discount</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Promotional Discount</controllingFieldValue>
+            <valueName>Price Support</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Promotional Discount</controllingFieldValue>
+            <controllingFieldValue>Promotional Discount - Performance Contract</controllingFieldValue>
+            <valueName>Base Discount</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Promotional Discount</controllingFieldValue>
+            <valueName>Promo Discount - Fixed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility - eCommerce</controllingFieldValue>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>eCommerce</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Guideline Discounts - External Performance Contract</controllingFieldValue>
+            <controllingFieldValue>Guideline Discounts</controllingFieldValue>
+            <valueName>Guideline Discounts</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Guideline Discounts - External Performance Contract</controllingFieldValue>
+            <valueName>EDLP Key Selling Period</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Promotional Discount - External Performance Contract</controllingFieldValue>
+            <valueName>Price Promo H&amp;L</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Base Rebate</controllingFieldValue>
+            <valueName>Base Rebate</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Functional Rebate</controllingFieldValue>
+            <valueName>Data Fee - Direct</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Performance Rebate</controllingFieldValue>
+            <valueName>Performance Rebate - Direct</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Performance Rebate</controllingFieldValue>
+            <valueName>Performance Rebate - Indirect</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Price Promo H&amp;L</controllingFieldValue>
+            <valueName>Price Promo H&amp;L (Off)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Price Promo H&amp;L</controllingFieldValue>
+            <valueName>Price Promo H&amp;L (On)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Chirashi (Store Leaflet)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Space Fee</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Customer Platform</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Instore Ad Fee</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>In Store Media</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Online Visibility</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Visibility Fees - Fixed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Other Visibility</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Visibility Bonus</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Display</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Visibility Agreements - indirect</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Visibility</controllingFieldValue>
+            <valueName>Ranging</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Original</controllingFieldValue>
+            <valueName>Customer Point</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Original</controllingFieldValue>
+            <valueName>Customer Application</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Customer Original</controllingFieldValue>
+            <valueName>Sweepstake</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Distribution</controllingFieldValue>
+            <valueName>Off-Premise Listing Fee</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Distribution</controllingFieldValue>
+            <valueName>Listing Fee (BS)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Distribution</controllingFieldValue>
+            <valueName>Listing Fee (Outlet)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Distribution</controllingFieldValue>
+            <valueName>On-Premise Free Bottle</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Other Promo</controllingFieldValue>
+            <valueName>Incentive Tour</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Other Promo</controllingFieldValue>
+            <valueName>Exhibition</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>E-Commerce</controllingFieldValue>
+            <valueName>E-Commerce Visibility</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

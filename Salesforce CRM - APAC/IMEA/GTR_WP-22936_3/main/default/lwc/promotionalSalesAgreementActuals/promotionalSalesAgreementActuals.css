@@ -1,0 +1,34 @@
+.card-body {
+    background-color: #fff;
+}
+
+.pageLeftMargin {
+    margin: 2em 3em;
+}
+.large-font {
+    font-size: normal;
+    font-weight: normal;
+}
+
+.warning {
+    background-color: #ff9a3c;
+    font-size: large;
+    text-transform: uppercase;
+    margin: 20px;
+    padding: 20px;
+}
+
+@media screen and (min-width: 600px) {
+    .right-border {
+        border-right: 1px solid #e6e6e6;
+    }
+}
+@media screen and (max-width: 600px) {
+    .large-font {
+        font-size: large;
+        font-weight: bold;
+    }
+    .pageLeftMargin {
+        margin: none;
+    }
+}

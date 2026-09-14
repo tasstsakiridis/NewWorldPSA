@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contract_Type__c</fullName>
+    <externalId>false</externalId>
+    <label>Contract Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Banner Trading Terms</fullName>
+                <default>false</default>
+                <label>Banner Trading Terms</label>
+            </value>
+            <value>
+                <fullName>Shopper Investment</fullName>
+                <default>false</default>
+                <label>Shopper Investment</label>
+            </value>
+            <value>
+                <fullName>Banner Customer Investment</fullName>
+                <default>false</default>
+                <label>Banner Customer Investment</label>
+            </value>
+            <value>
+                <fullName>Banner Shopper Lumpsum Investment</fullName>
+                <default>false</default>
+                <label>Banner Shopper Lumpsum Investment</label>
+            </value>
+            <value>
+                <fullName>Retail Store Investment</fullName>
+                <default>false</default>
+                <label>Retail Store Investment</label>
+            </value>
+            <value>
+                <fullName>Direct Customer Trading Terms</fullName>
+                <default>false</default>
+                <label>Direct Customer Trading Terms</label>
+            </value>
+            <value>
+                <fullName>On Premise Investment</fullName>
+                <default>false</default>
+                <label>On Premise Investment</label>
+            </value>
+            <value>
+                <fullName>CCM Lump Sum Manual Distribution</fullName>
+                <default>false</default>
+                <label>CCM Lump Sum Manual Distribution</label>
+            </value>
+            <value>
+                <fullName>CCM External Lump Sum Contract</fullName>
+                <default>false</default>
+                <label>CCM External Lump Sum Contract</label>
+            </value>
+            <value>
+                <fullName>CCM External Performance Contract</fullName>
+                <default>false</default>
+                <label>CCM External Performance Contract</label>
+            </value>
+            <value>
+                <fullName>CCM Performance Contract</fullName>
+                <default>false</default>
+                <label>CCM Performance Contract</label>
+            </value>
+            <value>
+                <fullName>CCM Lump Sum Contract</fullName>
+                <default>false</default>
+                <label>CCM Lump Sum Contract</label>
+            </value>
+            <value>
+                <fullName>Base Rebate</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Base Rebate</label>
+            </value>
+            <value>
+                <fullName>Customer Original</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Customer Original</label>
+            </value>
+            <value>
+                <fullName>Distribution</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Distribution</label>
+            </value>
+            <value>
+                <fullName>E-Commerce</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>E-Commerce</label>
+            </value>
+            <value>
+                <fullName>EDLP - Key Selling Period</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>EDLP - Key Selling Period</label>
+            </value>
+            <value>
+                <fullName>Functional Rebate</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Functional Rebate</label>
+            </value>
+            <value>
+                <fullName>Guideline Discounts</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Guideline Discounts</label>
+            </value>
+            <value>
+                <fullName>Logistics</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Logistics</label>
+            </value>
+            <value>
+                <fullName>Other Promo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Other Promo</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Performance Rebate</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate - Indirect</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Performance Rebate - Indirect</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Price Promo H&amp;L</label>
+            </value>
+            <value>
+                <fullName>Visibility</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Visibility</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

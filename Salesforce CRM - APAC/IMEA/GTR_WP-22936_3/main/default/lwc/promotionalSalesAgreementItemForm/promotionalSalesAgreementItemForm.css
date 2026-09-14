@@ -1,0 +1,59 @@
+.card-body {
+    background-color: #fff;
+}
+
+.destructive {
+    color: red;
+}
+
+img.product {
+    height: 80px;
+    max-height: 80px;
+    max-width: initial;
+    pointer-events: none;
+}
+
+.input-error {
+    color: red;
+    font-size: x-small;
+}
+
+.label {
+    font-size: 0.75rem;
+}
+.font-size_small {
+    font-size: 10pt;
+}
+.align_right {
+    text-align: right;
+}
+select {
+    width: 100%;
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+select > option {
+    font-family: 'Salesforce Sans',Arial,sans-serif;
+    font-size: 0.8125rem;
+    color: #080707;
+}
+
+.clicked {
+    border: 2px solid #406ec8;
+    border-radius: 0.25rem;
+    animation-name: selected;
+    animation-duration: 2s;
+}
+
+button {
+    transition: all 2s ease;
+}
+button:active {
+    border: 2px solid #406ec8;
+    transform: scale(1.15);
+}
+@keyframes selected {
+    0% { transform: scale(1.0); }
+    50% { border: 2px solid #406ec8; transform: scale(1.15); }
+    100% { transform: scale(1.0); }
+}

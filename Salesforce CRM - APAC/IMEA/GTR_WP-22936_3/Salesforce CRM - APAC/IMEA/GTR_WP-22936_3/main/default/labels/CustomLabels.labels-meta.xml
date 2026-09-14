@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Account_Promotional_Budget</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account Promotional Budget</shortDescription>
+        <value>Account Promotional Budget</value>
+    </labels>
+    <labels>
+        <fullName>Account_Promotional_Budget_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account Promotional Budget Error</shortDescription>
+        <value>The budget for this %0 is greater than the available promotional budget for this account</value>
+    </labels>
+    <labels>
+        <fullName>Account_Promotional_Budget_Remaining</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Account Promotional Budget Remaining</shortDescription>
+        <value>Promotional Budget Remaining</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Effectiveness_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Effectiveness (9L)</shortDescription>
+        <value>Actual Effectiveness (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Effectiveness_BTL</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Effectiveness BTL</shortDescription>
+        <value>Actual Effectives (BTL)</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Variance_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Variance (9L)</shortDescription>
+        <value>Actual Variance (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Actual_Variance_BTL</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Actual Variance (BTL)</shortDescription>
+        <value>Actual Variance (BTL)</value>
+    </labels>
+    <labels>
+        <fullName>Break_Even_Percentage</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Break Even Percentage</shortDescription>
+        <value>BE %</value>
+    </labels>
+    <labels>
+        <fullName>Budget_Overrun</fullName>
+        <categories>message</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Budget Overrun</shortDescription>
+        <value>Account&apos;s promotional budget has been overrun</value>
+    </labels>
+    <labels>
+        <fullName>CVS</fullName>
+        <categories>labels, abbreviations</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>CVS</shortDescription>
+        <value>CVS</value>
+    </labels>
+    <labels>
+        <fullName>Click_here_to_review_record</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Click here to review record</shortDescription>
+        <value>Click here to Open &amp; Review the PSA in Salesforce</value>
+    </labels>
+    <labels>
+        <fullName>CurrentVolume9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>CurrentVolume9L</shortDescription>
+        <value>Current Volume (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Customer</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Customer</shortDescription>
+        <value>Customer</value>
+    </labels>
+    <labels>
+        <fullName>Do_Nothing_Volume_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Do Nothing Volume 9L</shortDescription>
+        <value>DN Vol (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Do_Nothing_Volume_Bottle</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Do Nothing Volume Bottle</shortDescription>
+        <value>Do Nothing (BTL)</value>
+    </labels>
+    <labels>
+        <fullName>Do_Volume_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Do Volume (9L)</shortDescription>
+        <value>DO Vol (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Effective_End_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Effective End Date</shortDescription>
+        <value>Effective End Date</value>
+    </labels>
+    <labels>
+        <fullName>Effective_Start_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Effective Start Date</shortDescription>
+        <value>Effective Start Date</value>
+    </labels>
+    <labels>
+        <fullName>Effectiveness</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Effectiveness</shortDescription>
+        <value>Effectiveness</value>
+    </labels>
+    <labels>
+        <fullName>Effectiveness_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Effectiveness 9L</shortDescription>
+        <value>Effectiveness (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Excise</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Excise</shortDescription>
+        <value>Excise</value>
+    </labels>
+    <labels>
+        <fullName>Fee</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fee</shortDescription>
+        <value>Fee</value>
+    </labels>
+    <labels>
+        <fullName>FeePaid</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FeePaid</shortDescription>
+        <value>Fee Paid</value>
+    </labels>
+    <labels>
+        <fullName>Fee_Greater_Than_Budget_Error</fullName>
+        <categories>error, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fee Greater Than Budget Error</shortDescription>
+        <value>Fee cannot be greater than Total Budget</value>
+    </labels>
+    <labels>
+        <fullName>GP</fullName>
+        <categories>labels, abbreviations</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP</shortDescription>
+        <value>GP</value>
+    </labels>
+    <labels>
+        <fullName>GPM</fullName>
+        <categories>labels, abbreviations</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GPM</shortDescription>
+        <value>GPM</value>
+    </labels>
+    <labels>
+        <fullName>GP_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP 9L</shortDescription>
+        <value>GP 9L</value>
+    </labels>
+    <labels>
+        <fullName>GP_After_Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP After Cost</shortDescription>
+        <value>GP After Cost</value>
+    </labels>
+    <labels>
+        <fullName>GP_Do</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP Do</shortDescription>
+        <value>GP amount (DO)</value>
+    </labels>
+    <labels>
+        <fullName>GP_Do_Nothing</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP Do Nothing</shortDescription>
+        <value>GP Amount (DN)</value>
+    </labels>
+    <labels>
+        <fullName>GP_Effectiveness</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP Effectiveness</shortDescription>
+        <value>GP Effectiveness</value>
+    </labels>
+    <labels>
+        <fullName>GP_Net_Of_Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GP Net Of Cost</shortDescription>
+        <value>Investment Gross Profit, net of Total Investment</value>
+    </labels>
+    <labels>
+        <fullName>Increment_Bottle</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Increment Bottle</shortDescription>
+        <value>Increment Bottle</value>
+    </labels>
+    <labels>
+        <fullName>Incremental_Volume_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Incremental Volume (9L)</shortDescription>
+        <value>Incremental Vol (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Investment</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Investment</shortDescription>
+        <value>Investment</value>
+    </labels>
+    <labels>
+        <fullName>Investment_Gross_Profit</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Investment Gross Profit</shortDescription>
+        <value>Investment Gross Profit</value>
+    </labels>
+    <labels>
+        <fullName>Invoice_Date</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Invoice Date</shortDescription>
+        <value>Invoice Date</value>
+    </labels>
+    <labels>
+        <fullName>Korea_PSA_Budget_Error</fullName>
+        <categories>error, messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Korea PSA Budget Error</shortDescription>
+        <value>Budget for PSA cannot be greater than the remaining Promotional Budget for the account</value>
+    </labels>
+    <labels>
+        <fullName>Organic_Gross_Profit</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Organic Gross Profit</shortDescription>
+        <value>Organic Gross Profit</value>
+    </labels>
+    <labels>
+        <fullName>Organic_Performance</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Organic Performance</shortDescription>
+        <value>Organic Performance</value>
+    </labels>
+    <labels>
+        <fullName>Organic_Performance_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Organic Performance 9L</shortDescription>
+        <value>Organic Performance (9L)</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Date_Guidance</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Date Guidance</shortDescription>
+        <value>The date range in the PSA must match the actual contract period (Effective Date) specified in the agreement.</value>
+    </labels>
+    <labels>
+        <fullName>PSA_Stage</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>PSA Stage</shortDescription>
+        <value>PSA Stage</value>
+    </labels>
+    <labels>
+        <fullName>Planning</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Planning</shortDescription>
+        <value>Planning</value>
+    </labels>
+    <labels>
+        <fullName>ROI_Threshold_Risk</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>ROI Threshold Risk</shortDescription>
+        <value>ROI Threshold Risk</value>
+    </labels>
+    <labels>
+        <fullName>Rebate_Amount_Above_Promotional_Budget_Error</fullName>
+        <categories>messages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rebate Amount Above Promotional Budget Error</shortDescription>
+        <value>Amount is greater than remaining promotional budget for this account</value>
+    </labels>
+    <labels>
+        <fullName>SNS</fullName>
+        <categories>labels, abbreviations</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>SNS</shortDescription>
+        <value>SNS</value>
+    </labels>
+    <labels>
+        <fullName>Settlement</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Settlement</shortDescription>
+        <value>Settlement</value>
+    </labels>
+    <labels>
+        <fullName>StoreType</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>StoreType</shortDescription>
+        <value>Store Type</value>
+    </labels>
+    <labels>
+        <fullName>TotalVariableCost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>TotalVariableCost</shortDescription>
+        <value>Total Variable Cost</value>
+    </labels>
+    <labels>
+        <fullName>Total_Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Cost</shortDescription>
+        <value>Total Cost</value>
+    </labels>
+    <labels>
+        <fullName>Total_Do_Nothing_Vol_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Do Nothing Vol 9L</shortDescription>
+        <value>Total DN Vol (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Total_Do_Vol_9L</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Do Vol 9L</shortDescription>
+        <value>Total DO Vol (9L)</value>
+    </labels>
+    <labels>
+        <fullName>Total_Fixed_Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total Fixed Cost</shortDescription>
+        <value>Total Fixed Cost</value>
+    </labels>
+    <labels>
+        <fullName>Total_GP_Net_of_Cost</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total GP Net of Cost</shortDescription>
+        <value>Total GP Net of Cost</value>
+    </labels>
+    <labels>
+        <fullName>Variable_Investment</fullName>
+        <categories>labels</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Variable Investment</shortDescription>
+        <value>Variable Investment</value>
+    </labels>
+</CustomLabels>

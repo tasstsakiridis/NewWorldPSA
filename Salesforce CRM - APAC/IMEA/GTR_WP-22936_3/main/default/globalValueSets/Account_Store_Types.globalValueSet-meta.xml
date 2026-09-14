@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Convenience Store</fullName>
+        <default>false</default>
+        <label>Convenience Store</label>
+    </customValue>
+    <customValue>
+        <fullName>Discounter</fullName>
+        <default>false</default>
+        <label>Discounter</label>
+    </customValue>
+    <customValue>
+        <fullName>Hypermarket</fullName>
+        <default>false</default>
+        <label>Hypermarket</label>
+    </customValue>
+    <customValue>
+        <fullName>Supermarket</fullName>
+        <default>false</default>
+        <label>Supermarket</label>
+    </customValue>
+    <customValue>
+        <fullName>Wholesale</fullName>
+        <default>false</default>
+        <label>Wholesale</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Account Store Types</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

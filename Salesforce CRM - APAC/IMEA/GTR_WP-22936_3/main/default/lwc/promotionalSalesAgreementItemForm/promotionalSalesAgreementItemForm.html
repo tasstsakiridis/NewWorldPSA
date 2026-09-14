@@ -1,0 +1,410 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <img src={productImageUrl} class="product slds-m-around_x-small" alt="Product picture" />
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-m-bottom_small" style="word-wrap: normal;" title={productName}>{productName}</span>                                        
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <template lwc:if={isWorking}>
+        <div class="slds-m-around_medium slds-align_absolute-center">
+            <lightning-spinner alternative-text={labels.saving.message}></lightning-spinner>
+            <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
+    <template lwc:else>
+    <div class="card-body slds-m-top_small slds-p-top_small">
+        <lightning-layout horizontal-align="space" class="slds-m-around_small">
+            <lightning-layout-item>
+                <lightning-button-icon data-id="cancel" icon-name="utility:back" title="Back" alternative-text="Back" class="button click" onclick={handleCancelButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <template lwc:if={isNotDisabled}>
+                <lightning-layout-item>
+                    <lightning-button-icon data-id="save" icon-name="utility:save" title="Save" alternative-text="Save" class="" onclick={handleSaveButtonClick}></lightning-button-icon>
+                </lightning-layout-item>
+                <template lwc:if={canDelete}>
+                    <lightning-layout-item>
+                        <lightning-button-icon data-id="delete" variant="brand" icon-name="utility:delete" label="" title="Delete" alternative-text="Delete" onclick={handleDeleteButtonClick}></lightning-button-icon>
+                    </lightning-layout-item>
+                </template>
+                <lightning-layout-item>
+                    <lightning-button-icon data-id="clear" icon-name="utility:recycle_bin_empty" label="" title="Clear" alternative-text="Clear" onclick={handleClearButtonClick}></lightning-button-icon>
+                </lightning-layout-item>
+            </template>
+            <lightning-layout-item>
+                <lightning-button-icon data-id="help" icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right" onclick={handleHelpButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+        </lightning-layout>        
+
+        <lightning-layout multiple-rows="true" horizontal-align="center">
+            <template lwc:if={isKorea}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.increment.bottleLabel}</p>
+                            <lightning-formatted-number label={labels.increment.bottleLabel} 
+                                                        value={bottleIncrement} 
+                                                        format-style="decimal"
+                                                        minimum-integer-digits="1"
+                                                        minimum-fraction-digits="0"
+                                                        maximum-fraction-digits="0">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.increment.case9LLabel}</p>
+                            <lightning-formatted-number label={labels.increment.case9LLabel} 
+                                                        value={case9LIncrement} 
+                                                        format-style="decimal"
+                                                        minimum-integer-digits="1"
+                                                        minimum-fraction-digits="0"
+                                                        maximum-fraction-digits="0">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.totalCost.label}</p>
+                            <lightning-formatted-number label={labels.totalCost.label} 
+                                                        value={totalCost} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                    </lightning-layout>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.organicGrossProfit.label}</p>
+                            <lightning-formatted-number label={labels.gpDoNothing.label} 
+                                                        value={currentVolumeGPperBottle} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.investmentGrossProfit.label}</p>
+                            <lightning-formatted-number label={labels.gpEffectiveness.label} 
+                                                        value={planGPperBottle} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right; font-size_medium;">
+                            <p class="slds-text-heading_small font-size_small">{labels.gpNetOfTotalCost.label}</p>
+                            <lightning-formatted-number label={labels.gpNetOfTotalCost.label} 
+                                                        value={gpNetOfTotalCost} 
+                                                        format-style="currency"
+                                                        currency-display-as="symbol">
+                            </lightning-formatted-number>
+                        </lightning-layout-item>                        
+                    </lightning-layout>
+                </lightning-layout-item>
+            </template>  
+            <template lwc:else>
+                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" small-device-size="12" medium-device-size="4">
+                            <!-- Total Investment -->      
+                            <div lwc:if={isUKMarket}>
+                                <p class="slds-text-heading_small">{totalInvestmentLabel}</p>
+                                <lightning-formatted-number label={labels.totalInvestment.label} value={totalInvestment}
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>    
+                            </div>     
+                            <!-- Liability -->     
+                            <div lwc:if={isMexico}>
+                                <p class="slds-text-heading_small">{labels.liability.label}</p>
+                                <lightning-formatted-number label={labels.liability.label} value={rebateLiability} format-style="currency"
+                                    currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </div>
+                            <div lwc:if={isJapan}>
+                                <p class="slds-text-heading_small">{labels.roi.label}</p>
+                                <lightning-formatted-number value={planROI} maximum-fraction-digits="2"></lightning-formatted-number>
+                            </div>
+                        </lightning-layout-item>
+                        <template lwc:if={isJapan}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: center;">
+                                <p class="slds-text-heading_small">{labels.breakEven.label}</p>
+                                <lightning-formatted-number value={breakEven} maximum-fraction-digits="1" format-style="percent"></lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={calcSplit}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
+                                <p class="slds-text-heading_small">{labels.split.label}</p>
+                                <lightning-formatted-number label={labels.split.label} value={productSplit}
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={showGrossProfit}>
+                            <lightning-layout-item size="4" small-device-size="12" medium-device-size="4" style="text-align: right;">
+                                <p class="slds-text-heading_small">{labels.grossProfit.label}</p>
+                                <lightning-formatted-number label={labels.grossProfit.label} 
+                                                            value={thisProductGP} 
+                                                            format-style="currency"
+                                                            currency-display-as="symbol">
+                                </lightning-formatted-number>
+                            </lightning-layout-item>
+                        </template>   
+                    </lightning-layout>
+                </lightning-layout-item>
+            </template>               
+
+            <template lwc:if={captureFreeGoods}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="number" name="i_FreeGoods"
+                                    label={freeGoodsLabel}
+                                    value={freeGoodQty}
+                                    step="1"
+                                    readonly={isDisabled}
+                                    onchange={handleFreeGoodsQtyChange}>
+                    </lightning-input>                    
+                </lightning-layout-item>
+                <!--
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="date" name="i_FreGoodsGivenDate"
+                                    label={labels.freeGoodsGivenDate.label}
+                                    value={freeGoodGivenDate}
+                                    readonly={isDisabled}
+                                    onchange={handleFreeGoodsGivenDateChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            -->
+                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                    <lightning-checkbox-group name="i_FreeGoodsReason"
+                                    label={labels.freeGoodsReason.label}
+                                    options={freeGoodReasonOptions}
+                                    value={freeGoodReasonValues}
+                                    disabled={isDisabled}
+                                    onchange={handleFreeGoodsReasonChange}>
+                    </lightning-checkbox-group>
+                </lightning-layout-item>
+            </template>
+            <template lwc:if={captureBrandStatus}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_BrandStatus"
+                                            label={brandStatusLabel}
+                                            options={brandStatusOptions}
+                                            value={brandStatusValues}
+                                            disabled={isDisabled}
+                                            onchange={handleBrandStatusChange}></lightning-checkbox-group>
+                </lightning-layout-item>              
+            </template>
+            <template lwc:if={captureCurrentVolume}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <template lwc:if={captureVolumeInBottles}>
+                        <lightning-input type="number" name="i_CurrentVolume" label={currentVolumeLabel} value={currentVolume}
+                            step="1" readonly={isDisabled} onchange={handleCurrentVolumeChange}>
+                        </lightning-input>
+                    </template>
+                    <template lwc:else>
+                        <lightning-input type="number" name="i_CurrentVolume" label={currentVolumeLabel} value={currentVolume} step="0.01"
+                            readonly={isDisabled} onchange={handleCurrentVolumeChange}>
+                        </lightning-input>
+                    </template>                    
+                </lightning-layout-item>
+                <template lwc:if={isKorea}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-input type="number" name="f_current_volume_9L" label={labels.organicPerformance9L.label} value={currentVolume9LCase} disabled="true"></lightning-input>
+                    </lightning-layout-item>
+                </template>
+            </template>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Volume Forecast -->
+                <template lwc:if={captureVolumeInBottles}>                    
+                    <lightning-input type="number" name="i_VolumeForecast" label={volumeForecastBtlLabel} value={volumeForecast}
+                        step="1" readonly={isDisabled} onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template lwc:if={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecastBtl.error}</span>
+                    </template>    
+                </template>
+                <template lwc:else>
+                    <lightning-input type="number" name="i_VolumeForecast" label={labels.volumeForecast.label} value={volumeForecast}
+                        step="0.01" readonly={isDisabled} onchange={handleVolumeForecastChange}>
+                    </lightning-input>
+                    <template lwc:if={hasVolumeForecastError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.volumeForecast.error}</span>
+                    </template>
+                </template>
+            </lightning-layout-item>
+            <template lwc:if={isKorea}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input type="number" name="f_volume_effectiveness_9L" label={labels.effectiveness.label} value={effectiveness9L}
+                            disabled="true"></lightning-input>
+                </lightning-layout-item>                        
+            </template>
+            <template lwc:if={captureRebate}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Discounts per Case -->
+                    <template lwc:if={captureRebatePerBottle}>
+                        <lightning-input type="number" name="i_DiscountPerBottle" label={labels.discountPerBottle.label} value={discount} step="0.01"
+                            readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
+                        </lightning-input>
+                    </template>
+                    <template lwc:else>
+                        <lightning-input type="number" name="i_DiscountPerCase" label={labels.discountPerCase.label} value={discount} step="0.01"
+                            readonly={isDisabled} onchange={handleDiscountChange} formatter="currency">
+                        </lightning-input>                    
+                    </template>
+                    <template lwc:if={hasDiscountError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                    </template>
+                </lightning-layout-item>
+            </template>
+            <template lwc:if={captureRebatePercent}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Discounts per Case -->
+                    <lightning-input type="number" name="i_DiscountPercent" 
+                                    label={discountPercentLabel}                                 
+                                    value={discountPercent}
+                                    step="1"
+                                    readonly={isDisabled}
+                                    onchange={handleDiscountPercentChange}
+                                    formatter="percent-fixed">
+                    </lightning-input>
+                    <template lwc:if={hasDiscountError}>
+                        <span class="slds-m-horizontal_small input-error">{labels.discountPerCase.error}</span>
+                    </template>
+                </lightning-layout-item>
+            </template>
+            <template lwc:if={captureFee}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Listing Fee -->
+                    <lightning-input type="number" name="i_Fee" 
+                                    label={feeLabel}
+                                    value={fee}
+                                    readonly={isDisabled}
+                                    onchange={handleFeeChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+            <template lwc:if={captureListingFee}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Listing Fee -->
+                    <lightning-input type="number" name="i_ListingFee" 
+                                    label={listingFeeLabel}
+                                    value={listingFee}
+                                    readonly={isDisabled}
+                                    onchange={handleListingFeeChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureDrinkStrategy}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_DrinkStrategy"
+                                            label={drinkStrategyLabel}
+                                            options={drinkStrategyOptions}
+                                            value={drinkStrategyValues}
+                                            disabled={isDisabled}
+                                            onchange={handleDrinkStrategyChange}></lightning-checkbox-group>
+
+                </lightning-layout-item>
+            </template>
+            <template if:true={capturePromotionalActivity}>
+            <lightning-layout-item size="12" padding="around-small">
+                <lightning-checkbox-group name="i_PromotionalActivity"
+                                        label={promotionalActivityLabel}
+                                        options={promotionalActivityOptions}
+                                        value={promotionalActivityValues}
+                                        disabled={isDisabled}
+                                        onchange={handlePromotionalActivityChange}></lightning-checkbox-group>            
+                </lightning-layout-item>
+            </template>
+            <template if:true={capturePromotionalActivityAmount}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Promotional Activity Amount -->
+                    <lightning-input type="number" name="i_PromotionalActivityAmount" 
+                                    label={promotionalActivityLabel}
+                                    value={promotionalActivityAmount}
+                                    readonly={isDisabled}
+                                    onchange={handlePromotionalActivityValueChange}
+                                    formatter="currency">
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureBrandSupport}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Brand Support -->
+                    <lightning-input type="number" name="i_BrandSupport" label={brandSupportLabel}
+                        value={brandSupport} readonly={isDisabled} onchange={handleBrandSupportChange}
+                        formatter="currency">
+                    </lightning-input>                        
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureTrainingAndAdvocacy}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <!-- Training & Advocacy -->
+                    <lightning-checkbox-group name="i_TrainingAndAdvocacy" label={trainingAdvocacyLabel}
+                        options={trainingAdvocacyOptions} value={trainingAdvocacyValues} disabled={isDisabled}
+                        onchange={handleTrainingAdvocacyChange}></lightning-checkbox-group>
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureOutletToProvide}>
+            <lightning-layout-item size="12" padding="around-small">
+                <!-- Outlet to Provide -->
+                <lightning-checkbox-group name="i_OutletToProvide"
+                                        label={outletToProvideLabel}
+                                        options={outletToProvideOptions}
+                                        value={outletToProvideValues}
+                                        disabled={isDisabled}
+                                        onchange={handleOutletToProvideChange}></lightning-checkbox-group>            
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureBrandVisibility}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_BrandVisibility" label={brandVisibilityLabel} 
+                                            options={brandVisibilityOptions}
+                                            value={brandVisibilityValues} 
+                                            disabled={isDisabled}
+                                            onchange={handleBrandVisibilityChange}>
+                    </lightning-checkbox-group>                
+                </lightning-layout-item>
+            </template>
+            <template if:true={captureProductVisibility}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-checkbox-group name="i_ProductVisibility" label={productVisibilityLabel} 
+                                            options={productVisibilityOptions}
+                                            value={productVisibilityValues} 
+                                            disabled={isDisabled}
+                                            onchange={handleProductVisibilityChange}>
+                    </lightning-checkbox-group>
+                </lightning-layout-item>
+            </template>
+
+            <template if:true={captureComments}>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input name="i_Comments" type="text"
+                                    max="32768"
+                                    value={comments}
+                                    label={labels.comments.label}
+                                    disabled={isDisabled}
+                                    placeholder={labels.comments.placeholder}
+                                    onchange={handleCommentsChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+    </template>    
+</template>

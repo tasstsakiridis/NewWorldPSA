@@ -188,7 +188,7 @@ export default class PromotionalSalesAgreementSummary extends NavigationMixin(Li
         { label: LABEL_REBATE_LIABILITY, fieldName: 'rebateLiability', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_GP_DO_NOTHING, fieldName: 'gpDoNothing', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Japan'] },
         { label: LABEL_GP_DO, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Japan'] },
-        { label: LABEL_TOTAL_COST, fieldName: 'totalCost', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Japan'] },
+        { label: LABEL_TOTAL_COST, fieldName: 'totalCost', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Japan','Korea'] },
         { label: LABEL_GP_AFTER_COST, fieldName: 'gpAfterCost', type: 'currency', cellAttributes: { alignment: 'right'}, markets: ['Japan'] },
         { label: LABEL_GROSS_PROFIT, fieldName: 'totalPSAGP', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Mexico']},
         { label: LABEL_SPLIT, fieldName: 'productSplit', type: 'currency', cellAttributes: { alignment: 'right' }, markets: ['Brazil']},

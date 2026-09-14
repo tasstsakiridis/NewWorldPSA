@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>KR_PSA_Closed_Notification</fullName>
+        <description>KR - PSA Closed Notification</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>Workflow_Email_Templates/KR_PSA_Closed_Notification</template>
+    </alerts>
+    <alerts>
+        <fullName>KR_PSA_Status_Changed</fullName>
+        <description>KR - PSA Status Changed</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>Workflow_Email_Templates/KR_PSA_Status_Update</template>
+    </alerts>
+    <alerts>
+        <fullName>KR_PSA_Submitted</fullName>
+        <description>KR - PSA Submitted</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>Workflow_Email_Templates/KR_PSA_Submitted_Notification</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>Activity_PMI_Actual_Status_Reviewed</fullName>
+        <field>PMI_Actual_Status__c</field>
+        <literalValue>Reviewed</literalValue>
+        <name>Activity PMI Actual Status - Reviewed</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+</Workflow>

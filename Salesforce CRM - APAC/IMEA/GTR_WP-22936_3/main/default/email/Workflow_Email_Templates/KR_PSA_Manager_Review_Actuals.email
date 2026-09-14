@@ -1,0 +1,5 @@
+<messaging:emailTemplate subject="Settlement - {!relatedTo.Account__r.Name} - {!relatedTo.Promo_Code__c}" recipientType="User" relatedToType="Promotion_Activity__c">
+<messaging:htmlEmailBody >
+    <c:Korea_PSA_Contract_Actuals psa="{!relatedTo}" />
+</messaging:htmlEmailBody>
+</messaging:emailTemplate>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KR_PSA</fullName>
+    <active>true</active>
+    <description>Gross Profit details for Korea PSA</description>
+    <label>KR - PSA</label>
+    <picklistValues>
+        <picklist>Account_Group__c</picklist>
+        <values>
+            <fullName>Bar %2F Pub</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clubs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Department Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hippop Club %28HHC%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hostess</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hotel %2F Resort</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hyper Market</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Influencers</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>KTV</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Liquor Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mainstream</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mamasan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Night Club</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Premium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Super Premium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TOT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WithMeal</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Account_Store_Type__c</picklist>
+        <values>
+            <fullName>Convenience Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Discounter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hypermarket</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Supermarket</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Wholesale</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Channel__c</picklist>
+        <values>
+            <fullName>Combera</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Distributor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E-COMMERCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EVENTOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INTEGRATED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LKA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NON RETAIL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Non-Sellable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OFF PREMISE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ON PREMISE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Off</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Off DH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Off Modern</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Off Traditional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>On</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Parent</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sub_Wholesaler</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UNCLASSIFIED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Wholesaler</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

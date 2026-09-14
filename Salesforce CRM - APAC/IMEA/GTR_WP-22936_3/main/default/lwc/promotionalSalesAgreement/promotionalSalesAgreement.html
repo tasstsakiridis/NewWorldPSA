@@ -1,0 +1,569 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-partners">
+                                <lightning-icon icon-name="standard:partners" alternative-text="Agreement" title="Promotional Sales Agreement" ></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>&nbsp;</span>
+                                        <span class="slds-page-header__title slds-truncate slds-m-bottom_small" title={psaName}>{psaName}<span class="slds-text-title_caps slds-m-left_small">[{psaStatus}]</span></span>                                       
+                                    </h1>
+                                    <template lwc:if={sapAgreementNumber}>                                        
+                                        <h3>                                            
+                                            <span class="slds-text-title_caps slds-text-title_bold slds-truncate" title={sapAgreementNumber}>CCM #: {sapAgreementNumber}</span>
+                                            <template lwc:if={boomiProcessed}>
+                                                <span class="slds-text-title_caps slds-text-color_success slds-m-left_medium">[{labels.sentToCCM.label}]</span>
+                                            </template>
+                                        </h3>                                        
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <template if:false={isPhone}>
+                    <div class="slds-page-header__col-actions">
+                        <div class="slds-page-header__controls">
+                            <div class="slds-page-header__control">
+                                <lightning-button-group>
+                                    <lightning-button label={labels.back.label} icon-name="utility:back" title="Back" class="" onclick={handleCancelButtonClick} ></lightning-button>
+                                    <lightning-button label={labels.save.label} icon-name="utility:save" title="Save" class="" onclick={handleSaveButtonClick} ></lightning-button>
+                                    <template if:true={canSubmitForApproval}>
+                                        <lightning-button label={labels.submitForApproval.label} icon-name="utility:approval" title="Submit for Approval" class="slds-m-horizontal_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={isSubmitted}>
+                                        <lightning-button label={labels.recall.label} icon-name="utility:reassign" title="Recall" class="slds-m-horizontal_x-small" onclick={handleRecallButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canClone}>
+                                        <lightning-button label={labels.clone.label} icon-name="utility:copy" title="Clone" class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canCloseAgreement}>
+                                        <lightning-button label={labels.close.label} icon-name="utility:copy" title="Close" class="slds-m-horizontal_x-small" onclick={handleCloseButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canSendContract}>
+                                        <lightning-button label={labels.docusign.label} icon-name="utility:edit_form" title="Docusign" class="slds-m-horizontal_x-small" onclick={handleDocusignButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={canViewSummary}>
+                                        <lightning-button label={labels.summary.label} icon-name="utility:matrix" title="Summary" class="slds-m-horizontal_x-small" onclick={handleSummaryButtonClick}></lightning-button>
+                                    </template>
+                                    <template if:true={hasPreview}>
+                                        <lightning-button icon-name="utility:list" label={labels.preview.label} title="Preview" class="slds-m-horizontal_x-small" onclick={handlePreviewButtonClick}></lightning-button>
+                                    </template>                    
+                                    <lightning-button label={labels.items.label} icon-name="utility:snippet" title="Items" class="slds-m-horizontal_x-small" onclick={handleItemsButtonClick} ></lightning-button>
+                                    <template if:true={canEditActuals}>
+                                        <lightning-button label={labels.actuals.label} icon-name="utility:task" title="Actuals" class="slds-m-horizontal_x-small" onclick={handleActualsButtonClick}></lightning-button>
+                                    </template>
+                                    <lightning-button-icon variant="brand" alternative-text={labels.help.label} icon-name="utility:help" class="slds-m-left_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </article>
+    <template if:true={isPhone}>
+        <lightning-layout>
+            <lightning-layout-item size="2">
+                <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" class="slds-m-left_x-small slds-m-right_small" onclick={handleCancelButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item size="8" class="slds-text-align_center">
+                <lightning-button-icon icon-name="utility:save" title="Save" alternative-text="Save" class="slds-m-right_x-small" onclick={handleSaveButtonClick}></lightning-button-icon>
+                <template if:true={canSubmitForApproval}>
+                    <lightning-button-icon icon-name="utility:approval" title="Submit for Approval" alternative-text="Submit for Approval" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={isSubmitted}>
+                    <lightning-button-icon icon-name="utility:reassign" title="Recall" alternative-text="Recall" class="slds-m-right_x-small" onclick={handleSubmitForApprovalButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={canClone}>
+                    <lightning-button-icon icon-name="utility:copy" title="Clone" alternative-text={labels.clone.label} class="slds-m-horizontal_x-small" onclick={handleCloneButtonClick}></lightning-button-icon>
+                </template>
+                <lightning-button-icon icon-name="utility:snippet" title="Items" alternative-text="Items" class="slds-m-right_x-small" onclick={handleItemsButtonClick}></lightning-button-icon>            
+                <template if:true={canEditActuals}>
+                    <lightning-button-icon icon-name="utility:task" title="Actuals" class="slds-m-horizontal_x-small" onclick={handleActualsButtonClick}></lightning-button-icon>
+                </template>
+                <template if:true={hasPreview}>
+                    <lightning-button-icon icon-name="utility:list" title="Preview" class="slds-m-horizontal_x-small" onclick={handlePreviewButtonClick}></lightning-button-icon>
+                </template>
+            </lightning-layout-item>
+            <lightning-layout-item size="2">
+                <lightning-button-icon icon-name="utility:question" title="Help" alternative-text="Help" class="slds-float_right slds-m-right_x-small" onclick={handleHelpButtonClick}></lightning-button-icon>
+            </lightning-layout-item>
+        </lightning-layout>        
+    </template>
+
+    <template if:true={error}>
+        <c-inline-message message={error.body.message} errors={errors} type="error"></c-inline-message>
+    </template>
+
+    <template if:true={isWorking}>
+        <div class="slds-m-around_medium slds-align_absolute-center">
+            <lightning-spinner alternative-text={labels.save.message}></lightning-spinner>
+            <p class="slds-text-title_caps">{workingMessage}</p>
+        </div>
+    </template>
+    <template if:true={isCloning}>
+        <div class="slds-m-top_small">
+            <lightning-card title={labels.clone.label}>
+                <template if:true={isPhone}>
+                    <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneCancelButtonClick}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:check" title="OK" alternative-text="OK" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneOKButtonClick}></lightning-button-icon>
+                </template>
+                <template if:false={isPhone}>
+                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Back" slot="actions" class="" onclick={handleCloneCancelButtonClick} ></lightning-button>
+                    <lightning-button label={labels.ok.label} icon-name="utility:check" title="OK" slot="actions" class="" onclick={handleCloneOKButtonClick} ></lightning-button>
+                </template>
+                <div class="slds-m-around_medium">            
+                    <lightning-input name="i_ClonedName" label={labels.clone.instruction} max-length="80" value={cloneName} onchange={handleCloneNameChange}></lightning-input>
+                </div>    
+            </lightning-card>
+        </div>
+    </template>
+    <template if:true={isClosing}>
+        <div class="slds-m-top_small">
+            <lightning-card title={labels.close.label}>
+                <template if:true={isPhone}>
+                    <lightning-button-icon icon-name="utility:back" title="Back" alternative-text="Back" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneCancelButtonClick}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:check" title="OK" alternative-text="OK" slot="actions" class="slds-m-left_x-small slds-m-right_small" onclick={handleCloneOKButtonClick}></lightning-button-icon>
+                </template>
+                <template if:false={isPhone}>
+                    <lightning-button label={labels.cancel.label} icon-name="utility:back" title="Back" slot="actions" class="" onclick={handleCloseCancelButtonClick} ></lightning-button>
+                    <lightning-button label={labels.ok.label} icon-name="utility:check" title="OK" slot="actions" class="" onclick={handleCloseOKButtonClick} ></lightning-button>
+                </template>
+                <div class="slds-m-around_medium">
+                    <lightning-layout>
+                        <lightning-layout-item size="4" padding="around-large">
+                            <lightning-radio-group name="i_Close_Options" label={labels.close.label} class="slds-text-heading_medium"
+                                        options={closeOptions} value={closeType} type="radio" onchange={handleCloseTypeChange}>
+                            </lightning-radio-group>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="8" padding="around-large">
+                            <lightning-textarea name="i_CloseReason" label={labels.reason.label} max-length="80" value={closeReason} onchange={handleCloseReasonChange} required="true"></lightning-textarea>            
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>    
+            </lightning-card>
+        </div>
+    </template>
+    <div class="card-body slds-m-top_small">
+        <lightning-layout multiple-rows={isPhone}>
+            <lightning-layout-item size="12" small-device-size="12" large-device-size="4" class="border-right">
+                <h2 class="slds-text-title_caps slds-m-around_small">{labels.dateRange.label}</h2>
+                <lightning-layout multiple-rows="true" class="slds-m-vertical_small">
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-input type="date" name="i_StartDate" label={startDateLabel} value={startDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleStartDateChange}></lightning-input>
+                        <template if:true={hasStartDateError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.startDate.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <template if:true={captureEndDate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <lightning-input type="date" name="i_EndDate" label={endDateLabel} value={endDate} class="slds-m-horizontal_small" readonly={isLocked} onchange={handleEndDateChange}></lightning-input>
+                            <template if:true={hasEndDateError}>
+                                <span class="slds-m-horizontal_small input-error">{labels.endDate.error}</span>
+                            </template>    
+                        </lightning-layout-item>
+                    </template>
+                    <template if:false={captureEndDate}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <template lwc:if={isPhone}>
+                                <lightning-layout multiple-rows="true">
+                                    <lightning-layout-item size="12">
+                                        <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType"  checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="12">
+                                        <template if:true={isLengthInYears}>
+                                            <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                        </template>                            
+                                        <template if:false={isLengthInYears}>
+                                            <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" readonly={isLocked} onchange={handleLengthOfPSAChange}></lightning-input>
+                                        </template>
+                                        <template if:true={hasLengthOfPSAError}>
+                                            <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                                        </template>            
+                                    </lightning-layout-item>
+                                </lightning-layout>    
+
+                            </template>
+                            <template lwc:else>
+                                <lightning-layout>
+                                    <lightning-layout-item size="9">
+                                        <template if:true={isLengthInYears}>
+                                            <lightning-radio-group name="i_LengthOfPSA" label={labels.lengthOfPSA.yearsLabel} options={lengthOfPSAOptions} value={lengthOfPSA} type="button" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-radio-group>
+                                        </template>                            
+                                        <template if:false={isLengthInYears}>
+                                            <lightning-input name="i_LengthOfPSA" label={labels.lengthOfPSA.monthsLabel} value={lengthOfPSA} type="number" class="slds-m-horizontal_small" onchange={handleLengthOfPSAChange}></lightning-input>
+                                        </template>
+                                        <template if:true={hasLengthOfPSAError}>
+                                            <span class="slds-m-horizontal_small input-error">{labels.lengthOfPSA.error}</span>
+                                        </template>            
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="3">
+                                        <lightning-input type="toggle" class="length-type-toggle slds-float_right" name="i_LengthType" checked={isLengthInYears} message-toggle-active={labels.year.labelPlural} message-toggle-inactive={labels.month.labelPlural} onchange={handleLengthTypeToggle}></lightning-input>                                        
+                                    </lightning-layout-item>
+                                </lightning-layout>    
+                            </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.agreementEndDate.label}</h2>
+                            <lightning-formatted-date-time value={endDate} year="numeric" month="long" day="2-digit" weekday="long" class="slds-text-heading_small slds-m-top_small slds-m-horizontal_small"></lightning-formatted-date-time>
+                        </lightning-layout-item>
+                    </template>
+                    <template lwc:if={showDateGuidance}>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <p><lightning-formatted-text value={labels.psaDateGuidance.label}></lightning-formatted-text></p>
+                        </lightning-layout-item>
+                    </template>
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">                        
+                        <h3 class="slds-text-title_caps slds-m-vertical_small" >{labels.details.label}</h3>
+                        <lightning-layout multiple-rows="true">
+                            <template lwc:if={showPICDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.pic.label}</h3>
+                                    <p>{personInCharge.name}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.function.label}</h3>
+                                    <p>{personInCharge.function}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.channel.label}</h3>
+                                    <p>{personInCharge.channel}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">
+                                        <template lwc:if={isKorea}>
+                                            {labels.storeType.label}
+                                        </template>
+                                        <template lwc:else>
+                                            {labels.group.label}
+                                        </template>
+                                    </h3>
+                                    <p>{personInCharge.group}</p>                                    
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.approver.label}</h3>
+                                    <p>{personInCharge.approver}</p>                                    
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={captureCCMDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.ccmDetails.label}</h3>
+                                    <lightning-combobox name="i_ContractType" label={labels.contractType.label} value={contractType}
+                                        options={contractTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} required
+                                        onchange={handleContractTypeChange}></lightning-combobox>      
+                                    <template if:true={hasContractTypeError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.required.label}</span>
+                                    </template>            
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_DiscountCategory" label={labels.discountCategory.label} value={discountCategory}
+                                        options={discountCategoryOptions} class="slds-m-horizontal_small" disabled={isLocked} required
+                                        onchange={handleDiscountCategoryChange}></lightning-combobox>
+                                    <template if:true={hasDiscountCategoryError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.required.label}</span>
+                                    </template>            
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" padding="around-small" class="slds-border_bottom">
+                                    <lightning-combobox name="i_PromoCode" label={labels.promoCode.label} value={promoCode}
+                                        options={promoCodeOptions} class="slds-m-horizontal_small" disabled={isLocked} required
+                                        onchange={handlePromoCodeChange}></lightning-combobox>
+                                    <template if:true={hasPromoCodeError}>
+                                        <span class="slds-m-horizontal_small input-error">{labels.required.label}</span>
+                                    </template>            
+                                </lightning-layout-item>                                
+                            </template>
+                            <template lwc:if={isApproved}>
+                                <template lwc:if={canChangeStatus}>
+                                    <lightning-layout-item size="12" padding="around-small">
+                                        <lightning-combobox name="i_Status" label={labels.status.label} value={status} options={statusOptions} class="slds-m-horizontal_small" onchange={handleStatusChange}></lightning-combobox>
+                                    </lightning-layout-item>
+                                </template>                                
+                            </template>
+                            <template lwc:if={captureTotalBudget}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="totalBudget" label={labels.budget.label} formatter="currency" step="0.01" value={totalBudget} class="slds-m-horizontal_small" disabled={isLocked} required={isBudgetRequired} onchange={handleTotalBudgetChange}></lightning-input>
+                                </lightning-layout-item>
+                                <template lwc:if={hasBudgetError}>
+                                    <span class="slds-m-horizontal_small input-error">{budgetErrorMessage}</span>
+                                </template>    
+                            </template>
+                            <template lwc:if={captureAgreementLevelDetails}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="fee" label={labels.fee.label} formatter="currency" step="0.01" value={fee} class="slds-m-horizontal_small" disabled={isLocked} required="false" onchange={handleFeeChange}></lightning-input>
+                                </lightning-layout-item>
+                                <template lwc:if={hasFeeError}>
+                                    <span class="slds-m-horizontal_small input-error">{labels.fee.budgetError}</span>
+                                </template>    
+                            </template>
+                            <template lwc:if={isKorea}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudget" label={labels.accountPromotionalBudget.label} formatter="currency" step="0.01" value={accountPromotionalBudget} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="accountPromotionalBudgetRemaining" label={labels.accountPromotionalBudgetRemaining.label} formatter="currency" step="0.01" value={accountPromotionalBudgetRemaining} class="slds-m-horizontal_small" disabled></lightning-input>
+                                </lightning-layout-item>   
+                            </template>     
+                            <template lwc:if={captureProbability}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="probabilityPercentage" label={labels.probabilityPercentage.label} step="1"
+                                        value={probabilityPercentage} disabled={isLocked} formatter="percent-fixed"
+                                        onchange={handleProbabilityPercentageChange}></lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={capturePercentageVisibility}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-input type="number" name="percentageVisibility" label={labels.percentageVisibility.label} step="1" value={percentageVisibility} disabled={isLocked} onchange={handlePercentageVisibilityChange}></lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={capturePromotionType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_PromotionType" label={labels.promotionType.label} value={promotionType} options={promotionTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} onchange={handlePromotionTypeChange}></lightning-combobox>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={captureMenuType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-combobox name="i_MenuType" label={labels.menuType.label} value={menuType} options={menuTypeOptions} class="slds-m-horizontal_small" disabled={isLocked} onchange={handleMenuTypeChange}></lightning-combobox>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={captureActivityType}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.activityType.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_ActivityType" checked={isDirectRebate} message-toggle-active={activityTypeActive.label} message-toggle-inactive={activityTypeInactive.label} disabled={isLocked} onchange={handleActivityTypeToggle}></lightning-input>
+                                </lightning-layout-item>    
+                            </template>
+                            <template lwc:if={canAddNewAccountsToPSA}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.limitToSelectedAccounts.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_LimitAccounts" checked={limitToSelectedAccounts} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} disabled={isLocked} onchange={handleLimitToSelectedAccountsToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:if={captureNumberOfPayments}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <lightning-radio-group name="i_numberOfPayments" label={labels.numberOfPayments.label} options={numberOfPaymentOptions} value={numberOfPayments} type="button" disabled={paymentsLocked} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-radio-group>
+                                    <!--<lightning-combobox name="i_NumberOfPayments" label={labels.numberOfPayments.label} value={numberOfPayments} options={numberOfPaymentOptions} class="slds-m-horizontal_small" onchange={handleNumberOfPaymentsChange}></lightning-combobox>-->
+                                </lightning-layout-item>
+                                <template lwc:if={configurePayments}>
+                                    <div style="margin-left: 2em;">
+                                        <ul class="slds-m-around_small">
+                                            <li>
+                                                <div style="display: inline-block; margin-right: 20px;"><h4>{labels.paymentConfigurations.label}</h4></div>
+                                                <div style="display: inline-block;"><h4>% or $</h4></div>
+                                                <div style="display: inline-block; float: right; margin-left: 20px; margin-right: 20px;"><h4>{labels.comments.label}</h4></div>
+                                            </li>
+                                            <template for:each={paymentConfigs} for:item="paymentConfig">                                                
+                                                <li key={paymentConfig.payment_number}>
+                                                    <div>
+                                                        <div style="display: inline-block; margin-right: 10px;"><span>Payment {paymentConfig.payment_number}</span></div>
+                                                        <div style="display: inline-block;"><lightning-input type="number" data-paymentnumber={paymentConfig.payment_number} 
+                                                                        value={paymentConfig.percent_achieved}
+                                                                        readonly={isLocked} 
+                                                                        onchange={handlePaymentConfigChange}></lightning-input>
+                                                        </div>
+                                                        <div style="display: inline-block; margin-left: 20px;"><lightning-input type="text" data-paymentnumber={paymentConfig.payment_number} 
+                                                                        value={paymentConfig.comments}
+                                                                        readonly={isLocked} 
+                                                                        onchange={handlePaymentConfigCommentChange}></lightning-input>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                    <!--
+                                    <lightning-datatable key-field="payment_number" data={paymentConfigs} 
+                                                        columns={paymentColumns}
+                                                        show-row-number-column="false"
+                                                        hide-checkbox-column
+                                                        class="payment-configuration-table"
+                                                        onsave={handlePaymentConfigurationsSave}></lightning-datatable>
+                                    -->
+                                </template>
+                                <template if:false={configurePayments}>
+                                    <template lwc:if={isOnePayment}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.oneHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template lwc:if={isTwoPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.twoHelpText}></lightning-formatted-rich-text>
+                                    </template>
+                                    <template lwc:if={isThreePayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.threeHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>
+                                    <template lwc:if={isFourPayments}>
+                                        <lightning-formatted-rich-text class='text-info slds-m-left_medium' value={labels.payments.fourHelpText}></lightning-formatted-rich-text>                                    
+                                    </template>    
+                                </template>
+                            </template>                                
+
+                            <template lwc:if={captureMPO}>
+                                <lightning-layout-item size="12" padding="around-small">
+                                    <h2 class="slds-text-body_small slds-m-horizontal_small slds-m-bottom_x-small">{labels.mpoPrestige.label}</h2>
+                                    <lightning-input type="toggle" class="prestige-type-toggle" name="i_Prestige" checked={isMPOPrestige} message-toggle-active={labels.yes.label} message-toggle-inactive={labels.no.label} onchange={handlePrestigeTypeToggle}></lightning-input>                                        
+                                </lightning-layout-item>
+                            </template>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.comments.label}</h3>
+                                <lightning-textarea label={labels.comments.label} value={comments} onchange={handleCommentsChange}></lightning-textarea>
+                            </lightning-layout-item>
+                    </lightning-layout>
+                    </lightning-layout-item>
+                    <!--
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
+                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.uploadFile.label}</h3>
+                        <lightning-file-upload label={labels.uploadFile.message}
+                                               name="i_FileUpload"
+                                               accept={acceptedFileUploadFormats}
+                                               record-id={recordId}
+                                               class="fill-width"
+                                               onuploadfinished={handleFileUploadFinished}
+                                               multiple>
+                        </lightning-file-upload>
+                        <template if:true={attachedFiles}>
+                            <template if:true={attachedFiles.length}>
+                                <lightning-pill-container items={attachedFiles} onitemremove={handleRemoveAttachedFile}></lightning-pill-container>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                -->
+                    <lightning-layout-item size="12" padding="around-small" class="slds-border_top">
+                        <h3 class="slds-text-title_caps slds-m-vertical_small">{labels.routeToMarket.label}</h3>                        
+                        <lightning-combobox name="i_WholesalerPreferred"
+                                            label={labels.preferredRTM.label}
+                                            placeholder={labels.preferredRTM.placeholder}
+                                            value={wholesalerPreferred}
+                                            options={wholesalers}
+                                            readonly={isLocked}
+                                            onchange={handlePreferredRTMChange}>
+                        </lightning-combobox>
+                        <template lwc:if={hasPreferredRTMError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.preferredRTM.error}</span>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-combobox name="i_WholesalerAlternate"
+                                            label={labels.alternateRTM.label}
+                                            placeholder={labels.alternateRTM.placeholder}
+                                            value={wholesalerAlternate}
+                                            options={wholesalers}
+                                            readonly={isLocked}
+                                            onchange={handleAlternateRTMChange}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" small-device-size="12" large-device-size="8" class="slds-m-horizontal_small">
+                <h2 class="slds-text-title_caps slds-m-around_small">{labels.customerDetails.label}</h2>
+                <lightning-layout multiple-rows="true" class="slds-m-around_small">
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size="6" padding="around-small">
+                        <template if:false={isLocked}>
+                            <lightning-input type="search" name="i_search_account" label={accountSearchInputLabel} is-loading={isSearching} readonly={isLocked} onchange={handleSearchAccountChange}></lightning-input>
+                            <div class="slds-float_right slds-m-top_x-small">
+                                <lightning-button-group>
+                                    <lightning-input type="toggle" class="account-type-toggle" name="accountTypeSearchOption" checked={isUsingParentAccount} message-toggle-active={labels.parentAccount.label} message-toggle-inactive={labels.account.label} onchange={handleAccountTypeToggle}></lightning-input>        
+                                    <lightning-button label={labels.search.label} icon-name="utility:search" title="Search for Account" alternative-text="Search for account" class="slds-m-left_small" disabled={isSearching} onclick={handleAccountSearchButtonClick}></lightning-button>
+                                </lightning-button-group>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" large-device-size="6" padding="around-small">
+                        <template lwc:if={hasParentAccountError}>
+                            <div class="slds-m-horizontal_small">
+                                <span class="input-error error-large">{labels.parentAccount.error}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={parentAccount}>
+                            <div class="">
+                                <h3 class="slds-m-around_small border-bottom">{labels.signingCustomerHeader.label}</h3>
+                                <template if:true={signingCustomer}>
+                                    <span class="slds-text-heading_medium slds-m-horizontal_medium">{signingCustomerName}</span>
+                                    <template if:true={hasMultipleSigningContacts}>
+                                        <template if:false={isLocked}>
+                                            <template if:true={isPhone}>
+                                                <lightning-button-icon variant="bare" icon-name="utility:edit" alternative-text="change" title="Change" onclick={handleChangeSigningCustomerClick}></lightning-button-icon>
+                                            </template>
+                                            <template if:false={isPhone}>
+                                                <lightning-button variant="base" label={labels.change.labelLowercase} class="lowercase slds-m-left_x-small" icon-name="utility:edit" icon-position="right" title="Change" alternative-text="Change signing customer" onclick={handleChangeSigningCustomerClick}></lightning-button>
+                                            </template>
+                                        </template>
+                                    </template>
+                                </template>
+                                <template lwc:if={hasSigningCustomerError}>
+                                    <div class="slds-m-horizontal_small">
+                                        <span class="input-error error-large">{labels.signingCustomer.error}</span>
+                                    </div>
+                                </template>
+                                <template if:false={signingCustomer}>
+                                    <div class="slds-m-horizontal_medium">
+                                        <span class="slds-text-title_caps">{labels.noSigningCustomers.message}</span>
+                                    </div>
+                                </template>                                
+                            </div>
+                            <template if:false={isLocked}>
+                                <div>
+                                    <h3 class="slds-m-around_small border-bottom">{labels.companyDetails.label}</h3>
+                                    <lightning-button variant="base" label={labels.clear.label} icon-name="utility:clear" class="slds-float_right" onclick={handleClearAccountDetailsClick}></lightning-button>
+                                </div>
+                            </template>
+                            <h4 class="slds-text-heading_medium slds-m-horizontal_medium slds-truncate">{accountName}</h4>
+                            <div class="slds-m-top_x-small slds-m-horizontal_medium">
+                                <lightning-formatted-address street={accountStreet} city={accountCity} province={accountState} country={accountCountry} postal-code={accountPostalCode} class="slds-truncate"></lightning-formatted-address>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12">
+                        <hr class="slds-m-around_medium" />
+                        <span class="slds-m-around_small">{accountsHeader}</span>
+                        <template if:false={isLocked}>
+                            <template if:true={showAccountActions}>
+                                <lightning-button-group class="slds-float_right slds-m-right_small">
+                                    <lightning-button label={labels.selectAll.label} icon-name="utility:locker_service_api_viewer" title="Select All accounts" onclick={handleSelectAllAccountsClick}></lightning-button>
+                                    <lightning-button label={labels.deSelectAll.label} icon-name="utility:matrix" title="UnSelect All accounts" onclick={handleUnSelectAllAccountsClick}></lightning-button>
+                                </lightning-button-group>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12">
+                        <template lwc:if={hasChildAccountsError}>
+                            <span class="slds-m-horizontal_small input-error">{labels.noAccountsSelected.error}</span>
+                        </template>
+                        <template lwc:if={selectAllChildAccounts}>
+                            <span class="slds-m-around_small warning-info">{labels.allAccountSelected.message}</span>
+                        </template>
+
+                        <template lwc:if={accounts}>
+                            <template lwc:if={accounts.records.length}>
+                                <div class="content">
+                                    <template for:each={accounts.records} for:item="account">
+                                        <c-account-tile key={account.item.Id} 
+                                                        account={account}
+                                                        showaddress="true"
+                                                        onselected={handleAccountSelected}
+                                                        ondeselected={handleAccountDeSelected}
+                                                        class="slds-m-around_x-small"></c-account-tile>
+                                    </template>    
+                                </div>
+                                <c-paginator page-number={pageNumber}
+                                            page-size={accounts.pageSize}
+                                            total-item-count={accounts.totalItemCount}
+                                            object-type={labels.account.labelPlural}
+                                            onprevious={handlePreviousPage}
+                                            onnext={handleNextPage}></c-paginator>
+                                    
+                            </template>
+                        </template>
+                    </lightning-layout-item>                    
+                </lightning-layout>
+            </lightning-layout-item>
+        </lightning-layout>
+    
+    </div>
+
+</template>

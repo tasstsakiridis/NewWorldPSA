@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Translations xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customApplications>
+        <label><!-- Sales App - Korea --></label>
+        <name>Sales_App_Korea</name>
+    </customApplications>
+    <customLabels>
+        <label>거래처 연간 예산</label>
+        <name>Account_Promotional_Budget</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Account Promotional Budget Error --></label>
+        <name>Account_Promotional_Budget_Error</name>
+    </customLabels>
+    <customLabels>
+        <label>거래처 연간 잔여 예산</label>
+        <name>Account_Promotional_Budget_Remaining</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Actual Effectiveness (9L) --></label>
+        <name>Actual_Effectiveness_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Actual Effectiveness BTL --></label>
+        <name>Actual_Effectiveness_BTL</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Actual Variance (9L) --></label>
+        <name>Actual_Variance_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Actual Variance (BTL) --></label>
+        <name>Actual_Variance_BTL</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Break Even Percentage --></label>
+        <name>Break_Even_Percentage</name>
+    </customLabels>
+    <customLabels>
+        <label>해당 거래처의 연간 예산이 초과되었습니다.</label>
+        <name>Budget_Overrun</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- CVS --></label>
+        <name>CVS</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Click here to review record --></label>
+        <name>Click_here_to_review_record</name>
+    </customLabels>
+    <customLabels>
+        <label>자연 성과 (9L)</label>
+        <name>CurrentVolume9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Customer --></label>
+        <name>Customer</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Do Nothing Volume 9L --></label>
+        <name>Do_Nothing_Volume_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Do Nothing Volume Bottle --></label>
+        <name>Do_Nothing_Volume_Bottle</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Do Volume (9L) --></label>
+        <name>Do_Volume_9L</name>
+    </customLabels>
+    <customLabels>
+        <label>계약종료일</label>
+        <name>Effective_End_Date</name>
+    </customLabels>
+    <customLabels>
+        <label>계약시작일</label>
+        <name>Effective_Start_Date</name>
+    </customLabels>
+    <customLabels>
+        <label>효과</label>
+        <name>Effectiveness</name>
+    </customLabels>
+    <customLabels>
+        <label>효과 (9L)</label>
+        <name>Effectiveness_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Excise --></label>
+        <name>Excise</name>
+    </customLabels>
+    <customLabels>
+        <label>투자금액</label>
+        <name>Fee</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- FeePaid --></label>
+        <name>FeePaid</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Fee Greater Than Budget Error --></label>
+        <name>Fee_Greater_Than_Budget_Error</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- GP --></label>
+        <name>GP</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- GPM --></label>
+        <name>GPM</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- GP 9L --></label>
+        <name>GP_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- GP After Cost --></label>
+        <name>GP_After_Cost</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- GP Do --></label>
+        <name>GP_Do</name>
+    </customLabels>
+    <customLabels>
+        <label>자연 매출총이익</label>
+        <name>GP_Do_Nothing</name>
+    </customLabels>
+    <customLabels>
+        <label>투자 매출총이익</label>
+        <name>GP_Effectiveness</name>
+    </customLabels>
+    <customLabels>
+        <label>총 투자 차감 후 프로모션 매출총이익</label>
+        <name>GP_Net_Of_Cost</name>
+    </customLabels>
+    <customLabels>
+        <label>투자 기여 효과 (BTL)</label>
+        <name>Increment_Bottle</name>
+    </customLabels>
+    <customLabels>
+        <label>투자 기여 효과 (9L)</label>
+        <name>Incremental_Volume_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Investment --></label>
+        <name>Investment</name>
+    </customLabels>
+    <customLabels>
+        <label>투자 매출총이익</label>
+        <name>Investment_Gross_Profit</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Invoice Date --></label>
+        <name>Invoice_Date</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Korea PSA Budget Error --></label>
+        <name>Korea_PSA_Budget_Error</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Organic Gross Profit --></label>
+        <name>Organic_Gross_Profit</name>
+    </customLabels>
+    <customLabels>
+        <label>자연 성과</label>
+        <name>Organic_Performance</name>
+    </customLabels>
+    <customLabels>
+        <label>자연 성과 (9L)</label>
+        <name>Organic_Performance_9L</name>
+    </customLabels>
+    <customLabels>
+        <label>기안서의 기간은 실제 계약서 내 계약 기간(Effective Date)과 동일해야 합니다.</label>
+        <name>PSA_Date_Guidance</name>
+    </customLabels>
+    <customLabels>
+        <label>PSA 단계</label>
+        <name>PSA_Stage</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Planning --></label>
+        <name>Planning</name>
+    </customLabels>
+    <customLabels>
+        <label>ROI 기준달성 리스크</label>
+        <name>ROI_Threshold_Risk</name>
+    </customLabels>
+    <customLabels>
+        <label>요청 금액이 해당 거래처의 잔여 프로모션 예산을 초과합니다.</label>
+        <name>Rebate_Amount_Above_Promotional_Budget_Error</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- SNS --></label>
+        <name>SNS</name>
+    </customLabels>
+    <customLabels>
+        <label>정산</label>
+        <name>Settlement</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- StoreType --></label>
+        <name>StoreType</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- TotalVariableCost --></label>
+        <name>TotalVariableCost</name>
+    </customLabels>
+    <customLabels>
+        <label>총 비용</label>
+        <name>Total_Cost</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Total Do Nothing Vol 9L --></label>
+        <name>Total_Do_Nothing_Vol_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Total Do Vol 9L --></label>
+        <name>Total_Do_Vol_9L</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Total Fixed Cost --></label>
+        <name>Total_Fixed_Cost</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Total GP Net of Cost --></label>
+        <name>Total_GP_Net_of_Cost</name>
+    </customLabels>
+    <customLabels>
+        <label><!-- Variable Investment --></label>
+        <name>Variable_Investment</name>
+    </customLabels>
+    <flowDefinitions>
+        <flows/>
+        <fullName>PromotionActivity</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows/>
+        <fullName>Promotion_Activity_KR</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows/>
+        <fullName>Promotion_Activity_Korea</fullName>
+    </flowDefinitions>
+</Translations>

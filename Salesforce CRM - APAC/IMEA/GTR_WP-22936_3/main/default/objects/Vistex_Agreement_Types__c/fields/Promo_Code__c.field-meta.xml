@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Promo_Code__c</fullName>
+    <externalId>false</externalId>
+    <label>Promo Code</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Trading Terms</fullName>
+                <default>false</default>
+                <label>Trading Terms</label>
+            </value>
+            <value>
+                <fullName>Marketing Terms</fullName>
+                <default>false</default>
+                <label>Marketing Terms</label>
+            </value>
+            <value>
+                <fullName>Intermediary Trading Terms</fullName>
+                <default>false</default>
+                <label>Intermediary Trading Terms</label>
+            </value>
+            <value>
+                <fullName>Ranging &amp; Promotion</fullName>
+                <default>false</default>
+                <label>Ranging &amp; Promotion</label>
+            </value>
+            <value>
+                <fullName>Compliance</fullName>
+                <default>false</default>
+                <label>Compliance</label>
+            </value>
+            <value>
+                <fullName>Banner Incentive</fullName>
+                <default>false</default>
+                <label>Banner Incentive</label>
+            </value>
+            <value>
+                <fullName>Partnership Programs</fullName>
+                <default>false</default>
+                <label>Partnership Programs</label>
+            </value>
+            <value>
+                <fullName>Promotional Plan</fullName>
+                <default>false</default>
+                <label>Promotional Plan</label>
+            </value>
+            <value>
+                <fullName>Marketing Initiative</fullName>
+                <default>false</default>
+                <label>Marketing Initiative</label>
+            </value>
+            <value>
+                <fullName>Ranging</fullName>
+                <default>false</default>
+                <label>Ranging</label>
+            </value>
+            <value>
+                <fullName>Instore Visibility</fullName>
+                <default>false</default>
+                <label>Instore Visibility</label>
+            </value>
+            <value>
+                <fullName>Consumer Loyalty Programs</fullName>
+                <default>false</default>
+                <label>Consumer Loyalty Programs</label>
+            </value>
+            <value>
+                <fullName>Online Visibility</fullName>
+                <default>false</default>
+                <label>Online Visibility</label>
+            </value>
+            <value>
+                <fullName>KSP Promotional Plan - Scan</fullName>
+                <default>false</default>
+                <label>KSP Promotional Plan - Scan</label>
+            </value>
+            <value>
+                <fullName>KSP Promotional Plan - Off Invoice</fullName>
+                <default>false</default>
+                <label>KSP Promotional Plan - Off Invoice</label>
+            </value>
+            <value>
+                <fullName>Pouring Rebate Lumpsum</fullName>
+                <default>false</default>
+                <label>Pouring Rebate Lumpsum</label>
+            </value>
+            <value>
+                <fullName>Cocktail Listing</fullName>
+                <default>false</default>
+                <label>Cocktail Listing</label>
+            </value>
+            <value>
+                <fullName>In-Venue Visibility</fullName>
+                <default>false</default>
+                <label>In-Venue Visibility</label>
+            </value>
+            <value>
+                <fullName>Trade Engagement</fullName>
+                <default>false</default>
+                <label>Trade Engagement</label>
+            </value>
+            <value>
+                <fullName>In-Venue Activation</fullName>
+                <default>false</default>
+                <label>In-Venue Activation</label>
+            </value>
+            <value>
+                <fullName>Marketing Initiative Online &amp; Social</fullName>
+                <default>false</default>
+                <label>Marketing Initiative Online &amp; Social</label>
+            </value>
+            <value>
+                <fullName>Bonus Stock</fullName>
+                <default>false</default>
+                <label>Bonus Stock</label>
+            </value>
+            <value>
+                <fullName>Lumpsum Terms</fullName>
+                <default>false</default>
+                <label>Lumpsum Terms</label>
+            </value>
+            <value>
+                <fullName>Listing Fee</fullName>
+                <default>false</default>
+                <label>Listing Fee</label>
+            </value>
+            <value>
+                <fullName>Business Development</fullName>
+                <default>false</default>
+                <label>Business Development</label>
+            </value>
+            <value>
+                <fullName>Category Development</fullName>
+                <default>false</default>
+                <label>Category Development</label>
+            </value>
+            <value>
+                <fullName>Consumer Sampling</fullName>
+                <default>false</default>
+                <label>Consumer Sampling</label>
+            </value>
+            <value>
+                <fullName>Customer Level Deals - On Going</fullName>
+                <default>false</default>
+                <label>Customer Level Deals - On Going</label>
+            </value>
+            <value>
+                <fullName>Freight Claim</fullName>
+                <default>false</default>
+                <label>Freight Claim</label>
+            </value>
+            <value>
+                <fullName>Incentives</fullName>
+                <default>false</default>
+                <label>Incentives</label>
+            </value>
+            <value>
+                <fullName>Insights &amp; Planning Support</fullName>
+                <default>false</default>
+                <label>Insights &amp; Planning Support</label>
+            </value>
+            <value>
+                <fullName>Instore Ranging</fullName>
+                <default>false</default>
+                <label>Instore Ranging</label>
+            </value>
+            <value>
+                <fullName>KSP Promotional Plan</fullName>
+                <default>false</default>
+                <label>KSP Promotional Plan</label>
+            </value>
+            <value>
+                <fullName>Member Engagement</fullName>
+                <default>false</default>
+                <label>Member Engagement</label>
+            </value>
+            <value>
+                <fullName>Member Marketing</fullName>
+                <default>false</default>
+                <label>Member Marketing</label>
+            </value>
+            <value>
+                <fullName>Mutual Campaign Co-op</fullName>
+                <default>false</default>
+                <label>Mutual Campaign Co-op</label>
+            </value>
+            <value>
+                <fullName>Mutual Campaign Lump Sum</fullName>
+                <default>false</default>
+                <label>Mutual Campaign Lump Sum</label>
+            </value>
+            <value>
+                <fullName>New Store Opening Support</fullName>
+                <default>false</default>
+                <label>New Store Opening Support</label>
+            </value>
+            <value>
+                <fullName>NPD Ranging Investment</fullName>
+                <default>false</default>
+                <label>NPD Ranging Investment</label>
+            </value>
+            <value>
+                <fullName>Ongoing Pricing Plan</fullName>
+                <default>false</default>
+                <label>Ongoing Pricing Plan</label>
+            </value>
+            <value>
+                <fullName>Ongoing Pricing Plan - Off Invoice</fullName>
+                <default>false</default>
+                <label>Ongoing Pricing Plan - Off Invoice</label>
+            </value>
+            <value>
+                <fullName>Ongoing Pricing Plan - Scan</fullName>
+                <default>false</default>
+                <label>Ongoing Pricing Plan - Scan</label>
+            </value>
+            <value>
+                <fullName>Online Ranging</fullName>
+                <default>false</default>
+                <label>Online Ranging</label>
+            </value>
+            <value>
+                <fullName>Pouring Upfront Payment</fullName>
+                <default>false</default>
+                <label>Pouring Upfront Payment</label>
+            </value>
+            <value>
+                <fullName>Price Claim</fullName>
+                <default>false</default>
+                <label>Price Claim</label>
+            </value>
+            <value>
+                <fullName>Price Override</fullName>
+                <default>false</default>
+                <label>Price Override</label>
+            </value>
+            <value>
+                <fullName>Promotional Plan - Off Invoice</fullName>
+                <default>false</default>
+                <label>Promotional Plan - Off Invoice</label>
+            </value>
+            <value>
+                <fullName>Promotional Plan - Scan</fullName>
+                <default>false</default>
+                <label>Promotional Plan - Scan</label>
+            </value>
+            <value>
+                <fullName>State Development</fullName>
+                <default>false</default>
+                <label>State Development</label>
+            </value>
+            <value>
+                <fullName>Stock Claim</fullName>
+                <default>false</default>
+                <label>Stock Claim</label>
+            </value>
+            <value>
+                <fullName>Trade Education</fullName>
+                <default>false</default>
+                <label>Trade Education</label>
+            </value>
+            <value>
+                <fullName>Guideline Discounts</fullName>
+                <default>false</default>
+                <label>Guideline Discounts</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Direct</fullName>
+                <default>false</default>
+                <label>Data Fee - Direct</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Indirect</fullName>
+                <default>false</default>
+                <label>Data Fee - Indirect</label>
+            </value>
+            <value>
+                <fullName>On-Premise Free Bottle</fullName>
+                <default>false</default>
+                <label>On-Premise Free Bottle</label>
+            </value>
+            <value>
+                <fullName>Exhibition</fullName>
+                <default>false</default>
+                <label>Exhibition</label>
+            </value>
+            <value>
+                <fullName>Logistics</fullName>
+                <default>false</default>
+                <label>Logistics</label>
+            </value>
+            <value>
+                <fullName>Incentive Tour</fullName>
+                <default>false</default>
+                <label>Incentive Tour</label>
+            </value>
+            <value>
+                <fullName>Space Fee</fullName>
+                <default>false</default>
+                <label>Space Fee</label>
+            </value>
+            <value>
+                <fullName>E-Commerce Visibility</fullName>
+                <default>false</default>
+                <label>E-Commerce Visibility</label>
+            </value>
+            <value>
+                <fullName>Instore Ad Fee</fullName>
+                <default>false</default>
+                <label>Instore Ad Fee</label>
+            </value>
+            <value>
+                <fullName>Customer Application</fullName>
+                <default>false</default>
+                <label>Customer Application</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L (Off)</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L (Off)</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L (On)</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L (On)</label>
+            </value>
+            <value>
+                <fullName>Customer Platform</fullName>
+                <default>false</default>
+                <label>Customer Platform</label>
+            </value>
+            <value>
+                <fullName>Off-Premise Listing Fee</fullName>
+                <default>false</default>
+                <label>Off-Premise Listing Fee</label>
+            </value>
+            <value>
+                <fullName>Listing Fee (Outlet)</fullName>
+                <default>false</default>
+                <label>Listing Fee (Outlet)</label>
+            </value>
+            <value>
+                <fullName>Sweepstake</fullName>
+                <default>false</default>
+                <label>Sweepstake</label>
+            </value>
+            <value>
+                <fullName>Chirashi (Store Leaflet)</fullName>
+                <default>false</default>
+                <label>Chirashi (Store Leaflet)</label>
+            </value>
+            <value>
+                <fullName>Listing Fee (BS)</fullName>
+                <default>false</default>
+                <label>Listing Fee (BS)</label>
+            </value>
+            <value>
+                <fullName>Customer Point</fullName>
+                <default>false</default>
+                <label>Customer Point</label>
+            </value>
+            <value>
+                <fullName>Base Rebate</fullName>
+                <default>false</default>
+                <label>Base Rebate</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate - Direct</fullName>
+                <default>false</default>
+                <label>Performance Rebate - Direct</label>
+            </value>
+            <value>
+                <fullName>Performance Rebate - Indirect</fullName>
+                <default>false</default>
+                <label>Performance Rebate - Indirect</label>
+            </value>
+            <value>
+                <fullName>EDLP</fullName>
+                <default>false</default>
+                <label>EDLP</label>
+            </value>
+            <value>
+                <fullName>Promotional Discount</fullName>
+                <default>false</default>
+                <label>Promotional Discount</label>
+            </value>
+            <value>
+                <fullName>Data - Key Period</fullName>
+                <default>false</default>
+                <label>Data - Key Period</label>
+            </value>
+            <value>
+                <fullName>Central Processing</fullName>
+                <default>false</default>
+                <label>Central Processing</label>
+            </value>
+            <value>
+                <fullName>Incentive Trip</fullName>
+                <default>false</default>
+                <label>Incentive Trip</label>
+            </value>
+            <value>
+                <fullName>Price Support</fullName>
+                <default>false</default>
+                <label>Price Support</label>
+            </value>
+            <value>
+                <fullName>Base Discount</fullName>
+                <default>false</default>
+                <label>Base Discount</label>
+            </value>
+            <value>
+                <fullName>Promo Discount - Fixed</fullName>
+                <default>false</default>
+                <label>Promo Discount - Fixed</label>
+            </value>
+            <value>
+                <fullName>In Store Media</fullName>
+                <default>false</default>
+                <label>In Store Media</label>
+            </value>
+            <value>
+                <fullName>Visibility Fees - Fixed</fullName>
+                <default>false</default>
+                <label>Visibility Fees - Fixed</label>
+            </value>
+            <value>
+                <fullName>Other Visibility</fullName>
+                <default>false</default>
+                <label>Other Visibility</label>
+            </value>
+            <value>
+                <fullName>Visibility Bonus</fullName>
+                <default>false</default>
+                <label>Visibility Bonus</label>
+            </value>
+            <value>
+                <fullName>Display</fullName>
+                <default>false</default>
+                <label>Display</label>
+            </value>
+            <value>
+                <fullName>Visibility agreements - indirect</fullName>
+                <default>false</default>
+                <label>Visibility agreements - indirect</label>
+            </value>
+            <value>
+                <fullName>eCommerce</fullName>
+                <default>false</default>
+                <label>eCommerce</label>
+            </value>
+            <value>
+                <fullName>Data</fullName>
+                <default>false</default>
+                <label>Data</label>
+            </value>
+            <value>
+                <fullName>Data Fee - Key Period</fullName>
+                <default>false</default>
+                <label>Data Fee - Key Period</label>
+            </value>
+            <value>
+                <fullName>EDLP Key Selling Period</fullName>
+                <default>false</default>
+                <label>EDLP Key Selling Period</label>
+            </value>
+            <value>
+                <fullName>Price Promo H&amp;L</fullName>
+                <default>false</default>
+                <label>Price Promo H&amp;L</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

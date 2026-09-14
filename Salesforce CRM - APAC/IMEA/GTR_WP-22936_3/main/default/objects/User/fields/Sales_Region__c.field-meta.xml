@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sales_Region__c</fullName>
+    <description>Sales Region that drives workflows and BI reporting.</description>
+    <externalId>false</externalId>
+    <label>Sales Region</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>NSW/ACT/SA/NT</fullName>
+                <default>false</default>
+                <label>NSW/ACT/SA/NT</label>
+            </value>
+            <value>
+                <fullName>QLD</fullName>
+                <default>false</default>
+                <label>QLD</label>
+            </value>
+            <value>
+                <fullName>VIC/TAS/WA</fullName>
+                <default>false</default>
+                <label>VIC/TAS/WA</label>
+            </value>
+            <value>
+                <fullName>Greater Manila Area</fullName>
+                <default>false</default>
+                <label>Greater Manila Area</label>
+            </value>
+            <value>
+                <fullName>North Metro Manila</fullName>
+                <default>false</default>
+                <label>North Metro Manila</label>
+            </value>
+            <value>
+                <fullName>South Metro Manila</fullName>
+                <default>false</default>
+                <label>South Metro Manila</label>
+            </value>
+            <value>
+                <fullName>Northern Luzon</fullName>
+                <default>false</default>
+                <label>Northern Luzon</label>
+            </value>
+            <value>
+                <fullName>Mindanao</fullName>
+                <default>false</default>
+                <label>Mindanao</label>
+            </value>
+            <value>
+                <fullName>Visayas</fullName>
+                <default>false</default>
+                <label>Visayas</label>
+            </value>
+            <value>
+                <fullName>North</fullName>
+                <default>false</default>
+                <label>North</label>
+            </value>
+            <value>
+                <fullName>South</fullName>
+                <default>false</default>
+                <label>South</label>
+            </value>
+            <value>
+                <fullName>North-West Manila</fullName>
+                <default>false</default>
+                <label>North-West Manila</label>
+            </value>
+            <value>
+                <fullName>South-East Manila</fullName>
+                <default>false</default>
+                <label>South-East Manila</label>
+            </value>
+            <value>
+                <fullName>North and Central Luzon</fullName>
+                <default>false</default>
+                <label>North and Central Luzon</label>
+            </value>
+            <value>
+                <fullName>Northern</fullName>
+                <default>false</default>
+                <label>Northern</label>
+            </value>
+            <value>
+                <fullName>Southern</fullName>
+                <default>false</default>
+                <label>Southern</label>
+            </value>
+            <value>
+                <fullName>Key Accounts - Off</fullName>
+                <default>false</default>
+                <label>Key Accounts - Off</label>
+            </value>
+            <value>
+                <fullName>On Premise</fullName>
+                <default>false</default>
+                <label>On Premise</label>
+            </value>
+            <value>
+                <fullName>Regional</fullName>
+                <default>false</default>
+                <label>Regional</label>
+            </value>
+            <value>
+                <fullName>East</fullName>
+                <default>false</default>
+                <label>East</label>
+            </value>
+            <value>
+                <fullName>West</fullName>
+                <default>false</default>
+                <label>West</label>
+            </value>
+            <value>
+                <fullName>Channel Team A</fullName>
+                <default>false</default>
+                <label>Channel Team A</label>
+            </value>
+            <value>
+                <fullName>Region Team</fullName>
+                <default>false</default>
+                <label>Region Team</label>
+            </value>
+            <value>
+                <fullName>MKT1</fullName>
+                <default>false</default>
+                <label>MKT1</label>
+            </value>
+            <value>
+                <fullName>MKT2</fullName>
+                <default>false</default>
+                <label>MKT2</label>
+            </value>
+            <value>
+                <fullName>ePremise</fullName>
+                <default>false</default>
+                <label>ePremise</label>
+            </value>
+            <value>
+                <fullName>Retail</fullName>
+                <default>false</default>
+                <label>Retail</label>
+            </value>
+            <value>
+                <fullName>On Premise &amp; Integrated</fullName>
+                <default>false</default>
+                <label>On Premise &amp; Integrated</label>
+            </value>
+            <value>
+                <fullName>Non Retail</fullName>
+                <default>false</default>
+                <label>Non Retail</label>
+            </value>
+            <value>
+                <fullName>North-West</fullName>
+                <default>false</default>
+                <label>North-West</label>
+            </value>
+            <value>
+                <fullName>South-West</fullName>
+                <default>false</default>
+                <label>South-West</label>
+            </value>
+            <value>
+                <fullName>South-East</fullName>
+                <default>false</default>
+                <label>South-East</label>
+            </value>
+            <value>
+                <fullName>Central</fullName>
+                <default>false</default>
+                <label>Central</label>
+            </value>
+            <value>
+                <fullName>Warsaw</fullName>
+                <default>false</default>
+                <label>Warsaw</label>
+            </value>
+            <value>
+                <fullName>Karnataka</fullName>
+                <default>false</default>
+                <label>Karnataka</label>
+            </value>
+            <value>
+                <fullName>Hyderabad</fullName>
+                <default>false</default>
+                <label>Hyderabad</label>
+            </value>
+            <value>
+                <fullName>Mumbai 2</fullName>
+                <default>false</default>
+                <label>Mumbai 2</label>
+            </value>
+            <value>
+                <fullName>Delhi</fullName>
+                <default>false</default>
+                <label>Delhi</label>
+            </value>
+            <value>
+                <fullName>Pune</fullName>
+                <default>false</default>
+                <label>Pune</label>
+            </value>
+            <value>
+                <fullName>Mumbai</fullName>
+                <default>false</default>
+                <label>Mumbai</label>
+            </value>
+            <value>
+                <fullName>Goa</fullName>
+                <default>false</default>
+                <label>Goa</label>
+            </value>
+            <value>
+                <fullName>Maharashtra</fullName>
+                <default>false</default>
+                <label>Maharashtra</label>
+            </value>
+            <value>
+                <fullName>Uttar Pradesh</fullName>
+                <default>false</default>
+                <label>Uttar Pradesh</label>
+            </value>
+            <value>
+                <fullName>TELENGANA</fullName>
+                <default>false</default>
+                <label>TELENGANA</label>
+            </value>
+            <value>
+                <fullName>PONDICHERRY</fullName>
+                <default>false</default>
+                <label>PONDICHERRY</label>
+            </value>
+            <value>
+                <fullName>Haryana</fullName>
+                <default>false</default>
+                <label>Haryana</label>
+            </value>
+            <value>
+                <fullName>CHANDIGARH</fullName>
+                <default>false</default>
+                <label>CHANDIGARH</label>
+            </value>
+            <value>
+                <fullName>Arunachal Pradesh State</fullName>
+                <default>false</default>
+                <label>Arunachal Pradesh State</label>
+            </value>
+            <value>
+                <fullName>Delhi 2</fullName>
+                <default>false</default>
+                <label>Delhi 2</label>
+            </value>
+            <value>
+                <fullName>Maharashtra 2</fullName>
+                <default>false</default>
+                <label>Maharashtra 2</label>
+            </value>
+            <value>
+                <fullName>BKK1</fullName>
+                <default>false</default>
+                <label>BKK1</label>
+            </value>
+            <value>
+                <fullName>BKK2</fullName>
+                <default>false</default>
+                <label>BKK2</label>
+            </value>
+            <value>
+                <fullName>East/Lower NE</fullName>
+                <default>false</default>
+                <label>East/Lower NE</label>
+            </value>
+            <value>
+                <fullName>North/Upper NE</fullName>
+                <default>false</default>
+                <label>North/Upper NE</label>
+            </value>
+            <value>
+                <fullName>ON</fullName>
+                <default>false</default>
+                <label>ON</label>
+            </value>
+            <value>
+                <fullName>OFF NKA</fullName>
+                <default>false</default>
+                <label>OFF NKA</label>
+            </value>
+            <value>
+                <fullName>OFF WEST</fullName>
+                <default>false</default>
+                <label>OFF WEST</label>
+            </value>
+            <value>
+                <fullName>OFF EAST</fullName>
+                <default>false</default>
+                <label>OFF EAST</label>
+            </value>
+            <value>
+                <fullName>SALES PLANNING</fullName>
+                <default>false</default>
+                <label>SALES PLANNING</label>
+            </value>
+            <value>
+                <fullName>Regions - Korea</fullName>
+                <default>false</default>
+                <label>Regions - Korea</label>
+            </value>
+            <value>
+                <fullName>Seoul Capital Area</fullName>
+                <default>false</default>
+                <label>Seoul Capital Area</label>
+            </value>
+            <value>
+                <fullName>Off1</fullName>
+                <default>false</default>
+                <label>Off1</label>
+            </value>
+            <value>
+                <fullName>Off2</fullName>
+                <default>false</default>
+                <label>Off2</label>
+            </value>
+            <value>
+                <fullName>Wholesale</fullName>
+                <default>false</default>
+                <label>Wholesale</label>
+            </value>
+            <value>
+                <fullName>OnRegion</fullName>
+                <default>false</default>
+                <label>OnRegion</label>
+            </value>
+            <value>
+                <fullName>OnSeoul</fullName>
+                <default>false</default>
+                <label>OnSeoul</label>
+            </value>
+            <value>
+                <fullName>Commercial</fullName>
+                <default>false</default>
+                <label>Commercial</label>
+            </value>
+            <value>
+                <fullName>MKT</fullName>
+                <default>false</default>
+                <label>MKT</label>
+            </value>
+            <value>
+                <fullName>MT</fullName>
+                <default>false</default>
+                <label>MT</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

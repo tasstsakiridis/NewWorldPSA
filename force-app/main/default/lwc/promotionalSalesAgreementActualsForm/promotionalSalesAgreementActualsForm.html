@@ -66,6 +66,12 @@
                         <span class="slds-text-heading_medium">{productName}</span>
                     </lightning-layout-item>
                 </template>
+                <template if:false={canEdit}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <p class="slds-text-title_caps">{labels.product.label}</p>
+                        <span class="slds-text-heading_medium">{productName}</span>
+                    </lightning-layout-item>
+                </template>
                 <template lwc:if={canEdit}>
                     <template lwc:if={isNew}>
                         <lightning-layout-item size="12" padding="around-small" class="slds-m-top_small">

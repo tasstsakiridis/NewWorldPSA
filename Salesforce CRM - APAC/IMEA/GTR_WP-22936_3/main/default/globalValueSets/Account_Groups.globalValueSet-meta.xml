@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Bar / Pub</fullName>
+        <default>false</default>
+        <label>Bar / Pub</label>
+    </customValue>
+    <customValue>
+        <fullName>Clubs</fullName>
+        <default>false</default>
+        <label>Clubs</label>
+    </customValue>
+    <customValue>
+        <fullName>Department Store</fullName>
+        <default>false</default>
+        <label>Department Store</label>
+    </customValue>
+    <customValue>
+        <fullName>Hotel / Resort</fullName>
+        <default>false</default>
+        <label>Hotel / Resort</label>
+    </customValue>
+    <customValue>
+        <fullName>Hyper Market</fullName>
+        <default>false</default>
+        <label>Hyper Market</label>
+    </customValue>
+    <customValue>
+        <fullName>Liquor Store</fullName>
+        <default>false</default>
+        <label>Liquor Store</label>
+    </customValue>
+    <customValue>
+        <fullName>TOT</fullName>
+        <default>false</default>
+        <label>TOT</label>
+    </customValue>
+    <customValue>
+        <fullName>WithMeal</fullName>
+        <default>false</default>
+        <label>WithMeal</label>
+    </customValue>
+    <customValue>
+        <fullName>Hostess</fullName>
+        <default>false</default>
+        <label>Hostess</label>
+    </customValue>
+    <customValue>
+        <fullName>Hippop Club (HHC)</fullName>
+        <default>false</default>
+        <label>Hippop Club (HHC)</label>
+    </customValue>
+    <customValue>
+        <fullName>Mamasan</fullName>
+        <default>false</default>
+        <label>Mamasan</label>
+    </customValue>
+    <customValue>
+        <fullName>Night Club</fullName>
+        <default>false</default>
+        <label>Night Club</label>
+    </customValue>
+    <customValue>
+        <fullName>KTV</fullName>
+        <default>false</default>
+        <label>KTV</label>
+    </customValue>
+    <customValue>
+        <fullName>Influencers</fullName>
+        <default>false</default>
+        <label>Influencers</label>
+    </customValue>
+    <customValue>
+        <fullName>Mainstream</fullName>
+        <default>false</default>
+        <label>Mainstream</label>
+    </customValue>
+    <customValue>
+        <fullName>Premium</fullName>
+        <default>false</default>
+        <label>Premium</label>
+    </customValue>
+    <customValue>
+        <fullName>Super Premium</fullName>
+        <default>false</default>
+        <label>Super Premium</label>
+    </customValue>
+    <masterLabel>Account Groups</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>
