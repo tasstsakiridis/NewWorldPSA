@@ -44,6 +44,7 @@ public with sharing class Korea_PSA_Contract_Controller_Test {
             childAccount.ShippingCity = 'Korea';
             childAccount.ShippingPostalCode = 'G20 OTL';
             childAccount.ShippingCountry = 'Korea';
+            childAccount.Promotional_Budget__c = 1000000;
             insert childAccount;
 
             Contact contact1 = helper.createContact('Test KOR Child', 'Child Contact', childAccount.Id);
@@ -70,6 +71,7 @@ public with sharing class Korea_PSA_Contract_Controller_Test {
             psa1.Begin_Date__c = Date.today();
             psa1.End_Date__c = psa1.Begin_Date__c.addDays(10);
             psa1.Account__c = childAccount.Id;
+            psa1.Account_Promotional_Target_ROI__c = 1.2;
             psa1.Contact__c = contact1.Id;
             psa1.Wholesaler_Preferred__c = wholesaler1.Id;
             psa1.Wholesaler_Preferred_Name__c = wholesaler1.Name;
@@ -82,6 +84,10 @@ public with sharing class Korea_PSA_Contract_Controller_Test {
             psa1.Total_Listing_Fee__c = 100000;
             psa1.Activity_Budget__c = 100000;
             psa1.Date_Approved__c = Date.today();
+            psa1.Requires_Special_Approval__c = true;
+            psa1.Total_Fee__c = 1000000;
+            psa1.Total_Fee_Paid__c = 1100000;
+            psa1.Total_PSA_Actual_ROI__c = 1.4;
             
             Promotion_Activity__c[] l_PSA = new Promotion_Activity__c[]{psa1};
             insert l_PSA;
@@ -110,6 +116,7 @@ public with sharing class Korea_PSA_Contract_Controller_Test {
                         
             ApexPages.StandardController stdController = new ApexPages.StandardController(psa1);
             
+           
             Approval.ProcessSubmitRequest req1 = new Approval.ProcessSubmitRequest();
             req1.setComments('Submitting request');
             req1.setObjectId(psa1.Id);
@@ -127,7 +134,8 @@ public with sharing class Korea_PSA_Contract_Controller_Test {
 
             Korea_PSA_Contract_Controller contractController = new Korea_PSA_Contract_Controller();
             contractController.setThePSA(psa1);
-
+			Promotion_Activity__c thePSA = contractController.getThePSA();
+            
             Test.stopTest();
         }
     }

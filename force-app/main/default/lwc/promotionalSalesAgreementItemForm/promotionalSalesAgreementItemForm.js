@@ -1351,9 +1351,6 @@ export default class PromotionalSalesAgreementItemForm extends NavigationMixin(L
             }
             if (this.isKorea) {
                 fields[FIELD_PRODUCT_PRICE.fieldApiName] = this.product.Price__c == undefined ? 0 : this.product.Price__c;
-                fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.planGPper9LCase;
-            } else {
-                fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.thisProductGP;
             }
             fields[FIELD_PLAN_PSA_GROSS_PROFIT.fieldApiName] = this.thisProductGP;
 

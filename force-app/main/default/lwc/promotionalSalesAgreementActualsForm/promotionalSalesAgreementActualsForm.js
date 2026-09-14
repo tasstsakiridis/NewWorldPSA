@@ -642,10 +642,7 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
             }
         });
 
-<<<<<<< HEAD
         console.log('[actualsForm.setFieldOptions] rebates', this.rebates);
-=======
->>>>>>> bbe9f5b7b3f0a389596cdab4cc1d62ebb156b54a
         console.log('[actualsForm.setFieldOptions] finished loading field options.  pmiaId', this.pmiaId);
         //this.loadPSA();
 
@@ -682,12 +679,9 @@ export default class PromotionalSalesAgreementActualsForm extends NavigationMixi
                 this.processedDate = this.thePMIA.Processed_Date__c;
                 this.plannedFee = parseFloat(this.thePMIA.Activity__r.Planned_Fee__c);
                 this.feePaid = parseFloat(this.thePMIA.Activity__r.Total_Fee_Paid__c);
-<<<<<<< HEAD
                 if (this.thePMIA.Approval_Status__c == 'New' && this.thePMIA.Rebate_Type__c == 'Fee') {
                     this.feePaid -= parseFloat(this.thePMIA.Rebate_Amount__c);
                 }
-=======
->>>>>>> bbe9f5b7b3f0a389596cdab4cc1d62ebb156b54a
                 if (this.thePMIA.Promotion_Material_Item__c != null) {
                     this.plannedVolume = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Volume__c);
                     this.plannedDiscount = parseFloat(this.thePMIA.Promotion_Material_Item__r.Plan_Rebate__c);
