@@ -432,63 +432,6 @@ export default class PromotionalSalesAgreementActuals extends NavigationMixin(Li
                     return pmiTree;
                 });
 
-                let headerTree = {
-                    label: LABEL_FEE,
-                    name: promotionWithParentAccount.Id,
-                    disabled: false,
-                    expanded: this.expandedItems.indexOf(promotionWithParentAccount.Id) >= 0 || this.showExpandedActualsOnLoad,
-                    items: []
-                };
-                const headerActuals = this.actuals.filter(pmia => pmia.Promotion_Material_Item__c == null && pmia.Promotion__c == promotionWithParentAccount.Id);
-                console.log('[buildTree] headerActuals', headerActuals);
-                if (headerActuals) {
-                    headerActuals.forEach(actual => {
-                        const pd = new Date(actual.Payment_Date__c);
-                        let metatext = '';
-                        if (actual.Rebate_Type__c == 'Volume') {
-                            if (this.thePSA.Market__r.Capture_Volume_in_Bottles__c) {
-                                metatext += 'Actual Qty: ' + (actual.Act_Qty__c * actual.Product_Pack_Qty__c);
-                            } else {
-                                metatext += 'Actual Qty: ' + actual.Act_Qty__c;
-                            }
-                        } else {
-                            metatext += actual.Rebate_Type__c + ': ' + actual.Rebate_Amount__c;
-                        }
-                        let found = false;
-                        headerTree.items.forEach(item => {
-                            if (item.paymentDate == actual.Payment_Date__c) {
-                                found = true;
-                                item.items.push({
-                                    label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
-                                    metatext: metatext,
-                                    name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id + '_' + actual.Rebate_Type__c,
-                                    disabled: false,
-                                    expanded: this.showExpandedActualsOnLoad,
-                                    items: []    
-                                });
-                                return true;
-                            }
-                        });
-                        if (!found) {
-                            headerTree.items.push({
-                                paymentDate: actual.Payment_Date__c,
-                                label: pd.toLocaleDateString(userLocale, dateOptions),
-                                metatext: actual.Actual_Wholesaler__r == undefined ? '' : actual.Actual_Wholesaler__r.Name,
-                                name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id,
-                                disabled: false,
-                                expanded: this.showExpandedActualsOnLoad,
-                                items: [
-                                    { label: actual.Rebate_Type__c + ' - ' + actual.Approval_Status__c,
-                                        metatext: metatext,
-                                        name: 'promotion_'+promotionWithParentAccount.Id+'_pmia_'+actual.Id+'_'+actual.Rebate_Type__c,
-                                        disabled: false,
-                                        expanded: this.showExpandedActualsOnLoad,
-                                        items: []
-                                }]
-                            });
-                        }
-                    });
-                }                
                 accountTree.items = pmiItems;
 
                 if (this.thePSA.Market__r.Capture_Agreement_Level_Plan_Details__c) {
